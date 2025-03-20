@@ -1,0 +1,12 @@
+---
+- name: "Grow VM disk"
+  with_items: "{{ machines }}"
+  community.general.proxmox_disk:
+      api_host: "{{ api_host }}"
+      api_user: "{{ api_user }}"
+      api_password: "{{ api_password }}"
+      vmid: "{{ vm_map[item.name] }}"
+      disk: scsi0
+      size: "{{ item.size }}"
+      state: resized
+

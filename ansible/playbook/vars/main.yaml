@@ -1,0 +1,36 @@
+---
+# cloud-init image configuration
+image_url: "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img"
+image_dest: "/var/lib/vz/template/iso"
+image_name: "noble-server-cloudimg-amd64.img"
+
+
+# Proxmox API variables
+api_host: "{{ lookup('env', 'REMOTE_HOST') }}"
+api_user: "{{ lookup('env', 'PROXMOX_USER') }}"
+api_password: "{{ lookup('env', 'REMOTE_PASSWORD') }}"
+node_target: "{{ lookup('env', 'PROXMOX_NODE_TARGET') }}"
+
+# Proxmox template variables
+storage_target: "{{ lookup('env', 'PROXMOX_STORAGE_TARGET') }}"
+template_name: noble-ubuntu-cloudinit-template
+image_ostype: l26
+
+# VM configuration (looped over)
+machines:
+  - name: master4
+    size: 20G
+    tags: ["k3s"]
+    cores: 2
+    memory: 8192
+    ci_user: "{{ lookup('env', 'MASTER1_USER') }}"
+    ci_password: "{{ lookup('env', 'MASTER1_PASSWORD') }}"
+    ip_config: "ip=192.168.0.133/24,gw=192.168.0.1"
+  - name: master3
+    size: 20G
+    tags: ["k3s"]
+    cores: 2
+    memory: 8192
+    ci_user: "{{ lookup('env', 'MASTER1_USER') }}"
+    ci_password: "{{ lookup('env', 'MASTER1_PASSWORD') }}"
+    ip_config: "ip=192.168.0.134/24,gw=192.168.0.1"

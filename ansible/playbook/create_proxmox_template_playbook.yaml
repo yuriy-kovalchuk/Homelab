@@ -1,0 +1,7 @@
+---
+- name: Create a Proxmox VM template
+  hosts: localhost
+  vars_files:
+    - ./vars/main.yaml
+  roles:
+    - create_proxmox_template

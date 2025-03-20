@@ -1,0 +1,31 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.14.0/.schema/devbox.schema.json",
+  "packages": [
+    "ansible@2.18.1",
+    "python3",
+    "python3Packages.pip",
+    "python3Packages.proxmoxer",
+    "python3Packages.requests",
+    "python3Packages.urllib3",
+    "sshpass",
+    "gum@0.16.0",
+    "gettext@0.22.5",
+    "kubectl@1.32.2",
+    "kubernetes-helm@3.17.2"
+  ],
+  "shell": {
+    "init_hook": [
+      "chmod +x devbox_scripts/*",
+      "export $(cat .env | xargs)",
+      "echo Letsgoski letsgo!"
+    ],
+    "scripts": {
+      "test": [
+        "echo \"Error: no test specified\" && exit 1"
+      ],
+      "download_base_image_playbook":     "./devbox_scripts/download_cloud_init.sh",
+      "create_proxmox_template_playbook": "./devbox_scripts/create_vm_template.sh",
+      "create_proxmox_vm_playbook":       "./devbox_scripts/create_vm_from_template.sh"
+    }
+  }
+}

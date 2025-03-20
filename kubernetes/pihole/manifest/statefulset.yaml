@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: pihole
+  namespace: pihole
+spec:
+  serviceName: pihole
+  replicas: 2  # Adjust as needed
+  selector:
+    matchLabels:
+      app: pihole
+  template:
+    metadata:
+      labels:
+        app: pihole
+    spec:
+      containers:
+        - name: pihole
+          image: pihole/pihole:latest
+          securityContext:
+            capabilities:
+              add:
+                - NET_BIND_SERVICE  # Allow binding to privileged ports like 53
+          ports:
+            - containerPort: 53  # DNS UDP
+              protocol: UDP
+            - containerPort: 53  # DNS TCP
+              protocol: TCP
+            - containerPort: 80  # Web UI
+              protocol: TCP
+          env:
+            - name: TZ
+              value: "UTC+1"
+            - name: FTLCONF_webserver_api_password
+              value: "securepassword"
+            - name: FTLCONF_dns_listeningMode
+              value: "all"
+          volumeMounts:
+            - name: pihole-config
+              mountPath: /etc/pihole
+            - name: dnsmasq-config
+              mountPath: /etc/dnsmasq.d
+  volumeClaimTemplates:
+    - metadata:
+        name: pihole-config
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi  # Adjust as needed for your use case
+    - metadata:
+        name: dnsmasq-config
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi  # Adjust as needed for your use case

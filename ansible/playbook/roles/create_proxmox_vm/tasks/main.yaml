@@ -1,0 +1,4 @@
+---
+- import_tasks: create_vm.yaml
+- import_tasks: increase_disk_size.yaml
+- import_tasks: finalize_vm.yaml

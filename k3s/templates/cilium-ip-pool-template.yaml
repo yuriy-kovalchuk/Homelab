@@ -1,0 +1,8 @@
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: "$POOL_NAME"
+spec:
+  blocks:
+    - start: "$START_IP"
+      stop: "$STOP_IP"
