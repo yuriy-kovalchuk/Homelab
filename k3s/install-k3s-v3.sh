@@ -9,18 +9,18 @@ INGRESS_NGINX_VERSION="v1.12.0" # Adjust version as needed
 LONGHORN_VERSION="1.8.1"        # Adjust version as needed
 
 
-MAIN_MASTER_NODE="192.168.0.114"
 MASTER_USER="master"
-MASTER_NODES=("192.168.0.134")  # List of master node IP addresses
-WORKER_NODES=("192.168.0.133")  # List of worker node IP addresses
+MAIN_MASTER_NODE="192.168.0.10"
+MASTER_NODES=()  # List of master node IP addresses
+WORKER_NODES=("192.168.0.13" "192.168.0.14")  # List of worker node IP addresses
 
 K3S_CLUSTER_TOKEN="YOUR_CLUSTER_TOKEN"  # Replace with your desired K3s cluster token
 
 
 # Cilium IP Configuration
 export POOL_NAME="master-pool"
-export START_IP="192.168.0.70"
-export STOP_IP="192.168.0.90"
+export START_IP="192.168.0.50"
+export STOP_IP="192.168.0.99"
 export MAIN_MASTER_NODE=$MAIN_MASTER_NODE
 
 # kubeconfig
@@ -129,7 +129,7 @@ install_k3s_worker() {
         return 0
     fi
 
-    for NODE_IP in "$WORKER_NODES"; do
+    for NODE_IP in "${WORKER_NODES[@]}"; do 
         gum log --structured --level info "Installing k3s on the worker node" node $NODE_IP
         ssh $MASTER_USER@$NODE_IP "curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=$K3S_VERSION K3S_URL=https://$MAIN_MASTER_NODE:6443 K3S_TOKEN=$JOIN_TOKEN sh -s - agent --kubelet-arg node-status-update-frequency=5s"
     done

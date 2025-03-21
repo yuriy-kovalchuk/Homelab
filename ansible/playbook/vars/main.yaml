@@ -17,20 +17,30 @@ template_name: noble-ubuntu-cloudinit-template
 image_ostype: l26
 
 # VM configuration (looped over)
+# v1 range suggested for master nodes 192.168.0.10 - 192.168.0.12
+# v1 range suggested for workes nodes 192.168.0.13 - 192.168.0.20
 machines:
-  - name: master4
+  - name: master1
     size: 20G
+    tags: ["k3s"]
+    cores: 2
+    memory: 4096
+    ci_user: "{{ lookup('env', 'MASTER1_USER') }}"
+    ci_password: "{{ lookup('env', 'MASTER1_PASSWORD') }}"
+    ip_config: "ip=192.168.0.10/24,gw=192.168.0.1"
+  - name: worker1
+    size: 50G
     tags: ["k3s"]
     cores: 2
     memory: 8192
     ci_user: "{{ lookup('env', 'MASTER1_USER') }}"
     ci_password: "{{ lookup('env', 'MASTER1_PASSWORD') }}"
-    ip_config: "ip=192.168.0.133/24,gw=192.168.0.1"
-  - name: master3
-    size: 20G
+    ip_config: "ip=192.168.0.13/24,gw=192.168.0.1"
+  - name: worker2
+    size: 50G
     tags: ["k3s"]
     cores: 2
     memory: 8192
     ci_user: "{{ lookup('env', 'MASTER1_USER') }}"
     ci_password: "{{ lookup('env', 'MASTER1_PASSWORD') }}"
-    ip_config: "ip=192.168.0.134/24,gw=192.168.0.1"
+    ip_config: "ip=192.168.0.14/24,gw=192.168.0.1"

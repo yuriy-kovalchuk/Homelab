@@ -81,4 +81,4 @@ spec:
                 port:
                   number: 80
 ---
-# test example -> curl -v https://whoami.yuriy-lab.cloud --resolve whoami.yuriy-lab.cloud:443:192.168.0.70
+# test example -> curl -v https://whoami.yuriy-lab.cloud --resolve whoami.yuriy-lab.cloud:443:192.168.0.XXX
