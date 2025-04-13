@@ -4,24 +4,11 @@
 
 # Variables
 K3S_VERSION="v1.31.6+k3s1"      # Adjust version as needed
-CILIUM_VERSION="1.16.7"         # Adjust version as needed
-INGRESS_NGINX_VERSION="v1.12.0" # Adjust version as needed
-LONGHORN_VERSION="1.8.1"        # Adjust version as needed
-
-
 MASTER_USER="master"
-MAIN_MASTER_NODE="192.168.0.10"
+MAIN_MASTER_NODE="10.0.8.20"
 MASTER_NODES=()  # List of master node IP addresses
-WORKER_NODES=("192.168.0.13" "192.168.0.14")  # List of worker node IP addresses
-
+WORKER_NODES=("10.0.8.24")  # List of worker node IP addresses
 K3S_CLUSTER_TOKEN="YOUR_CLUSTER_TOKEN"  # Replace with your desired K3s cluster token
-
-
-# Cilium IP Configuration
-export POOL_NAME="master-pool"
-export START_IP="192.168.0.50"
-export STOP_IP="192.168.0.99"
-export MAIN_MASTER_NODE=$MAIN_MASTER_NODE
 
 # kubeconfig
 REMOTE_KUBECONFIG_PATH="/etc/rancher/k3s/k3s.yaml"  # Path to the Kubeconfig on the remote node
@@ -46,8 +33,6 @@ echo "=========================================="
 echo "🔹 Installation Mode:         $INSTALL_MODE"
 echo ""
 echo "🔹 K3s Version:               $K3S_VERSION"
-echo "🔹 Cilium Version:            $CILIUM_VERSION"
-echo "🔹 Ingress NGINX Version:     $INGRESS_NGINX_VERSION"
 echo ""
 echo "🔹 Main Master Node:          $MAIN_MASTER_NODE"
 echo "🔹 Master User:               $MASTER_USER"
@@ -55,9 +40,6 @@ echo "🔹 Master Nodes:              ${MASTER_NODES[*]}"
 echo "🔹 Worker Nodes:              ${WORKER_NODES[*]}"
 echo ""
 echo "🔹 K3s Cluster Token:         [HIDDEN]"
-echo ""
-echo "🔹 Cilium IP Pool:            $POOL_NAME"
-echo "🔹 Cilium IP Range:           $START_IP - $STOP_IP"
 echo ""
 echo "🔹 Remote Kubeconfig Path:    $REMOTE_KUBECONFIG_PATH"
 echo "🔹 Local Kubeconfig Path:     $LOCAL_KUBECONFIG_PATH"
@@ -160,29 +142,6 @@ install_cilium_cli() {
     '
 }
 
-
-# Install Cilium CNI from the main master node
-install_cilium_cni() {
-
-    if [ -z "$MAIN_MASTER_NODE" ]; then
-        gum log --structured --level error "No nodes provided, skipping the installation of the master node"
-        return 1
-    fi
-
-    gum log --structured --level info "Installing Cilium CNI on the target node" node $NODE_IP
-    ssh $MASTER_USER@$MAIN_MASTER_NODE "
-    export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-    cilium install \
-        --version $CILIUM_VERSION \
-        --set kubeProxyReplacement=true \
-        --set k8sServiceHost=$MAIN_MASTER_NODE \
-        --set k8sServicePort=6443
-    "
-
-  # Optionally, wait for Cilium to be ready on the first master node:
-  # ssh master@${MASTER_NODES[0]} "cilium status --wait"
-}
-
 # Install K3s on extra master nodes
 install_k3s_extra_master() {
     if [ -z "$MAIN_MASTER_NODE" ]; then
@@ -209,6 +168,8 @@ install_k3s_extra_master() {
     done
 }
 
+
+#TODO fix the merge process
 get_remote_kubeconfig() {
 
     mkdir -p "${HOME}/.kube"
@@ -254,70 +215,6 @@ taint_all_master_nodes() {
 }
 
 
-create_cilium_ip_pool() {
-    envsubst < templates/cilium-ip-pool-template.yaml | kubectl apply -f -
-}
-
-#TODO run on each master node
-cilium_l2_announcements() {
-    envsubst < templates/cilium-config.yaml > /tmp/cilium-config.yaml
-    scp /tmp/cilium-config.yaml ${MASTER_USER}@${MAIN_MASTER_NODE}:/tmp/cilium-config.yaml
-    ssh $MASTER_USER@$MAIN_MASTER_NODE "
-        export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-        cilium upgrade -f /tmp/cilium-config.yaml
-        rm /tmp/cilium-config.yaml
-    "
-    kubectl apply -f templates/cilium-announcements-template.yaml
-}
-
-install_ingress() {
-    # Check if the ingress-nginx namespace exists
-    if kubectl get namespace ingress-nginx &>/dev/null; then
-        gum log --structured --level info "Ingress NGINX is already installed. Skipping installation."
-    else
-        gum log --structured --level info "Installing Ingress NGINX..."
-        kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-$INGRESS_NGINX_VERSION/deploy/static/provider/cloud/deploy.yaml
-        kubectl patch svc ingress-nginx-controller -p "{\"spec\": {\"loadBalancerIP\": \"$START_IP\"}}" -n ingress-nginx
-    fi
-}
-
-install_cert_manager() {
-    #    - **Zone > DNS > Edit**
-    #    - **Zone > Zone > Read**
-    YOUR_CLOUDFLARE_API_TOKEN=$(gum input --cursor.foreground "#FF0" \
-        --prompt.foreground "#0FF" \
-        --placeholder "Your Cloudflare token:" \
-        --prompt "* " \
-        --width 80)
-
-    helm repo add jetstack https://charts.jetstack.io
-    helm repo update
-    helm upgrade --install cert-manager jetstack/cert-manager \
-      --namespace cert-manager \
-      --create-namespace \
-      --set installCRDs=true
-
-    kubectl delete secret cloudflare-api-token-secret -n cert-manager
-    kubectl create secret generic cloudflare-api-token-secret \
-      --namespace cert-manager \
-      --from-literal=api-token=$YOUR_CLOUDFLARE_API_TOKEN
-
-    kubectl apply -f templates/cert-manager-cluster-issuer.yaml
-
-    kubectl patch ingressclass nginx -p '{"metadata":{"annotations":{"cert-manager.io/cluster-issuer":"letsencrypt-dns"}}}'
-}
-
-install_longhorn() {
-    helm repo add longhorn https://charts.longhorn.io
-    helm repo update
-
-    helm upgrade --install longhorn longhorn/longhorn --namespace longhorn-system --create-namespace --version $LONGHORN_VERSION
-
-    #kubectl patch svc longhorn-frontend -n longhorn-system -p '{"spec": {"type": "ClusterIP"}}'
-    #kubectl patch svc longhorn-frontend -n longhorn-system -p '{"spec": {"type": "LoadBalancer"}}'
-
-}
-
 disable_swap
 
 install_k3s_single_master
@@ -337,18 +234,4 @@ fi
 
 get_remote_kubeconfig
 
-install_cilium_cli
-
-install_cilium_cni
-
 taint_all_master_nodes
-
-create_cilium_ip_pool
-
-cilium_l2_announcements
-
-install_ingress
-
-install_cert_manager
-
-install_longhorn

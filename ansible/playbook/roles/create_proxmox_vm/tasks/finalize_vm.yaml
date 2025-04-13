@@ -13,9 +13,12 @@
       tags: "{{ item.tags }}"
       cores: "{{ item.cores }}"
       memory: "{{ item.memory }}"
+      bios: "seabios"
       ciuser: "{{ item.ci_user }}"
       cipassword: "{{ item.ci_password }}"
       ipconfig:
           ipconfig0: "{{ item.ip_config }}"
       sshkeys: "{{ ssh_key_path }}"
+      net:
+          net0: "{{ item.vmbr }}"
       update: true

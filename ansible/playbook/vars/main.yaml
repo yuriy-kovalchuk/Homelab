@@ -20,27 +20,21 @@ image_ostype: l26
 # v1 range suggested for master nodes 192.168.0.10 - 192.168.0.12
 # v1 range suggested for workes nodes 192.168.0.13 - 192.168.0.20
 machines:
-  - name: master1
+  - name: node1
     size: 20G
     tags: ["k3s"]
     cores: 2
-    memory: 4096
+    memory: 8196
     ci_user: "{{ lookup('env', 'MASTER1_USER') }}"
     ci_password: "{{ lookup('env', 'MASTER1_PASSWORD') }}"
-    ip_config: "ip=192.168.0.10/24,gw=192.168.0.1"
-  - name: worker1
-    size: 50G
+    ip_config: "ip=10.0.8.20/24,gw=10.0.8.1"
+    vmbr: "virtio,bridge=vmbr8"
+  - name: node2
+    size: 20G
     tags: ["k3s"]
     cores: 2
-    memory: 8192
+    memory: 8196
     ci_user: "{{ lookup('env', 'MASTER1_USER') }}"
     ci_password: "{{ lookup('env', 'MASTER1_PASSWORD') }}"
-    ip_config: "ip=192.168.0.13/24,gw=192.168.0.1"
-  - name: worker2
-    size: 50G
-    tags: ["k3s"]
-    cores: 2
-    memory: 8192
-    ci_user: "{{ lookup('env', 'MASTER1_USER') }}"
-    ci_password: "{{ lookup('env', 'MASTER1_PASSWORD') }}"
-    ip_config: "ip=192.168.0.14/24,gw=192.168.0.1"
+    ip_config: "ip=10.0.8.24/24,gw=10.0.8.1"
+    vmbr: "virtio,bridge=vmbr8"

@@ -9,7 +9,7 @@
     node: "{{ node_target }}"
     name: "{{ template_name }}"
     vmid: 50000
-    bios: ovmf
+    bios: "seabios"
     boot: 'order=scsi0'
     cores: 1
     sockets: 1
@@ -29,5 +29,5 @@
     ide:
         ide2: "{{ storage_target }}:cloudinit,format=raw"
     net:
-        net0: 'virtio,bridge=vmbr0'
+        net0: 'virtio,bridge=vmbr8'
     template: true
