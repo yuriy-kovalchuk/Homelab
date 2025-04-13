@@ -12,7 +12,7 @@ install_longhorn() {
     helm upgrade --install longhorn longhorn/longhorn --namespace longhorn-system --create-namespace --version $LONGHORN_VERSION --wait
 
     #kubectl patch svc longhorn-frontend -n longhorn-system -p '{"spec": {"type": "ClusterIP"}}'
-    #kubectl patch svc longhorn-frontend -n longhorn-system -p '{"spec": {"type": "LoadBalancer"}}'
+    kubectl patch svc longhorn-frontend -n longhorn-system -p '{"spec": {"type": "LoadBalancer"}}'
 
 }
 

@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
         - name: pihole
-          image: pihole/pihole:latest
+#          image: pihole/pihole:2025.04.0
+          image: pihole/pihole:2024.07.0
           securityContext:
             capabilities:
               add:
@@ -32,14 +33,14 @@ spec:
             - name: TZ
               value: "UTC+1"
             - name: FTLCONF_webserver_api_password
-              value: "securepassword"
+              value: "$PIHOLE_WEB_PASSWORD"
+            - name: WEBPASSWORD
+              value: "$PIHOLE_WEB_PASSWORD"
             - name: FTLCONF_dns_listeningMode
               value: "all"
           volumeMounts:
             - name: pihole-config
               mountPath: /etc/pihole
-            - name: dnsmasq-config
-              mountPath: /etc/dnsmasq.d
   volumeClaimTemplates:
     - metadata:
         name: pihole-config
@@ -49,11 +50,5 @@ spec:
         resources:
           requests:
             storage: 1Gi  # Adjust as needed for your use case
-    - metadata:
-        name: dnsmasq-config
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: 1Gi  # Adjust as needed for your use case
+
+

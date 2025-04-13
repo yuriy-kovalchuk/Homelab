@@ -17,6 +17,7 @@ spec:
       port: 80
       protocol: TCP
   type: LoadBalancer
+  loadBalancerIP: "$PIHOLE_FIRST_IP"
 ---
 apiVersion: v1
 kind: Service
@@ -37,3 +38,23 @@ spec:
       port: 80
       protocol: TCP
   type: LoadBalancer
+  loadBalancerIP: "$PIHOLE_SECOND_IP"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pihole-svc
+  namespace: pihole
+spec:
+  selector:
+    app: pihole
+  ports:
+    - name: dns-udp
+      port: 53
+      protocol: UDP
+    - name: dns-tcp
+      port: 53
+      protocol: TCP
+  type: LoadBalancer
+  loadBalancerIP: "$PIHOLE_LB"
+
