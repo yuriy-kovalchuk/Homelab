@@ -1,0 +1,20 @@
+namespaceOverride: argo-cd
+
+redis-ha:
+  enabled: false
+
+controller:
+  replicas: 1
+
+server:
+  replicas: 2
+
+repoServer:
+  replicas: 2
+
+applicationSet:
+  replicas: 2
+
+configs:
+  params:
+    server.insecure: true

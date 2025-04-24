@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gitea-ingress
+  namespace: gitea
+  labels:
+    app.kubernetes.io/name: gitea
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-dns
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - gitea.yuriy-lab.cloud
+    secretName: gitea-lab-tls
+  rules:
+    - host: "gitea.yuriy-lab.cloud"
+      http:
+        paths:
+          - path: "/"
+            pathType: Prefix
+            backend:
+              service:
+                name: gitea-http
+                port:
+                  number: 3000
