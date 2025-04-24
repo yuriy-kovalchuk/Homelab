@@ -13,7 +13,6 @@ spec:
     helm:
       valueFiles:
         - values.yaml
-        - ingress.yaml
   destination:
     server: https://kubernetes.default.svc   # Kubernetes cluster to deploy to
     namespace: rancher                # Namespace where Rancher will be installed

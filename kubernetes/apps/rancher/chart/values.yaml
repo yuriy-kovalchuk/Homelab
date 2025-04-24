@@ -3,4 +3,5 @@ rancher:
     ingress:
         enabled: false
     replicas: 1
+    bootstrapPassword: "password"
 
