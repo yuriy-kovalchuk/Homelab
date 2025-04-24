@@ -1,0 +1,14 @@
+apiVersion: v2
+name: rancher
+description: Rancher installation
+
+type: application
+
+version: 0.1.0
+
+appVersion: 2.10.3
+
+dependencies:
+    - name: rancher
+      version: 2.10.3
+      repository: https://releases.rancher.com/server-charts/stable
