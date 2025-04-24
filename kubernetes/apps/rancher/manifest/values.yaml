@@ -1,0 +1,8 @@
+hostname: "rancher.yuriy-lab.cloud"
+
+
+ingress:
+    enabled: false
+
+replicas: 1
+
