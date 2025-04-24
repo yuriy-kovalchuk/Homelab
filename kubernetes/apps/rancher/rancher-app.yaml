@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default             # Argo CD project; "default" if you're not using custom projects
   source:
-    repoURL: https://gitea.yuriy-lab.cloud/yuriy/Homelab
+    repoURL: https://gitea-http/yuriy/Homelab
     path: kubernetes/apps/rancher/chart
     targetRevision: HEAD
     helm:
