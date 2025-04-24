@@ -1,17 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: rancher                # Name of the Argo CD app (visible in Argo CD UI)
+  name: homepage                # Name of the Argo CD app (visible in Argo CD UI)
   namespace: argo-cd            # Namespace where Argo CD is installed
 spec:
   project: default             # Argo CD project; "default" if you're not using custom projects
   source:
     repoURL: http://gitea-http.gitea.svc.cluster.local:3000/yuriy/Homelab
-    path: kubernetes/apps/homepage/chart
+    path: kubernetes/apps/homepage/manifest
     targetRevision: HEAD
   destination:
     server: https://kubernetes.default.svc   # Kubernetes cluster to deploy to
-    namespace: rancher                # Namespace where Rancher will be installed
+    namespace: homepage                # Namespace where Rancher will be installed
   syncPolicy:
     automated:                         # Enables auto-sync (GitOps!)
       selfHeal: true                   # Auto-correct drift between live & desired state
