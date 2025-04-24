@@ -30,7 +30,7 @@ machines:
     ip_config: "ip=10.0.8.20/24,gw=10.0.8.1"
     vmbr: "virtio,bridge=vmbr8"
   - name: node2
-    size: 20G
+    size: 40G
     tags: ["k3s"]
     cores: 2
     memory: 8196
