@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager
+  namespace: argo-cd
+spec:
+  destination:
+    name: 'cert-manager'
+    namespace: cert-manager
+    server: https://kubernetes.default.svc
+  source:
+    repoURL: http://gitea-http.gitea.svc.cluster.local:3000/yuriy/Homelab
+    targetRevision: HEAD
+    path: kubernetes/apps/cert-manager/manifest
+    helm:
+      values: |
+        installCRDs: true
+        global.namespace: cert-manager
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

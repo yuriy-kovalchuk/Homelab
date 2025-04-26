@@ -1,14 +1,12 @@
 apiVersion: v2
 name: cert-manager
-description: Cert Manager
+description: A Helm chart for cert-manager, ClusterIssuer, and Sealed Secrets
 
 type: application
-
 version: 0.1.0
-
-appVersion: 2.10.3
+appVersion: "v1.17.1"
 
 dependencies:
-    - name: rancher
-      version: 2.10.3
-      repository: https://releases.rancher.com/server-charts/stable
+  - name: cert-manager
+    version: "v1.17.1"              # Specify the version of cert-manager you want
+    repository: https://charts.jetstack.io   # Jetstack's Helm repository
