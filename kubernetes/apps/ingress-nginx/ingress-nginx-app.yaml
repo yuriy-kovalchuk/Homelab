@@ -2,17 +2,15 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: ingress-nginx
-  namespace: argo-cd # assumes Argo CD is installed in 'argocd' namespace
+  namespace: argo-cd
 spec:
   project: default
   source:
-    repoURL: https://kubernetes.github.io/ingress-nginx
-    chart: ingress-nginx
-    targetRevision: 4.12.1
-    helm:
-      parameters:
-        - name: controller.service.loadBalancerIP
-          value: "10.0.8.100"
+    repoURL: http://gitea-http.gitea.svc.cluster.local:3000/yuriy/Homelab
+    path: kubernetes/apps/ingress-nginx/manifest
+    targetRevision: HEAD
+    plugin:
+      name: kustomize
   destination:
     server: https://kubernetes.default.svc
     namespace: ingress-nginx
