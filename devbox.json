@@ -11,7 +11,8 @@
     "gum@0.16.0",
     "gettext@0.22.5",
     "kubectl@1.32.2",
-    "kubernetes-helm@3.17.2"
+    "kubernetes-helm@3.17.2",
+    "kubeseal@0.29.0"
   ],
   "shell": {
     "init_hook": [

@@ -17,7 +17,7 @@ spec:
       port: 80
       protocol: TCP
   type: LoadBalancer
-  loadBalancerIP: "$PIHOLE_FIRST_IP"
+  loadBalancerIP: "10.0.8.153"
 ---
 apiVersion: v1
 kind: Service
@@ -38,7 +38,7 @@ spec:
       port: 80
       protocol: TCP
   type: LoadBalancer
-  loadBalancerIP: "$PIHOLE_SECOND_IP"
+  loadBalancerIP: "10.0.8.154"
 ---
 apiVersion: v1
 kind: Service
@@ -56,5 +56,5 @@ spec:
       port: 53
       protocol: TCP
   type: LoadBalancer
-  loadBalancerIP: "$PIHOLE_LB"
+  loadBalancerIP: "10.0.8.152"
 
