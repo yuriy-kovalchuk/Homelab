@@ -6,9 +6,19 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: http://gitea-http.gitea.svc.cluster.local:3000/yuriy/Homelab
-    path: kubernetes/apps/ingress-nginx/manifest
-    targetRevision: HEAD
+    repoURL: https://kubernetes.github.io/ingress-nginx
+    chart: ingress-nginx
+    targetRevision: 4.12.1
+    helm:
+      parameters:
+        - name: controller.service.loadBalancerIP
+          value: "10.0.8.100"
+        - name: controller.ingressClassResource.default
+          value: "true"
+        - name: controller.ingressClassResource.annotations.cert-manager\.io/cluster-issuer
+          value: "letsencrypt-dns"
+        - name: controller.ingressClassResource.annotations.test
+          value: "owo"
   destination:
     server: https://kubernetes.default.svc
     namespace: ingress-nginx
