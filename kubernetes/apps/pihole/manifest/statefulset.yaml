@@ -30,7 +30,7 @@ spec:
             - containerPort: 80  # Web UI
               protocol: TCP
           env:
-            name: TZ
+            - name: TZ
               value: "UTC+1"
             - name: FTLCONF_webserver_api_password
               valueFrom:
