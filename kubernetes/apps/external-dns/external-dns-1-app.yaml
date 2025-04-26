@@ -30,8 +30,8 @@ spec:
           - name: PIHOLE_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: external-dns-password
-                key: password
+                name: pihole-password
+                key: PIHOLE_WEB_PASSWORD
   destination:
     server: https://kubernetes.default.svc
     namespace: pihole
