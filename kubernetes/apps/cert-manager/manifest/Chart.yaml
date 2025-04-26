@@ -1,5 +1,5 @@
 apiVersion: v2
-name: cert-manager
+name: cert-manager-yk
 description: A Helm chart for cert-manager, ClusterIssuer, and Sealed Secrets
 
 type: application
