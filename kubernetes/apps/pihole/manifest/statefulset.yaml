@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: pihole
-#          image: pihole/pihole:2025.04.0
+          #          image: pihole/pihole:2025.04.0
           image: pihole/pihole:2024.07.0
           securityContext:
             capabilities:

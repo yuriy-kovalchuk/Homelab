@@ -1,0 +1,25 @@
+#helm install -n monitoring prometheus prometheus-community/kube-prometheus-stack -f values.yaml
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+    name: grafana-prometheus                # Name of the Argo CD app (visible in Argo CD UI)
+    namespace: argo-cd            # Namespace where Argo CD is installed
+spec:
+    project: default             # Argo CD project; "default" if you're not using custom projects
+    source:
+        repoURL: https://prometheus-community.github.io/helm-charts
+        chart: kube-prometheus-stack
+        targetRevision: 70.10.0       # version of the Helm chart
+        helm:
+            valueFiles:
+                - https://your-git-repo-url/raw/main/path/to/values.yaml
+    destination:
+        server: https://kubernetes.default.svc   # Kubernetes cluster to deploy to
+        namespace: monitoring                # Namespace where Rancher will be installed
+    syncPolicy:
+        automated: # Enables auto-sync (GitOps!)
+            selfHeal: true                   # Auto-correct drift between live & desired state
+            prune: true                      # Remove resources that are no longer in Git
+        syncOptions:
+            - CreateNamespace=true
