@@ -32,7 +32,7 @@ spec:
           emptyDir: {}
       initContainers:
         - name: config-renderer
-          image: busybox:1.36
+          image: alpine:latest
           command:
             - /bin/sh
             - -c
