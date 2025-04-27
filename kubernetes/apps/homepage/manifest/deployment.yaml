@@ -40,6 +40,7 @@ spec:
               set -e
               mkdir -p /generated
               # List of files to process
+              apk add --no-cache gettext # Ensure gettext is installed, which includes envsubst
               for file in services.yaml settings.yaml bookmarks.yaml widgets.yaml docker.yaml kubernetes.yaml; do
                 if [ -f "/config/$file" ]; then
                   echo "Processing $file"
