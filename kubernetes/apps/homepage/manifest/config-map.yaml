@@ -77,7 +77,7 @@ data:
               href: https://gitea.yuriy-lab.cloud
               description: YK Gitea instance
           - ArgoCD:
-              icon: argocd.svg
+              icon: argo-cd.svg
               href: https://argocd.yuriy-lab.cloud
               description: YK ArgoCD intance
     widgets.yaml: |
