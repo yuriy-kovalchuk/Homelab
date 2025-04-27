@@ -1,0 +1,44 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: portainer
+  namespace: argo-cd
+spec:
+  project: default  # Use your desired Argo CD project
+  source:
+    repoURL: https://portainer.github.io/k8s/  # Helm chart repository URL for Portainer
+    targetRevision: "1.0.64"
+    chart: portainer  # Helm chart name
+    helm:
+      parameters:
+        - name: service.type
+          value: ClusterIP
+        - name: tls.force
+          value: "true"
+        - name: image.tag
+          value: lts
+        - name: ingress.enabled
+          value: "true"
+        - name: ingress.ingressClassName
+          value: "nginx"
+        - name: ingress.annotations.nginx\.ingress\.kubernetes\.io/backend-protocol
+          value: HTTPS
+        - name: ingress.annotations.cert-manager\.io/cluster-issuer
+          value: letsencrypt-dns
+        - name: ingress.tls[0].hosts[0]
+          value: "portainer.yuriy-lab.cloud"
+        - name: ingress.tls[0].secretName
+          value: "portainer-ingress-tls"
+        - name: ingress.hosts[0].host
+          value: "portainer.yuriy-lab.cloud"
+        - name: ingress.hosts[0].paths[0].path
+          value: "/"
+  destination:
+    server: https://kubernetes.default.svc  # This is the default Kubernetes server
+    namespace: portainer  # Namespace where the app will be installed
+  syncPolicy:
+    automated:
+      prune: true  # Enable pruning of resources when they are removed from the app definition
+      selfHeal: true  # Automatically heal the application if there are drifted resources
+    syncOptions:
+      - CreateNamespace=true

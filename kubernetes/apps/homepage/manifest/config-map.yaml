@@ -60,7 +60,7 @@ data:
       - Containers:
           - Portainer:
               icon: portainer.svg
-              href: "{{HOMEPAGE_VAR_PORTAINER_URL}}"
+              href: "https://portainer.yuriy-lab.cloud"
               description: docker
       - Network:
           - PfSense:
