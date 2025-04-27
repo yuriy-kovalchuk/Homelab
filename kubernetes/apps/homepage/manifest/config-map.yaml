@@ -44,22 +44,24 @@ data:
     custom.js: ""
     bookmarks.yaml: ""
     services.yaml: |
-      - Hypervisor:
+      - Core:
           - Proxmox:
               icon: proxmox.svg
-              href: "$HOMEPAGE_PROXMOX_NODE1_URL"
+              href: "https://10.0.0.2:8006"
               description: node1
-              widget:
-                  type: proxmox
-                  url: "$HOMEPAGE_PROXMOX_NODE1_URL"
-                  username: "$HOMEPAGE_PROXMOX_NODE1_USER"
-                  password: "$HOMEPAGE_PROXMOX_NODE1_PASSWORD"
-                  node: node1
-      - Containers:
+          - Pi-Hole-0:
+              icon: pi-hole.svg
+              href: "https://pihole-0.yuriy-lab.cloud"
+              description: pihole-0
+          - Pi-Hole-1:
+              icon: pi-hole.svg
+              href: "https://pihole-1.yuriy-lab.cloud"
+              description: pihole-1
           - Longhorn:
               icon: longhorn.svg
-              href: "{{HOMEPAGE_VAR_LONGHORN_URL}}"
+              href: "http://10.0.8.102/#/dashboard"
               description: k8s storage
+      - Containers:
           - Portainer:
               icon: portainer.svg
               href: "{{HOMEPAGE_VAR_PORTAINER_URL}}"
@@ -69,23 +71,6 @@ data:
                   url: "{{HOMEPAGE_VAR_PORTAINER_URL}}"
                   env: 2
                   key: "{{HOMEPAGE_VAR_PORTAINER_API_KEY}}"
-      - DNS:
-          - Pi-Hole-0:
-              icon: pi-hole.svg
-              href: "{{HOMEPAGE_VAR_PIHOLE_URL_1}}"
-              description: quasar
-              widget:
-                  type: pihole
-                  url: "{{HOMEPAGE_VAR_PIHOLE_URL_1}}"
-                  key: "{{HOMEPAGE_VAR_PIHOLE_API_KEY_1}}"
-          - Pi-Hole-1:
-              icon: pi-hole.svg
-              href: "{{HOMEPAGE_VAR_PIHOLE_URL_2}}"
-              description: blazar
-              widget:
-                  type: pihole
-                  url: "{{HOMEPAGE_VAR_PIHOLE_URL_2}}"
-                  key: "{{HOMEPAGE_VAR_PIHOLE_API_KEY_2}}"
       - Network:
           - UniFi:
               icon: unifi.svg
