@@ -20,15 +20,11 @@ data:
       color: slate
       useEqualHeights: true
       layout:
-        Hypervisor:
+        Core:
           header: true
           style: row
           columns: 4
         Containers:
-          header: true
-          style: row
-          columns: 4
-        DNS:
           header: true
           style: row
           columns: 4
@@ -51,11 +47,11 @@ data:
               description: node1
           - Pi-Hole-0:
               icon: pi-hole.svg
-              href: "https://pihole-0.yuriy-lab.cloud"
+              href: "https://pihole-0.yuriy-lab.cloud/admin"
               description: pihole-0
           - Pi-Hole-1:
               icon: pi-hole.svg
-              href: "https://pihole-1.yuriy-lab.cloud"
+              href: "https://pihole-1.yuriy-lab.cloud/admin"
               description: pihole-1
           - Longhorn:
               icon: longhorn.svg
