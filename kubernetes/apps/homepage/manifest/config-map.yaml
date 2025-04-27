@@ -51,7 +51,7 @@ data:
               description: node1
               widget:
                   type: proxmox
-                  url: "$HOMEPAGE_PROXMOX_NODE1_URL$"
+                  url: "$HOMEPAGE_PROXMOX_NODE1_URL"
                   username: "{{HOMEPAGE_PROXMOX_NODE1_USER}}"
                   password: "{{HOMEPAGE_PROXMOX_NODE1_PASSWORD}}"
                   node: node1

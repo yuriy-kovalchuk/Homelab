@@ -22,6 +22,40 @@ spec:
       automountServiceAccountToken: true
       dnsPolicy: ClusterFirst
       enableServiceLinks: true
+      volumes:
+        - name: homepage-config
+          configMap:
+            name: homepage
+        - name: generated-config
+          emptyDir: {}   # New: where initContainer will write the final rendered config
+        - name: logs
+          emptyDir: {}
+      initContainers:
+        - name: config-renderer
+          image: busybox:1.36
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              mkdir -p /generated
+              # List of files to process
+              for file in services.yaml settings.yaml bookmarks.yaml widgets.yaml docker.yaml kubernetes.yaml; do
+                if [ -f "/config/$file" ]; then
+                  echo "Processing $file"
+                  envsubst < "/config/$file" > "/generated/$file"
+                fi
+              done
+              cp /config/custom.css /generated/custom.css
+              cp /config/custom.js /generated/custom.js
+          envFrom:
+            - secretRef:
+                name: homepage-secrets
+          volumeMounts:
+            - name: homepage-config
+              mountPath: /config
+            - name: generated-config
+              mountPath: /generated
       containers:
         - name: homepage
           image: "ghcr.io/gethomepage/homepage:latest"
@@ -38,34 +72,28 @@ spec:
               protocol: TCP
           volumeMounts:
             - mountPath: /app/config/custom.js
-              name: homepage-config
+              name: generated-config
               subPath: custom.js
             - mountPath: /app/config/custom.css
-              name: homepage-config
+              name: generated-config
               subPath: custom.css
             - mountPath: /app/config/bookmarks.yaml
-              name: homepage-config
+              name: generated-config
               subPath: bookmarks.yaml
             - mountPath: /app/config/docker.yaml
-              name: homepage-config
+              name: generated-config
               subPath: docker.yaml
             - mountPath: /app/config/kubernetes.yaml
-              name: homepage-config
+              name: generated-config
               subPath: kubernetes.yaml
             - mountPath: /app/config/services.yaml
-              name: homepage-config
+              name: generated-config
               subPath: services.yaml
             - mountPath: /app/config/settings.yaml
-              name: homepage-config
+              name: generated-config
               subPath: settings.yaml
             - mountPath: /app/config/widgets.yaml
-              name: homepage-config
+              name: generated-config
               subPath: widgets.yaml
             - mountPath: /app/config/logs
               name: logs
-      volumes:
-        - name: homepage-config
-          configMap:
-            name: homepage
-        - name: logs
-          emptyDir: {}
