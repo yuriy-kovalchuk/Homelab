@@ -52,8 +52,8 @@ data:
               widget:
                   type: proxmox
                   url: "$HOMEPAGE_PROXMOX_NODE1_URL"
-                  username: "{{HOMEPAGE_PROXMOX_NODE1_USER}}"
-                  password: "{{HOMEPAGE_PROXMOX_NODE1_PASSWORD}}"
+                  username: "$HOMEPAGE_PROXMOX_NODE1_USER"
+                  password: "$HOMEPAGE_PROXMOX_NODE1_PASSWORD"
                   node: node1
       - Containers:
           - Longhorn:
