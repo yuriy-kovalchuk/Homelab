@@ -26,6 +26,9 @@ spec:
         - name: homepage
           image: "ghcr.io/gethomepage/homepage:latest"
           imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: homepage-secrets
           env:
             - name: HOMEPAGE_ALLOWED_HOSTS
               value: homepage.yuriy-lab.cloud
