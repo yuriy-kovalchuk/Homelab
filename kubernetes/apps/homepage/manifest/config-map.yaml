@@ -32,7 +32,7 @@ data:
           header: true
           style: row
           columns: 4
-        Other:
+        Git:
           header: true
           style: row
           columns: 4
@@ -62,46 +62,24 @@ data:
               icon: portainer.svg
               href: "{{HOMEPAGE_VAR_PORTAINER_URL}}"
               description: docker
-              widget:
-                  type: portainer
-                  url: "{{HOMEPAGE_VAR_PORTAINER_URL}}"
-                  env: 2
-                  key: "{{HOMEPAGE_VAR_PORTAINER_API_KEY}}"
       - Network:
-          - UniFi:
-              icon: unifi.svg
-              href: "{{HOMEPAGE_VAR_UNIFI_NETWORK_URL}}"
-              description: network
-              widget:
-                  type: unifi
-                  url: "{{HOMEPAGE_VAR_UNIFI_NETWORK_URL}}"
-                  username: "{{HOMEPAGE_VAR_UNIFI_NETWORK_USERNAME}}"
-                  password: "{{HOMEPAGE_VAR_UNIFI_NETWORK_PASSWORD}}"
+          - PfSense:
+              icon: pfsense.svg
+              href: "https://10.0.0.1"
+              description: PfSense
           - Uptime Kuma:
               icon: uptime-kuma.svg
               href: "{{HOMEPAGE_VAR_UPTIME_KUMA_URL}}"
               description: internal
-              widget:
-                  type: uptimekuma
-                  url: "{{HOMEPAGE_VAR_UPTIME_KUMA_URL}}"
-                  slug: home
-          - Uptime Robot:
-              icon: https://play-lh.googleusercontent.com/cUrv0t00FYQ1GKLuOTvv8qjo1lSDjqZC16IOp3Fb6ijew6Br5m4o16HhDp0GBu_Bw8Y=w240-h480-rw
-              href: https://uptimerobot.com/dashboard
-              description: external
-              widget:
-                  type: uptimerobot
-                  url: https://api.uptimerobot.com
-                  key: "{{HOMEPAGE_VAR_UPTIME_ROBOT_API_KEY}}"
-      - Other:
-          - GitLab:
-              icon: gitlab.svg
-              href: https://gitlab.com
-              description: source code
-          - GitHub:
-              icon: github.svg
-              href: https://github.com
-              description: source cod
+      - Git:
+          - Gitea:
+              icon: gitea.svg
+              href: https://gitea.yuriy-lab.cloud
+              description: YK Gitea instance
+          - ArgoCD:
+              icon: argocd.svg
+              href: https://argocd.yuriy-lab.cloud
+              description: YK ArgoCD intance
     widgets.yaml: |
       - datetime:
           text_size: xl
