@@ -13,7 +13,7 @@ spec:
         targetRevision: 70.10.0       # version of the Helm chart
         helm:
             valueFiles:
-                - https://your-git-repo-url/raw/main/path/to/values.yaml
+                - http://gitea-http.gitea.svc.cluster.local:3000/yuriy/Homelab/raw/kubernetes/apps/grafana-prometheus/manifest/values.yaml
     destination:
         server: https://kubernetes.default.svc   # Kubernetes cluster to deploy to
         namespace: monitoring                # Namespace where Rancher will be installed
