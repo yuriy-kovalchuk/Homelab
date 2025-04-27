@@ -12,6 +12,8 @@ spec:
         chart: kube-prometheus-stack
         targetRevision: 70.10.0       # version of the Helm chart
         helm:
+            values: |
+                installCRDs: true
             valueFiles:
                 - http://gitea-http.gitea.svc.cluster.local:3000/yuriy/Homelab/raw/kubernetes/apps/grafana-prometheus/manifest/values.yaml
     destination:
