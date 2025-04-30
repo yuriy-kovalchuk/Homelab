@@ -5,7 +5,7 @@ metadata:
   namespace: pihole-v6
 spec:
   serviceName: pihole-v6
-  replicas: 2  # Adjust as needed
+  replicas: 2
   selector:
     matchLabels:
       app: pihole-v6
@@ -14,19 +14,29 @@ spec:
       labels:
         app: pihole-v6
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - pihole-v6
+              topologyKey: "kubernetes.io/hostname"
       containers:
         - name: pihole
           image: pihole/pihole:2025.04.0
           securityContext:
             capabilities:
               add:
-                - NET_BIND_SERVICE  # Allow binding to privileged ports like 53
+                - NET_BIND_SERVICE
           ports:
-            - containerPort: 53  # DNS UDP
+            - containerPort: 53
               protocol: UDP
-            - containerPort: 53  # DNS TCP
+            - containerPort: 53
               protocol: TCP
-            - containerPort: 80  # Web UI
+            - containerPort: 80
               protocol: TCP
           env:
             - name: TZ
@@ -54,6 +64,4 @@ spec:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 1Gi  # Adjust as needed for your use case
-
-
+            storage: 1Gi
