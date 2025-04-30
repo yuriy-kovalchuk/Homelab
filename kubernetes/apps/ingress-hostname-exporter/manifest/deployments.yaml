@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: my-go-app
+    namespace: pihole-v6
+    labels:
+        app: ingress-exporter
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: ingress-exporter
+    template:
+        metadata:
+            labels:
+                app: ingress-exporter
+        spec:
+            serviceAccountName: ingress-exporter-sa   # Use the ServiceAccount
+            containers:
+                - name: ingress-exporter
+                  image: yuriykovalchuk92/ingress-exporter:latest
+                  imagePullPolicy: Always
+                  env:
+                      - name: PIHOLE_PASSWORD
+                        valueFrom:
+                            secretKeyRef:
+                              name: pihole-v6-password
+                              key: PIHOLE_WEB_PASSWORD
+                      - name: PIHOLE_ENDPOINTS
+                        value: "http://pihole-v6-0-svc,http://pihole-v6-1-svc"  # comma-separated endpoints
+                  resources:
+                      requests:
+                          cpu: 25m
+                          memory: 32Mi
+                      limits:
+                          cpu: 59m
+                          memory: 64Mi
