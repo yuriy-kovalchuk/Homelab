@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-    name: my-go-app
+    name: ingress-exporter
     namespace: pihole-v6
     labels:
         app: ingress-exporter
