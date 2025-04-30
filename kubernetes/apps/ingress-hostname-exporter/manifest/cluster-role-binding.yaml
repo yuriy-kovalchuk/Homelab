@@ -8,5 +8,5 @@ roleRef:
     name: ingress-watcher
 subjects:
     - kind: ServiceAccount
-      name: ingress-exportr-sa
+      name: ingress-exporter-sa
       namespace: pihole-v6

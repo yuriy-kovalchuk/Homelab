@@ -16,7 +16,7 @@ spec:
             labels:
                 app: ingress-exporter
         spec:
-            serviceAccountName: ingress-exporter-sa   # Use the ServiceAccount
+            serviceAccountName: ingress-exporter-sa
             containers:
                 - name: ingress-exporter
                   image: yuriykovalchuk92/ingress-exporter:latest
