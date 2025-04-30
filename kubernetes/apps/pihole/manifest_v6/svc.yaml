@@ -17,7 +17,7 @@ spec:
       port: 80
       protocol: TCP
   type: LoadBalancer
-  loadBalancerIP: "10.0.8.155"
+  loadBalancerIP: "10.0.8.153"
 ---
 apiVersion: v1
 kind: Service
@@ -38,7 +38,7 @@ spec:
       port: 80
       protocol: TCP
   type: LoadBalancer
-  loadBalancerIP: "10.0.8.156"
+  loadBalancerIP: "10.0.8.154"
 ---
 apiVersion: v1
 kind: Service
@@ -56,5 +56,5 @@ spec:
       port: 53
       protocol: TCP
   type: LoadBalancer
-  loadBalancerIP: "10.0.8.157"
+  loadBalancerIP: "10.0.8.152"
 
