@@ -24,6 +24,10 @@ data:
           header: true
           style: row
           columns: 4
+        Monitoring:
+          header: true
+          style: row
+          columns: 4
         Containers:
           header: true
           style: row
@@ -57,6 +61,19 @@ data:
               icon: longhorn.svg
               href: "http://10.0.8.102/#/dashboard"
               description: k8s storage
+      - Monitoring:
+          - Uptime Kuma:
+              icon: uptime-kuma.svg
+              href: "{{HOMEPAGE_VAR_UPTIME_KUMA_URL}}"
+              description: internal
+          - Grafana:
+              icon: grafana.svg
+              href: "https://grafana.yuriy-lab.cloud"
+              description: YK Grafana
+          - Alert Manager:
+              icon: alertmanager.svg
+              href: "https://alertmanager.yuriy-lab.cloud"
+              description: YK Grafana
       - Containers:
           - Portainer:
               icon: portainer.svg
@@ -67,10 +84,6 @@ data:
               icon: pfsense.svg
               href: "https://10.0.0.1"
               description: PfSense
-          - Uptime Kuma:
-              icon: uptime-kuma.svg
-              href: "{{HOMEPAGE_VAR_UPTIME_KUMA_URL}}"
-              description: internal
       - Git:
           - Gitea:
               icon: gitea.svg
