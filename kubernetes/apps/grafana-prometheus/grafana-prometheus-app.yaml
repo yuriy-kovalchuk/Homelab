@@ -14,8 +14,8 @@ spec:
         helm:
             values: |
                 installCRDs: true
-            valueFiles:
-                - http://gitea-http.gitea.svc.cluster.local:3000/yuriy/Homelab/raw/kubernetes/apps/grafana-prometheus/manifest/values.yaml
+#            valueFiles:
+#                - http://gitea-http.gitea.svc.cluster.local:3000/yuriy/Homelab/raw/kubernetes/apps/grafana-prometheus/manifest/values.yaml
     destination:
         server: https://kubernetes.default.svc   # Kubernetes cluster to deploy to
         namespace: monitoring                # Namespace where Rancher will be installed
