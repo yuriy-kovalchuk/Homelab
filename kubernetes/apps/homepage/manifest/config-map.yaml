@@ -73,7 +73,7 @@ data:
           - Alert Manager:
               icon: alertmanager.svg
               href: "https://alertmanager.yuriy-lab.cloud"
-              description: YK Grafana
+              description: YK Alert Manager
       - Containers:
           - Portainer:
               icon: portainer.svg
