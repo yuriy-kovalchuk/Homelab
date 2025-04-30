@@ -13,6 +13,8 @@ spec:
       parameters:
         - name: service.type
           value: ClusterIP
+        - name: persistence.size
+          value: 1Gi
         - name: tls.force
           value: "true"
         - name: image.tag
