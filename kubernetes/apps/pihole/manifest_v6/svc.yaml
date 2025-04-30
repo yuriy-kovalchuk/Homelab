@@ -22,7 +22,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: pihole-1-svc
+  name: pihole-v6-1-svc
   namespace: pihole-v6
 spec:
   selector:

@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: pihole                # Name of the Argo CD app (visible in Argo CD UI)
+  name: pihole-v6               # Name of the Argo CD app (visible in Argo CD UI)
   namespace: argo-cd            # Namespace where Argo CD is installed
 spec:
   project: default             # Argo CD project; "default" if you're not using custom projects
