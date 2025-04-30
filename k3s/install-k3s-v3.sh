@@ -7,7 +7,7 @@ K3S_VERSION="v1.31.6+k3s1" # Adjust version as needed
 MASTER_USER="master"
 MAIN_MASTER_NODE="10.0.8.20"
 MASTER_NODES=() # List of master node IP addresses
-WORKER_NODES=("10.0.8.24") # List of worker node IP addresses
+WORKER_NODES=("10.0.8.24" "10.0.8.25") # List of worker node IP addresses
 K3S_CLUSTER_TOKEN=${K3S_VAR_CLUSTER_TOKEN} # Replace with your desired K3s cluster token
 
 # kubeconfig

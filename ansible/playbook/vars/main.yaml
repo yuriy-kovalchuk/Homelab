@@ -24,7 +24,7 @@ machines:
     size: 20G
     tags: ["k3s"]
     cores: 2
-    memory: 8196
+    memory: 4098
     ci_user: "{{ lookup('env', 'MASTER1_USER') }}"
     ci_password: "{{ lookup('env', 'MASTER1_PASSWORD') }}"
     ip_config: "ip=10.0.8.20/24,gw=10.0.8.1"
@@ -33,8 +33,17 @@ machines:
     size: 40G
     tags: ["k3s"]
     cores: 2
-    memory: 8196
+    memory: 12294
     ci_user: "{{ lookup('env', 'MASTER1_USER') }}"
     ci_password: "{{ lookup('env', 'MASTER1_PASSWORD') }}"
     ip_config: "ip=10.0.8.24/24,gw=10.0.8.1"
+    vmbr: "virtio,bridge=vmbr8"
+  - name: node3
+    size: 40G
+    tags: ["k3s"]
+    cores: 2
+    memory: 12294
+    ci_user: "{{ lookup('env', 'MASTER1_USER') }}"
+    ci_password: "{{ lookup('env', 'MASTER1_PASSWORD') }}"
+    ip_config: "ip=10.0.8.25/24,gw=10.0.8.1"
     vmbr: "virtio,bridge=vmbr8"
