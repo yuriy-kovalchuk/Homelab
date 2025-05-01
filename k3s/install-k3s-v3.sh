@@ -105,7 +105,6 @@ install_k3s_single_master() {
 --kube-controller-arg node-monitor-period=20s \
 --kube-controller-arg node-monitor-grace-period=20s \
 --kube-controller-manager-arg bind-address=0.0.0.0 \
---kube-proxy-arg metrics-bind-address=0.0.0.0 \
 --kube-scheduler-arg bind-address=0.0.0.0 \
 --etcd-expose-metrics true \
 --kubelet-arg containerd=/run/k3s/containerd/containerd.sock \
@@ -181,7 +180,6 @@ install_k3s_extra_master() {
 --kube-controller-arg node-monitor-period=20s \
 --kube-controller-arg node-monitor-grace-period=20s \
 --kube-controller-manager-arg bind-address=0.0.0.0 \
---kube-proxy-arg metrics-bind-address=0.0.0.0 \
 --kube-scheduler-arg bind-address=0.0.0.0 \
 --etcd-expose-metrics true \
 --kubelet-arg containerd=/run/k3s/containerd/containerd.sock \
