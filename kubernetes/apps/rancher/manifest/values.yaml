@@ -2,7 +2,7 @@ rancher:
   enabled: true
 
   hostname: rancher.yuriy-lab.cloud
-  bootstrapPassword: "password"
+  bootstrapPassword: "reijfnerikqgbnitrhgoireqgjoitrqbY9."
 
   replicas: 1  # HA setup for production
 
