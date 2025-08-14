@@ -1,0 +1,29 @@
+rancher:
+  enabled: true
+
+  hostname: rancher.yuriy-lab.cloud
+  bootstrapPassword: "" 
+
+  replicas: 1  # HA setup for production
+
+  resources:
+    requests:
+      cpu: 1000m
+      memory: 2Gi
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+
+  # Production-specific settings
+  ingress:
+    tls:
+      source: letsEncrypt
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+
+  letsEncrypt:
+    email: yuriykovalchuk1992@icloud.com
+    environment: prod  # Use production Let's Encrypt
+    ingress:
+      class: nginx
