@@ -2,16 +2,16 @@ rancher:
   enabled: true
 
   hostname: rancher.yuriy-lab.cloud
-  bootstrapPassword: "" 
+  bootstrapPassword: "password"
 
   replicas: 1  # HA setup for production
 
   resources:
     requests:
-      cpu: 2000m
+      cpu: 500m
       memory: 2Gi
     limits:
-      cpu: 3000m
+      cpu: 2000m
       memory: 4Gi
 
   # Production-specific settings
