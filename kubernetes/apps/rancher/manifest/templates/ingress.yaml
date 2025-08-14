@@ -12,7 +12,7 @@ spec:
   tls:
   - hosts:
     - rancher.yuriy-lab.cloud
-    secretName: gitea-lab-tls
+    secretName: rancher-tls
   rules:
     - host: "rancher.yuriy-lab.cloud"
       http:
