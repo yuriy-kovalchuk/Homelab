@@ -16,11 +16,7 @@ rancher:
 
   # Production-specific settings
   ingress:
-    tls:
-      source: letsEncrypt
-    annotations:
-      nginx.ingress.kubernetes.io/ssl-redirect: "true"
-      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    enabled: false
 
   letsEncrypt:
     email: yuriykovalchuk1992@icloud.com
