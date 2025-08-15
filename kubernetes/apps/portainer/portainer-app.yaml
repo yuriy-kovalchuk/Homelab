@@ -5,6 +5,7 @@ metadata:
   namespace: argo-cd
 spec:
   project: default  # Use your desired Argo CD project
+  preserveResourcesOnDeletion: true
   destination:
     namespace: portainer
     server: https://kubernetes.default.svc
