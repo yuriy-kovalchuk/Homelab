@@ -9,10 +9,14 @@ spec:
     repoURL: http://gitea-http.gitea.svc.cluster.local:3000/yuriy/Homelab
     path: kubernetes/apps/whoami/manifest
     targetRevision: HEAD
+    helm:
+      releaseName: whoami
   destination:
     server: https://kubernetes.default.svc   # Kubernetes cluster to deploy to
     namespace: whoami                # Namespace where Rancher will be installed
   syncPolicy:
-    automated:                         # Enables auto-sync (GitOps!)
+    automated: # Enables auto-sync (GitOps!)
       selfHeal: true                   # Auto-correct drift between live & desired state
       prune: true                      # Remove resources that are no longer in Git
+    syncOptions:
+      - CreateNamespace=true
