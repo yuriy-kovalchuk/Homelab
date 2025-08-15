@@ -1,0 +1,27 @@
+portainer:
+  service:
+    type: ClusterIP
+
+  persistence:
+    size: 1Gi
+  
+  tls:
+    force: true
+
+  image:
+    tag: lts
+
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+      cert-manager.io/cluster-issuer: letsencrypt-dns
+    tls:
+      - hosts:
+          - portainer.yuriy-lab.cloud
+        secretName: portainer-ingress-tls
+    hosts:
+      - host: portainer.yuriy-lab.cloud
+        paths:
+          - path: "/"

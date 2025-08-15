@@ -1,0 +1,12 @@
+apiVersion: v2
+name: portainer-yk
+description: Umbrella Helm chart for portainer on k8s
+
+type: application
+version: 1.0.0
+appVersion: "1.0.64"
+
+dependencies:
+  - name: portainer
+    version: "1.0.64"
+    repository: https://portainer.github.io/k8s/
