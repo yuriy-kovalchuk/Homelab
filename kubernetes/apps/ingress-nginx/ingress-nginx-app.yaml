@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: http://gitea-http.gitea.svc.cluster.local:3000/yuriy/Homelab
     targetRevision: HEAD
-    path: kubernetes/apps/sealed-secrets/manifest
+    path: kubernetes/apps/ingress-nginx/manifest
     helm:
       releaseName: ingress-nginx
   destination:
