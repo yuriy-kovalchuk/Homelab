@@ -1,6 +1,5 @@
 apiVersion: v2
 name: pihole-yk
 description: Umbrella Helm chart for pihole application k8s
-type: application
 version: 1.0.0
 appVersion: "1.0.0"
