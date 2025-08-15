@@ -1,0 +1,9 @@
+ingress-nginx:
+  controller:
+    service:
+      loadBalancerIP: "10.0.8.100"
+
+    ingressClassResource:
+      default: true
+      annotations:
+        cert-manager.io/cluster-issuer: "letsencrypt-dns"
