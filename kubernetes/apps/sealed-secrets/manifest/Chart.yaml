@@ -4,9 +4,9 @@ description: Umbrella Helm chart for sealed-secrets k8s
 
 type: application
 version: 1.0.0
-appVersion: "2.17.2"
+appVersion: "2.17.3"
 
 dependencies:
   - name: sealed-secrets
-    version: "2.17.2"
+    version: "2.17.3"
     repository: https://bitnami-labs.github.io/sealed-secrets/
