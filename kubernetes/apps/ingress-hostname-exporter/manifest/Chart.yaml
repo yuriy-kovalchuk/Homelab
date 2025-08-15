@@ -1,0 +1,5 @@
+apiVersion: v2
+name: ingress-watcher-yk
+description: Umbrella Helm chart for a custom ingress watcher
+version: 1.0.0
+appVersion: "1.0.0"
