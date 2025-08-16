@@ -18,7 +18,7 @@
 - Monitoring:
     - Uptime Kuma:
         icon: uptime-kuma.svg
-        href: "http://10.0.8.102/#/dashboard"
+        href: "https://kuma.yuriy-lab.cloud"
         description: internal
     - Grafana:
         icon: grafana.svg
