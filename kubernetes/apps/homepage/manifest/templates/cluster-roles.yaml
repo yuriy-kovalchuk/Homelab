@@ -1,9 +1,9 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: homepage
+  name: {{ .Release.Name }}
   labels:
-    app.kubernetes.io/name: homepage
+    app.kubernetes.io/name: {{ .Release.Name }}
 rules:
   - apiGroups:
       - ""
@@ -49,14 +49,14 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: homepage
+  name: {{ .Release.Name }}
   labels:
-    app.kubernetes.io/name: homepage
+    app.kubernetes.io/name: {{ .Release.Name }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: homepage
+  name: {{ .Release.Name }}
 subjects:
   - kind: ServiceAccount
-    name: homepage
-    namespace: homepage
+    name: {{ .Values.serviceAccount.name | default .Release.Name }}
+    namespace: {{ .Release.Namespace }}
