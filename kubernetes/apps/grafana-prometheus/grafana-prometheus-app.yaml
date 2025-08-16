@@ -8,14 +8,11 @@ metadata:
 spec:
     project: default             # Argo CD project; "default" if you're not using custom projects
     source:
-        repoURL: https://prometheus-community.github.io/helm-charts
-        chart: kube-prometheus-stack
-        targetRevision: 70.10.0       # version of the Helm chart
-        helm:
-            values: |
-                installCRDs: true
-            valueFiles:
-                - http://gitea-http.gitea.svc.cluster.local:3000/yuriy/Homelab/raw/kubernetes/apps/grafana-prometheus/manifest/default-values.yaml
+      repoURL: http://gitea-http.gitea.svc.cluster.local:3000/yuriy/Homelab
+      targetRevision: HEAD
+      path: kubernetes/apps/grafana-prometheus/manifest
+      helm:
+        releaseName: grafana-prometheus
     destination:
         server: https://kubernetes.default.svc   # Kubernetes cluster to deploy to
         namespace: monitoring                # Namespace where Rancher will be installed
