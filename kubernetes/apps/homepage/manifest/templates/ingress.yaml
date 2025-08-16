@@ -1,11 +1,11 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "homepage.fullname" . }}
+  name: {{ .Release.Name }}
   namespace: {{ .Release.Namespace }}
   labels:
-    app.kubernetes.io/name: {{ include "homepage.name" . }}
-    helm.sh/chart: {{ include "homepage.chart" . }}
+    app.kubernetes.io/name: {{ .Release.Name }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   annotations:
@@ -29,6 +29,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ include "homepage.fullname" . }}
+                name: {{ .Release.Name }}
                 port:
                   number: {{ .Values.service.port }}

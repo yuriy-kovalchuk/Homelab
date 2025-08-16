@@ -12,8 +12,8 @@ homepage:
   allowedHost: homepage.yuriy-lab.cloud
 
 serviceAccount:
-  create: true
-  name: "homepage"
+  name: homepage
+
 
 ingress:
   enabled: true
