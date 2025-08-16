@@ -14,10 +14,11 @@ spec:
         app: uptime-kuma
     spec:
       dnsPolicy: None
-      nameservers:
-        - 10.0.8.152
-      searches:
-        - default.svc.cluster.local
+      dnsConfig:
+        nameservers:
+          - 10.0.8.152
+        searches:
+          - default.svc.cluster.local
       containers:
         - name: uptime-kuma
           image: louislam/uptime-kuma:latest
