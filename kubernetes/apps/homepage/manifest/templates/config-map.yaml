@@ -64,7 +64,7 @@ data:
       - Monitoring:
           - Uptime Kuma:
               icon: uptime-kuma.svg
-              href: "{{HOMEPAGE_VAR_UPTIME_KUMA_URL}}"
+              href: "http://10.0.8.102/#/dashboard"
               description: internal
           - Grafana:
               icon: grafana.svg
