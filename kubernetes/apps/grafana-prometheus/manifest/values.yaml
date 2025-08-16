@@ -731,8 +731,8 @@ alertmanager:
     clusterIP: ""
     ipDualStack:
       enabled: false
-      ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilies: ["IPv4"]
+      ipFamilyPolicy: "SingleStack"
 
     ## Port for Alertmanager Service to listen on
     ##
@@ -1781,8 +1781,8 @@ kubeControllerManager:
     targetPort: null
     ipDualStack:
       enabled: false
-      ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilies: ["IPv4"]
+      ipFamilyPolicy: "SingleStack"
     # selector:
     #   component: kube-controller-manager
 
@@ -1876,8 +1876,8 @@ coreDns:
 
     ipDualStack:
       enabled: false
-      ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilies: ["IPv4"]
+      ipFamilyPolicy: "SingleStack"
     # selector:
     #   k8s-app: kube-dns
   serviceMonitor:
@@ -1960,8 +1960,8 @@ kubeDns:
       targetPort: 10055
     ipDualStack:
       enabled: false
-      ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilies: ["IPv4"]
+      ipFamilyPolicy: "SingleStack"
     # selector:
     #   k8s-app: kube-dns
   serviceMonitor:
@@ -2063,8 +2063,8 @@ kubeEtcd:
     targetPort: 2381
     ipDualStack:
       enabled: false
-      ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilies: ["IPv4"]
+      ipFamilyPolicy: "SingleStack"
     # selector:
     #   component: etcd
 
@@ -2174,8 +2174,8 @@ kubeScheduler:
     targetPort: null
     ipDualStack:
       enabled: false
-      ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilies: ["IPv4"]
+      ipFamilyPolicy: "SingleStack"
     # selector:
     #   component: kube-scheduler
 
@@ -2273,8 +2273,8 @@ kubeProxy:
     targetPort: 10249
     ipDualStack:
       enabled: false
-      ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilies: ["IPv4"]
+      ipFamilyPolicy: "SingleStack"
     # selector:
     #   k8s-app: kube-proxy
 
@@ -2463,8 +2463,8 @@ prometheus-node-exporter:
     portName: http-metrics
     ipDualStack:
       enabled: false
-      ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilies: ["IPv4"]
+      ipFamilyPolicy: "SingleStack"
     labels:
       jobLabel: node-exporter
 
@@ -2658,8 +2658,8 @@ prometheusOperator:
         clusterIP: ""
         ipDualStack:
           enabled: false
-          ipFamilies: ["IPv6", "IPv4"]
-          ipFamilyPolicy: "PreferDualStack"
+          ipFamilies: ["IPv4"]
+          ipFamilyPolicy: "SingleStack"
 
         ## Port to expose on each node
         ## Only used if service.type is 'NodePort'
@@ -2971,8 +2971,8 @@ prometheusOperator:
     clusterIP: ""
     ipDualStack:
       enabled: false
-      ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilies: [IPv4"]
+      ipFamilyPolicy: "SingleStack"
 
     ## Port to expose on each node
     ## Only used if service.type is 'NodePort'
@@ -3365,8 +3365,8 @@ prometheus:
     ##
     ipDualStack:
       enabled: false
-      ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilies: [IPv4"]
+      ipFamilyPolicy: "SingleStack"
 
     ## gRPC port config
     portName: grpc
@@ -3456,8 +3456,8 @@ prometheus:
     clusterIP: ""
     ipDualStack:
       enabled: false
-      ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilies: ["IPv4"]
+      ipFamilyPolicy: "SingleStack"
 
     ## Port for Prometheus Service to listen on
     ##
@@ -3554,8 +3554,8 @@ prometheus:
     ##
     ipDualStack:
       enabled: false
-      ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilies: ["IPv4"]
+      ipFamilyPolicy: "SingleStack"
 
   ## Configure pod disruption budgets for Prometheus
   ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
@@ -4870,8 +4870,8 @@ thanosRuler:
     clusterIP: ""
     ipDualStack:
       enabled: false
-      ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilies: ["IPv4"]
+      ipFamilyPolicy: "SingleStack"
 
     ## Port for ThanosRuler Service to listen on
     ##
