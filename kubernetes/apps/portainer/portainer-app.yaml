@@ -9,9 +9,9 @@ spec:
     namespace: portainer
     server: https://kubernetes.default.svc
   source:
-    repoURL: https://portainer.github.io/k8s/  # Helm chart repository URL for Portainer
-    targetRevision: "1.0.64"
-    chart: portainer  # Helm chart name
+    repoURL: http://gitea-http.gitea.svc.cluster.local:3000/yuriy/Homelab
+    targetRevision: HEAD
+    path: kubernetes/apps/portainer/manifest
     helm:
       releaseName: portainer
   syncPolicy:

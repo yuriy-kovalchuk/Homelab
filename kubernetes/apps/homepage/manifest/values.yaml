@@ -1,0 +1,29 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/gethomepage/homepage
+  tag: latest
+  pullPolicy: Always
+
+service:
+  port: 3000
+
+homepage:
+  allowedHost: homepage.yuriy-lab.cloud
+
+serviceAccount:
+  create: true
+  name: "homepage"
+
+ingress:
+  enabled: true
+  className: nginx
+  host: homepage.yuriy-lab.cloud
+  tlsSecret: homepage-lab-tls
+  clusterIssuer: letsencrypt-dns
+  annotations:
+    description: "Dynamically Detected Homepage"
+    enabled: "true"
+    group: "Cluster Management"
+    icon: "homepage.png"
+    name: "Homepage"
