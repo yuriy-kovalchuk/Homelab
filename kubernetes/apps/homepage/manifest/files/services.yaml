@@ -29,6 +29,10 @@
         href: "https://alertmanager.yuriy-lab.cloud"
         description: YK Alert Manager
 - Containers:
+    - Rancher:
+        icon: rancher.svg
+        href: "https://rancher.yuriy-lab.cloud"
+        description: rancher k8s
     - Portainer:
         icon: portainer.svg
         href: "https://portainer.yuriy-lab.cloud"
