@@ -13,10 +13,10 @@ spec:
     targetRevision: HEAD
     path: kubernetes/apps/cert-manager/manifest
     helm:
-      values: |
-        installCRDs: true
-        global.namespace: cert-manager
+      releaseName: cert-manager
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
