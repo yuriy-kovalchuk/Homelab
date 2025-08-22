@@ -27,7 +27,8 @@
       "prx_download_base_image":     "./devbox_scripts/download_cloud_init.sh",
       "prx_create_vm_template": "./devbox_scripts/create_vm_template.sh",
       "prx_create_vm":       "./devbox_scripts/create_vm_from_template.sh",
-      "k_ss_create":       "./devbox_scripts/create_sealed_secret.sh $1 $2 $3 $4" // 1 secret name 2 secret spec 3 secret value 4 namespace
+      "argo_new_app":       "./devbox_scripts/new_app.sh $@",
+      "k_ss_create":       "./devbox_scripts/create_sealed_secret.sh $1 $2 $3 $4"
     }
   }
 }
