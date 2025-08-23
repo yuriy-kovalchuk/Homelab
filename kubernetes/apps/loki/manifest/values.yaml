@@ -9,6 +9,13 @@ loki:
           index:
             prefix: loki_index_
             period: 24h
+    storage_config:
+      aws:
+        s3: s3://loki
+        endpoint: http://minio.minio-dev.svc.cluster.local:9000
+        access_key_id: minioadmin
+        secret_access_key: minioadmin
+        insecure: true  # Only if not using TLS
     ingester:
       chunk_encoding: snappy
     querier:
@@ -67,8 +74,5 @@ loki:
       type: LoadBalancer
 
 
-  # Enable minio for storage
   minio:
-    enabled: true
-    persistence:
-      size: 1Gi
+    enabled: false
