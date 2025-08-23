@@ -1,21 +1,26 @@
 loki:
   loki:
-    schemaConfig:
-      configs:
-        - from: "2024-04-01"
-          store: tsdb
-          object_store: s3
-          schema: v13
-          index:
-            prefix: loki_index_
-            period: 24h
-    storage_config:
-      aws:
-        s3: s3://loki
+    config:
+      schema_config:
+        configs:
+          - from: 2020-10-24
+            store: boltdb-shipper
+            object_store: s3
+            schema: v11
+            index:
+              prefix: index_
+              period: 168h
+    storage:
+      type: s3
+      s3:
         endpoint: http://minio.minio-dev.svc.cluster.local:9000
+        bucketNames:
+          chunks: loki-chunks
+          index: loki-index
         access_key_id: minioadmin
         secret_access_key: minioadmin
-        insecure: true  # Only if not using TLS
+        insecure: true
+
     ingester:
       chunk_encoding: snappy
     querier:
