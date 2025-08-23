@@ -1,5 +1,6 @@
 loki:
   loki:
+    auth_enabled: false
     schemaConfig:
       configs:
         - from: "2024-04-01"
@@ -80,10 +81,3 @@ loki:
       pullPolicy: IfNotPresent
     persistence:
       size: 1Gi
-
-promtail:
-  config:
-    # publish data to loki
-    clients:
-      - url: http://loki-gateway/loki/api/v1/push
-        tenant_id: 1
