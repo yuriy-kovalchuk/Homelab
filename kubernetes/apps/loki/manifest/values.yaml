@@ -24,20 +24,20 @@ loki:
   deploymentMode: Distributed
 
   ingester:
-    replicas: 3 # To ensure data durability with replication
+    replicas: 2 # To ensure data durability with replication
     zoneAwareReplication:
       enabled: false
   querier:
-    replicas: 3 # Improve query performance via parallelism
-    maxUnavailable: 2
+    replicas: 2 # Improve query performance via parallelism
+    maxUnavailable: 1
   queryFrontend:
     replicas: 2
     maxUnavailable: 1
   queryScheduler:
     replicas: 2
   distributor:
-    replicas: 3
-    maxUnavailable: 2
+    replicas: 2
+    maxUnavailable: 1
   compactor:
     replicas: 1
   indexGateway:
