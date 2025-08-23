@@ -80,4 +80,13 @@ loki:
       tag: RELEASE.2024-11-21T17-21-54Z-cpuv1
       pullPolicy: IfNotPresent
     persistence:
-      size: 1Gi
+      size: 1G
+
+alloy:
+  alloy:
+    varlog: true
+    configMap:
+      # -- Create a new ConfigMap for the config file.
+      create: false
+      name: alloy-config
+      key: config.alloy
