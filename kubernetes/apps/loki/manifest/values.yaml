@@ -70,3 +70,5 @@ loki:
   # Enable minio for storage
   minio:
     enabled: true
+    persistence:
+      size: 1Gi
