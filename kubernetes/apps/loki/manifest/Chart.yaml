@@ -1,0 +1,13 @@
+apiVersion: v2
+name: loki-yk
+description: Umbrella Helm chart for loki application in Kubernetes
+
+type: application
+version: 1.0.0
+appVersion: "6.37.0"
+
+# If your app wraps an upstream chart, uncomment and edit the dependency block below
+dependencies:
+  - name: loki
+    version: "6.37.0"
+    repository: https://grafana.github.io/helm-charts
