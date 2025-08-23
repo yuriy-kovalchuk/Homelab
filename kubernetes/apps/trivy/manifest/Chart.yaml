@@ -1,0 +1,13 @@
+apiVersion: v2
+name: trivy-yk
+description: Umbrella Helm chart for trivy application in Kubernetes
+
+type: application
+version: 1.0.0
+appVersion: "v0.28.0"
+
+# If your app wraps an upstream chart, uncomment and edit the dependency block below
+dependencies:
+  - name: trivy-operator
+    version: "v0.28.0"
+    repository: https://aquasecurity.github.io/helm-charts/
