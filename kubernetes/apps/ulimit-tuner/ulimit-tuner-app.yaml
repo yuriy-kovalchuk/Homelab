@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ulimit-tuner
+  namespace: argo-cd
+spec:
+  project: default
+  source:
+    repoURL: http://gitea-http.gitea.svc.cluster.local:3000/yuriy/Homelab
+    targetRevision: HEAD
+    path: kubernetes/apps/ulimit-tuner/manifest
+    helm:
+      releaseName: ulimit-tuner
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

@@ -1,8 +1,5 @@
-helm repo add minio https://charts.min.io/
-helm repo update
-kubectl create namespace minio
+kubectl create ns boutique
+kubectl apply -n boutique \
+  -f https://raw.githubusercontent.com/GoogleCloudPlatform/microservices-demo/main/release/kubernetes-manifests.yaml
 
-helm install minio minio/minio \
-  --namespace minio \
-  --set accessKey=minioadmin \
-  --set secretKey=minioadmin
+
