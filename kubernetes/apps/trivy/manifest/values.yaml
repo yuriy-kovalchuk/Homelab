@@ -1,0 +1,22 @@
+trivy-operator:
+  trivy:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 100M
+        # ephemeralStorage: "2Gi"
+      limits:
+        cpu: 100m
+        memory: 500M
+        # ephemeralStorage: "2Gi"
+    server:
+      # -- resources set trivy-server resource
+      resources:
+        requests:
+          cpu: 20m
+          memory: 512Mi
+          # ephemeral-storage: "2Gi"
+        limits:
+          cpu: 200m
+          memory: 1Gi
+          # ephemeral-storage: "2Gi"
