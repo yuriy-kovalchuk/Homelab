@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: gitea_v2
+  name: gitea
   namespace: argo-cd
 spec:
   project: default
@@ -10,7 +10,7 @@ spec:
     targetRevision: HEAD
     path: kubernetes/apps/gitea_v2/manifest
     helm:
-      releaseName: gitea_v2
+      releaseName: gitea
   destination:
     server: https://kubernetes.default.svc
     namespace: gitea
