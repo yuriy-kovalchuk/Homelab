@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: longhorn
+  namespace: argo-cd
+spec:
+  project: default
+  source:
+    repoURL: http://gitea-http.gitea.svc.cluster.local:3000/yuriy/Homelab
+    targetRevision: HEAD
+    path: kubernetes/apps/longhorn/manifest
+    helm:
+      releaseName: longhorn
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: longhorn
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

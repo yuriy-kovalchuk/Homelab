@@ -1,0 +1,10 @@
+longhorn:
+  ingress:
+    enabled: true
+    host: longhorn.yuriy-lab.cloud
+    tls: true
+    tlsSecret: longhorn-ingress-tls
+    ingressClassName: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+      cert-manager.io/cluster-issuer: letsencrypt-dns
