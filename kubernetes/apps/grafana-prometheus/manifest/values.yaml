@@ -181,10 +181,10 @@ kube-prometheus-stack:
       k8sContainerMemoryWorkingSetBytes: true
       k8sPodOwner: true
       kubeApiserverAvailability: true
-      kubeApiserverBurnrate: true
+      kubeApiserverBurnrate: false
       kubeApiserverHistogram: true
-      kubeApiserverSlos: true
-      kubeControllerManager: true
+      kubeApiserverSlos: false
+      kubeControllerManager: false
       kubelet: true
       kubeProxy: true
       kubePrometheusGeneral: true
@@ -193,16 +193,16 @@ kube-prometheus-stack:
       kubernetesResources: true
       kubernetesStorage: true
       kubernetesSystem: true
-      kubeSchedulerAlerting: true
+      kubeSchedulerAlerting: false
       kubeSchedulerRecording: true
       kubeStateMetrics: true
       network: true
       node: true
-      nodeExporterAlerting: true
+      nodeExporterAlerting: false
       nodeExporterRecording: true
       prometheus: true
       prometheusOperator: true
-      windows: true
+      windows: false
 
     ## Reduce app namespace alert scope
     appNamespacesTarget: ".*"
@@ -2440,9 +2440,9 @@ kube-prometheus-stack:
       linux:
         enabled: true
       aix:
-        enabled: true
+        enabled: false
       darwin:
-        enabled: true
+        enabled: false
 
     ## ForceDeployDashboard Create dashboard configmap even if nodeExporter deployment has been disabled
     ##

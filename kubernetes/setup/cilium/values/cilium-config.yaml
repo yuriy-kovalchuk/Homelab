@@ -22,3 +22,14 @@ operator:
   rollOutPods: true
 
 rollOutCiliumPods: true
+
+routing-mode: "native"
+bpf:
+  masquerade: true
+
+hubble:
+  enabled: false
+  relay:
+    enabled: false
+  ui:
+    enabled: false
