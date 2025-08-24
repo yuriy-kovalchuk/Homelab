@@ -1,4 +1,15 @@
 trivy-operator:
+  operator:
+    scanJobTimeout: 30m
+    scanJobsConcurrentLimit: 3
+    sbomGenerationEnabled: false
+    configAuditScannerEnabled: false
+    rbacAssessmentScannerEnabled: false
+    infraAssessmentScannerEnabled: false
+    clusterComplianceEnabled: false
+    metricsFindingsEnabled: false
+  serviceMonitor:
+    enabled: true
   trivy:
     resources:
       requests:
@@ -20,3 +31,6 @@ trivy-operator:
           cpu: 200m
           memory: 1Gi
           # ephemeral-storage: "2Gi"
+    storageSize: "1Gi"
+    slow: false
+    timeout: "3h"
