@@ -1,13 +1,7 @@
 trivy-operator:
   operator:
-    scanJobTimeout: 30m
+    scanJobTimeout: 1h
     scanJobsConcurrentLimit: 3
-    sbomGenerationEnabled: false
-    configAuditScannerEnabled: false
-    rbacAssessmentScannerEnabled: false
-    infraAssessmentScannerEnabled: false
-    clusterComplianceEnabled: false
-    metricsFindingsEnabled: false
   serviceMonitor:
     enabled: true
     namespace: monitoring
@@ -19,7 +13,7 @@ trivy-operator:
         # ephemeralStorage: "2Gi"
       limits:
         cpu: 100m
-        memory: 500M
+        memory: 900M
         # ephemeralStorage: "2Gi"
     server:
       # -- resources set trivy-server resource
