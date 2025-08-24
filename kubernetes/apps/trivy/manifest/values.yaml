@@ -34,3 +34,5 @@ trivy-operator:
     storageSize: "1Gi"
     slow: false
     timeout: "3h"
+  service:
+    headless: false
