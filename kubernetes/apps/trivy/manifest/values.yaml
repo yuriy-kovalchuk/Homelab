@@ -10,6 +10,7 @@ trivy-operator:
     metricsFindingsEnabled: false
   serviceMonitor:
     enabled: true
+    namespace: monitoring
   trivy:
     resources:
       requests:
