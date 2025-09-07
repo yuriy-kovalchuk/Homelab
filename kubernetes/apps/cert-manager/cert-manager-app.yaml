@@ -4,12 +4,12 @@ metadata:
   name: cert-manager
   namespace: argo-cd
 spec:
-  project: default             # Argo CD project; "default" if you're not using custom projects
+  project: infrastructure
   destination:
     namespace: cert-manager
     server: https://kubernetes.default.svc
   source:
-    repoURL: http://gitea-http.gitea.svc.cluster.local:3000/yuriy/Homelab
+    repoURL: git@github.com:yuriy-kovalchuk/Homelab.git
     targetRevision: HEAD
     path: kubernetes/apps/cert-manager/manifest
     helm:

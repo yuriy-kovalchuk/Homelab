@@ -6,7 +6,6 @@ provider "helm" {
 
 provider "kubernetes" {
   config_path = "talos-kubeconfig"
-
 }
 
 
@@ -86,5 +85,4 @@ resource "helm_release" "metrics_server" {
   ]
 }
 
-
-
+# TODO patch coredns forward
