@@ -4,9 +4,9 @@ metadata:
   name: longhorn
   namespace: argo-cd
 spec:
-  project: default
+  project: infrastructure
   source:
-    repoURL: http://gitea-http.gitea.svc.cluster.local:3000/yuriy/Homelab
+    repoURL: git@github.com:yuriy-kovalchuk/Homelab.git
     targetRevision: HEAD
     path: kubernetes/apps/longhorn/manifest
     helm:
