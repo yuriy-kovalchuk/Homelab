@@ -1,0 +1,8 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: default
+  namespace: argo-cd
+spec:
+  sourceRepos: []       # empty = no repos allowed
+  destinations: []      # empty = no clusters/namespaces allowed
