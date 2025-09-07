@@ -1,70 +1,6 @@
 {
   "lockfile_version": "1",
   "packages": {
-    "ansible@2.18.1": {
-      "last_modified": "2025-02-08T12:54:32Z",
-      "resolved": "github:NixOS/nixpkgs/fa35a3c8e17a3de613240fea68f876e5b4896aec#ansible",
-      "source": "devbox-search",
-      "version": "2.18.1",
-      "systems": {
-        "aarch64-darwin": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/grqcvr7l457ks79d9cr4jq0apcifxinv-python3.12-ansible-core-2.18.1",
-              "default": true
-            },
-            {
-              "name": "dist",
-              "path": "/nix/store/4jpqqqamj4l4b6sbik9c69v7jxwjjzjj-python3.12-ansible-core-2.18.1-dist"
-            }
-          ],
-          "store_path": "/nix/store/grqcvr7l457ks79d9cr4jq0apcifxinv-python3.12-ansible-core-2.18.1"
-        },
-        "aarch64-linux": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/w8j04xgwp3fn8368cdgpibcasdqg12y3-python3.12-ansible-core-2.18.1",
-              "default": true
-            },
-            {
-              "name": "dist",
-              "path": "/nix/store/pc344nkz8b4p62729y59jwzjlzdbnqj0-python3.12-ansible-core-2.18.1-dist"
-            }
-          ],
-          "store_path": "/nix/store/w8j04xgwp3fn8368cdgpibcasdqg12y3-python3.12-ansible-core-2.18.1"
-        },
-        "x86_64-darwin": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/ma5sv31v0hbyjf0xxl2dbmymw9mp4g7h-python3.12-ansible-core-2.18.1",
-              "default": true
-            },
-            {
-              "name": "dist",
-              "path": "/nix/store/nrnn8zxrgvrn2xxnnnc8ml5hl9w88r5k-python3.12-ansible-core-2.18.1-dist"
-            }
-          ],
-          "store_path": "/nix/store/ma5sv31v0hbyjf0xxl2dbmymw9mp4g7h-python3.12-ansible-core-2.18.1"
-        },
-        "x86_64-linux": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/ypsx6nxccpyb70fq4jbpr090hxg85889-python3.12-ansible-core-2.18.1",
-              "default": true
-            },
-            {
-              "name": "dist",
-              "path": "/nix/store/9lc34jqvbn8ygp2g0sagxmfjgkwi3g9b-python3.12-ansible-core-2.18.1-dist"
-            }
-          ],
-          "store_path": "/nix/store/ypsx6nxccpyb70fq4jbpr090hxg85889-python3.12-ansible-core-2.18.1"
-        }
-      }
-    },
     "gettext@0.22.5": {
       "last_modified": "2025-03-17T10:12:08Z",
       "resolved": "github:NixOS/nixpkgs/096478927c360bc18ea80c8274f013709cf7bdcd#gettext",
@@ -167,54 +103,6 @@
     },
     "github:NixOS/nixpkgs/nixpkgs-unstable": {
       "resolved": "github:NixOS/nixpkgs/ba0939c506a03c60a765cd7f7c43794816540eec?lastModified=1739482815&narHash=sha256-%2F5Lwtmp%2F8j%2Bro32gXzitucSdyjJ6QehfJCL58WNA7N0%3D"
-    },
-    "gum@0.16.0": {
-      "last_modified": "2025-03-13T11:38:39Z",
-      "resolved": "github:NixOS/nixpkgs/573c650e8a14b2faa0041645ab18aed7e60f0c9a#gum",
-      "source": "devbox-search",
-      "version": "0.16.0",
-      "systems": {
-        "aarch64-darwin": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/kwkfj9ifihlfzv7damvf0x42w1l904ld-gum-0.16.0",
-              "default": true
-            }
-          ],
-          "store_path": "/nix/store/kwkfj9ifihlfzv7damvf0x42w1l904ld-gum-0.16.0"
-        },
-        "aarch64-linux": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/fflgnfjyizrfp3kb9kg1rb13zh8iqgpa-gum-0.16.0",
-              "default": true
-            }
-          ],
-          "store_path": "/nix/store/fflgnfjyizrfp3kb9kg1rb13zh8iqgpa-gum-0.16.0"
-        },
-        "x86_64-darwin": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/854g6bmylzpaz7s1xdccfq9x2xkx6fcc-gum-0.16.0",
-              "default": true
-            }
-          ],
-          "store_path": "/nix/store/854g6bmylzpaz7s1xdccfq9x2xkx6fcc-gum-0.16.0"
-        },
-        "x86_64-linux": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/hn1dl52063dlljmzjlx0cw1f59yk5r2n-gum-0.16.0",
-              "default": true
-            }
-          ],
-          "store_path": "/nix/store/hn1dl52063dlljmzjlx0cw1f59yk5r2n-gum-0.16.0"
-        }
-      }
     },
     "kubectl@1.32.2": {
       "last_modified": "2025-03-11T17:52:14Z",
@@ -396,76 +284,99 @@
         }
       }
     },
-    "python3": {
-      "plugin_version": "0.0.4",
-      "resolved": "github:NixOS/nixpkgs/ba0939c506a03c60a765cd7f7c43794816540eec?narHash=sha256-%2F5Lwtmp%2F8j%2Bro32gXzitucSdyjJ6QehfJCL58WNA7N0%3D#python3",
-      "source": "nixpkg"
-    },
-    "python3Packages.pip": {
-      "resolved": "github:NixOS/nixpkgs/ba0939c506a03c60a765cd7f7c43794816540eec?narHash=sha256-%2F5Lwtmp%2F8j%2Bro32gXzitucSdyjJ6QehfJCL58WNA7N0%3D#python3Packages.pip",
-      "source": "nixpkg"
-    },
-    "python3Packages.proxmoxer": {
-      "resolved": "github:NixOS/nixpkgs/ba0939c506a03c60a765cd7f7c43794816540eec?narHash=sha256-%2F5Lwtmp%2F8j%2Bro32gXzitucSdyjJ6QehfJCL58WNA7N0%3D#python3Packages.proxmoxer",
-      "source": "nixpkg"
-    },
-    "python3Packages.requests": {
-      "resolved": "github:NixOS/nixpkgs/ba0939c506a03c60a765cd7f7c43794816540eec?narHash=sha256-%2F5Lwtmp%2F8j%2Bro32gXzitucSdyjJ6QehfJCL58WNA7N0%3D#python3Packages.requests",
-      "source": "nixpkg"
-    },
-    "python3Packages.urllib3": {
-      "resolved": "github:NixOS/nixpkgs/ba0939c506a03c60a765cd7f7c43794816540eec?narHash=sha256-%2F5Lwtmp%2F8j%2Bro32gXzitucSdyjJ6QehfJCL58WNA7N0%3D#python3Packages.urllib3",
-      "source": "nixpkg"
-    },
-    "sshpass": {
-      "resolved": "github:NixOS/nixpkgs/ba0939c506a03c60a765cd7f7c43794816540eec?narHash=sha256-%2F5Lwtmp%2F8j%2Bro32gXzitucSdyjJ6QehfJCL58WNA7N0%3D#sshpass",
-      "source": "nixpkg"
-    },
-    "trivy@latest": {
-      "last_modified": "2025-08-04T03:33:26Z",
-      "resolved": "github:NixOS/nixpkgs/6a489c9482ca676ce23c0bcd7f2e1795383325fa#trivy",
+    "talosctl@latest": {
+      "last_modified": "2025-08-01T06:30:45Z",
+      "resolved": "github:NixOS/nixpkgs/a7822a17050fedda63794775b9090880c8214290#talosctl",
       "source": "devbox-search",
-      "version": "0.65.0",
+      "version": "1.10.6",
       "systems": {
         "aarch64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/irnblw5xzp5sbpzhywvffrbswcaq02ay-trivy-0.65.0",
+              "path": "/nix/store/1madm8r2hwq0zwlf8liwxsspf8kh7cga-talosctl-1.10.6",
               "default": true
             }
           ],
-          "store_path": "/nix/store/irnblw5xzp5sbpzhywvffrbswcaq02ay-trivy-0.65.0"
+          "store_path": "/nix/store/1madm8r2hwq0zwlf8liwxsspf8kh7cga-talosctl-1.10.6"
         },
         "aarch64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/jzzbn2fj7c44wnj03b7x67cwa088ln98-trivy-0.65.0",
+              "path": "/nix/store/gxqi8zq1ff72n75dw7lb6j033yq4y3b5-talosctl-1.10.6",
               "default": true
             }
           ],
-          "store_path": "/nix/store/jzzbn2fj7c44wnj03b7x67cwa088ln98-trivy-0.65.0"
+          "store_path": "/nix/store/gxqi8zq1ff72n75dw7lb6j033yq4y3b5-talosctl-1.10.6"
         },
         "x86_64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/icia80rh93gcylbdqmmmrwkm25kr0inb-trivy-0.65.0",
+              "path": "/nix/store/n6jgcrfhgl7aapfjl5j7r9axiq9mkj73-talosctl-1.10.6",
               "default": true
             }
           ],
-          "store_path": "/nix/store/icia80rh93gcylbdqmmmrwkm25kr0inb-trivy-0.65.0"
+          "store_path": "/nix/store/n6jgcrfhgl7aapfjl5j7r9axiq9mkj73-talosctl-1.10.6"
         },
         "x86_64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/8sc6n7vn73bkzz9km5mrv1z8f8h4r8yx-trivy-0.65.0",
+              "path": "/nix/store/phk7qg6c9sl3qv8qwb5xwdc8x21m32ba-talosctl-1.10.6",
               "default": true
             }
           ],
-          "store_path": "/nix/store/8sc6n7vn73bkzz9km5mrv1z8f8h4r8yx-trivy-0.65.0"
+          "store_path": "/nix/store/phk7qg6c9sl3qv8qwb5xwdc8x21m32ba-talosctl-1.10.6"
+        }
+      }
+    },
+    "terraform@latest": {
+      "last_modified": "2025-07-28T17:09:23Z",
+      "resolved": "github:NixOS/nixpkgs/648f70160c03151bc2121d179291337ad6bc564b#terraform",
+      "source": "devbox-search",
+      "version": "1.12.2",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/40gjbhfk5r4njbvkny3jcn8dz9slr138-terraform-1.12.2",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/40gjbhfk5r4njbvkny3jcn8dz9slr138-terraform-1.12.2"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/bvi0sf7qi75lk7aczgwp1bq811py9rj0-terraform-1.12.2",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/bvi0sf7qi75lk7aczgwp1bq811py9rj0-terraform-1.12.2"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/km3x95bvr81n0lpyfr7nf00vifl3q6hy-terraform-1.12.2",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/km3x95bvr81n0lpyfr7nf00vifl3q6hy-terraform-1.12.2"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/vxazqkmsxlc6fgx3kl53jxiwjszghwrm-terraform-1.12.2",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/vxazqkmsxlc6fgx3kl53jxiwjszghwrm-terraform-1.12.2"
         }
       }
     }
