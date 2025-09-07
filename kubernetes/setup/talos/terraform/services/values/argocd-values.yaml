@@ -13,15 +13,10 @@ server:
     ingressClassName: "nginx"
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-dns
-    hosts:
-      - host: argocd.yuriy-lab.cloud
-        paths:
-          - path: /
-            pathType: Prefix
-    tls:
-      - hosts:
-          - argocd.yuriy-lab.cloud
-        secretName: argocd-lab-tls
+    hostname: argocd.yuriy-lab.cloud
+    path: /
+    pathType: Prefix
+    tls: true
 
 repoServer:
   replicas: 2
