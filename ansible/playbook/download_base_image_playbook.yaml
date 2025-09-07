@@ -1,8 +1,0 @@
----
-- name: Download an image on remote PROXMOX host
-  hosts: proxmox_nodes
-  become: yes
-  vars_files:
-    - ./vars/main.yaml
-  roles:
-    - download_base_image

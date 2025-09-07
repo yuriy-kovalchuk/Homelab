@@ -1,8 +1,0 @@
----
-- name: Create Proxmox VMs from a template
-  hosts: localhost
-  gather_facts: no
-  vars_files:
-    - ./vars/main.yaml
-  roles:
-    - create_proxmox_vm

@@ -1,8 +1,0 @@
----
-- name: Download cloud-init image if not present
-  register: image
-  ansible.builtin.get_url:
-      url: "{{ image_url }}"
-      dest: "{{ image_dest }}/{{ image_name }}"
-      mode: '0644'
-      force: false  # Ensures the file is not re-downloaded if it exists
