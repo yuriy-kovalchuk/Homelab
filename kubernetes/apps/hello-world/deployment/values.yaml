@@ -1,9 +1,0 @@
-replicaCount: 1
-image:
-  repository: hashicorp/http-echo
-  tag: latest
-  pullPolicy: IfNotPresent
-service:
-  type: ClusterIP
-  port: 8080
-message: "Hello, ArgoCD!"

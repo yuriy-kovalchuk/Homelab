@@ -1769,7 +1769,9 @@ kube-prometheus-stack:
     ## If your kube controller manager is not deployed as a pod, specify IPs it can be found on
     ##
     endpoints:
-      - 10.0.8.20
+      - 10.0.8.2
+      - 10.0.8.3
+      - 10.0.8.4
 
     ## If using kubeControllerManager.endpoints only the port and targetPort are used
     ##
@@ -2054,7 +2056,9 @@ kube-prometheus-stack:
     ## If your etcd is not deployed as a pod, specify IPs it can be found on
     ##
     endpoints:
-      - 10.0.8.20
+      - 10.0.8.2
+      - 10.0.8.3
+      - 10.0.8.4
 
     ## Etcd service. If using kubeEtcd.endpoints only the port and targetPort are used
     ##
@@ -2161,7 +2165,9 @@ kube-prometheus-stack:
     ## If your kube scheduler is not deployed as a pod, specify IPs it can be found on
     ##
     endpoints:
-      - 10.0.8.20
+      - 10.0.8.2
+      - 10.0.8.3
+      - 10.0.8.4
 
 
     ## If using kubeScheduler.endpoints only the port and targetPort are used
@@ -2266,7 +2272,9 @@ kube-prometheus-stack:
     ## If your kube proxy is not deployed as a pod, specify IPs it can be found on
     ##
     endpoints:
-      - 10.0.8.20
+      - 10.0.8.2
+      - 10.0.8.3
+      - 10.0.8.4
 
     service:
       enabled: true
