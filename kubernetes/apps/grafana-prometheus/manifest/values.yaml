@@ -5297,7 +5297,15 @@ kube-prometheus-stack:
   ## Extra manifests to deploy.  Can be of type dict or list.
   ## If dict, keys are ignored and only values are used.
   ## Items contained within extraObjects can be defined as dict or string and are passed through tpl.
-  extraManifests: null
+  extraManifests:
+    - apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: monitoring
+        labels:
+          pod-security.kubernetes.io/enforce: privileged
+          pod-security.kubernetes.io/audit: privileged
+          pod-security.kubernetes.io/warn: privileged
     # - apiVersion: v1
     #   kind: ConfigMap
     #   metadata:
