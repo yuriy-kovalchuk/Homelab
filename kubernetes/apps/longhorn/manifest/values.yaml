@@ -1,6 +1,6 @@
 longhorn:
   ingress:
-    enabled: true
+    enabled: false
     host: longhorn.yuriy-lab.cloud
     tls: true
     tlsSecret: longhorn-ingress-tls
@@ -17,3 +17,14 @@ longhorn:
       nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required '
       # custom max body size for file uploading like backing image uploading
       nginx.ingress.kubernetes.io/proxy-body-size: 10000m
+
+  extraObjects:
+    - apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: longhorn-system
+        labels:
+          pod-security.kubernetes.io/enforce: privileged
+          pod-security.kubernetes.io/audit: privileged
+          pod-security.kubernetes.io/warn: privileged
+
