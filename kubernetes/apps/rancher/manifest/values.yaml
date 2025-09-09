@@ -1,6 +1,13 @@
 rancher:
   enabled: true
 
+  fleet:
+    enabled: false
+  postDelete:
+    enabled: false
+  webhook:
+    enabled: false
+
   hostname: rancher.yuriy-lab.cloud
   bootstrapPassword: "reijfnerikqgbnitrhgoireqgjoitrqbY9."
 
