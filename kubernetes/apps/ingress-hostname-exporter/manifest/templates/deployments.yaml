@@ -1,38 +1,44 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-    name: ingress-exporter
-    namespace: pihole-v6
-    labels:
-        app: ingress-exporter
+  name: {{ .Release.Name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
-    replicas: 1
-    selector:
-        matchLabels:
-            app: ingress-exporter
-    template:
-        metadata:
-            labels:
-                app: ingress-exporter
-        spec:
-            serviceAccountName: ingress-exporter-sa
-            containers:
-                - name: ingress-exporter
-                  image: yuriykovalchuk92/ingress-exporter:latest
-                  imagePullPolicy: Always
-                  env:
-                      - name: PIHOLE_PASSWORD
-                        valueFrom:
-                            secretKeyRef:
-                              name: pihole-v6-password
-                              key: PIHOLE_WEB_PASSWORD
-                      - name: PIHOLE_ENDPOINTS
-                        value: "http://pihole-v6-0-svc,http://pihole-v6-1-svc"  # comma-separated endpoints
-                  resources:
-                      requests:
-                          cpu: 25m
-                          memory: 32Mi
-                      limits:
-                          cpu: 59m
-                          memory: 64Mi
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Release.Name }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      containers:
+        - name: {{ .Release.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: OPNSENSE_URI
+              value: {{ .Values.env.OPNSENSE_URI | quote }}
+            - name: OPNSENSE_SKIP_TLS_VERIFY
+              value: {{ .Values.env.OPNSENSE_SKIP_TLS_VERIFY | quote }}
+            - name: OPNSENSE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secretName }}
+                  key: {{ .Values.secretKeys.key }}
+            - name: OPNSENSE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secretName }}
+                  key: {{ .Values.secretKeys.secret }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
