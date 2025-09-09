@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: http://gitea-http.gitea.svc.cluster.local:3000/yuriy/Homelab
+    repoURL: git@github.com:yuriy-kovalchuk/Homelab.git
     targetRevision: HEAD
     path: kubernetes/apps/__APP_NAME__/manifest
     helm:
