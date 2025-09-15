@@ -1,6 +1,6 @@
 longhorn:
   ingress:
-    enabled: false
+    enabled: true
     host: longhorn.yuriy-lab.cloud
     tls: true
     tlsSecret: longhorn-ingress-tls
