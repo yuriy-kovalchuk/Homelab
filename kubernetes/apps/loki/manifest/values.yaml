@@ -114,26 +114,6 @@ k8s-monitoring:
   alloy-logs:
     enabled: true
     alloy:
-      podSecurityContext: { }
-      containerSecurityContext:
-        allowPrivilegeEscalation: false
-        capabilities:
-          drop:
-            - ALL
-          add:
-            - CHOWN
-            - DAC_OVERRIDE
-            - FOWNER
-            - FSETID
-            - KILL
-            - SETGID
-            - SETUID
-            - SETPCAP
-            - NET_BIND_SERVICE
-            - SYS_CHROOT
-            - MKNOD
-            - AUDIT_WRITE
-            - SETFCAP
       mounts:
         varlog: false
         dockercontainers: false
