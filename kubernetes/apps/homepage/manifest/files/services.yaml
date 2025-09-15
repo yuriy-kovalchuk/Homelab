@@ -5,8 +5,12 @@
         description: firewall
     - Longhorn:
         icon: longhorn.svg
-        href: "http://10.0.8.102/#/dashboard"
+        href: "http://longhorn.yuriy-lab.cloud/"
         description: k8s storage
+    - Vault:
+        icon: vault.svg
+        href: "http://vault.yuriy-lab.cloud/"
+        description: Vault PRD
 - Monitoring:
     - Uptime Kuma:
         icon: uptime-kuma.svg
@@ -30,12 +34,16 @@
         href: "https://portainer.yuriy-lab.cloud"
         description: docker
 - Network:
-    - PfSense:
+    - OpnSense:
         icon: opnsense.svg
         href: "https://10.0.1.254"
-        description: PfSense
+        description: OpnSense
+    - Nginx:
+        icon: nginx.svg
+        href: "http://10.0.10.5:81"
+        description: Nginx Proxy Manager
 - GitOps:
     - ArgoCD:
         icon: argo-cd.svg
         href: https://argocd.yuriy-lab.cloud
-        description: YK ArgoCD intance
+        description: YK ArgoCD instance
