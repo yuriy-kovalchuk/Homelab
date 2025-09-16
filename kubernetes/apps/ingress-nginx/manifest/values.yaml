@@ -2,6 +2,10 @@ ingress-nginx:
   controller:
     service:
       loadBalancerIP: "10.0.8.100"
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
 
     ingressClassResource:
       default: true
