@@ -23,7 +23,7 @@ policy-reporter:
             pathType: ImplementationSpecific
 
   ui:
-    enable: true
+    enabled: true
     displayMode: dark
 
     ingress:
