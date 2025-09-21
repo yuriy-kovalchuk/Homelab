@@ -10,3 +10,6 @@ kyverno:
     replicas: 3
   reportsController:
     replicas: 3
+
+kyverno-policies:
+  skipBackgroundRequests: false
