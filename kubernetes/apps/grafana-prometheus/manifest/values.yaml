@@ -60,6 +60,9 @@ kube-prometheus-stack:
       accessModes:
         - ReadWriteOnce
       size: 1Gi
+      finalizers:
+        - kubernetes.io/pvc-protection
+
   kubeControllerManager:
     endpoints:
       - 10.0.8.2
