@@ -4,7 +4,7 @@ metadata:
   name: kyverno
   namespace: argo-cd
 spec:
-  project: default
+  project: infrastructure
   source:
     repoURL: git@github.com:yuriy-kovalchuk/Homelab.git
     targetRevision: HEAD
@@ -20,3 +20,5 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
+
