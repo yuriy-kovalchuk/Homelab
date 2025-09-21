@@ -19,7 +19,8 @@ policy-reporter:
     hosts:
       - host: kyverno-reporter-api.yuriy-lab.cloud
         paths:
-          - path: "/"
+          - path: '/(.*)'
+            pathType: ImplementationSpecific
 
   ui:
     enable: true
@@ -37,8 +38,8 @@ policy-reporter:
       hosts:
         - host: kyverno-reporter.yuriy-lab.cloud
           paths:
-            - path: "/"
-
+            - path: '/(.*)'
+              pathType: ImplementationSpecific
     resources:
       limits:
         memory: 200Mi
