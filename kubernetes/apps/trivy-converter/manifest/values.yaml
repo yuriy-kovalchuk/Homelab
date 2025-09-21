@@ -10,7 +10,7 @@ trivy-operator-polr-adapter:
 
   adapters:
     cisKubeBenchReports:
-      enabled: true
+      enabled: false
     complianceReports:
       enabled: true
     rbacAssessmentReports:
