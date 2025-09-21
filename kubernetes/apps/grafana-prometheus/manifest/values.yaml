@@ -72,36 +72,18 @@ kube-prometheus-stack:
       ipDualStack:
         ipFamilies: ["IPv4"]
         ipFamilyPolicy: "SingleStack"
-    serviceMonitor:
-      metricRelabelings:
-        - action: replace
-          sourceLabels:
-            - node
-          targetLabel: instance
 
   coreDns:
     service:
       ipDualStack:
         ipFamilies: ["IPv4"]
         ipFamilyPolicy: "SingleStack"
-    serviceMonitor:
-      metricRelabelings:
-        - action: replace
-          sourceLabels:
-            - node
-          targetLabel: instance
 
   kubeDns:
     service:
       ipDualStack:
         ipFamilies: ["IPv4"]
         ipFamilyPolicy: "SingleStack"
-    serviceMonitor:
-      metricRelabelings:
-        - action: replace
-          sourceLabels:
-            - node
-          targetLabel: instance
 
   kubeEtcd:
     endpoints:
@@ -112,12 +94,6 @@ kube-prometheus-stack:
       ipDualStack:
         ipFamilies: ["IPv4"]
         ipFamilyPolicy: "SingleStack"
-    serviceMonitor:
-      metricRelabelings:
-        - action: replace
-          sourceLabels:
-            - node
-          targetLabel: instance
 
   kubeScheduler:
     endpoints:
@@ -128,12 +104,6 @@ kube-prometheus-stack:
       ipDualStack:
         ipFamilies: ["IPv4"]
         ipFamilyPolicy: "SingleStack"
-    serviceMonitor:
-      metricRelabelings:
-        - action: replace
-          sourceLabels:
-            - node
-          targetLabel: instance
 
   kubeProxy:
     enabled: false
@@ -145,12 +115,6 @@ kube-prometheus-stack:
       ipDualStack:
         ipFamilies: ["IPv4"]
         ipFamilyPolicy: "SingleStack"
-    serviceMonitor:
-      metricRelabelings:
-        - action: replace
-          sourceLabels:
-            - node
-          targetLabel: instance
 
   nodeExporter:
     operatingSystems:
@@ -168,16 +132,6 @@ kube-prometheus-stack:
       ipDualStack:
         ipFamilies: ["IPv4"]
         ipFamilyPolicy: "SingleStack"
-    prometheus:
-      monitor:
-        enabled: true
-        relabelings:
-          - action: replace
-            regex: (.*)
-            replacement: $1
-            sourceLabels:
-              - __meta_kubernetes_pod_node_name
-            targetLabel: kubernetes_node
 
   prometheusOperator:
     admissionWebhooks:
