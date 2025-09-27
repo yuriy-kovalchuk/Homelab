@@ -5,16 +5,8 @@ loki:
       - -config.expand-env=true
 
     extraEnvFrom:
-      - name: S3_ACCESS_KEY
-        valueFrom:
-          secretKeyRef:
-            name: loki-s3-secret
-            key: accessKeyId
-      - name: S3_SECRET_KEY
-        valueFrom:
-          secretKeyRef:
-            name: loki-s3-secret
-            key: secretAccessKey
+      - secretRef:
+          name: loki-s3-secret
 
   loki:
     auth_enabled: false
