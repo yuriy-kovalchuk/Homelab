@@ -20,7 +20,7 @@ minio:
           - minio.yuriy-lab.cloud
         secretName: minio-ingress-tls
     hosts:
-      - host: minio.yuriy-lab.cloud
+      - minio.yuriy-lab.cloud
     path: "/"
 
     consoleIngress:
@@ -33,7 +33,7 @@ minio:
             - minio-console.yuriy-lab.cloud
           secretName: minio-console-ingress-tls
       hosts:
-        - host: minio-console.yuriy-lab.cloud
+        - minio-console.yuriy-lab.cloud
       path: "/"
 
     resources:
