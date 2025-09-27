@@ -1,0 +1,25 @@
+minio:
+  image:
+    tag: RELEASE.2025-07-18T21-56-31Z-cpuv1
+
+  mcImage:
+    tag: RELEASE.2025-07-18T21-56-31Z-cpuv1
+
+  replicas: 3
+
+  persistence:
+    size: 50Gi
+
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-dns
+    tls:
+      - hosts:
+          - minio.yuriy-lab.cloud
+        secretName: minio-ingress-tls
+    hosts:
+      - host: minio.yuriy-lab.cloud
+        paths:
+          - path: "/"

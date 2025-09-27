@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: minio
+  namespace: argo-cd
+spec:
+  project: infrastructure
+  source:
+    repoURL: git@github.com:yuriy-kovalchuk/Homelab.git
+    targetRevision: HEAD
+    path: kubernetes/apps/minio/manifest
+    helm:
+      releaseName: minio
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: minio
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+
