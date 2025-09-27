@@ -1,6 +1,7 @@
 loki:
   loki:
 
+    auth_enabled: false
     storage:
       type: "s3"
       s3:
