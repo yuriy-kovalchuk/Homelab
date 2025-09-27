@@ -47,4 +47,5 @@ minio:
   metrics:
     serviceMonitor:
       enabled: true
+      includeNode: true
       namespace: monitoring
