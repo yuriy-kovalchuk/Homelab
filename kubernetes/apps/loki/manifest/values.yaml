@@ -74,7 +74,7 @@ loki:
       tag: RELEASE.2024-11-21T17-21-54Z-cpuv1
       pullPolicy: IfNotPresent
     persistence:
-      size: 1G
+      size: 20G
 
 #https://github.com/grafana/k8s-monitoring-helm/tree/main/charts/k8s-monitoring/charts/
 k8s-monitoring:
