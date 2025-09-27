@@ -1,4 +1,8 @@
 - Core:
+    - ArgoCD:
+        icon: argo-cd.svg
+        href: https://argocd.yuriy-lab.cloud
+        description: YK ArgoCD instance
     - Proxmox:
         icon: proxmox.svg
         href: "https://10.0.1.1:8006"
@@ -12,14 +16,18 @@
         href: "http://vault.yuriy-lab.cloud/"
         description: Vault PRD
 - Monitoring:
-    - Uptime Kuma:
-        icon: uptime-kuma.svg
-        href: "https://kuma.yuriy-lab.cloud"
-        description: internal
     - Grafana:
         icon: grafana.svg
         href: "https://grafana.yuriy-lab.cloud"
         description: YK Grafana
+    - Kyverno:
+        icon: kyverno.svg
+        href: "https://kyverno-reporter.yuriy-lab.cloud"
+        description: YK Kyverno Reporter
+    - Uptime Kuma:
+        icon: uptime-kuma.svg
+        href: "https://kuma.yuriy-lab.cloud"
+        description: internal
     - Alert Manager:
         icon: alertmanager.svg
         href: "https://alertmanager.yuriy-lab.cloud"
@@ -33,6 +41,15 @@
         icon: portainer.svg
         href: "https://portainer.yuriy-lab.cloud"
         description: docker
+- Storage:
+    - Minio K8s:
+        icon: minio.svg
+        href: "https://minio-console.yuriy-lab.cloud"
+        description: YK Minio K8s
+    - Minio Proxmox:
+        icon: minio.svg
+        href: "http://10.0.10.10:9001"
+        description: YK Minio Proxmox
 - Network:
     - OpnSense:
         icon: opnsense.svg
@@ -42,8 +59,3 @@
         icon: nginx.svg
         href: "http://10.0.10.5:81"
         description: Nginx Proxy Manager
-- GitOps:
-    - ArgoCD:
-        icon: argo-cd.svg
-        href: https://argocd.yuriy-lab.cloud
-        description: YK ArgoCD instance

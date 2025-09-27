@@ -10,11 +10,6 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   annotations:
     cert-manager.io/cluster-issuer: {{ .Values.ingress.clusterIssuer | quote }}
-    gethomepage.dev/description: {{ .Values.ingress.annotations.description | quote }}
-    gethomepage.dev/enabled: {{ .Values.ingress.annotations.enabled | quote }}
-    gethomepage.dev/group: {{ .Values.ingress.annotations.group | quote }}
-    gethomepage.dev/icon: {{ .Values.ingress.annotations.icon | quote }}
-    gethomepage.dev/name: {{ .Values.ingress.annotations.name | quote }}
 spec:
   ingressClassName: {{ .Values.ingress.className }}
   tls:
