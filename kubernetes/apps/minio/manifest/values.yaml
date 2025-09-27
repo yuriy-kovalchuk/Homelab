@@ -5,6 +5,9 @@ minio:
   mcImage:
     tag: RELEASE.2025-04-16T18-13-26Z-cpuv1
 
+
+  existingSecret: minio-credentials
+
   replicas: 3
 
   persistence:
