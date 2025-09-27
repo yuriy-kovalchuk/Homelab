@@ -125,6 +125,8 @@ k8s-monitoring:
   alloy-receiver:
     enabled: false
 
+  extraArgs:
+    - -config.expand-env=true
 
   extraEnvFrom:
     - name: S3_ACCESS_KEY
