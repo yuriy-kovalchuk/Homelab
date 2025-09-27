@@ -6,6 +6,11 @@ redis-ha:
 controller:
   replicas: 1
 
+  metrics:
+    serviceMonitor:
+      enabled: true
+      namespace: monitoring
+
 server:
   replicas: 2
   ingress:
@@ -27,5 +32,8 @@ applicationSet:
 configs:
   params:
     server.insecure: true
+
+
+
 
 

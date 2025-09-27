@@ -20,6 +20,10 @@
         icon: grafana.svg
         href: "https://grafana.yuriy-lab.cloud"
         description: YK Grafana
+    - Prometheus:
+        icon: prometheus.svg
+        href: "https://prometheus.yuriy-lab.cloud"
+        description: YK Prometheus
     - Kyverno:
         icon: kyverno.svg
         href: "https://kyverno-reporter.yuriy-lab.cloud"
