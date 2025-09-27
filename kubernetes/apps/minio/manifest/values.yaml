@@ -36,15 +36,15 @@ minio:
       - minio-console.yuriy-lab.cloud
     path: "/"
 
-    resources:
-      requests:
-        memory: 100Mi
-        cpu: 50m
-      limits:
-        memory: 1Gi
-        cpu: 200m
+  resources:
+    requests:
+      memory: 100Mi
+      cpu: 50m
+    limits:
+      memory: 1Gi
+      cpu: 200m
 
-    metrics:
-      serviceMonitor:
-        enabled: true
-        namespace: monitoring
+  metrics:
+    serviceMonitor:
+      enabled: true
+      namespace: monitoring
