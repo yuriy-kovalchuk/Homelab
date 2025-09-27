@@ -21,5 +21,30 @@ minio:
         secretName: minio-ingress-tls
     hosts:
       - host: minio.yuriy-lab.cloud
-        paths:
-          - path: "/"
+    path: "/"
+
+    consoleIngress:
+      enabled: true
+      ingressClassName: nginx
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-dns
+      tls:
+        - hosts:
+            - minio-console.yuriy-lab.cloud
+          secretName: minio-console-ingress-tls
+      hosts:
+        - host: minio-console.yuriy-lab.cloud
+      path: "/"
+
+    resources:
+      requests:
+        memory: 100Mi
+        cpu: 50m
+      limits:
+        memory: 1Gi
+        cpu: 200m
+
+    metrics:
+      serviceMonitor:
+        enabled: true
+        namespace: monitoring
