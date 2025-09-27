@@ -1,6 +1,6 @@
 minio:
   image:
-    tag: RELEASE.2025-07-18T21-56-31Z-cpuv1
+    tag: 2025-04-22T22-12-26Z-cpuv1
 
   mcImage:
     tag: RELEASE.2024-11-21T17-21-54Z-cpuv1
