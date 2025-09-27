@@ -23,18 +23,18 @@ minio:
       - minio.yuriy-lab.cloud
     path: "/"
 
-    consoleIngress:
-      enabled: true
-      ingressClassName: nginx
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-dns
-      tls:
-        - hosts:
-            - minio-console.yuriy-lab.cloud
-          secretName: minio-console-ingress-tls
-      hosts:
-        - minio-console.yuriy-lab.cloud
-      path: "/"
+  consoleIngress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-dns
+    tls:
+      - hosts:
+          - minio-console.yuriy-lab.cloud
+        secretName: minio-console-ingress-tls
+    hosts:
+      - minio-console.yuriy-lab.cloud
+    path: "/"
 
     resources:
       requests:
