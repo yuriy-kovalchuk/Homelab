@@ -45,6 +45,10 @@
         icon: portainer.svg
         href: "https://portainer.yuriy-lab.cloud"
         description: docker
+    - Harbor:
+        icon: harbor.svg
+        href: "https://harbor.yuriy-lab.cloud"
+        description: YK Container Registry
 - Storage:
     - Minio K8s:
         icon: minio.svg
