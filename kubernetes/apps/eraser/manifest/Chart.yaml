@@ -1,0 +1,12 @@
+apiVersion: v2
+name: eraser-yk
+description: Umbrella Helm chart for eraser application in Kubernetes
+
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+
+dependencies:
+  - name: eraser
+    version: "1.5.0-beta.0"
+    repository: https://eraser-dev.github.io/eraser/charts

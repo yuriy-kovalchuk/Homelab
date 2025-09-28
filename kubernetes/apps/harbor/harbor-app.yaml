@@ -14,6 +14,14 @@ spec:
         - /status
         - /metadata/creationTimestamp
         - /spec/volumeClaimTemplates
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
+        - /spec/template/metadata/annotations
+        - /spec/updateStrategy/rollingUpdate/partition
+        - /status
+        - /metadata/creationTimestamp
   project: infrastructure
   source:
     repoURL: git@github.com:yuriy-kovalchuk/Homelab.git
