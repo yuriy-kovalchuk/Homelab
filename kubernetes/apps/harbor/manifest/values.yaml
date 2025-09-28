@@ -1,0 +1,46 @@
+harbor:
+  expose:
+    tls:
+      secretName: harbor-tls-secret
+    ingress:
+      hosts:
+        core: harbor.yuriy-lab.cloud
+        notary: notary.harbor.yuriy-lab.cloud
+      annotations:
+        ingress.kubernetes.io/ssl-redirect: "true"
+        ingress.kubernetes.io/proxy-body-size: "0"
+        nginx.ingress.kubernetes.io/ssl-redirect: "true"
+        nginx.ingress.kubernetes.io/proxy-body-size: "0"
+        cert-manager.io/cluster-issuer: letsencrypt-dns
+
+  externalURL: https://harbor.yuriy-lab.cloud
+
+  persistence:
+    persistentVolumeClaim:
+      registry:
+        size: 30Gi
+      database:
+        size: 512Mi
+      redis:
+        size: 512Mi
+
+  portal:
+   resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 200m
+
+  core:
+    resources:
+      requests:
+        memory: 256Mi
+        cpu: 100m
+      limits:
+        memory: 512Mi
+        cpu: 200m
+
+
+

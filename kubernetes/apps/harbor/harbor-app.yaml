@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: harbor
+  namespace: argo-cd
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:yuriy-kovalchuk/Homelab.git
+    targetRevision: HEAD
+    path: kubernetes/apps/harbor/manifest
+    helm:
+      releaseName: harbor
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: harbor
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+
