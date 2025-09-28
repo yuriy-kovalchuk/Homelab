@@ -6,6 +6,7 @@ harbor:
       hosts:
         core: harbor.yuriy-lab.cloud
         notary: notary.harbor.yuriy-lab.cloud
+      controller: nginx
       annotations:
         ingress.kubernetes.io/ssl-redirect: "true"
         ingress.kubernetes.io/proxy-body-size: "0"
