@@ -1,5 +1,9 @@
 harbor:
   expose:
+    tls:
+      certSource: secret
+      secret:
+        secretName: harbor-tls-ingress
     ingress:
       hosts:
         core: harbor.yuriy-lab.cloud
