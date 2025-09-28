@@ -55,14 +55,11 @@ If OPNSENSE_* variables are missing, the program exits.
 ## Build and push Docker image
 Assuming you’re at applications/ingress-hostname-exporter directory:
 
-- Build:
-  - docker build -t YOUR_REGISTRY/ingress-hostname-exporter:TAG -f dockerfile .
-- Push:
-  - docker push YOUR_REGISTRY/ingress-hostname-exporter:TAG
+```
+docker buildx build --platform linux/amd64 -t harbor.yuriy-lab.cloud/library/ingress-hostname-exporter:TAG -f dockerfile .
+docker push harbor.yuriy-lab.cloud/library/ingress-hostname-exporter:TAG
+```
 
-Example:
-- docker build -t ghcr.io/youruser/ingress-hostname-exporter:0.1.0 -f dockerfile .
-- docker push ghcr.io/youruser/ingress-hostname-exporter:0.1.0
 
 ## Kubernetes deployment notes
 A sample Helm chart exists in kubernetes/apps/ingress-hostname-exporter/manifest.
