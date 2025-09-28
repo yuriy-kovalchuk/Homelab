@@ -26,6 +26,10 @@ harbor:
       redis:
         size: 512Mi
 
+    imageChartStorage:
+      filesystem:
+        rootdirectory: /home/harbor/storage
+
   ipFamily:
     ipv6:
       enabled: false
