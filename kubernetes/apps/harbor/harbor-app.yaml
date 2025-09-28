@@ -4,6 +4,13 @@ metadata:
   name: harbor
   namespace: argo-cd
 spec:
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      jsonPointers:
+        - /spec/updateStrategy/rollingUpdate/partition
+        - /metadata/creationTimestamp
+        - /spec/volumeClaimTemplates
   project: infrastructure
   source:
     repoURL: git@github.com:yuriy-kovalchuk/Homelab.git
@@ -21,4 +28,6 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+      - RespectIgnoreDifferences=true
+
 

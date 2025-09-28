@@ -7,6 +7,7 @@ harbor:
     ingress:
       hosts:
         core: harbor.yuriy-lab.cloud
+      className: nginx
       annotations:
         ingress.kubernetes.io/ssl-redirect: "true"
         ingress.kubernetes.io/proxy-body-size: "0"
