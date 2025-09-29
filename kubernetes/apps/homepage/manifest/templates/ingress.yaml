@@ -10,6 +10,8 @@ metadata:
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   annotations:
     cert-manager.io/cluster-issuer: {{ .Values.ingress.clusterIssuer | quote }}
+    nginx.ingress.kubernetes.io/auth-url: "https://authentik.yuriy-lab.cloud/outpost.goauthentik.io/auth/nginx"
+    nginx.ingress.kubernetes.io/auth-signin: "https://authentik.yuriy-lab.cloud/outpost.goauthentik.io/start?rd=$scheme://$host$request_uri"
 spec:
   ingressClassName: {{ .Values.ingress.className }}
   tls:

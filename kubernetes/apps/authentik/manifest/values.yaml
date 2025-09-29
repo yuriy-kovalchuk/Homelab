@@ -1,5 +1,7 @@
 authentik:
 
+#  first login at https://<ingress-host-name>/if/flow/initial-setup/
+
   authentik:
     secret_key: file:///postgres-creds/password
     error_reporting:
