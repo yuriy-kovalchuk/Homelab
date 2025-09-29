@@ -1,6 +1,7 @@
 authentik:
 
   authentik:
+    secret_key: file:///postgres-creds/password
     error_reporting:
       enabled: false
     postgresql:
