@@ -8,19 +8,22 @@ RUN apk add --no-cache git
 WORKDIR /app
 
 # Copy Go module files
-COPY go.mod go.sum ./
+COPY src/go.mod src/go.sum ./
 
 # Download dependencies
 RUN go mod download
 
 # Copy the entire project
-COPY . .
+COPY src/ .
 
 # Build the Go application from cmd/ingress-watcher
 RUN CGO_ENABLED=0 GOOS=linux go build -o /goapp ./cmd/ingress-watcher
 
 # Stage 2: Create the final image
 FROM alpine:latest
+
+# Set author information
+LABEL maintainer="Yuriy Kovalchuk <yuriy.kovalchuk@proton.me>"
 
 # Set working directory
 WORKDIR /app

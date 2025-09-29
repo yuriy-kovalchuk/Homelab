@@ -1,0 +1,54 @@
+minio:
+  image:
+    tag: RELEASE.2025-04-22T22-12-26Z-cpuv1
+
+  mcImage:
+    tag: RELEASE.2025-04-16T18-13-26Z-cpuv1
+
+
+  existingSecret: minio-credentials
+
+  replicas: 3
+
+  persistence:
+    size: 10Gi
+
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-dns
+    tls:
+      - hosts:
+          - minio.yuriy-lab.cloud
+        secretName: minio-ingress-tls
+    hosts:
+      - minio.yuriy-lab.cloud
+    path: "/"
+
+  consoleIngress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-dns
+    tls:
+      - hosts:
+          - minio-console.yuriy-lab.cloud
+        secretName: minio-console-ingress-tls
+    hosts:
+      - minio-console.yuriy-lab.cloud
+    path: "/"
+
+  resources:
+    requests:
+      memory: 100Mi
+      cpu: 50m
+    limits:
+      memory: 1Gi
+      cpu: 200m
+
+  metrics:
+    serviceMonitor:
+      enabled: true
+      includeNode: true
+      namespace: monitoring

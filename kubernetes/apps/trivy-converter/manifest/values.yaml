@@ -1,0 +1,25 @@
+trivy-operator-polr-adapter:
+
+  resources:
+     limits:
+       cpu: 200m
+       memory: 256Mi
+     requests:
+       cpu: 100m
+       memory: 128Mi
+
+  adapters:
+    cisKubeBenchReports:
+      enabled: false
+    complianceReports:
+      enabled: true
+    rbacAssessmentReports:
+      enabled: true
+    exposedSecretReports:
+      enabled: true
+    infraAssessmentReports:
+      enabled: true
+    clusterInfraAssessmentReports:
+      enabled: true
+    clusterVulnerabilityReports:
+      enabled: true

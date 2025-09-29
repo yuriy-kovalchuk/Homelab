@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kyverno-reporter
+  namespace: argo-cd
+spec:
+  project: infrastructure
+  source:
+    repoURL: git@github.com:yuriy-kovalchuk/Homelab.git
+    targetRevision: HEAD
+    path: kubernetes/apps/kyverno-reporter/manifest
+    helm:
+      releaseName: kyverno-reporter
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kyverno-reporter
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+

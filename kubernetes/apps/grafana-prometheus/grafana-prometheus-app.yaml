@@ -5,6 +5,16 @@ metadata:
     name: grafana-prometheus
     namespace: argo-cd
 spec:
+    ignoreDifferences:
+      - group: apps
+        kind: StatefulSet
+        jsonPointers:
+          - /spec/replicas
+          - /spec/template/metadata/annotations
+          - /spec/updateStrategy/rollingUpdate/partition
+          - /status
+          - /metadata/creationTimestamp
+          - /spec/volumeClaimTemplates
     project: infrastructure
     source:
       repoURL: git@github.com:yuriy-kovalchuk/Homelab.git
@@ -22,4 +32,6 @@ spec:
         syncOptions:
             - CreateNamespace=true
             - ServerSideApply=true
+            - RespectIgnoreDifferences=true
+
 

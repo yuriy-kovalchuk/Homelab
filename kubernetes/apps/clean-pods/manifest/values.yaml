@@ -1,0 +1,11 @@
+schedule: "0 * * * *"   # every hour
+cleanup:
+  failed: true
+  succeeded: true
+  succeededMaxAgeSeconds: 3600   # 1 hours
+image:
+  repository: bitnami/kubectl
+  tag: latest
+  pullPolicy: IfNotPresent
+rbac:
+  serviceAccountName: cleanup-sa

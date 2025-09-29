@@ -1,6 +1,5 @@
-title: YK Homepage
-theme: dark
-color: slate
+title: Home
+background: https://images.unsplash.com/photo-1502790671504-542ad42d5189?auto=format&fit=crop&w=2560&q=80
 useEqualHeights: true
 layout:
   Core:
@@ -16,10 +15,6 @@ layout:
     style: row
     columns: 4
   Network:
-    header: true
-    style: row
-    columns: 4
-  Git:
     header: true
     style: row
     columns: 4

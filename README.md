@@ -12,14 +12,10 @@ Important: Devbox is required to run most scripts and to ensure the correct tool
 
 Each top-level area has its own README with details. Start here:
 
-- Ansible (Proxmox automation): [ansible/README.md](ansible/README.md)
-  - Automates Proxmox tasks: download cloud‑init image, create a VM template, and clone VMs.
-- k3s installer and helpers: [k3s/README.md](k3s/README.md)
-  - Installs a k3s cluster on Proxmox VMs (single master, master+workers, or HA) and prepares for Cilium.
-- Kubernetes setup bootstrap: [kubernetes/setup/README.md](kubernetes/setup/README.md)
-  - Bootstraps a fresh cluster with Cilium (CNI) and Argo CD. Note: kubernetes/setup/longhorn is out of scope here.
 - Kubernetes apps (Argo CD-managed): [kubernetes/apps/README.md](kubernetes/apps/README.md)
   - Helm charts/manifests plus Argo CD Application definitions for cluster apps.
+- Cluster setup tooling: kubernetes/setup/
+  - Contains tooling and IaC to stand up/operate the cluster (e.g., Talos Terraform under kubernetes/setup/talos/). See READMEs inside subfolders when present.
 - Ad‑hoc Kubernetes tests: [kubernetes/test/README.md](kubernetes/test/README.md)
   - Scratch area for quick manifest experiments (not managed by Argo CD).
 - Custom applications source: [applications/README.md](applications/README.md)
@@ -34,12 +30,6 @@ Each top-level area has its own README with details. Start here:
 - Run helper scripts: `devbox run <script-name>` (see the full mapping in [devbox_scripts/README.md](devbox_scripts/README.md))
 - The Devbox shell auto-exports variables from your local `.env` (see `devbox.json` init_hook). Avoid committing `.env` and quote values containing spaces.
 
-Common examples:
-- Proxmox image download: `devbox run prx_download_base_image`
-- Proxmox template creation: `devbox run prx_create_vm_template`
-- Create VMs from template: `devbox run prx_create_vm`
-- Scaffold a new app: `devbox run argo_new_app myapp --namespace myns`
-- Create a SealedSecret: `devbox run k_ss_create <name> <key> <value> <namespace>`
 
 ## Environment configuration (.env)
 
@@ -47,15 +37,13 @@ Place a .env file at the repository root to configure credentials and parameters
 
 | Variable | Purpose | Used by | Example |
 |---|---|---|---|
-| REMOTE_HOST | Proxmox API host (FQDN/IP) | Ansible | 192.168.0.2 |
-| REMOTE_USER | Proxmox SSH/API user (if used in your workflow) | Local/Ansible context | root |
-| REMOTE_PASSWORD | Proxmox API password/token | Ansible | ******** |
-| PROXMOX_USER | Proxmox API user | Ansible | root@pam |
-| PROXMOX_NODE_TARGET | Proxmox node name | Ansible | node1 |
-| PROXMOX_STORAGE_TARGET | Proxmox storage pool | Ansible | local-lvm |
-| MASTER1_USER | Cloud‑init VM user for template/VMs | Ansible | master |
-| MASTER1_PASSWORD | Cloud‑init VM password | Ansible | ******** |
-| K3S_VAR_CLUSTER_TOKEN | Shared k3s cluster token | k3s/install-k3s-v3.sh | YOUR_CLUSTER_TOKEN |
+| TF_VAR_s3_access_key | Terraform S3 backend access key | Talos Terraform init scripts | terraform-prd |
+| TF_VAR_s3_secret_key | Terraform S3 backend secret key | Talos Terraform init scripts | terraform-prd |
+| TF_VAR_s3_endpoint | S3-compatible endpoint URL for Terraform backend | Talos Terraform init scripts | http://10.0.10.10:9000 |
+| OPNSENSE_URI | Base URL to OPNsense API | ingress-hostname-exporter app/chart | https://10.0.8.254 |
+| OPNSENSE_KEY | OPNsense API key | ingress-hostname-exporter app/chart | ******** |
+| OPNSENSE_SECRET | OPNsense API secret | ingress-hostname-exporter app/chart | ******** |
+| OPNSENSE_SKIP_TLS_VERIFY | Skip TLS verification (self-signed certs) | ingress-hostname-exporter app/chart | true |
 
 Notes:
 - Only include what you actually use. Treat secrets carefully; do not commit .env.
@@ -63,9 +51,9 @@ Notes:
 
 ## Typical flow
 
-1) Provision Proxmox VMs (optionally using the Ansible playbooks via devbox run).
-2) Install k3s onto those nodes (see k3s/README.md).
-3) Bootstrap the cluster networking and GitOps: install Cilium and Argo CD (see kubernetes/setup/README.md).
-4) Let Argo CD manage apps in kubernetes/apps, and build/publish images for custom apps in applications/.
+1) Provision or prepare your Kubernetes nodes/cluster using the tooling under kubernetes/setup/ (see subfolder READMEs when present).
+2) Bootstrap cluster essentials (CNI, GitOps such as Argo CD) as defined by your chosen setup under kubernetes/setup/.
+3) Manage and deploy applications via Argo CD using definitions in kubernetes/apps/.
+4) Build and publish images for any custom services under applications/ and update corresponding charts/manifests in kubernetes/apps/.
 
 For details and troubleshooting, follow the linked READMEs above.

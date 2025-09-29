@@ -1,0 +1,44 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: harbor
+  namespace: argo-cd
+spec:
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      jsonPointers:
+        - /spec/replicas
+        - /spec/template/metadata/annotations
+        - /spec/updateStrategy/rollingUpdate/partition
+        - /status
+        - /metadata/creationTimestamp
+        - /spec/volumeClaimTemplates
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
+        - /spec/template/metadata/annotations
+        - /spec/updateStrategy/rollingUpdate/partition
+        - /status
+        - /metadata/creationTimestamp
+  project: infrastructure
+  source:
+    repoURL: git@github.com:yuriy-kovalchuk/Homelab.git
+    targetRevision: HEAD
+    path: kubernetes/apps/harbor/manifest
+    helm:
+      releaseName: harbor
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: harbor
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true
+
+

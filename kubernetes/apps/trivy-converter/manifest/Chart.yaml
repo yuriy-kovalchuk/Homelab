@@ -1,0 +1,12 @@
+apiVersion: v2
+name: trivy-converter-yk
+description: Umbrella Helm chart for trivy-converter application in Kubernetes
+
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+
+dependencies:
+  - name: trivy-operator-polr-adapter
+    version: "0.11.1"
+    repository: "https://fjogeleit.github.io/trivy-operator-polr-adapter"

@@ -1,0 +1,56 @@
+policy-reporter:
+  resources:
+     limits:
+       memory: 200Mi
+       cpu: 100m
+     requests:
+       memory: 75Mi
+       cpu: 5m
+
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-dns
+    tls:
+      - hosts:
+          - kyverno-reporter-api.yuriy-lab.cloud
+        secretName: kyverno-reporter-api-ingress-tls
+    hosts:
+      - host: kyverno-reporter-api.yuriy-lab.cloud
+        paths:
+          - path: '/'
+            pathType: Prefix
+
+  ui:
+    enabled: true
+    displayMode: dark
+
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-dns
+      tls:
+        - hosts:
+            - kyverno-reporter.yuriy-lab.cloud
+          secretName: kyverno-reporter-ingress-tls
+      hosts:
+        - host: kyverno-reporter.yuriy-lab.cloud
+          paths:
+            - path: '/'
+              pathType: Prefix
+    resources:
+      limits:
+        memory: 200Mi
+        cpu: 100m
+      requests:
+        memory: 75Mi
+        cpu: 5m
+
+  plugin:
+    kyverno:
+      enabled: true
+    trivy:
+      enabled: true
+
