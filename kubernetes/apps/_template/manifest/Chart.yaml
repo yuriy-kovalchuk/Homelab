@@ -6,8 +6,7 @@ type: application
 version: 1.0.0
 appVersion: "1.0.0"
 
-# If your app wraps an upstream chart, uncomment and edit the dependency block below
-# dependencies:
-#   - name: <upstream-chart-name>
-#     version: "<upstream-version>"
-#     repository: <upstream-helm-repo-url>
+#dependencies:
+#  - name: <upstream-chart-name>
+#    version: "<upstream-version>"
+#    repository: <upstream-helm-repo-url>

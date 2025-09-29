@@ -30,5 +30,6 @@ trivy-operator:
     storageSize: "1Gi"
     slow: false
     timeout: "3h"
+    ignoreUnfixed: true
   service:
     headless: false
