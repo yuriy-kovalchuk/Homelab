@@ -1,19 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: __APP_NAME__
+  name: cloudnative-pg
   namespace: argo-cd
 spec:
-  project: default
+  project: infrastructure
   source:
     repoURL: git@github.com:yuriy-kovalchuk/Homelab.git
     targetRevision: HEAD
-    path: kubernetes/apps/__APP_NAME__/manifest
+    path: kubernetes/apps/cloudnative-pg/manifest
     helm:
-      releaseName: __APP_NAME__
+      releaseName: cloudnative-pg
   destination:
     server: https://kubernetes.default.svc
-    namespace: __NAMESPACE__
+    namespace: cloudnative-pg
   syncPolicy:
     automated:
       prune: true
@@ -21,4 +21,3 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
-
