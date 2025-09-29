@@ -4,13 +4,15 @@ authentik:
     error_reporting:
       enabled: false
     postgresql:
+      host: pg-cluster-authentik
+      user: file:///postgres-creds/username
       password: file:///postgres-creds/password
 
   server:
     volumes:
       - name: postgres-creds
         secret:
-          secretName: authentik-postgres-credentials
+          secretName: cluster-authentik-user
     volumeMounts:
       - name: postgres-creds
         mountPath: /postgres-creds
@@ -34,7 +36,7 @@ authentik:
     volumes:
       - name: postgres-creds
         secret:
-          secretName: authentik-postgres-credentials
+          secretName: cluster-authentik-user
     volumeMounts:
       - name: postgres-creds
         mountPath: /postgres-creds
