@@ -12,6 +12,7 @@ metadata:
     cert-manager.io/cluster-issuer: {{ .Values.ingress.clusterIssuer | quote }}
     nginx.ingress.kubernetes.io/auth-url: "https://authentik.yuriy-lab.cloud/outpost.goauthentik.io/auth/nginx"
     nginx.ingress.kubernetes.io/auth-signin: "https://authentik.yuriy-lab.cloud/outpost.goauthentik.io/start?rd=$scheme://$host$request_uri"
+    nginx.ingress.kubernetes.io/auth-response-headers: "X-authentik-username, X-authentik-groups, X-authentik-email"
 spec:
   ingressClassName: {{ .Values.ingress.className }}
   tls:
