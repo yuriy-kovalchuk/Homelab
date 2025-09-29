@@ -1,0 +1,44 @@
+# PostgreSQL Cluster
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: pg-cluster-authentik
+spec:
+  description: "Authentik pg cluster"
+  imageName: ghcr.io/cloudnative-pg/postgresql:15.4
+  instances: 3
+  startDelay: 300
+  stopDelay: 300
+  primaryUpdateStrategy: unsupervised
+
+  # PostgreSQL configuration
+  postgresql:
+    parameters:
+      shared_buffers: 256MB
+      pg_stat_statements.max: '10000'
+      pg_stat_statements.track: all
+      auto_explain.log_min_duration: '10s'
+    # Allow all users to connect from any IP
+    pg_hba:
+      - host all all 0.0.0.0/0 md5
+
+  # Bootstrap app user and database
+  bootstrap:
+    initdb:
+      database: authentik
+      owner: authentik
+      secret:
+        name: cluster-authentik-user
+
+  # Storage configuration
+  storage:
+    size: 5Gi
+
+  # Resource requests/limits
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "100m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"

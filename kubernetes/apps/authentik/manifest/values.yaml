@@ -1,0 +1,44 @@
+authentik:
+
+  authentik:
+    error_reporting:
+      enabled: false
+    postgresql:
+      password: file:///postgres-creds/password
+
+  server:
+    volumes:
+      - name: postgres-creds
+        secret:
+          secretName: authentik-postgres-credentials
+    volumeMounts:
+      - name: postgres-creds
+        mountPath: /postgres-creds
+        readOnly: true
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-dns
+      tls:
+        - hosts:
+            - authentik.yuriy-lab.cloud
+          secretName: authentik-ingress-tls
+      hosts:
+        - authentik.yuriy-lab.cloud
+      paths:
+        - "/"
+
+
+  worker:
+    volumes:
+      - name: postgres-creds
+        secret:
+          secretName: authentik-postgres-credentials
+    volumeMounts:
+      - name: postgres-creds
+        mountPath: /postgres-creds
+        readOnly: true
+
+  redis:
+    enabled: true
