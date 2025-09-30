@@ -65,7 +65,7 @@
 - Network:
     - OpnSense:
         icon: opnsense.svg
-        href: "https://10.0.1.254"
+        href: "https://opnsense.yuriy-lab.cloud"
         description: OpnSense
     - Nginx:
         icon: nginx.svg
