@@ -4,7 +4,7 @@ cleanup:
   succeeded: true
   succeededMaxAgeSeconds: 3600   # 1 hours
 image:
-  repository: bitnami/kubectl
+  repository: "rancher/kubectl:v1.32.9-amd64"
   tag: latest
   pullPolicy: IfNotPresent
 rbac:
