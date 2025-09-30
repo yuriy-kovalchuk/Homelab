@@ -5,7 +5,7 @@
         description: YK ArgoCD instance
     - Proxmox:
         icon: proxmox.svg
-        href: "https://10.0.1.1:8006"
+        href: "https://firewall.yuriy-lab.cloud:8006"
         description: firewall
     - Authentik:
         icon: authentik.svg
