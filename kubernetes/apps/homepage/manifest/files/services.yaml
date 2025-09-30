@@ -7,6 +7,10 @@
         icon: proxmox.svg
         href: "https://10.0.1.1:8006"
         description: firewall
+    - Authentik:
+        icon: authentik.svg
+        href: "http://authentik.yuriy-lab.cloud/"
+        description: YK IDP
     - Longhorn:
         icon: longhorn.svg
         href: "http://longhorn.yuriy-lab.cloud/"
