@@ -62,19 +62,6 @@ kube-prometheus-stack:
       size: 1Gi
       finalizers:
         - kubernetes.io/pvc-protection
-    additionalDataSources:
-      - name: Mimir
-        type: prometheus
-        access: proxy
-        url: http://mimir-test-query-frontend.mimir:8080/prometheus
-        isDefault: true
-        uid: mimir-ds  # Add a UID for reference
-        jsonData:
-          httpHeaderName1: 'X-Scope-OrgID'
-          timeInterval: 30s
-          httpMethod: POST
-        secureJsonData:
-          httpHeaderValue1: 'anonymous'
 
   kubeControllerManager:
     endpoints:
@@ -159,10 +146,6 @@ kube-prometheus-stack:
         ipFamilyPolicy: "SingleStack"
 
   prometheus:
-    thanosService:
-      ipDualStack:
-        ipFamilies: ["IPv4"]
-        ipFamilyPolicy: "SingleStack"
     service:
       ipDualStack:
         ipFamilies: ["IPv4"]
@@ -189,21 +172,6 @@ kube-prometheus-stack:
         - url: http://mimir-test-nginx.mimir.svc.cluster.local/api/v1/push
           writeRelabelConfigs:
             # Convert all dots to underscores in metric names
-            - sourceLabels: [ __name__ ]
-              regex: '([^.]+)\.(.+)'
-              targetLabel: __name__
-              replacement: '${1}_${2}'
-              action: replace
-            - sourceLabels: [ __name__ ]
-              regex: '([^.]+)\.(.+)'
-              targetLabel: __name__
-              replacement: '${1}_${2}'
-              action: replace
-            - sourceLabels: [ __name__ ]
-              regex: '([^.]+)\.(.+)'
-              targetLabel: __name__
-              replacement: '${1}_${2}'
-              action: replace
             - sourceLabels: [ __name__ ]
               regex: '([^.]+)\.(.+)'
               targetLabel: __name__
@@ -256,13 +224,8 @@ kube-prometheus-stack:
             accessModes: ["ReadWriteOnce"]
             resources:
               requests:
-                storage: 10Gi
+                storage: 2Gi
 
-  thanosRuler:
-    service:
-      ipDualStack:
-        ipFamilies: ["IPv4"]
-        ipFamilyPolicy: "SingleStack"
 
   extraManifests:
     - apiVersion: v1
