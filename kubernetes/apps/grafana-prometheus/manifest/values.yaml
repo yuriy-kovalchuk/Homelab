@@ -63,14 +63,18 @@ kube-prometheus-stack:
       finalizers:
         - kubernetes.io/pvc-protection
     additionalDataSources:
-        - name: Mimir
-          type: prometheus
-          access: proxy
-          url: http://mimir-test-query-frontend.mimir:8080/prometheus
-          isDefault: true  # Make Mimir the default
-          jsonData:
-            timeInterval: 30s
-            queryTimeout: 300s
+      - name: Mimir
+        type: prometheus
+        access: proxy
+        url: http://mimir-test-query-frontend.mimir:8080/prometheus
+        isDefault: true
+        uid: mimir-ds  # Add a UID for reference
+        jsonData:
+          httpHeaderName1: 'X-Scope-OrgID'
+          timeInterval: 30s
+          httpMethod: POST
+        secureJsonData:
+          httpHeaderValue1: 'anonymous'
 
   kubeControllerManager:
     endpoints:
