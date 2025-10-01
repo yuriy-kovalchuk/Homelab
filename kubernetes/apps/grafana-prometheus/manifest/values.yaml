@@ -183,6 +183,28 @@ kube-prometheus-stack:
     prometheusSpec:
       remoteWrite:
         - url: http://mimir-test-nginx.mimir.svc.cluster.local/api/v1/push
+          writeRelabelConfigs:
+            # Convert all dots to underscores in metric names
+            - sourceLabels: [ __name__ ]
+              regex: '([^.]+)\.(.+)'
+              targetLabel: __name__
+              replacement: '${1}_${2}'
+              action: replace
+            - sourceLabels: [ __name__ ]
+              regex: '([^.]+)\.(.+)'
+              targetLabel: __name__
+              replacement: '${1}_${2}'
+              action: replace
+            - sourceLabels: [ __name__ ]
+              regex: '([^.]+)\.(.+)'
+              targetLabel: __name__
+              replacement: '${1}_${2}'
+              action: replace
+            - sourceLabels: [ __name__ ]
+              regex: '([^.]+)\.(.+)'
+              targetLabel: __name__
+              replacement: '${1}_${2}'
+              action: replace
           # If using distributed Mimir, use the gateway/nginx endpoint
           # Adjust the namespace if Mimir is in a different one
 
