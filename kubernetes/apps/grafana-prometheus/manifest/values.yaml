@@ -172,6 +172,47 @@ kube-prometheus-stack:
           hosts:
             - prometheus.yuriy-lab.cloud
     prometheusSpec:
+      remoteWrite:
+        - url: http://mimir-test-nginx.mimir.svc.cluster.local/api/v1/push
+          # If using distributed Mimir, use the gateway/nginx endpoint
+          # Adjust the namespace if Mimir is in a different one
+
+          # Optional: Add basic auth if configured
+          # basicAuth:
+          #   username:
+          #     name: mimir-credentials
+          #     key: username
+          #   password:
+          #     name: mimir-credentials
+          #     key: password
+
+          # Optional: Add headers for multi-tenancy
+          # headers:
+          #   X-Scope-OrgID: tenant-1
+
+          # Recommended queue configuration
+          queueConfig:
+            capacity: 10000
+            maxShards: 50
+            minShards: 1
+            maxSamplesPerSend: 5000
+            batchSendDeadline: 5s
+            minBackoff: 30ms
+            maxBackoff: 5s
+
+          # Write relabel configs (optional - for filtering/modifying metrics)
+          # writeRelabelConfigs:
+          #   - sourceLabels: [__name__]
+          #     regex: 'expensive_metric_.*'
+          #     action: drop
+
+      # Optional: Configure remote read from Mimir
+      # remoteRead:
+      #   - url: http://mimir-nginx.mimir.svc.cluster.local/prometheus
+      #     readRecent: true
+
+      # Retention - you can reduce local retention since data is in Mimir
+      retention: 1h  # Keep only 1 hours locally
       serviceMonitorSelectorNilUsesHelmValues: false
       storageSpec:
         volumeClaimTemplate:
