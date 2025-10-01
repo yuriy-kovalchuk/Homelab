@@ -62,6 +62,15 @@ kube-prometheus-stack:
       size: 1Gi
       finalizers:
         - kubernetes.io/pvc-protection
+    additionalDataSources:
+        - name: Mimir
+          type: prometheus
+          access: proxy
+          url: http://mimir-test-query-frontend.mimir:8080/prometheus
+          isDefault: true  # Make Mimir the default
+          jsonData:
+            timeInterval: 30s
+            queryTimeout: 300s
 
   kubeControllerManager:
     endpoints:
