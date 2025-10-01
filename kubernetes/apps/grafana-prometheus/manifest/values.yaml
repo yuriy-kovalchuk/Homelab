@@ -181,6 +181,11 @@ kube-prometheus-stack:
             resources:
               requests:
                 storage: 10Gi
+    thanos:
+      create: "true"
+      objectStorageConfig:
+        secretName: thanos-objstore-config
+        secretKey: thanos.yaml
 
   thanosRuler:
     service:
