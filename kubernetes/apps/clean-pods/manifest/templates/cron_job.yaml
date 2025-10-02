@@ -18,6 +18,8 @@ spec:
                 - /bin/sh
                 - -c
                 - |
+                  # install jq on the fly
+                  apk add --no-cache jq >/dev/null
                   {{- if .Values.cleanup.failed }}
                   echo "Cleaning up Failed pods..."
                   kubectl delete pods --all-namespaces --field-selector=status.phase=Failed --ignore-not-found
