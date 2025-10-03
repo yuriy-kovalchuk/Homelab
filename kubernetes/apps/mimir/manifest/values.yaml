@@ -1,0 +1,128 @@
+mimir-distributed:
+
+  global:
+   extraEnvFrom:
+     - secretRef:
+         name: mimir-credentials
+
+  mimir:
+    structuredConfig:
+      memberlist:
+        cluster_label: "mimir"
+        cluster_label_verification_disabled: false
+
+      server:
+        log_level: info
+        grpc_server_max_recv_msg_size: 104857600
+        grpc_server_max_send_msg_size: 104857600
+        grpc_server_max_concurrent_streams: 1000
+
+      limits:
+        max_label_names_per_series: 120
+        max_global_series_per_user: 12000000
+        max_global_series_per_metric: 200000000
+        compactor_blocks_retention_period: 90d
+        # Increase query limits
+        max_query_parallelism: 240  # Default is 14
+        max_queriers_per_tenant: 0  # 0 means unlimited
+
+        # Query sharding limits
+        query_sharding_total_shards: 128  # Default is 16
+        query_sharding_max_sharded_queries: 256  # Default is 128
+
+        # Rate limits
+        request_rate: 0  # 0 means unlimited (or set a high value like 10000)
+        request_burst_size: 0  # 0 means unlimited
+
+        # Ingestion rate limits (also increase these)
+        ingestion_rate: 100000  # Default is 25000
+        ingestion_burst_size: 200000  # Default is 50000
+
+      query_scheduler:
+        max_outstanding_requests_per_tenant: 10000
+
+      blocks_storage:
+        backend: s3
+        s3:
+          endpoint: "minio-svc.minio:9000"
+          region: "eu-south-1"
+          access_key_id: "${access_key_id}"
+          secret_access_key: "${secret_access_key}"
+          bucket_name: "mimir-data"
+          insecure: true
+          http:
+            insecure_skip_verify: true
+
+        # ADDED: TSDB configuration - controls flushing to MinIO
+        tsdb:
+          dir: /data/tsdb
+          block_ranges_period: [ 2h ]
+          retention_period: 6h  # ← Just needs to cover block creation period
+          ship_interval: 1m
+          flush_blocks_on_shutdown: true
+          head_compaction_interval: 1m
+          wal_compression_enabled: true
+
+      compactor:
+        compaction_interval: 30m  # ← Runs regularly to optimize blocks
+        data_dir: /data/compactor
+
+      ingester:
+        ring:
+          zone_awareness_enabled: false
+          replication_factor: 1
+          kvstore:
+            store: memberlist
+
+      store_gateway:
+        sharding_ring:
+          zone_awareness_enabled: false
+          replication_factor: 1
+          kvstore:
+            store: memberlist
+
+  # Writes incoming series to long-term storage on the write path and returns series samples for queries on the read path.
+  ingester:
+    zoneAwareReplication:
+      enabled: false
+    persistentVolume:
+      enabled: true
+    replicas: 1
+
+  # Receives data from alloy, corrects, devides data to batches and send to ingesters
+  distributor:
+    extraArgs:
+      auth.multitenancy-enabled: false
+      log.level: info
+    replicas: 1
+  # Increases query performance and reduces long-term storage usage by combining blocks.
+  compactor:
+    replicas: 1
+  # Evaluates PromQL expressions by fetching time series and labels on the read path. Uses store-gateway fron minio and ingester for latest data
+  querier:
+    replicas: 1
+  # "frontend" for querier
+  query_frontend:
+    replicas: 1
+  # comuniacation with minio
+  store_gateway:
+    zoneAwareReplication:
+      enabled: false
+    replicas: 1
+  query_scheduler:
+    replicas: 1
+
+
+  ## Disabled services:
+  rollout_operator:
+    enabled: false
+  gateway:
+    enabledNonEnterprise: false
+  ruler:
+    enabled: false
+  overrides_exporter:
+    enabled: false
+  alertmanager:
+    enabled: false
+  minio:
+    enabled: false
