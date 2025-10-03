@@ -7,6 +7,6 @@ image_registry   = "factory.talos.dev/nocloud-installer"
 control_plane_nodes = [
   { ip = "10.0.8.2", hostname = "yulia", interface = "eno1", disk = "/dev/sda", wipe = true},
   { ip = "10.0.8.3", hostname = "lisa", interface = "eno1", disk = "/dev/sda", wipe = true },
-  { ip = "10.0.8.4", hostname = "thea", interface = "eno1", disk = "/dev/sdb", wipe = true },
+  { ip = "10.0.8.4", hostname = "thea", interface = "eno1", disk = "/dev/nvme0n1", wipe = true },
 ]
 
