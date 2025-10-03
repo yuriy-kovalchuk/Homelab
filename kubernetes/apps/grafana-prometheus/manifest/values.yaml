@@ -169,7 +169,7 @@ kube-prometheus-stack:
             - prometheus.yuriy-lab.cloud
     prometheusSpec:
       remoteWrite:
-        - url: http://mimir-test-nginx.mimir.svc.cluster.local/api/v1/push
+        - url: http://mimir-nginx.mimir.svc.cluster.local/api/v1/push
           writeRelabelConfigs:
             # Convert all dots to underscores in metric names
             - sourceLabels: [ __name__ ]
