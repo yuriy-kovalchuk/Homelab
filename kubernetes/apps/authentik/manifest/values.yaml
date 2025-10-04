@@ -34,8 +34,8 @@ authentik:
       paths:
         - "/"
       extraPaths:
-        - path: /outpost.goauthentik.io/
-          pathType: Prefix
+        - path: /outpost.goauthentik.io(/|$)(.*)
+          pathType: ImplementationSpecific
           backend:
             service:
               name: ak-outpost-authentik-embedded-outpost
