@@ -1,6 +1,8 @@
 ingress-nginx:
   controller:
     allowSnippetAnnotations: true
+    config:
+      annotations-risk-level: Critical
     service:
       loadBalancerIP: "10.0.8.100"
     metrics:
