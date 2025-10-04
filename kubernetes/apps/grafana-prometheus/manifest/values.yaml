@@ -43,6 +43,12 @@ kube-prometheus-stack:
                 storage: 5Gi
 
   grafana:
+    grafana.ini:
+      server:
+        protocol: https
+        domain: grafana.yuriy-lab.cloud
+        root_url: https://grafana.yuriy-lab.cloud
+        serve_from_sub_path: false
     ingress:
       enabled: true
       ingressClassName: nginx
