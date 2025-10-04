@@ -8,7 +8,7 @@ longhorn:
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-dns
       nginx.ingress.kubernetes.io/auth-url: |-
-        http://ak-outpost-authentik-embedded-outpost.authentik.svc.cluster.local:9000/outpost.goauthentik.io/auth/nginx
+        http://ak-outpost-ext-outpost.authentik.svc.cluster.local:9000/outpost.goauthentik.io/auth/nginx
       nginx.ingress.kubernetes.io/auth-signin: |-
         https://outpost.authentik.yuriy-lab.cloud/outpost.goauthentik.io/start?rd=$scheme://$http_host$escaped_request_uri
       nginx.ingress.kubernetes.io/auth-response-headers: |-
