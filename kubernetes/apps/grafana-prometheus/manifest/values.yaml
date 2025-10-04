@@ -45,7 +45,7 @@ kube-prometheus-stack:
   grafana:
     grafana.ini:
       server:
-        protocol: https
+        protocol: http
         domain: grafana.yuriy-lab.cloud
         root_url: https://grafana.yuriy-lab.cloud
         serve_from_sub_path: false
