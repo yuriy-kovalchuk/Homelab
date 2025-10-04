@@ -29,7 +29,8 @@
         href: "https://prometheus.yuriy-lab.cloud"
         description: YK Prometheus
     - Kyverno:
-        icon: kyverno.svg
+#        icon: kyverno.svg
+        favicon: https://kyverno-reporter.yuriy-lab.cloud/logo.png
         href: "https://kyverno-reporter.yuriy-lab.cloud"
         description: YK Kyverno Reporter
     - Uptime Kuma:
