@@ -1,5 +1,6 @@
 ingress-nginx:
   controller:
+    allowSnippetAnnotations: true
     service:
       loadBalancerIP: "10.0.8.100"
     metrics:
