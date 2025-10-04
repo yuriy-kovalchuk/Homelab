@@ -49,8 +49,6 @@ kube-prometheus-stack:
         domain: grafana.yuriy-lab.cloud
         root_url: https://grafana.yuriy-lab.cloud
         serve_from_sub_path: false
-      auth.generic_oauth:
-        role_attribute_path: contains(groups, 'Grafana Admins') && 'Admin' || contains(groups, 'Grafana Editors') && 'Editor' || 'Viewer'
     ingress:
       enabled: true
       ingressClassName: nginx
