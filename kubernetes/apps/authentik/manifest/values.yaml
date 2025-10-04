@@ -33,14 +33,6 @@ authentik:
         - authentik.yuriy-lab.cloud
       paths:
         - "/"
-      extraPaths:
-        - path: /outpost.goauthentik.io
-          pathType: ImplementationSpecific
-          backend:
-            service:
-              name: ak-outpost-authentik-embedded-outpost
-              port:
-                number: 9000
 
 
   worker:
