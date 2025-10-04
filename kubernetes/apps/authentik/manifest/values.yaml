@@ -34,7 +34,7 @@ authentik:
       paths:
         - "/"
       extraPaths:
-        - path: /outpost.goauthentik.io
+        - path: /outpost.goauthentik.io/
           pathType: Prefix
           backend:
             service:
