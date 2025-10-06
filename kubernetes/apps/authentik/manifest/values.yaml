@@ -11,11 +11,6 @@ authentik:
       user: file:///postgres-creds/username
       password: file:///postgres-creds/password
 
-  # Blueprints via ConfigMap
-  blueprints:
-    configMaps:
-      - my-app-provider
-
 
   server:
     volumes:
