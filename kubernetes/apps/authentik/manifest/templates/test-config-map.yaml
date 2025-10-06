@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-app-provider
+  namespace: authentik  # <-- adjust to your namespace
+  labels:
+    app.kubernetes.io/name: authentik
+    app.kubernetes.io/component: blueprints
+data:
+  provider-application.yaml: |
+    version: 1
+    metadata:
+      name: my-company-app-provider
+      labels:
+        goauthentik_blueprint: "1"
+    entries:
+      # --- Provider definition ---
+      - id: my-oidc-provider
+        model: authentik_authentication.provider
+        create: true
+        update: true
+        fields:
+          name: "My OIDC Provider"
+          slug: "my-oidc-provider"
+          type: "oidc"
+          oidc_client_id: "my-client-id"
+          oidc_client_secret: "my-client-secret"
+          oidc_discovery_url: "https://accounts.example.com/.well-known/openid-configuration"
+          authorization_flow: "default-provider-authorization-implicit-consent"
+          scopes:
+            - openid
+            - email
+            - profile
+
+      # --- Application definition ---
+      - id: my-app
+        model: authentik_applications.application
+        create: true
+        update: true
+        fields:
+          name: "Example App"
+          slug: "example-app"
+          launch_url: "https://app.example.com/"
+          open_in_new_tab: true
+          icon: ""
+          publisher: "MyCompany"
+          policy_engine_mode: "any"
+          provider: my-oidc-provider

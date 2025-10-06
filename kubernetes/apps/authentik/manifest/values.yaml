@@ -11,6 +11,16 @@ authentik:
       user: file:///postgres-creds/username
       password: file:///postgres-creds/password
 
+  # Blueprints via ConfigMap
+  blueprints:
+    configMaps:
+      # map names to blueprint file(s)
+      my-app-provider:
+        # name inside the ConfigMap
+        - provider-application.yaml
+      # you could also use secrets similarly
+    # secrets: {}
+
   server:
     volumes:
       - name: postgres-creds
