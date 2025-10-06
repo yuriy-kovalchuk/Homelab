@@ -14,35 +14,33 @@ data:
       labels:
         goauthentik_blueprint: "1"
     entries:
-      # --- Provider definition ---
+      # --- OIDC Provider ---
       - id: my-oidc-provider
-        model: authentik_authentication.provider
+        model: authentik_providers_oidc.provider
         create: true
         update: true
         fields:
           name: "My OIDC Provider"
           slug: "my-oidc-provider"
-          type: "oidc"
-          oidc_client_id: "my-client-id"
-          oidc_client_secret: "my-client-secret"
-          oidc_discovery_url: "https://accounts.example.com/.well-known/openid-configuration"
+          client_id: "my-client-id"
+          client_secret: "my-client-secret"
           authorization_flow: "default-provider-authorization-implicit-consent"
-          scopes:
-            - openid
-            - email
-            - profile
-
-      # --- Application definition ---
+          redirect_uris:
+            - "https://app.example.com/auth/callback"
+          property_mappings:
+            - !Find [authentik_core.propertymapping, default-mapping-openid-email]
+            - !Find [authentik_core.propertymapping, default-mapping-openid-profile]
+          signing_key: !Find [authentik_crypto.certificatekeypair, authentik Self-signed Certificate]
+    
+      # --- Application ---
       - id: my-app
-        model: authentik_applications.application
+        model: authentik_core.application
         create: true
         update: true
         fields:
           name: "Example App"
           slug: "example-app"
+          provider: !KeyOf my-oidc-provider
           launch_url: "https://app.example.com/"
           open_in_new_tab: true
-          icon: ""
-          publisher: "MyCompany"
-          policy_engine_mode: "any"
-          provider: my-oidc-provider
+
