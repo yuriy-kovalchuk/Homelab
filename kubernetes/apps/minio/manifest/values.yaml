@@ -60,6 +60,18 @@ minio:
       policy: none
       purge: false
       versioning: false
+    - name: loki-admin
+      policy: none
+      purge: false
+      versioning: false
+    - name: loki-ruler
+      policy: none
+      purge: false
+      versioning: false
+    - name: loki-chunks
+      policy: none
+      purge: false
+      versioning: false
 
     #   # Name of the bucket
     # - name: bucket1
