@@ -13,8 +13,7 @@ minio:
 
 
   persistence:
-    size: 10Gi
-    existingClaim: "export-minio-0"
+    size: 20Gi
 
   ingress:
     enabled: true
