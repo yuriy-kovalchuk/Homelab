@@ -9,6 +9,8 @@ minio:
   existingSecret: minio-credentials
 
   replicas: 1
+  mode: "standalone"
+
 
   persistence:
     size: 10Gi
