@@ -105,22 +105,6 @@ resource "authentik_application" "vault_application" {
 
 
 # -------------------- grafana ---------------------------
-data "authentik_flow" "default-provider-authorization-implicit-consent" {
-  slug = "default-provider-authorization-implicit-consent"
-}
-
-data "authentik_property_mapping_provider_scope" "scope-email" {
-  name = "authentik default OAuth Mapping: OpenID 'email'"
-}
-
-data "authentik_property_mapping_provider_scope" "scope-profile" {
-  name = "authentik default OAuth Mapping: OpenID 'profile'"
-}
-
-data "authentik_property_mapping_provider_scope" "scope-openid" {
-  name = "authentik default OAuth Mapping: OpenID 'openid'"
-}
-
 resource "authentik_provider_oauth2" "grafana_provider" {
   name          = "grafana"
   client_id     = "ljuHKQWUPCdi2ElfXLUqFqvDrM9w2oa97mY7vRe4"
@@ -159,6 +143,36 @@ resource "authentik_group" "grafana_editors" {
 resource "authentik_group" "grafana_viewers" {
   name    = "Grafana Viewers"
 }
+# -------------------- grafana ---------------------------
+
+
+# -------------------- rancher ---------------------------
+resource "authentik_provider_oauth2" "rancher_provider" {
+  name          = "rancher"
+  client_id     = "JW5BvuhoQ8W662jSRMnjjt11lwvhf4tXyoi7JDfa"
+  client_secret = var.rancher_provider_client_secret
+  authorization_flow  = data.authentik_flow.default-provider-authorization-implicit-consent.id
+  invalidation_flow  = data.authentik_flow.default_invalidation.id
+  allowed_redirect_uris = [
+    {
+      matching_mode = "strict",
+      url           = "https://rancher.yuriy-lab.cloud/verify-auth",
+    }
+  ]
+
+  property_mappings = [
+    data.authentik_property_mapping_provider_scope.scope-email.id,
+    data.authentik_property_mapping_provider_scope.scope-profile.id,
+    data.authentik_property_mapping_provider_scope.scope-openid.id,
+  ]
+}
+
+resource "authentik_application" "rancher_application" {
+  name              = "rancher"
+  slug              = "rancher"
+  protocol_provider = authentik_provider_oauth2.rancher_provider.id
+}
+# -------------------- grafana ---------------------------
 
 
 

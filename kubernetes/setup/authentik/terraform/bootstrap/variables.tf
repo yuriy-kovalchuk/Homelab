@@ -27,3 +27,9 @@ variable "grafana_provider_client_secret" {
   type        = string
   sensitive   = true
 }
+
+variable "rancher_provider_client_secret" {
+  description = "Client secret for rancher provider"
+  type        = string
+  sensitive   = true
+}
