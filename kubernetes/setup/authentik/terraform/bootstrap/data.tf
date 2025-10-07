@@ -20,3 +20,8 @@ data "authentik_property_mapping_provider_scope" "profile" {
     "goauthentik.io/providers/oauth2/scope-profile"
   ]
 }
+
+# To get the name of a user by username
+data "authentik_user" "akadmin" {
+  username = "yuriy"
+}

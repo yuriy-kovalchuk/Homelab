@@ -21,3 +21,9 @@ variable "vault_provider_client_secret" {
   type        = string
   sensitive   = true
 }
+
+variable "grafana_provider_client_secret" {
+  description = "Client secret for grafana provider"
+  type        = string
+  sensitive   = true
+}

@@ -48,13 +48,6 @@ resource "authentik_application" "argocd_application" {
   protocol_provider = authentik_provider_oauth2.argocd_provider.id
 }
 
-# To get the name of a user by username
-
-data "authentik_user" "akadmin" {
-  username = "yuriy"
-}
-
-# Then use `data.authentik_group.akadmin.name`
 
 resource "authentik_group" "argo_admins_group" {
   name         = "ArgoCD Admins"
@@ -108,4 +101,64 @@ resource "authentik_application" "vault_application" {
   slug              = "vault"
   protocol_provider = authentik_provider_oauth2.vault_provider.id
 }
+# -------------------- vault ---------------------------
+
+
+# -------------------- grafana ---------------------------
+data "authentik_flow" "default-provider-authorization-implicit-consent" {
+  slug = "default-provider-authorization-implicit-consent"
+}
+
+data "authentik_property_mapping_provider_scope" "scope-email" {
+  name = "authentik default OAuth Mapping: OpenID 'email'"
+}
+
+data "authentik_property_mapping_provider_scope" "scope-profile" {
+  name = "authentik default OAuth Mapping: OpenID 'profile'"
+}
+
+data "authentik_property_mapping_provider_scope" "scope-openid" {
+  name = "authentik default OAuth Mapping: OpenID 'openid'"
+}
+
+resource "authentik_provider_oauth2" "grafana_provider" {
+  name          = "grafana"
+  client_id     = "ljuHKQWUPCdi2ElfXLUqFqvDrM9w2oa97mY7vRe4"
+  client_secret = var.grafana_provider_client_secret
+  authorization_flow  = data.authentik_flow.default-provider-authorization-implicit-consent.id
+  invalidation_flow  = data.authentik_flow.default_invalidation.id
+  allowed_redirect_uris = [
+    {
+      matching_mode = "strict",
+      url           = "https://grafana.yuriy-lab.cloud/login/generic_oauth",
+    }
+  ]
+
+  property_mappings = [
+    data.authentik_property_mapping_provider_scope.scope-email.id,
+    data.authentik_property_mapping_provider_scope.scope-profile.id,
+    data.authentik_property_mapping_provider_scope.scope-openid.id,
+  ]
+}
+
+resource "authentik_application" "grafana_application" {
+  name              = "grafana"
+  slug              = "grafana"
+  protocol_provider = authentik_provider_oauth2.grafana_provider.id
+}
+
+resource "authentik_group" "grafana_admins" {
+  name    = "Grafana Admins"
+  users        = [data.authentik_user.akadmin.id]
+}
+
+resource "authentik_group" "grafana_editors" {
+  name    = "Grafana Editors"
+}
+
+resource "authentik_group" "grafana_viewers" {
+  name    = "Grafana Viewers"
+}
+
+
 
