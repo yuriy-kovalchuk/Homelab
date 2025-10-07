@@ -44,7 +44,7 @@ mimir-distributed:
       blocks_storage:
         backend: s3
         s3:
-          endpoint: "minio:9000"
+          endpoint: "minio.minio:9000"
           region: "eu-south-1"
           access_key_id: "${access_key_id}"
           secret_access_key: "${secret_access_key}"
