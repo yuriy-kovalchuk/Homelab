@@ -15,5 +15,5 @@ spec:
         - whoami.istio.yuriy-lab.cloud
       tls:
         mode: SIMPLE
-        credentialName: my-default-tls-secret created
+        credentialName: my-default-tls-secret
         # self-signed default certificate from Istio ingressgateway will be used
