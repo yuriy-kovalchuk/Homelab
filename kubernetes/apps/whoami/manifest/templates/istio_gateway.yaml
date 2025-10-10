@@ -1,4 +1,3 @@
-# Istio Gateway using self-signed cert (default Istio)
 apiVersion: networking.istio.io/v1beta1
 kind: Gateway
 metadata:
@@ -16,4 +15,5 @@ spec:
         - whoami.istio.yuriy-lab.cloud
       tls:
         mode: SIMPLE
+        credentialName: my-default-tls-secret created
         # self-signed default certificate from Istio ingressgateway will be used
