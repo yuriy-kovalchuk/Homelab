@@ -8,12 +8,8 @@ spec:
     istio: istio
   servers:
     - port:
-        number: 443
+        number: 80
         name: https-whoami
-        protocol: HTTPS
+        protocol: HTTP
       hosts:
         - whoami.istio.yuriy-lab.cloud
-      tls:
-#        mode: SIMPLE
-#        credentialName: my-default-tls-secret
-        mode: PASSTHROUGH

@@ -15,6 +15,6 @@ spec:
             prefix: "/"  # same as your Ingress path
       route:
         - destination:
-            host: whoami.whoami.svc.cluster.local
+            host: whoami
             port:
               number: 80
