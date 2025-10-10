@@ -11,3 +11,15 @@ dependencies:
     version: "1.27.1"
     repository: https://istio-release.storage.googleapis.com/charts
 
+  - name: cni
+    version: "1.27.1"
+    repository: https://istio-release.storage.googleapis.com/charts
+
+  - name: istiod
+    version: "1.27.1"
+    repository: https://istio-release.storage.googleapis.com/charts
+
+  - name: gateway
+    version: "1.27.1"
+    repository: https://istio-release.storage.googleapis.com/charts
+

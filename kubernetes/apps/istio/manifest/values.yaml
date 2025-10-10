@@ -1,0 +1,17 @@
+gateway:
+  service:
+    loadBalancerIP: "10.0.8.101"
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+istiod:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
