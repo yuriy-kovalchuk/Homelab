@@ -1,0 +1,19 @@
+# Istio Gateway using self-signed cert (default Istio)
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: whoami-gateway
+  namespace: whoami
+spec:
+  selector:
+    istio: ingressgateway # use Istio ingress gateway
+  servers:
+    - port:
+        number: 443
+        name: https-whoami
+        protocol: HTTPS
+      hosts:
+        - whoami.istio.yuriy-lab.cloud
+      tls:
+        mode: SIMPLE
+        # self-signed default certificate from Istio ingressgateway will be used

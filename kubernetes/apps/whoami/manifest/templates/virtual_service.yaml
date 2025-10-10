@@ -1,0 +1,20 @@
+# Istio VirtualService
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: whoami-vs
+  namespace: whoami
+spec:
+  hosts:
+    - whoami.istio.yuriy-lab.cloud
+  gateways:
+    - whoami-gateway
+  http:
+    - match:
+        - uri:
+            prefix: "/"  # same as your Ingress path
+      route:
+        - destination:
+            host: whoami.whoami.svc.cluster.local
+            port:
+              number: 80
