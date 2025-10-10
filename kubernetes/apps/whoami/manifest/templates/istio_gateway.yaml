@@ -14,5 +14,6 @@ spec:
       hosts:
         - whoami.istio.yuriy-lab.cloud
       tls:
-        mode: SIMPLE
-        credentialName: my-default-tls-secret
+#        mode: SIMPLE
+#        credentialName: my-default-tls-secret
+        mode: PASSTHROUGH
