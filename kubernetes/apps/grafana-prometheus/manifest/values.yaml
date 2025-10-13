@@ -226,6 +226,7 @@ kube-prometheus-stack:
       retention: 1h  # Keep only 1 hours locally
       retentionSize: "1GiB"
       serviceMonitorSelectorNilUsesHelmValues: false
+      podMonitorSelectorNilUsesHelmValues: false
       storageSpec:
         volumeClaimTemplate:
           spec:
