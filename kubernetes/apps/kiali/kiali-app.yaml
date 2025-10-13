@@ -13,7 +13,7 @@ spec:
       releaseName: kiali
   destination:
     server: https://kubernetes.default.svc
-    namespace: kiali
+    namespace: istio-system
   syncPolicy:
     automated:
       prune: true
