@@ -1,19 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: __APP_NAME__
+  name: kiali
   namespace: argo-cd
 spec:
   project: infrastructure
   source:
     repoURL: git@github.com:yuriy-kovalchuk/Homelab.git
     targetRevision: HEAD
-    path: kubernetes/apps/__APP_NAME__/manifest
+    path: kubernetes/apps/kiali/manifest
     helm:
-      releaseName: __APP_NAME__
+      releaseName: kiali
   destination:
     server: https://kubernetes.default.svc
-    namespace: __NAMESPACE__
+    namespace: kiali
   syncPolicy:
     automated:
       prune: true
