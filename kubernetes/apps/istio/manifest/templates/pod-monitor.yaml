@@ -4,7 +4,7 @@ metadata:
   name: istio-sidecars
   namespace: monitoring
   labels:
-    release: kube-prometheus-stack  # must match your Prometheus release label
+    release: grafana-prometheus
 spec:
   namespaceSelector:
     any: true
