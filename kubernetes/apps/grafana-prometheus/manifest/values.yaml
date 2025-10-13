@@ -223,13 +223,8 @@ kube-prometheus-stack:
           #     regex: 'expensive_metric_.*'
           #     action: drop
 
-      # Optional: Configure remote read from Mimir
-      # remoteRead:
-      #   - url: http://mimir-nginx.mimir.svc.cluster.local/prometheus
-      #     readRecent: true
-
-      # Retention - you can reduce local retention since data is in Mimir
       retention: 1h  # Keep only 1 hours locally
+      retentionSize: "1GiB"
       serviceMonitorSelectorNilUsesHelmValues: false
       storageSpec:
         volumeClaimTemplate:
