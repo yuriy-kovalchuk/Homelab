@@ -1,0 +1,19 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: kiali-virtualservice
+  namespace: istio-system
+spec:
+  hosts:
+    - {{ .Values.kialiGateway.host | default "kiali.istio.yuriy-lab.cloud" }}
+  gateways:
+    - kiali-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: kiali.istio-system.svc.cluster.local
+            port:
+              number: 20001

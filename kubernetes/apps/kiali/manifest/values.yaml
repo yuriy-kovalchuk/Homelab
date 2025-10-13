@@ -23,3 +23,7 @@ kiali:
         use_kiali_token: false
     prometheus:
       url: "http://grafana-prometheus-kube-pr-prometheus.monitoring:9090"
+
+# Hostname for external access via Istio Gateway/VirtualService
+kialiGateway:
+  host: "kiali.istio.yuriy-lab.cloud"
