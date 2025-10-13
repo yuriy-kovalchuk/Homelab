@@ -9,5 +9,12 @@ kiali:
         memory: "256Mi"
 
   external_services:
+    grafana:
+      enabled: true
+      url: "http://grafana-prometheus.monitoring:80"
+      auth:
+        type: bearer
+        token: secret:grafana-credentials:token
+        use_kiali_token: false
     prometheus:
       url: "http://grafana-prometheus-kube-pr-prometheus.monitoring:9090"
