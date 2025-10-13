@@ -1,4 +1,8 @@
 kiali:
+
+  auth:
+    strategy: "anonymous"
+
   deployment:
     resources:
       requests:
@@ -11,7 +15,8 @@ kiali:
   external_services:
     grafana:
       enabled: true
-      url: "http://grafana-prometheus.monitoring:80"
+      url: http://grafana-prometheus.monitoring:80
+      in_cluster_url: http://grafana-prometheus.monitoring:80
       auth:
         type: bearer
         token: secret:grafana-credentials:token
