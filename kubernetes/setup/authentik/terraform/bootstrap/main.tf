@@ -147,8 +147,8 @@ resource "authentik_group" "grafana_viewers" {
 
 
 # -------------------- rancher ---------------------------
-resource "authentik_provider_oauth2" "rancher_provider" {
-  name          = "rancher"
+resource "authentik_provider_oauth2" "headlamp_provider" {
+  name          = "headlamp"
   client_id     = "JW5BvuhoQ8W662jSRMnjjt11lwvhf4tXyoi7JDfa"
   client_secret = var.rancher_provider_client_secret
   authorization_flow  = data.authentik_flow.default-provider-authorization-implicit-consent.id
@@ -156,7 +156,7 @@ resource "authentik_provider_oauth2" "rancher_provider" {
   allowed_redirect_uris = [
     {
       matching_mode = "strict",
-      url           = "https://rancher.yuriy-lab.cloud/verify-auth",
+      url           = "https://headlamp.yuriy-lab.cloud/oidc-callback",
     }
   ]
 
@@ -167,12 +167,13 @@ resource "authentik_provider_oauth2" "rancher_provider" {
   ]
 }
 
-resource "authentik_application" "rancher_application" {
-  name              = "rancher"
-  slug              = "rancher"
-  protocol_provider = authentik_provider_oauth2.rancher_provider.id
+resource "authentik_application" "headlamp_application" {
+  name              = "headlamp"
+  slug              = "headlamp"
+  protocol_provider = authentik_provider_oauth2.headlamp_provider.id
 }
-# -------------------- grafana ---------------------------
+# -------------------- rancher ---------------------------
+
 
 
 

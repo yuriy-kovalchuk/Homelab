@@ -1,4 +1,13 @@
 headlamp:
+
+  config:
+    inCluster: true
+    # -- base url path at which headlamp should run
+    baseURL: "headlamp.yuriy-lab.cloud"
+    oidc:
+      clientID: "JW5BvuhoQ8W662jSRMnjjt11lwvhf4tXyoi7JDfa"
+      issuerURL: "https://authentik.yuriy-lab.cloud/application/o/headlamp/"
+
   ingress:
     enabled: true
     ingressClassName: nginx
