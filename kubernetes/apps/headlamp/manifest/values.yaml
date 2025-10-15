@@ -25,3 +25,14 @@ headlamp:
     limits:
       cpu: 100m
       memory: 512Mi
+
+  extraManifests:
+    - |
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: headlamp-admin-token
+        namespace: headlamp
+        annotations:
+          kubernetes.io/service-account.name: headlamp
+      type: kubernetes.io/service-account-token
