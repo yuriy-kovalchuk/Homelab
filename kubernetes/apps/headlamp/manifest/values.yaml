@@ -9,9 +9,10 @@ headlamp:
           - headlamp.yuriy-lab.cloud
         secretName: headlamp-ingress-tls
     hosts:
-      - headlamp.yuriy-lab.cloud
-    path: "/"
-
+      - host: headlamp.yuriy-lab.cloud
+        paths:
+          - path: /
+            type: ImplementationSpecific
   resources:
     requests:
       cpu: 10m
