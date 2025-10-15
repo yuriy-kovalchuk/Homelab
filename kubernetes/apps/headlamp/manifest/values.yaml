@@ -1,0 +1,21 @@
+headlamp:
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-dns
+    tls:
+      - hosts:
+          - headlamp.yuriy-lab.cloud
+        secretName: headlamp-ingress-tls
+    hosts:
+      - headlamp.yuriy-lab.cloud
+    path: "/"
+
+  resources:
+    requests:
+      cpu: 10m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 512Mi
