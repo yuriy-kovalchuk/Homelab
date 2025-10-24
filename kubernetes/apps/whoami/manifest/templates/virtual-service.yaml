@@ -1,0 +1,20 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: whoami
+  namespace: whoami
+spec:
+  hosts:
+    - "whoami.gw.yuriy-lab.cloud"  # Same host as in the Gateway
+  gateways:
+    - whoami-gateway-istio           # Reference your Gateway
+  http:
+    - match:
+        - uri:
+            prefix: "/"             # Matches all paths
+      route:
+        - destination:
+            host: whoami           # Kubernetes service name
+            port:
+              number: 80          # Service port
+
