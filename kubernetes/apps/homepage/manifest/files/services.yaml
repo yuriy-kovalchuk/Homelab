@@ -45,7 +45,7 @@
         href: "https://alertmanager.yuriy-lab.cloud"
         description: YK Alert Manager
     - Kiali:
-        icon: kiali.svg
+        icon: "https://avatars.githubusercontent.com/u/36001875?v=4"
         href: "https://kiali.istio.yuriy-lab.cloud"
         description: YK Kiali
 - Containers:
