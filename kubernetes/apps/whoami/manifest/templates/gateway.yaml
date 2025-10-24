@@ -3,6 +3,8 @@ kind: Gateway
 metadata:
   name: whoami-gateway
   namespace: whoami
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-dns
 spec:
   # gatewayClassName defines which gateway controller to use
   # For Istio, this should be "istio"
@@ -10,9 +12,13 @@ spec:
 
   listeners:
     - name: http-whoami
-      port: 80
-      protocol: HTTP
+      port: 443
+      protocol: HTTPS
       hostname: "whoami.istio.yuriy-lab.cloud"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: whoami-tls  # cert-manager creates this automatically
       allowedRoutes:
         namespaces:
           from: Same  # Allow routes from same namespace (whoami)
