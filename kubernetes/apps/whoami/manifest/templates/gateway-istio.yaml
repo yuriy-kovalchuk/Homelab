@@ -12,8 +12,11 @@ spec:
   
   servers:
     - port:
-        number: 80
+        number: 443
         name: http-whoami
-        protocol: HTTP
+        protocol: HTTPS
       hosts:
         - "whoami.gw.yuriy-lab.cloud"
+      tls:
+        mode: SIMPLE                # or MUTUAL if using client certs
+        credentialName: whoami-cert # Kubernetes secret containing TLS certs
