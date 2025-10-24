@@ -46,7 +46,7 @@
         description: YK Alert Manager
     - Kiali:
         icon: kiali.svg
-        href: "https://kiali.istio.yuriy-lab.cloud
+        href: "https://kiali.istio.yuriy-lab.cloud"
         description: YK Kiali
 - Containers:
     - Headlamp:
