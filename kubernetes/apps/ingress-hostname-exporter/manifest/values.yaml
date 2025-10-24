@@ -7,7 +7,7 @@ serviceAccount:
 
 image:
   repository: harbor.yuriy-lab.cloud/library/ingress-hostname-exporter
-  tag: "1.0.4"
+  tag: "1.0.5"
   pullPolicy: IfNotPresent
 
 resources:

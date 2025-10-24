@@ -121,6 +121,7 @@ func SendIngressInfo(info models.IngressInfo, fqdn string) error {
 	payload.Host.RR = "A"
 	payload.Host.Server = info.LoadBalancerIP
 	payload.Host.Description = fmt.Sprintf("Ingress %s/%s", info.Namespace, info.Name)
+	log.Printf("Sending %s", payload)
 
 	jsonPayload, _ := json.Marshal(payload)
 	urlStr := fmt.Sprintf("%s/api/unbound/settings/AddHostOverride", OpnsenseURI)
