@@ -2,7 +2,7 @@ apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: kiali-virtualservice
-  namespace: istio-system
+  namespace: {{ .Release.Namespace }}
 spec:
   hosts:
     - {{ .Values.kialiGateway.host | default "kiali.istio.yuriy-lab.cloud" }}

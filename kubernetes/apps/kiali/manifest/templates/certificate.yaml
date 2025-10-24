@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kiali-istio-cert
+  namespace: {{ .Release.Namespace }} 
+spec:
+  secretName: kiali-istio-tls
+  dnsNames:
+  - {{ .Values.kialiGateway.host | default "kiali.istio.yuriy-lab.cloud" }}
+  issuerRef:
+    name: letsencrypt-dns
+    kind: ClusterIssuer
+
