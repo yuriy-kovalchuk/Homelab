@@ -1,6 +1,7 @@
 gateway:
   service:
     loadBalancerIP: "10.0.8.101"
+    externalTrafficPolicy: "Local"
 
   resources:
     requests:
