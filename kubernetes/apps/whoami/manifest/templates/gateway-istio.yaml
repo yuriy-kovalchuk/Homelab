@@ -1,0 +1,19 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: whoami-gateway
+  namespace: whoami
+spec:
+  # gatewayClassName defines which gateway controller to use
+  # For Istio, this should be "istio"
+  gatewayClassName: istio
+
+  listeners:
+    - name: http-whoami
+      port: 80
+      protocol: HTTP
+      hostname: "whoami.istio.yuriy-lab.cloud"
+      allowedRoutes:
+        namespaces:
+          from: Same  # Allow routes from same namespace (whoami)
+          # Use "from: All" to allow routes from any namespace
