@@ -1,4 +1,8 @@
 - Core:
+    - Git Homelab:
+        icon: github.svg
+        href: https://github.com/yuriy-kovalchuk/Homelab
+        description: YK Homelab
     - ArgoCD:
         icon: argo-cd.svg
         href: https://argocd.yuriy-lab.cloud
