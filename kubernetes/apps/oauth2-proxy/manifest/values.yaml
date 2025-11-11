@@ -24,8 +24,6 @@ oauth2-proxy:
     oidc-issuer-url: "https://login.microsoftonline.com/f6a43c35-26b3-4260-90e9-6d226459c179/v2.0"
     scope: "openid email profile"
     oidc-groups-claim: "groups"          # tells oauth2-proxy to read group GUIDs
-    pass-authorization-header: "true"
-    pass-claims: "true"
-    pass-user-headers: "true"
-    pass-access-token: "true"
+    set-xauthrequest: "true"
     set-authorization-header: "true"
+    whitelist-domain: ".yuriy-lab.cloud"
