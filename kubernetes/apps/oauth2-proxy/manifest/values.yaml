@@ -18,16 +18,27 @@ oauth2-proxy:
         hosts:
           - oauth2-proxy.yuriy-lab.cloud
 
+  sessionStorage:
+    type: redis
+    redis:
+      connectionUrl: "redis://redis:6379"
+
+  # Add Redis dependency
+  redis:
+    enabled: true
+
   extraArgs:
     provider: "entra-id"
     azure-tenant: "f6a43c35-26b3-4260-90e9-6d226459c179"
     oidc-issuer-url: "https://login.microsoftonline.com/f6a43c35-26b3-4260-90e9-6d226459c179/v2.0"
     scope: "openid email profile"
-    oidc-groups-claim: "groups"          # tells oauth2-proxy to read group GUIDs
+    oidc-groups-claim: "groups"
     set-xauthrequest: "true"
     set-authorization-header: "true"
     whitelist-domain: ".yuriy-lab.cloud"
     pass-user-headers: "true"
     cookie-domain: ".yuriy-lab.cloud"
     cookie-secure: "true"
+    session-store-type: redis
+    redis-connection-url: redis://redis:6379
 
