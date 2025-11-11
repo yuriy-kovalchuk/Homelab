@@ -12,8 +12,7 @@
   "shell": {
     "init_hook": [
       "chmod +x devbox_scripts/*",
-      "export $(cat .env | xargs)",
-      "echo Letsgoski letsgo!"
+      "export $(cat .env | xargs)"
     ],
     "scripts": {
       "test": [
