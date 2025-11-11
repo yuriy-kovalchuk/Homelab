@@ -27,3 +27,7 @@ oauth2-proxy:
     set-xauthrequest: "true"
     set-authorization-header: "true"
     whitelist-domain: ".yuriy-lab.cloud"
+    pass-user-headers: "true"
+    cookie-domain: ".yuriy-lab.cloud"
+    cookie-secure: "true"
+
