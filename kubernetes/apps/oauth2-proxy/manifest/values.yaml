@@ -40,5 +40,5 @@ oauth2-proxy:
     cookie-domain: ".yuriy-lab.cloud"
     cookie-secure: "true"
     session-store-type: redis
-    redis-connection-url: redis://redis:6379
+    redis-connection-url: redis://oauth2-proxy-redis:6379
 
