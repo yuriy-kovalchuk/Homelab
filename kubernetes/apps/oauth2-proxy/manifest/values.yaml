@@ -21,7 +21,7 @@ oauth2-proxy:
   sessionStorage:
     type: redis
     redis:
-      connectionUrl: "redis://redis:6379"
+      connectionUrl: "redis://oauth2-proxy-redis:6379"
 
   # Add Redis dependency
   redis:
