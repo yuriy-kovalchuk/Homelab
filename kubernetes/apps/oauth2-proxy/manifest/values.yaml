@@ -1,7 +1,7 @@
 oauth2-proxy:
   config:
     clientID: "ffaf8c5b-273f-4656-81b1-0edaeeede85e"
-    clientSecret: "c269bcbc-bd74-4e5e-b54a-c927ab867426"
+    clientSecret: "dzh8Q~JqujNRqyPlFN5EQWXsnR3efhLb8EBOZcWg"
     cookieSecret: "9qJLAxlZxfnAf2NutDFi9cKrhuD9Cecr"
 
   ingress:
