@@ -1,0 +1,12 @@
+apiVersion: v2
+name: httpbin-yk
+description: Umbrella Helm chart for httpbin application in Kubernetes
+
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+
+dependencies:
+  - name: httpbin
+    version: "0.1.1"
+    repository: https://estahn.github.io/charts

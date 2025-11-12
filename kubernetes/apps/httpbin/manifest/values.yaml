@@ -1,0 +1,58 @@
+httpbin:
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-dns
+      nginx.ingress.kubernetes.io/auth-url: "http://httpbin-oauth2-proxy.httpbin.svc.cluster.local/oauth2/auth"
+      nginx.ingress.kubernetes.io/auth-signin: "https://httpbin.yuriy-lab.cloud/oauth2/start?rd=$escaped_request_uri"
+      nginx.ingress.kubernetes.io/auth-response-headers: "X-Auth-Request-Email, X-Auth-Request-Groups"
+      nginx.ingress.kubernetes.io/server-snippet: |
+        location /oauth2/ {
+          proxy_pass http://httpbin-oauth2-proxy.httpbin.svc.cluster.local;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Scheme $scheme;
+          proxy_set_header X-Auth-Request-Redirect $request_uri;
+        }
+    tls:
+      - hosts:
+          - httpbin.yuriy-lab.cloud
+        secretName: httpbin-ingress-tls
+    hosts:
+      - host: httpbin.yuriy-lab.cloud
+        paths:
+          - path: /
+            type: ImplementationSpecific
+
+oauth2-proxy:
+  config:
+    clientID: "ffaf8c5b-273f-4656-81b1-0edaeeede85e"
+    clientSecret: "dzh8Q~JqujNRqyPlFN5EQWXsnR3efhLb8EBOZcWg"
+    cookieSecret: "ckxhdC9wY2JCd0pvdE8wNDE1NjRHc2JpenR5cjRiSDU="
+
+  sessionStorage:
+    type: redis
+    redis:
+      connectionUrl: "redis://httpbin-redis:6379"
+
+  # Add Redis dependency
+  redis:
+    enabled: true
+
+  extraArgs:
+    provider: "entra-id"
+    azure-tenant: "f6a43c35-26b3-4260-90e9-6d226459c179"
+    oidc-issuer-url: "https://login.microsoftonline.com/f6a43c35-26b3-4260-90e9-6d226459c179/v2.0"
+    scope: "openid email profile"
+    oidc-groups-claim: "groups"
+    set-xauthrequest: "true"
+    set-authorization-header: "true"
+    whitelist-domain: ".yuriy-lab.cloud"
+    pass-user-headers: "true"
+    cookie-domain: ".yuriy-lab.cloud"
+    cookie-secure: "true"
+    session-store-type: redis
+    redis-connection-url: redis://httpbin-redis:6379
+    allowed-group: ciuhfiue
+
