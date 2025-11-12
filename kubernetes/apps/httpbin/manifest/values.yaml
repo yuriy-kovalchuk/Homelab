@@ -23,7 +23,7 @@ httpbingo:
       - host: httpbin.yuriy-lab.cloud
         paths:
           - path: /
-            type: ImplementationSpecific
+            pathType: ImplementationSpecific
 
 oauth2-proxy:
   config:
