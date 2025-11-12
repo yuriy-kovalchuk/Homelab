@@ -37,8 +37,9 @@ oauth2-proxy:
     set-authorization-header: "true"
     whitelist-domain: ".yuriy-lab.cloud"
     pass-user-headers: "true"
-    cookie-domain: ".yuriy-lab.cloud"
-    cookie-secure: "true"
+#    cookie-domain: ".yuriy-lab.cloud"
+#    cookie-secure: "true"
     session-store-type: redis
     redis-connection-url: redis://oauth2-proxy-redis:6379
+    allowed-group: group-app-a
 

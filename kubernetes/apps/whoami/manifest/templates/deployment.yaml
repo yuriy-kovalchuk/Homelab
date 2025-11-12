@@ -13,8 +13,6 @@ spec:
     metadata:
       labels:
         app: whoami
-      annotations:
-        sidecar.istio.io/inject: "true"
     spec:
       containers:
         - image: containous/whoami
