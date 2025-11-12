@@ -1,4 +1,4 @@
-httpbin:
+httpbingo:
   ingress:
     enabled: true
     ingressClassName: nginx
