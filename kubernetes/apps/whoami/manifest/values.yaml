@@ -7,7 +7,7 @@ oauth2-proxy:
   sessionStorage:
     type: redis
     redis:
-      connectionUrl: "redis://oauth2-proxy-redis:6379"
+      connectionUrl: "redis://whoami-oauth2-proxy-redis:6379"
 
   # Add Redis dependency
   redis:
@@ -26,6 +26,6 @@ oauth2-proxy:
     cookie-domain: ".yuriy-lab.cloud"
     cookie-secure: "true"
     session-store-type: redis
-    redis-connection-url: redis://oauth2-proxy-redis:6379
+    redis-connection-url: redis://whoami-oauth2-proxy-redis:6379
     allowed-group: 4cc0e15c-4414-4aa8-b34e-7b20a29cf575
 
