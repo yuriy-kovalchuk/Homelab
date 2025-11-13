@@ -5,7 +5,7 @@ metadata:
   namespace: whoami
 spec:
   forwardAuth:
-    address: http://whoami-oauth2-proxy.whoami.svc.cluster.local/oauth2/auth
+    address: http://whoami-oauth2-proxy.whoami.svc.cluster.local
     trustForwardHeader: true
     authResponseHeaders:
       - X-Auth-Request-Email
