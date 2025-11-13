@@ -7,7 +7,7 @@ spec:
   errors:
     status:
       - "401"
-    query: "/oauth2/start?rd={url}"
+    query: "/oauth2/sign_in"
     service:
       name: whoami-oauth2-proxy
       port: 80
@@ -19,7 +19,7 @@ metadata:
   namespace: whoami
 spec:
   forwardAuth:
-    address: https://oauth2.yuriy-lab.cloud
+    address: https://oauth2.yuriy-lab.cloud/oauth2/auth
     trustForwardHeader: true
     authResponseHeaders:
       - X-Auth-Request-User
