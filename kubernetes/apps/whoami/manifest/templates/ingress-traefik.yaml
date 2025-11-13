@@ -19,6 +19,13 @@ spec:
     - host: whoami.traefik.yuriy-lab.cloud
       http:
         paths:
+          - path: /oauth2
+            pathType: Prefix
+            backend:
+              service:
+                name: whoami-oauth2-proxy
+                port:
+                  number: 80
           - path: /
             pathType: Prefix
             backend:
