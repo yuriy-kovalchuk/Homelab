@@ -32,9 +32,15 @@ metadata:
   name: require-admin-group
   namespace: whoami
 spec:
-  headersRegexp:
-    name: X-Auth-Request-Groups
-    regexp: ".*(^|,)(admins|developers)(,|$).*"
+  plugin:
+    checkheadersplugin:
+      headers:
+        - header:
+          name: "HEADER_1"
+          matchtype: one
+          values:
+            - "VALUE_1"
+            - "VALUE_99"
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
