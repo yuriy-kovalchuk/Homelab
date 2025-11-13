@@ -19,3 +19,4 @@ traefik:
       enabled: true
       entryPoints:
         - web
+        - websecure
