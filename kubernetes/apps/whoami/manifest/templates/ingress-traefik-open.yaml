@@ -3,21 +3,21 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: whoami-traekif-open-ingress
+  name: whoami-oauth2-open-ingress
   namespace: whoami
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-dns
 spec:
-  ingressClassName: traefik
+  ingressClassName: nginx
   tls:
   - hosts:
-    - whoami.traefik.yuriy-lab.cloud
-    secretName: whoami-traefik-lab-tls
+    - oauth2.yuriy-lab.cloud
+    secretName: oauth-traefik-lab-tls
   rules:
-    - host: whoami.traefik.yuriy-lab.cloud
+    - host: oauth2.yuriy-lab.cloud
       http:
         paths:
-          - path: /oauth2
+          - path: /
             pathType: Prefix
             backend:
               service:
