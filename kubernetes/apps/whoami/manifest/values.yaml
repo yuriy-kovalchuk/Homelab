@@ -5,6 +5,8 @@ oauth2-proxy:
     cookieSecret: "ckxhdC9wY2JCd0pvdE8wNDE1NjRHc2JpenR5cjRiSDU="
     configFile: |
       upstreams = ["static://200"]
+      email_domains = [ "*" ]
+      
 
   sessionStorage:
     type: redis
