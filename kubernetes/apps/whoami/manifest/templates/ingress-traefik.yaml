@@ -7,7 +7,7 @@ metadata:
   namespace: whoami
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-dns
-    traefik.ingress.kubernetes.io/router.middlewares: whoami-oauth2-proxy/oauth2@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: whoami-oauth2@kubernetescrd
 
 spec:
   ingressClassName: traefik
