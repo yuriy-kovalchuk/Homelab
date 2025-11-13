@@ -1,0 +1,15 @@
+traefik:
+  ingressClass: # @schema additionalProperties: false
+    isDefaultClass: false
+
+  metrics:
+    addInternals: true
+    prometheus:
+      serviceMonitor:
+        enabled: true
+        namespace: monitoring
+
+  service:
+    spec:
+      loadBalancerIP: 10.0.8.110
+    ipFamilyPolicy: SingleStack
