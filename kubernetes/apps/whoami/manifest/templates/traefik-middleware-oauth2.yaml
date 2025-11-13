@@ -41,5 +41,4 @@ metadata:
 spec:
   chain:
     middlewares:
-      - name: oauth2-errors
       - name: oauth2-auth
