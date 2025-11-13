@@ -13,3 +13,7 @@ traefik:
     spec:
       loadBalancerIP: 10.0.8.110
     ipFamilyPolicy: SingleStack
+
+  ingressRoute:
+    dashboard:
+      enabled: true
