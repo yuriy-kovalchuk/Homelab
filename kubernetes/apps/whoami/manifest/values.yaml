@@ -28,6 +28,7 @@ oauth2-proxy:
     session-store-type: redis
     redis-connection-url: redis://whoami-redis:6379
     skip-provider-button: true
+    reverse-proxy: true
 
 #    allowed-group: 4cc0e15c-4414-4aa8-b34e-7b20a29cf575
 
