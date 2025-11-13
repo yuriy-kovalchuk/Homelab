@@ -26,3 +26,11 @@ spec:
                 name: whoami
                 port:
                   number: 80
+          # OAuth2 proxy endpoint
+          - path: /oauth2
+            pathType: Prefix
+            backend:
+              service:
+                name: whoami-oauth2-proxy
+                port:
+                  number: 80
