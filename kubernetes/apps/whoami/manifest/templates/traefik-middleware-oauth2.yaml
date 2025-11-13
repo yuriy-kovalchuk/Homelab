@@ -36,11 +36,11 @@ spec:
     checkheadersplugin:
       headers:
         - header:
-          name: "HEADER_1"
+          name: "X-Auth-Request-Groups"
           matchtype: one
           values:
-            - "VALUE_1"
-            - "VALUE_99"
+            - "4cc0e15c-4414-4aa8-b34e-7b20a29cf575"
+            - "admins"
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
