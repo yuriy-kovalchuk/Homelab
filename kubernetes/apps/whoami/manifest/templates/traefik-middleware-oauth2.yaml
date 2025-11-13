@@ -1,20 +1,6 @@
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: oauth2-auth
-  namespace: whoami
-spec:
-  forwardAuth:
-    address: http://whoami-oauth2-proxy.whoami.svc.cluster.local/oauth2/auth
-    trustForwardHeader: true
-    authResponseHeaders:
-      - X-Auth-Request-Email
-      - X-Auth-Request-Groups
-      - Authorization
----
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
   name: oauth2-errors
   namespace: whoami
 spec:
@@ -26,7 +12,21 @@ spec:
       name: whoami-oauth2-proxy
       port: 80
 ---
-# Chain both middlewares together
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: oauth2-auth
+  namespace: whoami
+spec:
+  forwardAuth:
+    address: http://whoami-oauth2-proxy.whoami.svc.cluster.local/oauth2/auth
+    trustForwardHeader: true
+    authResponseHeaders:
+      - X-Auth-Request-User
+      - X-Auth-Request-Email
+      - X-Auth-Request-Preferred-Username
+      - Authorization
+---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
