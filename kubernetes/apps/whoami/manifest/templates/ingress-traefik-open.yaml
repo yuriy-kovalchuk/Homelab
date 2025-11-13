@@ -3,12 +3,10 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: whoami-traekif-ingress
+  name: whoami-traekif-open-ingress
   namespace: whoami
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-dns
-    traefik.ingress.kubernetes.io/router.middlewares: whoami-oauth2-chain@kubernetescrd
-
 spec:
   ingressClassName: traefik
   tls:
@@ -19,10 +17,10 @@ spec:
     - host: whoami.traefik.yuriy-lab.cloud
       http:
         paths:
-          - path: /
+          - path: /oauth2
             pathType: Prefix
             backend:
               service:
-                name: whoami
+                name: whoami-oauth2-proxy
                 port:
                   number: 80
