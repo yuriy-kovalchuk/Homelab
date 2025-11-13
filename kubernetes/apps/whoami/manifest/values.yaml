@@ -18,7 +18,7 @@ oauth2-proxy:
     azure-tenant: "f6a43c35-26b3-4260-90e9-6d226459c179"
     oidc-issuer-url: "https://login.microsoftonline.com/f6a43c35-26b3-4260-90e9-6d226459c179/v2.0"
     scope: "openid email profile"
-    redirect_url:  "https://oauth2.yuriy-lab.cloud/oauth2/callback"
+    redirect-url:  "https://oauth2.yuriy-lab.cloud/oauth2/callback"
     oidc-groups-claim: "groups"
     set-xauthrequest: "true"
     set-authorization-header: "true"
