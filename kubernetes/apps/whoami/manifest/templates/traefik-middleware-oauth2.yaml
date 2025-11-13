@@ -19,7 +19,7 @@ metadata:
   namespace: whoami
 spec:
   forwardAuth:
-    address: https://oauth2.yuriy-lab.cloud/oauth2/auth
+    address: https://oauth2.yuriy-lab.cloud/oauth2/start
     trustForwardHeader: true
     authResponseHeaders:
       - X-Auth-Request-User
