@@ -38,9 +38,10 @@ spec:
         - header:
           name: "X-Auth-Request-Groups"
           matchtype: one
+          contains: true
+          required: true
           values:
             - "4cc0e15c-4414-4aa8-b34e-7b20a29cf575"
-            - "admins"
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
@@ -50,6 +51,5 @@ metadata:
 spec:
   chain:
     middlewares:
-#      - name: oauth2-errors
       - name: oauth2-auth
       - name: require-admin-group
