@@ -7,7 +7,7 @@ metadata:
   namespace: whoami
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-dns
-    traefik.ingress.kubernetes.io/router.middlewares: whoami-oauth2@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: whoami-oauth2-chain@kubernetescrd
 
 spec:
   ingressClassName: traefik
@@ -24,13 +24,5 @@ spec:
             backend:
               service:
                 name: whoami
-                port:
-                  number: 80
-          # OAuth2 proxy endpoint
-          - path: /oauth2
-            pathType: Prefix
-            backend:
-              service:
-                name: whoami-oauth2-proxy
                 port:
                   number: 80

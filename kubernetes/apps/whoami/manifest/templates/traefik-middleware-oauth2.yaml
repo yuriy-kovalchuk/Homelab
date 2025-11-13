@@ -1,7 +1,7 @@
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: oauth2
+  name: oauth2-auth
   namespace: whoami
 spec:
   forwardAuth:
@@ -16,3 +16,29 @@ spec:
       - X-Forwarded-Host
       - X-Forwarded-Uri
       - X-Forwarded-For
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: oauth2-errors
+  namespace: whoami
+spec:
+  errors:
+    status:
+      - "401"
+    query: /oauth2/sign_in?rd={url}
+    service:
+      name: whoami-oauth2-proxy
+      port: 80
+---
+# Chain both middlewares together
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: oauth2-chain
+  namespace: whoami
+spec:
+  chain:
+    middlewares:
+      - name: oauth2-errors
+      - name: oauth2-auth
