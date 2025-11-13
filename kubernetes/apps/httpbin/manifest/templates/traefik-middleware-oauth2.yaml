@@ -27,7 +27,7 @@ spec:
           contains: true
           required: true
           values:
-            - "4cc0e15c-4414-4aa8-b34e-7b20a29cf575"
+            - "4cc0e15c-4414-4aa8-b34e-dsferfe"
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
