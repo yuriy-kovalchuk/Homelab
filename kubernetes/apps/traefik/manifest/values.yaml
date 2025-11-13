@@ -17,3 +17,5 @@ traefik:
   ingressRoute:
     dashboard:
       enabled: true
+      entrypoint:
+        - web
