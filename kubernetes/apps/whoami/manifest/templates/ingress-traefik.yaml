@@ -8,7 +8,7 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-dns
 spec:
-  ingressClassName: traekik
+  ingressClassName: traefik
   tls:
   - hosts:
     - whoami.traefik.yuriy-lab.cloud
