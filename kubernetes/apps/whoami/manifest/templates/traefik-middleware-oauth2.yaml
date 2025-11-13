@@ -10,6 +10,7 @@ spec:
     authResponseHeaders:
       - X-Auth-Request-Email
       - X-Auth-Request-Groups
+      - Authorization
     authRequestHeaders:
       - X-Forwarded-Method
       - X-Forwarded-Proto
