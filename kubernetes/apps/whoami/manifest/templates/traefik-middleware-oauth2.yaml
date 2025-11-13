@@ -32,19 +32,9 @@ metadata:
   name: require-admin-group
   namespace: whoami
 spec:
-  plugin:
-    validate-headers:
-      error:
-        statuscode: 403
-        message: "Forbidden: Admin or Developer group required"
-      headers:
-        - name: X-Auth-Request-Groups
-          matchtype: one
-          values:
-            - "admins"
-            - "developers"
-          contains: true
-          required: true
+  headersRegexp:
+    name: X-Auth-Request-Groups
+    regexp: ".*(^|,)(admins|developers)(,|$).*"
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
