@@ -7,7 +7,7 @@ metadata:
   namespace: whoami
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-dns
-    nginx.ingress.kubernetes.io/auth-url: http://whoami-oauth2-proxy.whoami.svc.cluster.local/oauth2/auth?allowed_emails=name.lastname@mydomain.com
+    nginx.ingress.kubernetes.io/auth-url: http://whoami-oauth2-proxy.whoami.svc.cluster.local/oauth2/auth?allowed_groups=uirgvnjrnvj
     nginx.ingress.kubernetes.io/auth-signin: "https://whoami.yuriy-lab.cloud/oauth2/start?rd=$escaped_request_uri"
     nginx.ingress.kubernetes.io/auth-response-headers: "X-Auth-Request-Email, X-Auth-Request-Groups"
     nginx.ingress.kubernetes.io/server-snippet: |
