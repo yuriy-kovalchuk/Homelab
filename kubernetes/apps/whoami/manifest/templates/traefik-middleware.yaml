@@ -1,9 +1,0 @@
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  name: add-custom-header
-  namespace: whoami
-spec:
-  headers:
-    customResponseHeaders:
-      X-My-Custom-Header: "Hello from Traefik!"
