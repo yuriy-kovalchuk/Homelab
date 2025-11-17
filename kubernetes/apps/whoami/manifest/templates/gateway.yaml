@@ -9,7 +9,9 @@ spec:
   # gatewayClassName defines which gateway controller to use
   # For Istio, this should be "istio"
   gatewayClassName: istio
-
+  addresses:
+    - type: IPAddress
+      value: "10.0.8.102"
   listeners:
     - name: http-whoami
       port: 443
