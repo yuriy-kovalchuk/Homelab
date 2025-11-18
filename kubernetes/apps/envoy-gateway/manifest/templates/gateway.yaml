@@ -16,4 +16,5 @@ spec:
         mode: Terminate
         certificateRefs:
           - kind: Secret
+            group: ''
             name: main-gw-tls-cert
