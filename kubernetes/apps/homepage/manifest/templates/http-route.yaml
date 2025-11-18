@@ -1,0 +1,21 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ .Release.Name }}-route
+  namespace: {{ .Release.Namespace }}
+spec:
+  parentRefs:
+    - name: main-gateway
+      namespace: envoy-gateway-system
+
+  hostnames:
+    - "homepage.yuriy-lab.cloud"
+    - "home.yuriy-lab.cloud"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: {{ .Release.Name }}
+          port: {{ .Values.service.port }}
