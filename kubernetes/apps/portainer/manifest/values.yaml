@@ -23,7 +23,7 @@ portainer:
     size: 1Gi
   
   tls:
-    force: true
+    force: false
 
   image:
     tag: lts
