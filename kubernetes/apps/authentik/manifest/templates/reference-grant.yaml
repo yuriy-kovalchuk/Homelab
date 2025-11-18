@@ -10,7 +10,7 @@ spec:
       namespace: "uptime-kuma"
     - group: gateway.envoyproxy.io
       kind: SecurityPolicy
-      namespace: "portainer"
+      namespace: "headlamp"
   to:
     - group: ''
       kind: Service
