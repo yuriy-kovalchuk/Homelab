@@ -21,14 +21,11 @@ portainer:
     size: 1Gi
   
   tls:
-    force: false
+    force:
 
   image:
     tag: lts
 
-  feature:
-    flags:
-      - "-http-enabled"
 
   resources:
     requests:
