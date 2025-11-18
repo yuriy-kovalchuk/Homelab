@@ -8,6 +8,18 @@ metadata:
 spec:
   gatewayClassName: envoy-gw
   listeners:
+    - name: https-propagation
+      protocol: HTTPS
+      port: 443
+      hostname: "*.yuriy-lab.cloud"
+      allowedRoutes:
+        namespaces:
+          from: All
+      tls:
+        certificateRefs:
+          - kind: Secret
+            group: ''
+            name: main-gw-tls-cert
     - name: https
       protocol: HTTPS
       port: 443
