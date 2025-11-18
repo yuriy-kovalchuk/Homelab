@@ -1,3 +1,18 @@
+yk:
+  httpRoute:
+    parentRefs:
+      - name: main-gateway
+        namespace: envoy-gateway-system
+    hostnames:
+      - "portainer.yuriy-lab.cloud"
+    path:
+      type: PathPrefix
+      value: /
+    backend:
+      name: uptime-kuma
+      port: 3001
+
+
 portainer:
   service:
     type: ClusterIP
