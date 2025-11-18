@@ -25,3 +25,15 @@ portainer:
 
   image:
     tag: lts
+
+  feature:
+    flags:
+      - "-http-enabled"
+
+  resources:
+    requests:
+      cpu: 10m
+      memory: 128Mi
+    limits:
+      cpu: 50m
+      memory: 512Mi
