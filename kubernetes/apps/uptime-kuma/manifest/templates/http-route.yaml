@@ -35,7 +35,7 @@ spec:
         name: ak-outpost-proxy
         namespace: authentik
         port: 9000
-      path: /outpost.goauthentik.io/auth/nginx
+      path: /outpost.goauthentik.io/auth/envoy
       headersToBackend:
         - X-Forwarded-Host
         - X-Forwarded-Proto
