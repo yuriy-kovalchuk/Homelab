@@ -7,7 +7,7 @@ spec:
   from:
     - group: gateway.envoyproxy.io
       kind: SecurityPolicy
-      namespace: "*"
+      namespace: "uptime-kuma"
   to:
     - group: ''
       kind: Service
