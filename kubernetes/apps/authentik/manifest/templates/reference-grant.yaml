@@ -11,6 +11,9 @@ spec:
     - group: gateway.envoyproxy.io
       kind: SecurityPolicy
       namespace: "headlamp"
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: "longhotn"
   to:
     - group: ''
       kind: Service
