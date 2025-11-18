@@ -87,6 +87,7 @@ mimir-distributed:
       enabled: false
     persistentVolume:
       enabled: true
+      size: 10Gi
     replicas: 1
 
   # Receives data from alloy, corrects, devides data to batches and send to ingesters

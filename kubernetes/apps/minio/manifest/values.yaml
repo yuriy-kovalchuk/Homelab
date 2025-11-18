@@ -1,3 +1,17 @@
+yk:
+  httpRoute:
+    parentRefs:
+      - name: main-gateway
+        namespace: envoy-gateway-system
+    hostnames:
+      - "minio.yuriy-lab.cloud"
+    path:
+      type: PathPrefix
+      value: /
+    backend:
+      name: minio-console
+      port: 9001
+
 minio:
   image:
     tag: RELEASE.2025-04-22T22-12-26Z-cpuv1
@@ -14,32 +28,6 @@ minio:
 
   persistence:
     size: 20Gi
-
-  ingress:
-    enabled: true
-    ingressClassName: nginx
-    annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-dns
-    tls:
-      - hosts:
-          - minio.yuriy-lab.cloud
-        secretName: minio-ingress-tls
-    hosts:
-      - minio.yuriy-lab.cloud
-    path: "/"
-
-  consoleIngress:
-    enabled: true
-    ingressClassName: nginx
-    annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-dns
-    tls:
-      - hosts:
-          - minio-console.yuriy-lab.cloud
-        secretName: minio-console-ingress-tls
-    hosts:
-      - minio-console.yuriy-lab.cloud
-    path: "/"
 
   resources:
     requests:
