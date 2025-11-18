@@ -13,7 +13,7 @@ spec:
       namespace: "headlamp"
     - group: gateway.envoyproxy.io
       kind: SecurityPolicy
-      namespace: "longhotn"
+      namespace: "longhorn-system"
   to:
     - group: ''
       kind: Service
