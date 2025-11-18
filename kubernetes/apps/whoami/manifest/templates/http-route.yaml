@@ -5,17 +5,16 @@ metadata:
   namespace: whoami
 spec:
   parentRefs:
-    - name: whoami-gateway
-      namespace: whoami
-
+    - name: main-gateway
+      namespace: envoy-gateway-system
   hostnames:
-    - "whoami.istio.yuriy-lab.cloud"
-
+    - "whoami.yuriy-lab.cloud"
   rules:
     - matches:
         - path:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: whoami  # Replace with your actual service name
-          port: 80              # Replace with your actual service port
+        - name: whoami
+          port: 80
+---
