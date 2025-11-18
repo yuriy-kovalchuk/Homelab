@@ -8,6 +8,9 @@ spec:
     - group: gateway.envoyproxy.io
       kind: SecurityPolicy
       namespace: "uptime-kuma"
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: "portainer"
   to:
     - group: ''
       kind: Service
