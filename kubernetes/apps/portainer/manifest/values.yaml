@@ -10,9 +10,7 @@ yk:
       value: /
     backend:
       name: portainer
-      port: 9443
-      tls:
-        enabled: true
+      port: 9000
 
 
 portainer:
@@ -23,7 +21,11 @@ portainer:
     size: 1Gi
   
   tls:
-    force: true
+    force: false
+
+  feature:
+    flags:
+      - "--http-enabled"
 
   image:
     tag: lts
