@@ -1,5 +1,5 @@
 {{- if .Values.yk.httpRoute.backend.tls.enabled }}
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1
 kind: BackendTLSPolicy
 metadata:
   name: {{ .Release.Name }}-backend-tls
