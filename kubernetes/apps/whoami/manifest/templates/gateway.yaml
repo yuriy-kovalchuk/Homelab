@@ -2,12 +2,10 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: whoami-gateway
-  namespace: whoami
+  namespace: platform-workspace
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-dns
 spec:
-  # gatewayClassName defines which gateway controller to use
-  # For Istio, this should be "istio"
   gatewayClassName: istio
   addresses:
     - type: IPAddress
