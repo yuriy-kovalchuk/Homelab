@@ -3,6 +3,7 @@ yk:
     - parentRefs:
         - name: main-gateway
           namespace: envoy-gateway-system
+      name: grafana
       hostnames:
         - "grafana.yuriy-lab.cloud"
       path:
@@ -14,6 +15,7 @@ yk:
     - parentRefs:
         - name: main-gateway
           namespace: envoy-gateway-system
+      name: prometheus
       hostnames:
         - "prometheus.yuriy-lab.cloud"
       path:
@@ -25,6 +27,7 @@ yk:
     - parentRefs:
         - name: main-gateway
           namespace: envoy-gateway-system
+      name: alertmanager
       hostnames:
         - "alertmanager.yuriy-lab.cloud"
       path:
