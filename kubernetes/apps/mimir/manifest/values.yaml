@@ -22,21 +22,17 @@ mimir-distributed:
         max_global_series_per_user: 12000000
         max_global_series_per_metric: 200000000
         compactor_blocks_retention_period: 7d
-        # Increase query limits
-        max_query_parallelism: 240  # Default is 14
-        max_queriers_per_tenant: 0  # 0 means unlimited
+        max_query_parallelism: 240
+        max_queriers_per_tenant: 0
 
-        # Query sharding limits
-        query_sharding_total_shards: 128  # Default is 16
-        query_sharding_max_sharded_queries: 256  # Default is 128
+        query_sharding_total_shards: 128
+        query_sharding_max_sharded_queries: 256
 
-        # Rate limits
-        request_rate: 0  # 0 means unlimited (or set a high value like 10000)
-        request_burst_size: 0  # 0 means unlimited
+        request_rate: 0
+        request_burst_size: 0
 
-        # Ingestion rate limits (also increase these)
-        ingestion_rate: 100000  # Default is 25000
-        ingestion_burst_size: 200000  # Default is 50000
+        ingestion_rate: 100000
+        ingestion_burst_size: 200000
 
       query_scheduler:
         max_outstanding_requests_per_tenant: 10000
@@ -53,18 +49,17 @@ mimir-distributed:
           http:
             insecure_skip_verify: true
 
-        # ADDED: TSDB configuration - controls flushing to MinIO
         tsdb:
           dir: /data/tsdb
           block_ranges_period: [ 2h ]
-          retention_period: 6h  # ← Just needs to cover block creation period
+          retention_period: 2h15m
           ship_interval: 1m
           flush_blocks_on_shutdown: true
           head_compaction_interval: 1m
           wal_compression_enabled: true
 
       compactor:
-        compaction_interval: 30m  # ← Runs regularly to optimize blocks
+        compaction_interval: 30m
         data_dir: /data/compactor
 
       ingester:
@@ -99,6 +94,9 @@ mimir-distributed:
   # Increases query performance and reduces long-term storage usage by combining blocks.
   compactor:
     replicas: 1
+    persistentVolume:
+      enabled: true
+      size: 15Gi
   # Evaluates PromQL expressions by fetching time series and labels on the read path. Uses store-gateway fron minio and ingester for latest data
   querier:
     replicas: 1
