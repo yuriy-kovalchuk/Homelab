@@ -8,6 +8,8 @@ spec:
   parentRefs:
   {{- range .parentRefs }}
   - name: {{ .name }}
+    group: gateway.networking.k8s.io
+    kind: Gateway
     namespace: {{ .namespace }}
   {{- end }}
   hostnames:
@@ -22,5 +24,8 @@ spec:
       backendRefs:
         - name: {{ .backend.name }}
           port: {{ .backend.port }}
+          group: ''
+          kind: Service
+          weight: 1
 ---
 {{- end }}
