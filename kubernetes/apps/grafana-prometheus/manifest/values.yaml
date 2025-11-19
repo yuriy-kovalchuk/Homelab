@@ -11,6 +11,28 @@ yk:
       backend:
         name: grafana-prometheus
         port: 80
+    - parentRefs:
+        - name: main-gateway
+          namespace: envoy-gateway-system
+      hostnames:
+        - "prometheus.yuriy-lab.cloud"
+      path:
+        type: PathPrefix
+        value: /
+      backend:
+        name: grafana-prometheus-kube-pr-prometheus
+        port: 9090
+    - parentRefs:
+        - name: main-gateway
+          namespace: envoy-gateway-system
+      hostnames:
+        - "alertmanager.yuriy-lab.cloud"
+      path:
+        type: PathPrefix
+        value: /
+      backend:
+        name: grafana-prometheus-kube-pr-alertmanager
+        port: 9093
 
 kube-prometheus-stack:
   defaultRules:
@@ -33,23 +55,6 @@ kube-prometheus-stack:
       ipDualStack:
         ipFamilies: ["IPv4"]
         ipFamilyPolicy: "SingleStack"
-    ingress:
-      enabled: true
-      ingressClassName: nginx
-      annotations:
-        "cert-manager.io/cluster-issuer": "letsencrypt-dns"
-        "nginx.ingress.kubernetes.io/auth-url": "http://ak-outpost-proxy.authentik.svc.cluster.local:9000/outpost.goauthentik.io/auth/nginx"
-        "nginx.ingress.kubernetes.io/auth-signin": "https://authentik.yuriy-lab.cloud/outpost.goauthentik.io/start?rd=$scheme://$http_host$escaped_request_uri"
-        "nginx.ingress.kubernetes.io/auth-response-headers": "Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid"
-        "nginx.ingress.kubernetes.io/auth-snippet": "proxy_set_header X-Forwarded-Host $http_host;"
-      hosts:
-        - alertmanager.yuriy-lab.cloud
-      paths:
-        - /
-      tls:
-        - secretName: alertmanager-general-tls
-          hosts:
-            - alertmanager.yuriy-lab.cloud
     alertmanagerSpec:
       storage:
         volumeClaimTemplate:
@@ -167,23 +172,6 @@ kube-prometheus-stack:
       ipDualStack:
         ipFamilies: ["IPv4"]
         ipFamilyPolicy: "SingleStack"
-    ingress:
-      enabled: true
-      ingressClassName: nginx
-      annotations:
-        "cert-manager.io/cluster-issuer": "letsencrypt-dns"
-        "nginx.ingress.kubernetes.io/auth-url": "http://ak-outpost-proxy.authentik.svc.cluster.local:9000/outpost.goauthentik.io/auth/nginx"
-        "nginx.ingress.kubernetes.io/auth-signin": "https://authentik.yuriy-lab.cloud/outpost.goauthentik.io/start?rd=$scheme://$http_host$escaped_request_uri"
-        "nginx.ingress.kubernetes.io/auth-response-headers": "Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid"
-        "nginx.ingress.kubernetes.io/auth-snippet": "proxy_set_header X-Forwarded-Host $http_host;"
-      hosts:
-        - prometheus.yuriy-lab.cloud
-      paths:
-        - /
-      tls:
-        - secretName: prometheus-general-tls
-          hosts:
-            - prometheus.yuriy-lab.cloud
     prometheusSpec:
       remoteWrite:
         - url: http://mimir-nginx.mimir.svc.cluster.local/api/v1/push
