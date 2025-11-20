@@ -64,7 +64,7 @@
 - Storage:
     - Minio K8s:
         icon: minio.svg
-        href: "https://minio-console.yuriy-lab.cloud"
+        href: "https://minio.yuriy-lab.cloud"
         description: YK Minio K8s
     - Minio Proxmox:
         icon: minio.svg
