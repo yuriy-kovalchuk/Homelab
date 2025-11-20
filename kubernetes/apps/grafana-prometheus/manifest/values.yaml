@@ -233,6 +233,14 @@ kube-prometheus-stack:
               requests:
                 storage: 2Gi
 
+  kubelet:
+    enabled: true
+
+    serviceMonitor:
+      enabled: true
+      kubelet: true
+      resource: true
+
 
   extraManifests:
     - apiVersion: v1
