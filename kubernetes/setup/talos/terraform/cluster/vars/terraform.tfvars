@@ -1,6 +1,6 @@
 cluster_name     = "talos-prd-cluster"
 gateway          = "10.0.8.254"
-talos_version    = "v1.11.0"
+talos_version    = "v1.11.5"
 cni_name         = "none"
 image_registry   = "factory.talos.dev/nocloud-installer"
 

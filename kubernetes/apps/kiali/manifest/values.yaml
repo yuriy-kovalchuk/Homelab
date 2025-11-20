@@ -1,8 +1,6 @@
 kiali:
-
   auth:
     strategy: "anonymous"
-
   deployment:
     resources:
       requests:
@@ -26,4 +24,4 @@ kiali:
 
 # Hostname for external access via Istio Gateway/VirtualService
 kialiGateway:
-  host: "kiali.istio.yuriy-lab.cloud"
+  host: "kiali.yuriy-lab.cloud"
