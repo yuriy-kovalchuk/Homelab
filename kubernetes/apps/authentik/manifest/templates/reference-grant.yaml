@@ -17,6 +17,9 @@ spec:
     - group: gateway.envoyproxy.io
       kind: SecurityPolicy
       namespace: "kyverno-reporter"
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: "argo-cd"
   to:
     - group: ''
       kind: Service
