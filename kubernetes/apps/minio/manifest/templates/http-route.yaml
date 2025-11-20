@@ -8,6 +8,8 @@ spec:
   {{- range .Values.yk.httpRoute.parentRefs }}
   - name: {{ .name }}
     namespace: {{ .namespace }}
+    group: gateway.networking.k8s.io
+    kind: Gateway
   {{- end }}
   hostnames:
   {{- range .Values.yk.httpRoute.hostnames }}
@@ -21,3 +23,6 @@ spec:
       backendRefs:
         - name: {{ .Values.yk.httpRoute.backend.name }}
           port: {{ .Values.yk.httpRoute.backend.port }}
+          group: ''
+          kind: Service
+          weight: 1
