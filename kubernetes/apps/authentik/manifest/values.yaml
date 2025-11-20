@@ -1,3 +1,19 @@
+yk:
+  httpRoutes:
+
+    - parentRefs:
+        - name: main-gateway
+          namespace: envoy-gateway-system
+      name: grafana
+      hostnames:
+        - "authentik.yuriy-lab.cloud"
+      path:
+        type: PathPrefix
+        value: /
+      backend:
+        name: authentik-server
+        port: 80
+
 authentik:
 
 #  first login at https://<ingress-host-name>/if/flow/initial-setup/
@@ -21,19 +37,6 @@ authentik:
       - name: postgres-creds
         mountPath: /postgres-creds
         readOnly: true
-    ingress:
-      enabled: true
-      ingressClassName: nginx
-      annotations:
-        cert-manager.io/cluster-issuer: letsencrypt-dns
-      tls:
-        - hosts:
-            - authentik.yuriy-lab.cloud
-          secretName: authentik-ingress-tls
-      hosts:
-        - authentik.yuriy-lab.cloud
-      paths:
-        - "/"
 
 
   worker:
