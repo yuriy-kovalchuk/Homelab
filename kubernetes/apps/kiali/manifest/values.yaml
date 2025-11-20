@@ -1,3 +1,19 @@
+yk:
+  httpRoutes:
+
+    - parentRefs:
+        - name: main-gateway
+          namespace: envoy-gateway-system
+      name: grafana
+      hostnames:
+        - "kiali.yuriy-lab.cloud"
+      path:
+        type: PathPrefix
+        value: /
+      backend:
+        name: kiali
+        port: 20001
+
 kiali:
   auth:
     strategy: "anonymous"
