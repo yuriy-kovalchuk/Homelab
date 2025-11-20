@@ -13,23 +13,3 @@ homepage:
 
 serviceAccount:
   name: homepage
-
-
-ingress:
-  enabled: true
-  className: nginx
-  host: homepage.yuriy-lab.cloud
-  tlsSecret: homepage-lab-tls
-  clusterIssuer: letsencrypt-dns
-#  annotations:
-#    description: "Dynamically Detected Homepage"
-#    enabled: "true"
-#    group: "Cluster Management"
-#    icon: "homepage.png"
-#    name: "Homepage"
-
-#    gethomepage.dev/description: {{ .Values.ingress.annotations.description | quote }}
-#    gethomepage.dev/enabled: {{ .Values.ingress.annotations.enabled | quote }}
-#    gethomepage.dev/group: {{ .Values.ingress.annotations.group | quote }}
-#    gethomepage.dev/icon: {{ .Values.ingress.annotations.icon | quote }}
-#    gethomepage.dev/name: {{ .Values.ingress.annotations.name | quote }}

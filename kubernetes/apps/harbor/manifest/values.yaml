@@ -1,19 +1,18 @@
 harbor:
   expose:
+    type: route
     tls:
-      certSource: secret
-      secret:
-        secretName: harbor-tls-ingress
-    ingress:
+      enabled: true
+      certSource: none
+    route:
+      parentRefs:
+        - name: main-gateway
+          namespace: envoy-gateway-system
+          sectionName: https
+          kind: Gateway
+          group: gateway.networking.k8s.io
       hosts:
-        core: harbor.yuriy-lab.cloud
-      className: nginx
-      annotations:
-        ingress.kubernetes.io/ssl-redirect: "true"
-        ingress.kubernetes.io/proxy-body-size: "0"
-        nginx.ingress.kubernetes.io/ssl-redirect: "true"
-        nginx.ingress.kubernetes.io/proxy-body-size: "0"
-        cert-manager.io/cluster-issuer: letsencrypt-dns
+        - harbor.yuriy-lab.cloud
 
   externalURL: https://harbor.yuriy-lab.cloud
 
