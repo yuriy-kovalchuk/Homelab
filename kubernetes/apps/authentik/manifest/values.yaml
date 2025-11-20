@@ -1,5 +1,17 @@
 yk:
   httpRoutes:
+    - parentRefs:
+        - name: main-gateway
+          namespace: envoy-gateway-system
+      name: outpost
+      hostnames:
+        - "authentik.yuriy-lab.cloud"
+      path:
+        type: PathPrefix
+        value: /outpost.goauthentik.io
+      backend:
+        name: ak-outpost-proxy
+        port: 9000
 
     - parentRefs:
         - name: main-gateway
@@ -14,18 +26,6 @@ yk:
         name: authentik-server
         port: 80
 
-    - parentRefs:
-        - name: main-gateway
-          namespace: envoy-gateway-system
-      name: outpost
-      hostnames:
-        - "authentik.yuriy-lab.cloud"
-      path:
-        type: PathPrefix
-        value: /outpost.goauthentik.io
-      backend:
-        name: ak-outpost-proxy
-        port: 9000
 
 authentik:
 
