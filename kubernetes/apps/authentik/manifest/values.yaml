@@ -17,7 +17,7 @@ yk:
     - parentRefs:
         - name: main-gateway
           namespace: envoy-gateway-system
-      name: grafana
+      name: outpost
       hostnames:
         - "authentik.yuriy-lab.cloud"
       path:
