@@ -1,5 +1,6 @@
 yk:
   httpRoutes:
+
     - parentRefs:
         - name: main-gateway
           namespace: envoy-gateway-system
@@ -12,6 +13,7 @@ yk:
       backend:
         name: grafana-prometheus
         port: 80
+
     - parentRefs:
         - name: main-gateway
           namespace: envoy-gateway-system
@@ -24,6 +26,7 @@ yk:
       backend:
         name: grafana-prometheus-kube-pr-prometheus
         port: 9090
+
     - parentRefs:
         - name: main-gateway
           namespace: envoy-gateway-system

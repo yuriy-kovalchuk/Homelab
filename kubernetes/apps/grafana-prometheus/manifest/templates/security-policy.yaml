@@ -1,0 +1,28 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: {{ .Release.Name }}-security-policy
+  namespace: {{ .Release.Namespace }}
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: {{ .Release.Name }}-route
+  extAuth:
+    headersToExtAuth:
+      - accept
+      - cookie
+      - authorization
+      - x-forwarded-proto
+    failOpen: false
+    http:
+      backendRef:
+        name: ak-outpost-proxy
+        namespace: authentik
+        port: 9000
+      path: /outpost.goauthentik.io/auth/envoy
+      headersToBackend:
+        - X-Forwarded-Host
+        - X-Forwarded-Proto
+        - X-Forwarded-Uri
+---
