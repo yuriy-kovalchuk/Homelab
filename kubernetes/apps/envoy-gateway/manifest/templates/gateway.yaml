@@ -20,7 +20,7 @@ spec:
         certificateRefs:
           - kind: Secret
             group: ''
-            name: main-gw-tls-cert
+            name: internal-tls-cert
     - name: https
       protocol: HTTPS
       port: 443
