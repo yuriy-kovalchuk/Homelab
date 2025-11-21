@@ -1,16 +1,16 @@
-apiVersion: networking.istio.io/v1beta1
+apiVersion: networking.istio.io/v1
 kind: VirtualService
 metadata:
   name: httpbin-istio-vs
   namespace: httpbin
 spec:
   hosts:
-    - "httpbin.yuriy-lab.cloud""
+    - "httpbin.yuriy-lab.cloud"
   gateways:
-    - my-gateway
+    - httpbin-istio-gw
   http:
     - route:
-        - destination:
-            host: httpbin-httpbingo.httpbin.svc.cluster.local
-            port:
-              number: 80
+      - destination:
+          host: httpbin-httpbingo.httpbin.svc.cluster.local
+          port:
+            number: 80
