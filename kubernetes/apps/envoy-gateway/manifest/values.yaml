@@ -34,7 +34,21 @@ yk:
 
 
 gateway-helm:
+
+  pod:
+    topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: topology.kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            "app.kubernetes.io/instance": envoy-gateway
+            "app.kubernetes.io/name": gateway-helm
+
+  podDisruptionBudget:
+    minAvailable: 1
+
   hpa:
-    enabled: enabled
+    enabled: false
     minReplicas: 1
     maxReplicas: 5

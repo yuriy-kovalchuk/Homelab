@@ -20,6 +20,14 @@ spec:
             limits:
               cpu: {{ .envoyProxy.deployment.envoy.resources.limits.cpu }}
               memory: {{ .envoyProxy.deployment.envoy.resources.limits.memory }}
+        pod:
+          topologySpreadConstraints:
+            - maxSkew: 1
+              topologyKey: topology.kubernetes.io/hostname
+              whenUnsatisfiable: DoNotSchedule
+              labelSelector:
+                matchLabels:
+                  "gateway.envoyproxy.io/owning-gateway-name": "main-gateway"
       envoyService:
         type: {{ .envoyProxy.service.type }}
         loadBalancerIP: {{ .envoyProxy.service.loadBalancerIP }}
