@@ -17,19 +17,6 @@ yk:
                 cpu: 100m
                 memory: 512Mi
       listeners:
-        - name: https-multiple-listeners
-          protocol: HTTPS
-          port: 443
-          hostname: "internal.yuriy-lab.cloud"
-          allowedRoutes:
-            namespaces:
-              from: All
-          tls:
-            mode: Terminate
-            certificateRefs:
-              - kind: Secret
-                group: ""
-                name: internal-tls-cert
         - name: https
           protocol: HTTPS
           port: 443
