@@ -14,7 +14,7 @@ yk:
                 cpu: 10m
                 memory: 128Mi
               limits:
-                cpu: 200m
+                cpu: 100m
                 memory: 512Mi
       listeners:
         - name: https-multiple-listeners
