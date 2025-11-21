@@ -26,7 +26,7 @@ headlamp:
 
   pluginsManager:
     # -- Enable plugin manager
-    enabled: true
+    enabled: false
 
   podDisruptionBudget:
     enabled: true
