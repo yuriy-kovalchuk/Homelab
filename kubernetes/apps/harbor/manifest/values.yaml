@@ -2,7 +2,7 @@ harbor:
   expose:
     type: route
     tls:
-      enabled: true
+      enabled: false
       certSource: none
     route:
       parentRefs:
