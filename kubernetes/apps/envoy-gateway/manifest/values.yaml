@@ -1,7 +1,6 @@
 yk:
   gateways:
     - name: main
-      hostname: "fdved.cei"
       replicas: 3
       envoyProxy:
         service:

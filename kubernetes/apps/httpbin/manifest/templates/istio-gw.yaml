@@ -1,0 +1,20 @@
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: httpbin-istio-gw
+  namespace: httpbin
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-dns
+spec:
+  selector:
+    istio: istio
+  servers:
+    - port:
+        number: 443
+        name: https
+        protocol: HTTPS
+      hosts:
+        - "httpbin.yuriy-lab.cloud"
+      tls:
+        mode: SIMPLE
+        credentialName: httpbin-tls-secret
