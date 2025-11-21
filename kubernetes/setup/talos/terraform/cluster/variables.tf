@@ -24,7 +24,7 @@ variable "gateway" {
 variable "talos_version" {
   description = "Talos version for installation"
   type        = string
-  default     = "v1.11.0"
+  default     = "v1.11.5"
 }
 
 

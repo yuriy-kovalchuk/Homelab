@@ -13,6 +13,9 @@ yk:
       port: 80
 
 headlamp:
+
+  replicaCount: 3
+
   resources:
     requests:
       cpu: 10m
@@ -20,6 +23,25 @@ headlamp:
     limits:
       cpu: 100m
       memory: 512Mi
+
+  pluginsManager:
+    # -- Enable plugin manager
+    enabled: true
+
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+              - key:  "app.kubernetes.io/name"
+                operator: In
+                values:
+                  - headlamp
+          topologyKey: "kubernetes.io/hostname"
 
   extraManifests:
     - |

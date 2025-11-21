@@ -78,6 +78,8 @@ config:
     validatorIssuerURL: ""
     # -- Use 'access_token' instead of 'id_token' when authenticating using OIDC
     useAccessToken: false
+    # -- Use PKCE (Proof Key for Code Exchange) for enhanced security in OIDC flow
+    usePKCE: false
 
     # Option 3:
     # @param config.oidc - External OIDC secret configuration
@@ -94,8 +96,14 @@ config:
     externalSecret:
       enabled: false
       name: ""
+
+    # -- URL to fetch additional user info for the /me endpoint.
+    # For oauth2proxy /oauth2/userinfo can be used. Empty and it will not be used.
+    meUserInfoURL: ""
+
   # -- directory to look for plugins
   pluginsDir: "/headlamp/plugins"
+  enableHelm: false
   watchPlugins: false
   # tlsCertPath: "/headlamp-cert/headlamp-ca.crt"
   # tlsKeyPath: "/headlamp-cert/headlamp-tls.key"
@@ -141,7 +149,7 @@ podLabels: {}
 # -- Headlamp pod's Security Context
 podSecurityContext:
   {}
-  # fsGroup: 2000
+# fsGroup: 2000
 
 # -- Headlamp containers Security Context
 securityContext:
@@ -208,12 +216,12 @@ ingress:
   # -- Annotations for Ingress resource
   annotations:
     {}
-    # kubernetes.io/tls-acme: "true"
+  # kubernetes.io/tls-acme: "true"
 
   # -- Additional labels to add to the Ingress resource
   labels: {}
     # app.kubernetes.io/part-of: traefik
-    # environment: prod
+  # environment: prod
 
   # -- Ingress class name. replacement for the deprecated "kubernetes.io/ingress.class" annotation
   ingressClassName: ""
@@ -225,7 +233,7 @@ ingress:
     # - host: chart-example.local
     #   paths:
     #   - path: /
-    #     type: ImplementationSpecific
+  #     type: ImplementationSpecific
   # -- Ingress TLS configuration
   tls: []
   #  - secretName: chart-example-tls
@@ -244,7 +252,7 @@ resources:
   #   memory: 128Mi
   # requests:
   #   cpu: 100m
-  #   memory: 128Mi
+#   memory: 128Mi
 
 # -- Node labels for pod assignment
 nodeSelector: {}
@@ -254,6 +262,9 @@ tolerations: []
 
 # -- Affinity settings for pod assignment
 affinity: {}
+
+# -- Pod priority class
+priorityClassName: ""
 
 # Plugin Manager Sidecar Container Configuration
 pluginsManager:
@@ -288,7 +299,7 @@ pluginsManager:
     # readOnlyRootFilesystem: true
     # capabilities:
     #   drop:
-    #     - ALL
+  #     - ALL
 
 podDisruptionBudget:
   # -- enable PodDisruptionBudget
@@ -327,4 +338,3 @@ extraManifests: []
 #     name: my-config-too
 #   data:
 #     key: value
-
