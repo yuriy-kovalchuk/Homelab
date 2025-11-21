@@ -30,7 +30,19 @@ yk:
               - kind: Secret
                 group: ""
                 name: main-gw-tls-cert
-
+        - name: https-whoami
+          protocol: HTTPS
+          port: 443
+          hostname: "whoami.yuriy-lab.cloud"
+          allowedRoutes:
+            namespaces:
+              from: All
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - kind: Secret
+                group: ""
+                name: whoami-gw-tls-cert
 
 
 gateway-helm:
