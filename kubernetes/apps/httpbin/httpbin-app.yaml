@@ -15,10 +15,15 @@ spec:
     server: https://kubernetes.default.svc
     namespace: httpbin
   syncPolicy:
+    managedNamespaceMetadata:
+      labels:
+        istio-injection: "enabled"
+        pod-security.kubernetes.io/enforce: privileged
+        pod-security.kubernetes.io/audit: privileged
+        pod-security.kubernetes.io/warn: privileged
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
-
