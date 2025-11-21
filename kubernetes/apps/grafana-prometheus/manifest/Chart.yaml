@@ -3,12 +3,12 @@ name: monitoring-stack-yk
 description: Umbrella chart for monitoring (Prometheus + Grafana)
 
 type: application
-version: 1.0.1
-appVersion: "77.10.0"
+version: 1.0.2
+appVersion: "79.6.1"
 
 
 dependencies:
   - name: kube-prometheus-stack
-    version: "77.10.0"
+    version: "79.6.1"
     repository: https://prometheus-community.github.io/helm-charts
 
