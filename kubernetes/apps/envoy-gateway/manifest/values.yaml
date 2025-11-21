@@ -35,6 +35,9 @@ yk:
 
 gateway-helm:
 
+  deployment:
+    replicas: 3
+
   pod:
     topologySpreadConstraints:
       - maxSkew: 1
