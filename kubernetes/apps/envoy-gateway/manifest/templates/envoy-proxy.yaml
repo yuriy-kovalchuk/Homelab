@@ -1,22 +1,27 @@
+{{- range .Values.yk.gateways }}
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: EnvoyProxy
 metadata:
-  name: default-proxy-config
-  namespace: envoy-gateway-system
+  name: {{ .name }}-proxy
+  namespace: {{ $.Release.Namespace | default "envoy-gateway-system" }}
 spec:
   provider:
     type: Kubernetes
     kubernetes:
+      envoyPDB:
+        minAvailable: 1
       envoyDeployment:
-        replicas: 3
+        replicas: {{ .replicas }}
         container:
           resources:
             requests:
-              cpu: 100m
-              memory: 512Mi
+              cpu: {{ .envoyProxy.deployment.envoy.resources.requests.cpu }}
+              memory: {{ .envoyProxy.deployment.envoy.resources.requests.memory }}
             limits:
-              cpu: 500m
-              memory: 1Gi
+              cpu: {{ .envoyProxy.deployment.envoy.resources.limits.cpu }}
+              memory: {{ .envoyProxy.deployment.envoy.resources.limits.memory }}
       envoyService:
-        type: LoadBalancer
-        loadBalancerIP: 10.0.8.105
+        type: {{ .envoyProxy.service.type }}
+        loadBalancerIP: {{ .envoyProxy.service.loadBalancerIP }}
+---
+{{- end }}

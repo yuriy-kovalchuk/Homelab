@@ -1,11 +1,14 @@
+{{- range .Values.yk.gateways }}
 apiVersion: gateway.networking.k8s.io/v1
 kind: GatewayClass
 metadata:
-  name: envoy-gw
+  name: {{ .name }}-class
 spec:
   controllerName: gateway.envoyproxy.io/gatewayclass-controller
   parametersRef:
     group: gateway.envoyproxy.io
     kind: EnvoyProxy
-    name: default-proxy-config
-    namespace: envoy-gateway-system
+    name: {{ .name }}-proxy
+    namespace: {{ $.Release.Namespace | default "envoy-gateway-system" }}
+---
+{{- end }}
