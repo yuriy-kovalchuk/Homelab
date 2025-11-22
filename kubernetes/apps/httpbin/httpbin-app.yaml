@@ -18,7 +18,7 @@ spec:
     managedNamespaceMetadata:
       labels:
         istio.io/dataplane-mode: ambient
-#        istio.io/use-waypoint: httpbin-waypoint
+        istio.io/use-waypoint: httpbin-waypoint
     automated:
       prune: true
       selfHeal: true
