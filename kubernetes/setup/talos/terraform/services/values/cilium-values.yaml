@@ -46,8 +46,7 @@ operator:
 rollOutCiliumPods: true
 
 routing-mode: "native"
-bpf:
-  masquerade: true
+
 
 hubble:
   enabled: false
@@ -55,4 +54,15 @@ hubble:
     enabled: false
   ui:
     enabled: false
+
+cni:
+  exclusive: false # REQUIRED: Allow Istio CNI chaining
+
+socketLB:
+  # REQUIRED: Prevent Cilium from bypassing Istio traffic capture
+  hostNamespaceOnly: true
+
+bpf:
+  # REQUIRED: Disable BPF masquerade to allow Istio health checks to pass
+  masquerade: false
 

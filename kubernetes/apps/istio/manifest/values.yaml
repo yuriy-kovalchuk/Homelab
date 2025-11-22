@@ -12,6 +12,7 @@ gateway:
       memory: 512Mi
 
 istiod:
+  profile: ambient
   resources:
     requests:
       cpu: 100m
