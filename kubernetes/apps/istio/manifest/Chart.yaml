@@ -19,3 +19,11 @@ dependencies:
     version: "1.27.1"
     repository: https://istio-release.storage.googleapis.com/charts
 
+  - name: cni
+    version: "1.27.1"
+    repository: https://istio-release.storage.googleapis.com/charts
+
+  - name: ztunnel
+    version: "1.27.1"
+    repository: https://istio-release.storage.googleapis.com/charts
+

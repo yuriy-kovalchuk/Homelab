@@ -17,3 +17,9 @@ istiod:
     requests:
       cpu: 100m
       memory: 128Mi
+
+cni:
+  profile: ambient
+  ambient:
+    enabled: true
+
