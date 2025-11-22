@@ -7,7 +7,8 @@
     "kubeseal@0.29.0",
     "terraform@latest",
     "talosctl@latest",
-    "git@latest"
+    "git@latest",
+    "istioctl@latest"
   ],
   "shell": {
     "init_hook": [
