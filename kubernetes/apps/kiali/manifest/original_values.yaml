@@ -25,9 +25,9 @@ kiali_route_url: ""
 #
 
 additional_display_details:
-- annotation: kiali.io/api-spec
-  icon_annotation: kiali.io/api-type
-  title: API Documentation
+  - annotation: kiali.io/api-spec
+    icon_annotation: kiali.io/api-type
+    title: API Documentation
 
 auth:
   openid: {}
@@ -64,7 +64,7 @@ deployment:
   image_name: quay.io/kiali/kiali
   image_pull_policy: "Always"
   image_pull_secrets: []
-  image_version: v2.17.0 # version like "v1.39" (see: https://quay.io/repository/kiali/kiali?tab=tags) or a digest hash
+  image_version: v2.18.0 # version like "v1.39" (see: https://quay.io/repository/kiali/kiali?tab=tags) or a digest hash
   ingress:
     additional_labels: {}
     class_name: "nginx"
@@ -110,7 +110,7 @@ deployment:
   service_type: ""
   tolerations: []
   topology_spread_constraints: []
-  version_label: v2.17.0 # v1.39 # v1.39.0 # see: https://quay.io/repository/kiali/kiali?tab=tags
+  version_label: v2.18.0 # v1.39 # v1.39.0 # see: https://quay.io/repository/kiali/kiali?tab=tags
   view_only_mode: false
 
 external_services:
@@ -121,7 +121,7 @@ external_services:
 
 identity: {}
   #cert_file:
-  #private_key_file:
+#private_key_file:
 
 kiali_feature_flags:
   custom_workload_types: []
@@ -140,4 +140,3 @@ server:
       enabled: true
       port: 9090
   web_root: ""
-
