@@ -17,11 +17,11 @@ spec:
   syncPolicy:
     managedNamespaceMetadata:
       labels:
-        istio-injection: "enabled"
+#        istio-injection: "enabled"
         pod-security.kubernetes.io/enforce: privileged
         pod-security.kubernetes.io/audit: privileged
         pod-security.kubernetes.io/warn: privileged
-#        istio.io/dataplane-mode: ambient
+        istio.io/dataplane-mode: ambient
 #        istio.io/use-waypoint: httpbin-waypoint
     automated:
       prune: true
