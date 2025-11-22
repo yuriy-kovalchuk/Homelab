@@ -17,7 +17,7 @@ spec:
   syncPolicy:
     managedNamespaceMetadata:
       labels:
-        istio.io/dataplane-mode=ambient
+        istio.io/dataplane-mode: ambient
     automated:
       prune: true
       selfHeal: true
