@@ -11,6 +11,6 @@ spec:
   http:
     - route:
       - destination:
-          host: httpbin-httpbingo.httpbin.svc.cluster.local
+          host: httpbin-httpbingo
           port:
             number: 80
