@@ -3,8 +3,6 @@ kind: Gateway
 metadata:
   name: httpbin-istio-gw
   namespace: httpbin
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-dns
 spec:
   selector:
     istio: istio
