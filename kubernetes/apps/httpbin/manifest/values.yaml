@@ -1,2 +1,16 @@
+yk:
+  httpRoute:
+    parentRefs:
+      - name: main-gateway
+        namespace: envoy-gateway-system
+    hostnames:
+      - "httpbin.yuriy-lab.cloud"
+    path:
+      type: PathPrefix
+      value: /
+    backend:
+      name: httpbin-httpbingo
+      port: 80
+
 httpbingo:
   replicaCount: 2

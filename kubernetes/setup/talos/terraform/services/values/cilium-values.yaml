@@ -55,14 +55,14 @@ hubble:
   ui:
     enabled: false
 
-cni:
-  exclusive: false # REQUIRED: Allow Istio CNI chaining
-
-socketLB:
-  # REQUIRED: Prevent Cilium from bypassing Istio traffic capture
-  hostNamespaceOnly: true
+#cni:
+#  exclusive: false # REQUIRED: Allow Istio CNI chaining
+#
+#socketLB:
+#  # REQUIRED: Prevent Cilium from bypassing Istio traffic capture
+#  hostNamespaceOnly: true
 
 bpf:
   # REQUIRED: Disable BPF masquerade to allow Istio health checks to pass
-  masquerade: false
+  masquerade: true
 

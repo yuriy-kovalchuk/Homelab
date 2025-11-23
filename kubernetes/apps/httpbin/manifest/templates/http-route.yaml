@@ -1,0 +1,28 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ .Release.Name }}-route
+  namespace: {{ .Release.Namespace }}
+spec:
+  parentRefs:
+  {{- range .Values.yk.httpRoute.parentRefs }}
+  - name: {{ .name }}
+    namespace: {{ .namespace }}
+    group: gateway.networking.k8s.io
+    kind: Gateway
+  {{- end }}
+  hostnames:
+  {{- range .Values.yk.httpRoute.hostnames }}
+  - {{ . | quote }}
+  {{- end }}
+  rules:
+    - matches:
+        - path:
+            type: {{ .Values.yk.httpRoute.path.type | default "PathPrefix" }}
+            value: {{ .Values.yk.httpRoute.path.value | default "/" }}
+      backendRefs:
+        - name: {{ .Values.yk.httpRoute.backend.name }}
+          port: {{ .Values.yk.httpRoute.backend.port }}
+          group: ''
+          kind: Service
+          weight: 1
