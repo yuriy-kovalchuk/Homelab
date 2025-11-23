@@ -4,8 +4,7 @@ metadata:
   name: httpbin-istio-gw
   namespace: httpbin
 spec:
-  selector:
-    istio: istio
+  gatewayClassName: istio
   servers:
     - port:
         number: 80

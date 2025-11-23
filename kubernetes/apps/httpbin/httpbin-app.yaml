@@ -18,9 +18,9 @@ spec:
     managedNamespaceMetadata:
       labels:
 #        istio-injection: "enabled"
-        pod-security.kubernetes.io/enforce: privileged
-        pod-security.kubernetes.io/audit: privileged
-        pod-security.kubernetes.io/warn: privileged
+#        pod-security.kubernetes.io/enforce: privileged
+#        pod-security.kubernetes.io/audit: privileged
+#        pod-security.kubernetes.io/warn: privileged
         istio.io/dataplane-mode: ambient
 #        istio.io/use-waypoint: httpbin-waypoint
     automated:
