@@ -24,6 +24,6 @@ cni:
     enabled: true
 
 ztunnel:
-  logLevel: debug
+  logLevel: info
 
 
