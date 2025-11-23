@@ -1,16 +1,13 @@
-apiVersion: networking.istio.io/v1
-kind: VirtualService
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
 metadata:
-  name: httpbin-istio-vs
-  namespace: httpbin
+  name: httpbin-route
 spec:
-  hosts:
+  parentRefs:
+    - name: httpbin-istio-gw
+  hostnames:
     - "httpbin.yuriy-lab.cloud"
-  gateways:
-    - httpbin-istio-gw
-  http:
-    - route:
-      - destination:
-          host: httpbin-httpbingo
-          port:
-            number: 80
+  rules:
+    - backendRefs:
+        - name: httpbin-httpbingo
+          weight: 90
