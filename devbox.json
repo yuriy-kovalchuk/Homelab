@@ -8,7 +8,8 @@
     "terraform@latest",
     "talosctl@latest",
     "git@latest",
-    "istioctl@latest"
+    "istioctl@latest",
+    "cilium-cli@latest"
   ],
   "shell": {
     "init_hook": [

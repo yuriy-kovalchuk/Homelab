@@ -1,6 +1,54 @@
 {
   "lockfile_version": "1",
   "packages": {
+    "cilium-cli@latest": {
+      "last_modified": "2025-11-15T07:28:48Z",
+      "resolved": "github:NixOS/nixpkgs/1d4c88323ac36805d09657d13a5273aea1b34f0c#cilium-cli",
+      "source": "devbox-search",
+      "version": "0.18.8",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/0l6wzi7ba440i26jl672cg9fc0cry1xa-cilium-cli-0.18.8",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/0l6wzi7ba440i26jl672cg9fc0cry1xa-cilium-cli-0.18.8"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/zv38y58j5lkh4y98pd5d8qv3ydqcmr3q-cilium-cli-0.18.8",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/zv38y58j5lkh4y98pd5d8qv3ydqcmr3q-cilium-cli-0.18.8"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/kmnjlqq0lsg3q3z0zh8462lsal02l7jm-cilium-cli-0.18.8",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/kmnjlqq0lsg3q3z0zh8462lsal02l7jm-cilium-cli-0.18.8"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/6mfgnap3mjq8pnvzyzv9a5lsy99mgraw-cilium-cli-0.18.8",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/6mfgnap3mjq8pnvzyzv9a5lsy99mgraw-cilium-cli-0.18.8"
+        }
+      }
+    },
     "gettext@0.22.5": {
       "last_modified": "2025-03-17T10:12:08Z",
       "resolved": "github:NixOS/nixpkgs/096478927c360bc18ea80c8274f013709cf7bdcd#gettext",
