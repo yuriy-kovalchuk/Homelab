@@ -4,7 +4,6 @@
   ],
   "enabled": true,
   "prCreation": "off",
-  "branchCreation": "never",
   "dependencyDashboard": true,
   "includePaths": [
     "kubernetes/apps/**"
