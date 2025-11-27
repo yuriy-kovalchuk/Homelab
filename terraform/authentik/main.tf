@@ -146,34 +146,5 @@ resource "authentik_group" "grafana_viewers" {
 # -------------------- grafana ---------------------------
 
 
-# -------------------- rancher ---------------------------
-resource "authentik_provider_oauth2" "headlamp_provider" {
-  name          = "headlamp"
-  client_id     = "JW5BvuhoQ8W662jSRMnjjt11lwvhf4tXyoi7JDfa"
-  client_secret = var.rancher_provider_client_secret
-  authorization_flow  = data.authentik_flow.default-provider-authorization-implicit-consent.id
-  invalidation_flow  = data.authentik_flow.default_invalidation.id
-  allowed_redirect_uris = [
-    {
-      matching_mode = "strict",
-      url           = "https://headlamp.yuriy-lab.cloud/oidc-callback",
-    }
-  ]
-
-  property_mappings = [
-    data.authentik_property_mapping_provider_scope.scope-email.id,
-    data.authentik_property_mapping_provider_scope.scope-profile.id,
-    data.authentik_property_mapping_provider_scope.scope-openid.id,
-  ]
-}
-
-resource "authentik_application" "headlamp_application" {
-  name              = "headlamp"
-  slug              = "headlamp"
-  protocol_provider = authentik_provider_oauth2.headlamp_provider.id
-}
-# -------------------- rancher ---------------------------
-
-
 
 
