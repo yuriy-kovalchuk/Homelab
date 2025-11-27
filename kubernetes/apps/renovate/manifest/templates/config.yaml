@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: renovate-config
+  namespace: {{ .Release.Namespace | default "renovate" }}
+data:
+  config.json: |
+{{ .Values.configJson | indent 4 }}

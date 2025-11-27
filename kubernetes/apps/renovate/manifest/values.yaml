@@ -1,0 +1,19 @@
+schedule: "0 4 * * *"
+image: renovate/renovate:latest
+configJson: |
+  {
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "platform": "github",
+    "repositories": ["yuriy-kovalchuk/Homelab"],
+    "enabled": true,
+  
+    "prCreation": "off",
+    "onboarding": false,
+    "autodiscover": false,
+  
+    "dependencyDashboard": true,
+    "dependencyDashboardHeader": "## Renovate Dependency Dashboard",
+  
+    "enabledManagers": ["helmv3", "helm-requirements"]
+  }
+  
