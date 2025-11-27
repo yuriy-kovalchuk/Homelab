@@ -4,20 +4,9 @@
   ],
   "enabled": true,
   "prCreation": "off",
-  "branchCreation": "off",
+  "branchCreation": "never",
   "dependencyDashboard": true,
   "includePaths": [
     "kubernetes/apps/**"
-  ],
-
-  "packageRules": [
-    {
-      "matchManagers": ["helmv3", "helm-requirements"],
-      "fileMatch": [
-        "**/Chart.yaml",
-        "**/requirements.yaml"
-      ],
-      "enabled": true
-    }
   ]
 }
