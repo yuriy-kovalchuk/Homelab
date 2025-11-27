@@ -18,6 +18,7 @@ yk:
         - name: main-gateway
           namespace: envoy-gateway-system
       name: prometheus
+      securityPolicy: true
       hostnames:
         - "prometheus.yuriy-lab.cloud"
       path:
@@ -31,6 +32,7 @@ yk:
         - name: main-gateway
           namespace: envoy-gateway-system
       name: alertmanager
+      securityPolicy: true
       hostnames:
         - "alertmanager.yuriy-lab.cloud"
       path:
