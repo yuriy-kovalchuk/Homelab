@@ -30,7 +30,7 @@ netbox:
     database: netbox
     username: netbox
     existingSecretName: "cluster-netbox-user"
-    existingSecretKey: pg_password
+    existingSecretKey: password
 
   valkey:
     enabled: false
