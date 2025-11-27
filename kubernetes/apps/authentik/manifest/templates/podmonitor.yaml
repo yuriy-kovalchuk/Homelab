@@ -1,0 +1,30 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: cnpg-authentik-cluster-monitor
+  namespace: monitoring
+  labels:
+    # IMPORTANT: If your Prometheus CRD has a specific selector (e.g., release: prometheus),
+    # you MUST add that label here for discovery to work.
+    cnpg.io/cluster-name: pg-cluster-authentik
+spec:
+  # 1. Namespace Selector
+  # This tells the PodMonitor to ONLY look for pods in the 'authentik' namespace.
+  # This is crucial for cross-namespace scraping.
+  namespaceSelector:
+    matchNames:
+      - authentik
+
+  # 2. Pod Selector
+  # This selects the specific CloudNativePG pods using the 'cnpg.io/cluster' label
+  # which is present on all your database instances.
+  selector:
+    matchLabels:
+      cnpg.io/cluster: pg-cluster-authentik
+
+  # 3. Metrics Endpoints
+  # This specifies how to scrape the metrics from the selected pods.
+  podMetricsEndpoints:
+    - port: metrics # This is the port NAME (9187/TCP) defined in your Pod spec.
+      path: /metrics # The standard path for the postgres exporter.
+      interval: 30s # Recommended scraping interval.
