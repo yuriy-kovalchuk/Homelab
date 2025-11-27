@@ -3,14 +3,14 @@ name: kyverno-yk
 description: Umbrella Helm chart for kyverno application in Kubernetes
 
 type: application
-version: 1.0.0
-appVersion: "1.0.0"
+version: 3.6.0
+appVersion: "3.6.0"
 
 dependencies:
   - name: "kyverno"
-    version: "3.5.2"
+    version: "3.6.0"
     repository: "https://kyverno.github.io/kyverno/"
   - name: "kyverno-policies"
-    version: "3.5.2"
+    version: "3.6.0"
     repository: "https://kyverno.github.io/kyverno/"
 
