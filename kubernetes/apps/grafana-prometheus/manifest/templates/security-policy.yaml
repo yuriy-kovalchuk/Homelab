@@ -4,7 +4,7 @@ apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: SecurityPolicy
 metadata:
   name: {{ .name }}-security-policy
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ $.Release.Namespace }}
 spec:
   targetRef:
     group: gateway.networking.k8s.io
