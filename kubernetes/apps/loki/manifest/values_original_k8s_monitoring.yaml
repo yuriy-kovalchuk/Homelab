@@ -21,6 +21,10 @@ global:
   # @section -- Global Settings
   scrapeInterval: 60s
 
+  # -- The timeout for scraping metrics.
+  # @section -- Global Settings
+  scrapeTimeout: 10s
+
   # -- The protocols to negotiate during a Prometheus metrics scrape, in order of preference.
   # @section -- Global Settings
   scrapeProtocols: ["OpenMetricsText1.0.0", "OpenMetricsText0.0.1", "PrometheusText0.0.4"]
@@ -28,6 +32,10 @@ global:
   # -- Whether to scrape a classic histogram that’s also exposed as a native histogram.
   # @section -- Global Settings
   scrapeClassicHistograms: false
+
+  # -- Whether to scrape native histograms.
+  # @section -- Global Settings
+  scrapeNativeHistograms: false
 
   # -- Sets the max_cache_size for every prometheus.relabel component. ([docs](https://grafana.com/docs/alloy/latest/reference/components/prometheus/prometheus.relabel/#arguments))
   # This should be at least 2x-5x your largest scrape target or samples appended rate.
@@ -135,6 +143,27 @@ podLogs:
   collector: alloy-logs
 
   # To see additional options, please see the [Pod Logs feature documentation](https://github.com/grafana/k8s-monitoring-helm/tree/main/charts/k8s-monitoring/charts/feature-pod-logs).
+
+# -- Pod logs via Kubernetes API.
+# Requires a destination that supports logs.
+# To see the valid options, please see the [Pod Logs via Kubernetes API feature documentation](https://github.com/grafana/k8s-monitoring-helm/tree/main/charts/k8s-monitoring/charts/feature-pod-logs-via-kubernetes-api).
+# @default -- Disabled
+# @section -- Features - Pod Logs via Kubernetes API
+podLogsViaKubernetesApi:
+  # -- Enable gathering Kubernetes Pod logs.
+  # @section -- Features - Pod Logs via Kubernetes API
+  enabled: false
+
+  # -- The destinations where logs will be sent. If empty, all logs-capable destinations will be used.
+  # @section -- Features - Pod Logs via Kubernetes API
+  destinations: []
+
+  # -- Which collector to assign this feature to. Do not change this unless you are sure of what you are doing.
+  # @section -- Features - Pod Logs via Kubernetes API
+  # @ignored
+  collector: alloy-logs
+
+  # To see additional options, please see the [Pod Logs via Kubernetes API feature documentation](https://github.com/grafana/k8s-monitoring-helm/tree/main/charts/k8s-monitoring/charts/feature-pod-logs-via-kubernetes-api).
 
 # -- Application Observability.
 # Requires destinations that supports metrics, logs, and traces.
@@ -371,31 +400,6 @@ alloy-operator:
   # @section -- Alloy Operator
   deploy: true
 
-  waitForReadiness:
-    # -- Utilize a Helm Hook to wait for the Alloy Operator to be ready before creating Alloy instances.
-    # This prevents timing issues where Alloy custom resources are created before the operator is ready to process them.
-    # @section -- Alloy Operator
-    enabled: true
-
-    # -- The image to use for the Helm Hook that ensures the Alloy Operator is ready.
-    # @section -- Alloy Operator
-    image:
-      registry: ghcr.io
-      repository: grafana/helm-chart-toolbox-kubectl
-      tag: 0.1.1
-      digest: ""
-      pullPolicy: IfNotPresent
-      pullSecrets: []
-
-    # -- Tolerations to apply to the Helm Hook that ensures the Alloy Operator is ready.
-    # @section -- Alloy Operator
-    tolerations: []
-
-    # -- Node selector to use for the Helm Hook that ensures the Alloy Operator is ready.
-    # @section -- Alloy Operator
-    nodeSelector:
-      kubernetes.io/os: linux
-
   waitForAlloyRemoval:
     # -- Utilize a Helm Hook to wait for all Alloy instances to be removed before uninstalling the Alloy Operator.
     # This ensures that all Alloy instances are properly cleaned up before the operator is removed.
@@ -407,10 +411,46 @@ alloy-operator:
     image:
       registry: ghcr.io
       repository: grafana/helm-chart-toolbox-kubectl
-      tag: 0.1.1
+      tag: 0.1.2
       digest: ""
       pullPolicy: IfNotPresent
       pullSecrets: []
+
+    # -- Annotations to apply to the Pod for the Helm Hook to wait for all Alloy instances to be removed before
+    # uninstalling the Alloy Operator
+    # @section -- Alloy Operator
+    podAnnotations: {}
+
+    # -- Labels to apply to the Pod for the Helm Hook to wait for all Alloy instances to be removed before uninstalling
+    # the Alloy Operator
+    # @section -- Alloy Operator
+    podLabels:
+      sidecar.istio.io/inject: "false"
+      linkerd.io/inject: disabled
+
+    # -- Default security context to apply to the container. This can also be set to `null` to remove the security
+    # context entirely. Also, `runAsUser` can be set to `null` to remove it.
+    # @section -- Alloy Operator
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 4242
+      seccompProfile:
+        type: RuntimeDefault
+
+    # -- Set the resource field for the Helm Hook that ensures that Alloy instances are removed during uninstall.
+    # @section -- Alloy Operator
+    resources: {}
+    #      requests:
+    #       cpu: 10m
+    #       memory: 64Mi
+    #
+    #      limits:
+    #       cpu: 500m
+    #       memory: 128Mi
 
     # -- Tolerations to apply to the Helm Hook that ensures that Alloy instances are removed during uninstall.
     # @section -- Alloy Operator
@@ -442,4 +482,3 @@ extraObjects: []
 #     dataFrom:
 #     - extract:
 #         key: mysecret
-
