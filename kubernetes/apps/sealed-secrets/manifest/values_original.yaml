@@ -39,7 +39,7 @@ commonLabels: {}
 image:
   registry: docker.io
   repository: bitnami/sealed-secrets-controller
-  tag: 0.29.0
+  tag: 0.33.1
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
   ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
@@ -84,7 +84,7 @@ keyrenewperiod: ""
 keyttl: ""
 ## @param keycutofftime Specifies a date at which the controller should generate a new certificate. Useful in early key renewal scenarios.
 ## Takes a date formated according to RFC1123. Can be obtained with the 'date -R' command on a unix system.
-## e.g 
+## e.g
 ## keycutofftime: "Mon, 14 Oct 2024 21:45:30 +0200"
 ##
 keycutofftime: ""
@@ -98,10 +98,10 @@ rateLimitBurst: ""
 ##
 additionalNamespaces: []
 ## @param privateKeyAnnotations Map of annotations to be set on the sealing keypairs
-## 
+##
 privateKeyAnnotations: {}
 ## @param privateKeyLabels Map of labels to be set on the sealing keypairs
-## 
+##
 privateKeyLabels: {}
 ## @param logInfoStdout Specifies whether the Sealed Secrets controller will log info to stdout
 ##
@@ -115,6 +115,9 @@ logFormat: ""
 ## @param maxRetries Number of maximum retries
 ##
 maxRetries: ""
+## @param watchForSecrets Specifies whether the Sealed Secrets controller will watch for new secrets
+##
+watchForSecrets: false
 ## @param command Override default container command
 ##
 command: []
@@ -429,7 +432,7 @@ rbac:
   ## @param rbac.namespacedRoles Specifies whether the namespaced Roles should be created (in each of the specified additionalNamespaces)
   ##
   namespacedRoles: false
-  ## @param rbac.namespacedRolesName Specifies the name for the namesapced Role resource
+  ## @param rbac.namespacedRolesName Specifies the name for the namespaced Role resource
   ##
   namespacedRolesName: "secrets-unsealer"
   ## @param rbac.labels Extra labels to be added to RBAC resources
@@ -543,4 +546,3 @@ pdb:
   ## @param pdb.maxUnavailable The maximum number of unavailable pods (non number to omit)
   ##
   maxUnavailable: ""
-

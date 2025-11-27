@@ -3,10 +3,10 @@ name: sealed-secrets-yk
 description: Umbrella Helm chart for sealed-secrets k8s
 
 type: application
-version: 2.17.4
-appVersion: "2.17.4"
+version: 2.17.9
+appVersion: "2.17.9"
 
 dependencies:
   - name: sealed-secrets
-    version: "2.17.4"
+    version: "2.17.9"
     repository: https://bitnami-labs.github.io/sealed-secrets/
