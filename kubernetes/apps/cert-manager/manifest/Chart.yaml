@@ -3,10 +3,10 @@ name: cert-manager-yk
 description: A Helm chart for cert-manager, ClusterIssuer, and Sealed Secrets
 
 type: application
-version: 0.1.0
+version: 1.19.1
 appVersion: "v1.17.1"
 
 dependencies:
   - name: cert-manager
-    version: "v1.17.1"              # Specify the version of cert-manager you want
-    repository: https://charts.jetstack.io   # Jetstack's Helm repository
+    version: "v1.19.1"
+    repository: https://charts.jetstack.io
