@@ -34,7 +34,7 @@ updateStrategy: {}
   # rollingUpdate:
   #  maxSurge: 25%
   #  maxUnavailable: 25%
-  # type: RollingUpdate
+# type: RollingUpdate
 
 # -- Container port
 port:
@@ -99,17 +99,17 @@ resources: {}
   #   cpu: 10m
   # requests:
   #   memory: 75Mi
-  #   cpu: 5m
+#   cpu: 5m
 
 networkPolicy:
   # -- Create NetworkPolicy
   enabled: false
   # -- Egress rule to allow Kubernetes API Server access
   egress:
-  - to:
-    ports:
-    - protocol: TCP
-      port: 6443
+    - to:
+      ports:
+        - protocol: TCP
+          port: 6443
   ingress: []
 
 ingress:
@@ -123,7 +123,7 @@ ingress:
   # -- Annotations for the Ingress
   annotations: {}
     # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+  # kubernetes.io/tls-acme: "true"
   # -- Ingress host list
   hosts:
   #  - host: chart-example.local
@@ -133,6 +133,39 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
+
+httproute:
+  # -- Enable HTTPRoute resource (Gateway API alternative to Ingress)
+  # Requires Gateway API CRDs (v1) installed in cluster
+  # https://gateway-api.sigs.k8s.io/
+  enabled: false
+  # -- Additional HTTPRoute labels
+  labels: {}
+  # -- Additional HTTPRoute annotations
+  annotations: {}
+  # -- Gateway API parentRefs (list of Gateway references)
+  # Must reference an existing Gateway resource
+  parentRefs: []
+  #  - name: example-gateway
+  #    namespace: gateway-system
+  #    sectionName: https
+  # -- List of hostnames for HTTPRoute
+  hostnames: []
+  #  - policy-reporter.example.com
+  # -- HTTPRoute rules configuration
+  # Allows advanced routing with matches and filters
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      # Optional filters:
+      # filters:
+      #   - type: RequestHeaderModifier
+      #     requestHeaderModifier:
+      #       add:
+      #         - name: X-Custom-Header
+      #           value: value
 
 logging:
   # -- Enables server access logging
@@ -178,12 +211,14 @@ reportFilter: {}
   #  include: []
   #  exclude: []
   # # -- Disable the processing of cluster scoped Reports
-  # disableClusterReports: false
+# disableClusterReports: false
 
 # -- Customize source specific logic like result ID generation
 sourceConfig: []
 # - selector:
 #     source: kyverno
+#   # -- Handles cluster scoped reports for namespaces as self assigned namespace scoped report
+#   selfassignNamespaces: true
 #   customId:
 #     enabled: true
 #     fields: ["resource", "policy", "rule", "category", "result", "message"]
@@ -192,17 +227,7 @@ sourceConfig: []
 sourceFilters:
   - selector:
       # -- select Report by source
-      source: kyverno
-    # -- Filter out Reports of controlled Pods and Jobs, only works for Reports with scope resource
-    uncontrolledOnly: true
-    # -- Filter out cluster scoped Reports
-    disableClusterReports: false
-    # -- Filter out Reports based on the scope resource kind
-    kinds:
-      exclude: [ReplicaSet]
-  - selector:
-      # -- select Report by source
-      source: KyvernoValidatingPolicy
+      sources: [kyverno, KyvernoValidatingPolicy, KyvernoImageValidatingPolicy]
     # -- Filter out Reports of controlled Pods and Jobs, only works for Reports with scope resource
     uncontrolledOnly: true
     # -- Filter out cluster scoped Reports
@@ -364,24 +389,24 @@ target:
     # Wildcars for namespaces and policies are supported, you can either define exclude or include values
     # Filters are available for all targets except the UI
     filter: {}
-#      namespaces:
-#        include: ["develop"]
-#      priorities:
-#        exclude: ["debug", "info", "error"]
-#      labels:
-#        include: ["app", "owner:team-a", "monitoring:*"]
+    #      namespaces:
+    #        include: ["develop"]
+    #      priorities:
+    #        exclude: ["debug", "info", "error"]
+    #      labels:
+    #        include: ["app", "owner:team-a", "monitoring:*"]
     # -- List of channels to route results to different configurations
     channels: []
-#    - host: "http://loki.loki-stack:3100"
-#      sources: []
-#      customLabels: {}
-#      filter:
-#        namespaces:
-#          include: ["develop"]
-#        priorities:
-#          exclude: ["debug", "info", "error"]
-#        reportLabels:
-# .         include: ["app", "owner:team-b"]
+  #    - host: "http://loki.loki-stack:3100"
+  #      sources: []
+  #      customLabels: {}
+  #      filter:
+  #        namespaces:
+  #          include: ["develop"]
+  #        priorities:
+  #          exclude: ["debug", "info", "error"]
+  #        reportLabels:
+  # .         include: ["app", "owner:team-b"]
 
   elasticsearch:
     # -- Host address
@@ -449,22 +474,22 @@ target:
     filter: {}
     # -- List of channels to route results to different configurations
     channels: []
-#    - webhook: "https://slack.webhook1"
-#      channel: ""
-#      filter:
-#        namespaces:
-#          include: ["develop"]
-#        priorities:
-#          exclude: ["debug", "info", "error"]
-#        policies:
-#          include: ["require-run-as-nonroot"]
-#        reportLabels:
-# .         include: ["app", "owner:team-b"]
-#    - webhook: "https://slack.webhook2"
-#      minimumSeverity: "warning"
-#      filter:
-#        namespaces:
-#          include: ["team-a-*"]
+  #    - webhook: "https://slack.webhook1"
+  #      channel: ""
+  #      filter:
+  #        namespaces:
+  #          include: ["develop"]
+  #        priorities:
+  #          exclude: ["debug", "info", "error"]
+  #        policies:
+  #          include: ["require-run-as-nonroot"]
+  #        reportLabels:
+  # .         include: ["app", "owner:team-b"]
+  #    - webhook: "https://slack.webhook2"
+  #      minimumSeverity: "warning"
+  #      filter:
+  #        namespaces:
+  #          include: ["team-a-*"]
 
   discord:
     # -- Webhook Address
@@ -942,7 +967,7 @@ extraVolumes:
 # -- If set the volume for sqlite is freely configurable below "- name: sqlite". If no value is set an emptyDir is used.
 sqliteVolume: {}
   # emptyDir:
-  #   sizeLimit: 10Mi
+#   sizeLimit: 10Mi
 
 # -- Allow additional env variables to be added
 envVars: []
@@ -961,7 +986,11 @@ ui:
     # -- (string) Image PullPolicy
     pullPolicy: IfNotPresent
     # -- (string) Image tag
-    tag: "2.4.3"
+    tag: "2.5.0"
+
+  crds:
+    # -- Install UI CustomBoard CRDs
+    customBoard: false
 
   # -- Deployment replica count
   replicaCount: 1
@@ -1114,7 +1143,7 @@ ui:
     # regcred:
     #   registry: foo.example.com
     #   username: foobar
-    #   password: secret
+  #   password: secret
 
   serviceAccount:
     # -- Create ServiceAccount
@@ -1226,7 +1255,7 @@ ui:
     # -- Ingress annotations.
     annotations: {}
       # kubernetes.io/ingress.class: nginx
-      # kubernetes.io/tls-acme: "true"
+    # kubernetes.io/tls-acme: "true"
     # -- List of ingress host configurations.
     hosts: []
     #  - host: chart-example.local
@@ -1239,6 +1268,39 @@ ui:
     #    hosts:
     #      - chart-example.local
 
+  httproute:
+    # -- Enable HTTPRoute resource (Gateway API alternative to Ingress)
+    # Requires Gateway API CRDs (v1) installed in cluster
+    # https://gateway-api.sigs.k8s.io/
+    enabled: false
+    # -- Additional HTTPRoute labels
+    labels: {}
+    # -- Additional HTTPRoute annotations
+    annotations: {}
+    # -- Gateway API parentRefs (list of Gateway references)
+    # Must reference an existing Gateway resource
+    parentRefs: []
+    #  - name: example-gateway
+    #    namespace: gateway-system
+    #    sectionName: https
+    # -- List of hostnames for HTTPRoute
+    hostnames: []
+    #  - policy-reporter-ui.example.com
+    # -- HTTPRoute rules configuration
+    # Allows advanced routing with matches and filters
+    rules:
+      - matches:
+          - path:
+              type: PathPrefix
+              value: /
+        # Optional filters:
+        # filters:
+        #   - type: RequestHeaderModifier
+        #     requestHeaderModifier:
+        #       add:
+        #         - name: X-Custom-Header
+        #           value: value
+
   networkPolicy:
     # -- When true, use a NetworkPolicy to allow ingress to the webhook
     # This is useful on clusters using Calico and/or native k8s network policies in a default-deny setup.
@@ -1246,9 +1308,9 @@ ui:
     # -- A list of valid from selectors according to https://kubernetes.io/docs/concepts/services-networking/network-policies.
     # Enables Kubernetes API Server by default
     egress:
-    - ports:
-      - protocol: TCP
-        port: 6443
+      - ports:
+          - protocol: TCP
+            port: 6443
     # -- A list of valid from selectors according to https://kubernetes.io/docs/concepts/services-networking/network-policies.
     ingress: []
 
@@ -1259,7 +1321,7 @@ ui:
     #   memory: 128Mi
     # requests:
     #   cpu: 100m
-    #   memory: 128Mi
+  #   memory: 128Mi
 
   # enabled if replicaCount > 1
   podDisruptionBudget:
@@ -1276,7 +1338,7 @@ ui:
   # -- List of node taints to tolerate
   tolerations: []
 
-    # -- Affinity constraints.
+  # -- Affinity constraints.
   affinity: {}
 
   # -- Pod Topology Spread Constraints for the policy-reporter-ui.
@@ -1304,7 +1366,7 @@ plugin:
       # -- (string) Image PullPolicy
       pullPolicy: IfNotPresent
       # -- (string) Image tag
-      tag: "0.5.1"
+      tag: "0.5.2"
 
     # -- Deployment replica count
     replicaCount: 1
@@ -1352,7 +1414,7 @@ plugin:
       # regcred:
       #   registry: foo.example.com
       #   username: foobar
-      #   password: secret
+    #   password: secret
 
     serviceAccount:
       # -- Create ServiceAccount
@@ -1425,7 +1487,7 @@ plugin:
       # -- Ingress annotations.
       annotations: {}
         # kubernetes.io/ingress.class: nginx
-        # kubernetes.io/tls-acme: "true"
+      # kubernetes.io/tls-acme: "true"
       # -- List of ingress host configurations.
       hosts: []
       #  - host: chart-example.local
@@ -1445,11 +1507,44 @@ plugin:
       # -- A list of valid from selectors according to https://kubernetes.io/docs/concepts/services-networking/network-policies.
       # Enables Kubernetes API Server by default
       egress:
-      - ports:
-        - protocol: TCP
-          port: 6443
+        - ports:
+            - protocol: TCP
+              port: 6443
       # -- A list of valid from selectors according to https://kubernetes.io/docs/concepts/services-networking/network-policies.
       ingress: []
+
+    httproute:
+      # -- Enable HTTPRoute resource (Gateway API alternative to Ingress)
+      # Requires Gateway API CRDs (v1) installed in cluster
+      # https://gateway-api.sigs.k8s.io/
+      enabled: false
+      # -- Additional HTTPRoute labels
+      labels: {}
+      # -- Additional HTTPRoute annotations
+      annotations: {}
+      # -- Gateway API parentRefs (list of Gateway references)
+      # Must reference an existing Gateway resource
+      parentRefs: []
+      #  - name: example-gateway
+      #    namespace: gateway-system
+      #    sectionName: https
+      # -- List of hostnames for HTTPRoute
+      hostnames: []
+      #  - policy-reporter-kyverno-plugin.example.com
+      # -- HTTPRoute rules configuration
+      # Allows advanced routing with matches and filters
+      rules:
+        - matches:
+            - path:
+                type: PathPrefix
+                value: /
+          # Optional filters:
+          # filters:
+          #   - type: RequestHeaderModifier
+          #     requestHeaderModifier:
+          #       add:
+          #         - name: X-Custom-Header
+          #           value: value
 
     # -- Resource constraints
     resources: {}
@@ -1458,7 +1553,7 @@ plugin:
       #   memory: 128Mi
       # requests:
       #   cpu: 100m
-      #   memory: 128Mi
+    #   memory: 128Mi
 
     # required for HA mode
     # if "blockReports" is disabled, leaderElection is also disabled automatically
@@ -1512,24 +1607,24 @@ plugin:
     image:
       # -- (string) Image registry
       registry: ghcr.io
-        # -- (string) Image repository
+      # -- (string) Image repository
       repository: kyverno/policy-reporter/trivy-plugin
-        # -- (string) Image PullPolicy
+      # -- (string) Image PullPolicy
       pullPolicy: IfNotPresent
         # -- (string) Image tag
-        # Defaults to `Chart.AppVersion` if omitted
-      tag: "0.4.10"
+      # Defaults to `Chart.AppVersion` if omitted
+      tag: "0.4.11"
 
     cli:
       image:
         # -- (string) Image registry
         registry: ghcr.io
-          # -- (string) Image repository
+        # -- (string) Image repository
         repository: aquasecurity/trivy
-          # -- (string) Image PullPolicy
+        # -- (string) Image PullPolicy
         pullPolicy: IfNotPresent
           # -- (string) Image tag
-          # Defaults to `Chart.AppVersion` if omitted
+        # Defaults to `Chart.AppVersion` if omitted
         tag: "0.63.0"
 
     # -- Additional container args.
@@ -1591,7 +1686,7 @@ plugin:
       # regcred:
       #   registry: foo.example.com
       #   username: foobar
-      #   password: secret
+    #   password: secret
 
     serviceAccount:
       # -- Create ServiceAccount
@@ -1678,7 +1773,7 @@ plugin:
       # -- Ingress annotations.
       annotations: {}
         # kubernetes.io/ingress.class: nginx
-        # kubernetes.io/tls-acme: "true"
+      # kubernetes.io/tls-acme: "true"
       # -- List of ingress host configurations.
       hosts: []
       #  - host: chart-example.local
@@ -1698,9 +1793,9 @@ plugin:
       # -- A list of valid from selectors according to https://kubernetes.io/docs/concepts/services-networking/network-policies.
       # Enables Kubernetes API Server by default
       egress:
-      - ports:
-        - protocol: TCP
-          port: 6443
+        - ports:
+            - protocol: TCP
+              port: 6443
       # -- A list of valid from selectors according to https://kubernetes.io/docs/concepts/services-networking/network-policies.
       ingress: []
 
@@ -1711,7 +1806,7 @@ plugin:
       #   memory: 128Mi
       # requests:
       #   cpu: 100m
-      #   memory: 128Mi
+    #   memory: 128Mi
 
     # enabled if replicaCount > 1
     podDisruptionBudget:
@@ -1879,4 +1974,3 @@ extraManifests: []
 
 # -- Extra configuration options appended to core policy reporter
 extraConfig: {}
-

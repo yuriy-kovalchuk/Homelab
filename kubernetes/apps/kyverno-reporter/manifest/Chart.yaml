@@ -3,12 +3,12 @@ name: kyverno-reporter-yk
 description: Umbrella Helm chart for kyverno-reporter application in Kubernetes
 
 type: application
-version: 1.0.0
-appVersion: "3.5.0"
+version: 3.7.0
+appVersion: "3.7.0"
 
 dependencies:
   - name: policy-reporter
-    version: "3.5.0"
+    version: "3.7.0"
     repository: "https://kyverno.github.io/policy-reporter"
 
 
