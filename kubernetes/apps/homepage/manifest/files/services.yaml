@@ -23,6 +23,10 @@
         icon: vault.svg
         href: "http://vault.yuriy-lab.cloud/"
         description: Vault PRD
+    - Netbox:
+        icon: netbox.svg
+        href: "http://netbox.yuriy-lab.cloud/"
+        description: Netbox PRD
 - Monitoring:
     - Grafana:
         icon: grafana.svg
