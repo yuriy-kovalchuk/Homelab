@@ -3,13 +3,13 @@
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: SecurityPolicy
 metadata:
-  name: {{ .Release.Name }}-security-policy
+  name: {{ .name }}-security-policy
   namespace: {{ .Release.Namespace }}
 spec:
   targetRef:
     group: gateway.networking.k8s.io
     kind: HTTPRoute
-    name: {{ .Release.Name }}-route
+    name: {{ .name }}-route
   extAuth:
     headersToExtAuth:
       - accept
