@@ -40,7 +40,7 @@ k8sClientRateLimit:
   burst: 200
 
 operator:
-  replicas: 1  # Uncomment this if you only have one node
+  replicas: 3
   rollOutPods: true
 
 rollOutCiliumPods: true

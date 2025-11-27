@@ -20,7 +20,7 @@
       "test": [
         "echo \"Error: no test specified\" && exit 1"
       ],
-      "argo_new_app": "./devbox_scripts/new_app.sh $@",
+      "k_argo_app": "./devbox_scripts/new_app.sh $@",
       "k_ss_create":  "./devbox_scripts/create_sealed_secret.sh $1 $2 $3 $4"
     }
   }

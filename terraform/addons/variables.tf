@@ -15,3 +15,17 @@ variable "s3_endpoint" {
   type        = string
   sensitive   = true
 }
+
+variable "cilium_version" {
+  default = ""
+  type = string
+}
+
+variable "argocd_version" {
+  default = ""
+  type = string
+}
+
+variable "metrics_server_version" {
+  default = ""
+}

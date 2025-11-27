@@ -10,3 +10,14 @@ terraform {
     }
   }
 }
+
+provider "helm" {
+  kubernetes = {
+    config_path = "talos-kubeconfig"
+  }
+}
+
+provider "kubernetes" {
+  config_path = "talos-kubeconfig"
+}
+

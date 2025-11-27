@@ -1,5 +1,8 @@
 namespaceOverride: argo-cd
 
+global:
+  domain: argocd.yuriy-lab.cloud
+
 redis-ha:
   enabled: false
 
@@ -22,9 +25,15 @@ repoServer:
 applicationSet:
   replicas: 2
 
+
+# TODO Add authentik integrtation
 configs:
   params:
     server.insecure: true
+  rbac:
+    policy.csv: |
+      g, ArgoCD Admins, role:admin
+      g, ArgoCD Viewers, role:readonly
 
 extraObjects:
   - apiVersion: gateway.networking.k8s.io/v1
