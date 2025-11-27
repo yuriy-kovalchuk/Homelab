@@ -1,3 +1,4 @@
+// renovate.json (In GitHub Repository Root)
 {
   "extends": [
     "config:base"
@@ -5,7 +6,15 @@
   "enabled": true,
   "prCreation": "off",
   "dependencyDashboard": true,
+
   "includePaths": [
     "kubernetes/apps/**"
+  ],
+
+  "packageRules": [
+    {
+      "matchManagers": ["helmv3", "helm-requirements"],
+      "enabled": true
+    }
   ]
 }
