@@ -31,6 +31,3 @@ netbox:
     username: netbox
     existingSecretName: "cluster-netbox-user"
     existingSecretKey: password
-
-  valkey:
-    enabled: false
