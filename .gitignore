@@ -1,6 +1,7 @@
 .env
 .devbox
 .venv
+.playground
 
 # -------------------------
 # Helm & Helm Charts

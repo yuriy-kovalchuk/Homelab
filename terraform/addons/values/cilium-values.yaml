@@ -49,11 +49,11 @@ routing-mode: "native"
 
 
 hubble:
-  enabled: false
+  enabled: true
   relay:
-    enabled: false
+    enabled: true
   ui:
-    enabled: false
+    enabled: true
 
 #cni:
 #  exclusive: false # REQUIRED: Allow Istio CNI chaining
