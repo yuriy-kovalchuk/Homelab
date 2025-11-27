@@ -20,6 +20,9 @@ spec:
     - group: gateway.envoyproxy.io
       kind: SecurityPolicy
       namespace: "argo-cd"
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: "monitoring"
   to:
     - group: ''
       kind: Service
