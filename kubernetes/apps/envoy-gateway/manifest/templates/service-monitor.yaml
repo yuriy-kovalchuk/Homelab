@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: envoy-gateway-control-plane
+  namespace: monitoring # Your prometheus namespace
+spec:
+  selector:
+    matchLabels:
+      control-plane: envoy-gateway # Verify this label on your Gateway service
+  namespaceSelector:
+    matchNames:
+      - envoy-gateway-system
+  endpoints:
+    - port: metrics # Or use targetPort: 19001
+      path: /metrics
+      interval: 15s
+---

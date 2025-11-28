@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: envoy-gateway-data-plane
+  namespace: monitoring
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: envoy # Common label, but check your specific Envoy pods
+  namespaceSelector:
+    matchNames:
+      - envoy-gateway-system # Or wherever your Gateways are deployed
+  podMetricsEndpoints:
+    - port: metrics # Often named 'metrics' or use port 19001
+      path: /stats/prometheus
+      interval: 15s
