@@ -17,9 +17,9 @@ netbox:
   superuser:
     name: yuriy
     email: yuriy.kovalchuk@proton.me
-#    password: ""
-#    apiToken: ""
-#    existingSecret: ""
+    password: ""
+    apiToken: ""
+    existingSecret: ""
 
   postgresql:
     enabled: false
