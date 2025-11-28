@@ -75,7 +75,7 @@ deployments:
       # Ensures at least 2 pods are available during voluntary disruptions
       minAvailable: 1
 
-    serviceAccountName: "false"
+    serviceAccountName: "default"
 
 configMaps:
   - name: opnsense-config-cm
