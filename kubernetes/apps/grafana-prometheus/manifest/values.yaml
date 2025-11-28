@@ -222,7 +222,7 @@ kube-prometheus-stack:
           #     regex: 'expensive_metric_.*'
           #     action: drop
 
-      retention: 1h  # Keep only 1 hours locally
+      retention: 15m
       retentionSize: "1GiB"
       serviceMonitorSelectorNilUsesHelmValues: false
       podMonitorSelectorNilUsesHelmValues: false
