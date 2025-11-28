@@ -1,11 +1,14 @@
 trivy-operator:
+
   operator:
     scanJobTimeout: 1h
     scanJobsConcurrentLimit: 5
     infraAssessmentScannerEnabled: false
+
   serviceMonitor:
     enabled: true
     namespace: monitoring
+
   trivy:
     resources:
       requests:
@@ -27,8 +30,10 @@ trivy-operator:
     slow: false
     timeout: "3h"
     ignoreUnfixed: true
+
   service:
     headless: false
+
   nodeCollector:
     volumeMounts:
       - name: var-lib-etcd
@@ -53,7 +58,6 @@ trivy-operator:
         mountPath: /etc/cni/net.d/
         readOnly: true
 
-    # -- node-collector pod volumes definition for collecting config files information
     volumes:
       - name: var-lib-etcd
         hostPath:
