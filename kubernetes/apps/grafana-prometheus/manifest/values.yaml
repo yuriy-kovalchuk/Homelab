@@ -182,7 +182,7 @@ kube-prometheus-stack:
         ipFamilyPolicy: "SingleStack"
     prometheusSpec:
       remoteWrite:
-        - url: http://mimir-distributor.mimir.svc.cluster.local/api/v1/push
+        - url: http://mimir-gateway.mimir.svc.cluster.local/api/v1/push
           writeRelabelConfigs:
             # Convert all dots to underscores in metric names
             - sourceLabels: [ __name__ ]
