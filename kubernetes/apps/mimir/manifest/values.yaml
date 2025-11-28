@@ -21,7 +21,7 @@ mimir-distributed:
         max_label_names_per_series: 120
         max_global_series_per_user: 12000000
         max_global_series_per_metric: 200000000
-        compactor_blocks_retention_period: 7d
+        compactor_blocks_retention_period: 3d
         max_query_parallelism: 240
         max_queriers_per_tenant: 0
 
@@ -31,8 +31,8 @@ mimir-distributed:
         request_rate: 0
         request_burst_size: 0
 
-        ingestion_rate: 100000
-        ingestion_burst_size: 200000
+        ingestion_rate: 10000
+        ingestion_burst_size: 20000
 
       query_scheduler:
         max_outstanding_requests_per_tenant: 10000
@@ -76,6 +76,11 @@ mimir-distributed:
           kvstore:
             store: memberlist
 
+  kafka:
+    persistentVolume:
+      enabled: true
+      size: 10Gi
+
   # Writes incoming series to long-term storage on the write path and returns series samples for queries on the read path.
   ingester:
     zoneAwareReplication:
@@ -91,26 +96,30 @@ mimir-distributed:
       auth.multitenancy-enabled: false
       log.level: info
     replicas: 1
+
   # Increases query performance and reduces long-term storage usage by combining blocks.
   compactor:
     replicas: 1
     persistentVolume:
       enabled: true
-      size: 15Gi
+      size: 7Gi
+
   # Evaluates PromQL expressions by fetching time series and labels on the read path. Uses store-gateway fron minio and ingester for latest data
   querier:
     replicas: 1
+
   # "frontend" for querier
   query_frontend:
     replicas: 1
+
   # comuniacation with minio
   store_gateway:
     zoneAwareReplication:
       enabled: false
     replicas: 1
+
   query_scheduler:
     replicas: 1
-
 
   ## Disabled services:
   rollout_operator:
