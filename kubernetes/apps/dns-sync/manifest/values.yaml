@@ -39,7 +39,7 @@ serviceAccount:
 deployments:
   - name: dns-sync
     enabled: true
-    replicas: 3
+    replicas: 1
 
     envFromConfigMaps:
       - name: opnsense-config-cm
