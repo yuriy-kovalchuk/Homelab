@@ -2,7 +2,7 @@ trivy-operator:
   operator:
     scanJobTimeout: 1h
     scanJobsConcurrentLimit: 5
-    infraAssessmentScannerEnabled: true
+    infraAssessmentScannerEnabled: false
   serviceMonitor:
     enabled: true
     namespace: monitoring
