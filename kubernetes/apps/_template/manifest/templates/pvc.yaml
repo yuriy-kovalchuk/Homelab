@@ -1,0 +1,22 @@
+{{- $ns := include "tpl.namespace" . -}}
+{{- range $v := .Values.pvcs }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $v.name }}
+  namespace: {{ $ns }}
+  labels:
+    {{- include "tpl.labels" (dict "root" $ "extra" $v.labels) | nindent 4 }}
+  annotations:
+    {{- include "tpl.annotations" (dict "root" $ "extra" $v.annotations) | nindent 4 }}
+spec:
+  accessModes:
+    {{- toYaml $v.accessModes | nindent 4 }}
+  {{- if $v.storageClassName }}
+  storageClassName: {{ $v.storageClassName }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ $v.size }}
+{{- end }}

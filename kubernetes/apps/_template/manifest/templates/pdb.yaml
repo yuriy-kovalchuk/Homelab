@@ -1,0 +1,50 @@
+{{- $ns := include "tpl.namespace" . -}}
+{{- range $d := .Values.deployments }}
+{{- if and (or (not (hasKey $d "enabled")) $d.enabled) (and $d.pdb $d.pdb.enabled) }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ default (printf "%s-%s-pdb" (include "tpl.fullname" $) (default "deploy" $d.name)) $d.name }}
+  namespace: {{ $ns }}
+  labels:
+    {{- include "tpl.labels" (dict "root" $ "extra" $d.labels) | nindent 4 }}
+  annotations:
+    {{- include "tpl.annotations" (dict "root" $ "extra" $d.annotations) | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "tpl.selectorLabels" (dict "root" $ "name" (default (include "tpl.fullname" $) $d.name)) | nindent 6 }}
+  {{- if hasKey $d.pdb "minAvailable" }}
+  minAvailable: {{ $d.pdb.minAvailable }}
+  {{- end }}
+  {{- if hasKey $d.pdb "maxUnavailable" }}
+  maxUnavailable: {{ $d.pdb.maxUnavailable }}
+  {{- end }}
+{{- end }}
+{{- end }}
+
+{{- range $s := .Values.statefulsets }}
+{{- if and (or (not (hasKey $s "enabled")) $s.enabled) (and $s.pdb $s.pdb.enabled) }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ default (printf "%s-%s-pdb" (include "tpl.fullname" $) (default "sts" $s.name)) $s.name }}
+  namespace: {{ $ns }}
+  labels:
+    {{- include "tpl.labels" (dict "root" $ "extra" $s.labels) | nindent 4 }}
+  annotations:
+    {{- include "tpl.annotations" (dict "root" $ "extra" $s.annotations) | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "tpl.selectorLabels" (dict "root" $ "name" (default (include "tpl.fullname" $) $s.name)) | nindent 6 }}
+  {{- if hasKey $s.pdb "minAvailable" }}
+  minAvailable: {{ $s.pdb.minAvailable }}
+  {{- end }}
+  {{- if hasKey $s.pdb "maxUnavailable" }}
+  maxUnavailable: {{ $s.pdb.maxUnavailable }}
+  {{- end }}
+{{- end }}
+{{- end }}

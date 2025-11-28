@@ -1,0 +1,23 @@
+{{- $ns := include "tpl.namespace" . -}}
+{{- range $cm := .Values.configMaps }}
+{{- if or (not (hasKey $cm "enabled")) $cm.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ default (printf "%s-%s" (include "tpl.fullname" $) (default "cm" $cm.name)) $cm.name }}
+  namespace: {{ $ns }}
+  labels:
+    {{- include "tpl.labels" (dict "root" $ "extra" $cm.labels) | nindent 4 }}
+  annotations:
+    {{- include "tpl.annotations" (dict "root" $ "extra" $cm.annotations) | nindent 4 }}
+{{- if $cm.data }}
+data:
+  {{- toYaml $cm.data | nindent 2 }}
+{{- end }}
+{{- if $cm.binaryData }}
+binaryData:
+  {{- toYaml $cm.binaryData | nindent 2 }}
+{{- end }}
+{{- end }}
+{{- end }}

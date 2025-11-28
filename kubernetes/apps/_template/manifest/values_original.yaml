@@ -1,0 +1,155 @@
+## Global/common settings
+nameOverride: ""
+fullnameOverride: ""
+
+namespace:
+  create: true
+  name: "__NAMESPACE__"
+  labels: {}
+  annotations: {}
+
+common:
+  labels: {}
+  annotations: {}
+  podAnnotations: {}
+  imagePullSecrets: []
+  priorityClassName: ""
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  topologySpreadConstraints: []
+  podSecurityContext: {}
+  securityContext: {}
+
+serviceAccount:
+  create: true
+  name: ""
+  automount: false
+  annotations: {}
+  imagePullSecrets: []
+
+## Workloads
+deployments: []
+# - name: app
+#   enabled: true
+#   replicas: 2
+#   strategy: {}
+#   labels: {}
+#   annotations: {}
+#   image:
+#     repository: nginx
+#     tag: "1.27"
+#     pullPolicy: IfNotPresent
+#   command: []
+#   args: []
+#   env: []
+#   # Raw envFrom entries supported by Kubernetes
+#   envFrom: []
+#   # Convenience: mount all keys from external Secrets as environment variables
+#   # Accepts string secret names or objects with name and optional flag
+#   # envFromSecrets:
+#   #   - my-existing-secret
+#   #   - name: other-secret
+#   #     optional: true
+#   # Convenience: mount all keys from ConfigMaps as environment variables
+#   # envFromConfigMaps:
+#   #   - my-existing-configmap
+#   #   - name: other-config
+#   #     optional: true
+#   ports:
+#     - name: http
+#       containerPort: 80
+#       protocol: TCP
+#   livenessProbe: {}
+#   readinessProbe: {}
+#   startupProbe: {}
+#   resources: {}
+#   volumeMounts: []
+#   volumes: []
+#   extraInitContainers: []
+#   extraContainers: []
+#   serviceAccountName: ""
+#   pdb:
+#     enabled: true
+#     minAvailable: 1
+#     maxUnavailable: null
+
+statefulsets: []
+# - name: db
+#   enabled: true
+#   replicas: 3
+#   serviceName: "db"
+#   labels: {}
+#   annotations: {}
+#   podManagementPolicy: OrderedReady
+#   updateStrategy: {}
+#   image:
+#     repository: bitnami/postgresql
+#     tag: "16"
+#     pullPolicy: IfNotPresent
+#   command: []
+#   args: []
+#   env: []
+#   envFrom: []
+#   # Same convenience fields as deployments
+#   # envFromSecrets: []
+#   # envFromConfigMaps: []
+#   ports:
+#     - name: tcp
+#       containerPort: 5432
+#   livenessProbe: {}
+#   readinessProbe: {}
+#   startupProbe: {}
+#   resources: {}
+#   volumeMounts: []
+#   extraInitContainers: []
+#   extraContainers: []
+#   volumeClaimTemplates:
+#     - name: data
+#       accessModes: ["ReadWriteOnce"]
+#       storageClassName: ""
+#       size: 10Gi
+#   pdb:
+#     enabled: true
+#     minAvailable: 1
+#     maxUnavailable: null
+
+services: []
+# - name: app
+#   labels: {}
+#   annotations: {}
+#   selectorName: app
+#   type: ClusterIP
+#   ports:
+#     - name: http
+#       port: 80
+#       targetPort: 80
+#       protocol: TCP
+
+pvcs: []
+# - name: data-shared
+#   labels: {}
+#   annotations: {}
+#   accessModes: ["ReadWriteOnce"]
+#   storageClassName: ""
+#   size: 5Gi
+
+# Chart-managed ConfigMaps (optional)
+configMaps: []
+# - name: app-config
+#   enabled: true
+#   labels: {}
+#   annotations: {}
+#   data:
+#     APP_MODE: "production"
+#     FEATURE_FLAG_X: "true"
+#   # binaryData also supported
+#   # binaryData:
+#   #   cert.pem: |
+#   #     <base64-encoded>
+
+networkPolicy:
+  enabled: false
+  createDefaultDeny: true
+  extraIngress: []
+  extraEgress: []

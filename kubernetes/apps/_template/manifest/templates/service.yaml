@@ -1,18 +1,21 @@
+{{- $ns := include "tpl.namespace" . -}}
+{{- range $i, $svc := .Values.services }}
+---
 apiVersion: v1
 kind: Service
 metadata:
-  name: __APP_NAME__
-  namespace: __NAMESPACE__
+  name: {{ default (printf "%s-%s" (include "tpl.fullname" $) (default (printf "svc-%d" $i) $svc.name)) $svc.name }}
+  namespace: {{ $ns }}
   labels:
-    app.kubernetes.io/name: __APP_NAME__
-    app.kubernetes.io/instance: __APP_NAME__
+    {{- include "tpl.labels" (dict "root" $ "extra" $svc.labels) | nindent 4 }}
+  annotations:
+    {{- include "tpl.annotations" (dict "root" $ "extra" $svc.annotations) | nindent 4 }}
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ default "ClusterIP" $svc.type }}
   selector:
-    app.kubernetes.io/name: __APP_NAME__
-    app.kubernetes.io/instance: __APP_NAME__
+    {{- include "tpl.selectorLabels" (dict "root" $ "name" (default (include "tpl.fullname" $) $svc.selectorName)) | nindent 4 }}
+  {{- $defaultPorts := (list (dict "name" "http" "port" 80 "targetPort" 80 "protocol" "TCP")) -}}
+  {{- $ports := default $defaultPorts $svc.ports -}}
   ports:
-    - name: http
-      port: {{ .Values.service.port }}
-      targetPort: {{ .Values.service.targetPort }}
-      protocol: TCP
+    {{- toYaml $ports | nindent 4 }}
+{{- end }}
