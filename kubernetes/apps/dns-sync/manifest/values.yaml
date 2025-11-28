@@ -28,11 +28,6 @@ common:
           app.kubernetes.io/name: dns-sync
 
 
-serviceAccount:
-  create: true
-  name: "dns-sync-sa"
-  automount: true
-
 # --- DEPLOYMENTS LIST ---
 
 deployments:
@@ -74,7 +69,7 @@ deployments:
       # Ensures at least 2 pods are available during voluntary disruptions
       minAvailable: 1
 
-    serviceAccountName: "dns-sync-sa"
+    serviceAccountName: "default"
 
 configMaps:
   - name: opnsense-config-cm
