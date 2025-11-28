@@ -31,7 +31,7 @@ common:
 serviceAccount:
   create: true
   name: "dns-sync-sa"
-  automount: false
+  automount: true
 
 # --- DEPLOYMENTS LIST ---
 
