@@ -31,6 +31,7 @@ common:
 serviceAccount:
   create: false
   automount: true
+  name: "default"
 
 
 # --- DEPLOYMENTS LIST ---
