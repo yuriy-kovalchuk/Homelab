@@ -29,9 +29,9 @@ common:
 
 
 serviceAccount:
-  create: false
+  create: true
   automount: true
-  name: "default"
+  name: "dns-sync-sa"
 
 
 # --- DEPLOYMENTS LIST ---
@@ -75,7 +75,7 @@ deployments:
       # Ensures at least 2 pods are available during voluntary disruptions
       minAvailable: 1
 
-    serviceAccountName: "default"
+    serviceAccountName: "dns-sync-sa"
 
 configMaps:
   - name: opnsense-config-cm
