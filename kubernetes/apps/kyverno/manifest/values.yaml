@@ -11,5 +11,9 @@ kyverno:
   reportsController:
     replicas: 3
 
+  features:
+    policyExceptions:
+      enabled: true
+
 kyverno-policies:
   skipBackgroundRequests: false
