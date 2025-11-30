@@ -1,0 +1,12 @@
+apiVersion: v2
+name: grafana-yk
+description: Umbrella Helm chart for grafana application in Kubernetes
+
+type: application
+version: 10.2.0
+appVersion: "10.2.0"
+
+dependencies:
+  - name: grafana
+    version: "10.2.0"
+    repository: "https://grafana.github.io/helm-charts"
