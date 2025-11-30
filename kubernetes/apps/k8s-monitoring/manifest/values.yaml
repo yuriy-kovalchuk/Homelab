@@ -27,7 +27,19 @@ k8s-monitoring:
 
   clusterMetrics:
     enabled: true
+    controlPlane:
+      enabled: true
+    kubeControllerManager:
+      enabled: true
+    kubeDNS:
+      enabled: true
+    kubeScheduler:
+      enabled: true
+    windows-exporter:
+      enabled: false
     opencost:
+      enabled: false
+    kepler:
       enabled: false
 
   clusterEvents:
