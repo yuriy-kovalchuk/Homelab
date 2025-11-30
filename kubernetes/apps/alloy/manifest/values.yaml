@@ -22,57 +22,96 @@ alloy:
           level  = "info"
           format = "logfmt"
         }
-        
+  
         // Kubernetes Discovery Components
         discovery.kubernetes "pods" {
           role = "pod"
         }
-        
+  
         discovery.kubernetes "nodes" {
           role = "node"
         }
-        
+  
         discovery.kubernetes "services" {
           role = "service"
         }
-        
+  
         discovery.kubernetes "endpoints" {
           role = "endpoints"
         }
-        
+  
         discovery.kubernetes "endpointslices" {
           role = "endpointslice"
         }
-        
+  
         discovery.kubernetes "ingresses" {
           role = "ingress"
         }
-        
+  
         // Mimir Remote Write Destination
         prometheus.remote_write "mimir" {
           endpoint {
-            url = "http://mimir-distributor.mimir.svc.cluster.local:8080/api/v1/push" 
+            url = "http://mimir-distributor.mimir.svc.cluster.local:8080/api/v1/push"
           }
         }
-        
+  
         // Alloy Self-Metrics Exporter
-        prometheus.exporter.self "self_metrics" {
-        }
-        
+        prometheus.exporter.self "self_metrics" {}
+  
         prometheus.scrape "self_scrape" {
-          targets = prometheus.exporter.self.self_metrics.targets
-          forward_to = [prometheus.remote_write.mimir.receiver]
+          targets     = prometheus.exporter.self.self_metrics.targets
+          forward_to  = [prometheus.remote_write.mimir.receiver]
         }
-        
-        // Watches ALL namespaces
+  
+        // Watches ALL ServiceMonitors in ALL namespaces
         prometheus.operator.servicemonitors "k8s_monitors" {
           forward_to = [prometheus.remote_write.mimir.receiver]
         }
-
-
-
-
-
+  
+        // ------------------------------------------------------------------------
+        //  EXTRA SCRAPE JOB: kube-state-metrics (adds Prometheus Operator relabels)
+        // ------------------------------------------------------------------------
+  
+        // Discover the kube-state-metrics service
+        discovery.kubernetes "ksm_svc" {
+          role = "service"
+          selectors {
+            field = "metadata.name=kube-state-metrics"
+          }
+        }
+  
+        prometheus.scrape "kube_state_metrics" {
+          targets = discovery.kubernetes.ksm_svc.targets
+  
+          forward_to = [prometheus.remote_write.mimir.receiver]
+  
+          // === kube-prometheus-stack compatibility pack ===
+  
+          // Map exported_* labels → canonical ones
+          relabel { action = "replace" source_labels = ["exported_namespace"] target_label = "namespace" }
+          relabel { action = "replace" source_labels = ["exported_pod"]       target_label = "pod" }
+          relabel { action = "replace" source_labels = ["exported_container"] target_label = "container" }
+          relabel { action = "replace" source_labels = ["exported_node"]      target_label = "node" }
+  
+          // Workload labels
+          relabel { action = "replace" source_labels = ["exported_workload"]              target_label = "workload" }
+          relabel { action = "replace" source_labels = ["exported_workload_kind"]         target_label = "workload_kind" }
+          relabel { action = "replace" source_labels = ["exported_workload_namespace"]    target_label = "workload_namespace" }
+  
+          // Kubernetes canonical metadata
+          relabel { action = "replace" source_labels = ["namespace"] target_label = "kubernetes_namespace" }
+          relabel { action = "replace" source_labels = ["pod"]       target_label = "kubernetes_pod" }
+  
+          // Normalize metrics_path
+          relabel { action = "replace" source_labels = ["__metrics_path__"] target_label = "metrics_path" }
+  
+          // Drop high-noise metrics (kube-prometheus behavior)
+          relabel { action = "drop" source_labels = ["__name__"]
+                   regex = "container_cpu_(load_average_10s|system_seconds_total|user_seconds_total)|container_memory_(mapped_file|swap)" }
+  
+          relabel { action = "drop" source_labels = ["__name__", "interface"]
+                   regex = "container_network_.*;(cali|cilium|cni|lxc|nodelocaldns|tunl).*" }
+        }
 
 
   extraObjects:
