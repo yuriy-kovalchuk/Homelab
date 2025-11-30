@@ -60,7 +60,7 @@ alloy:
           // 💡 MANDATORY FIX: Add a unique label (like 'cluster') to all metrics.
           // This is often required by Grafana dashboards to query across clusters.
           external_labels = {
-            cluster = "my-k8s-cluster-name"
+            cluster = "my-k8s-cluster-name",
           }
         }
         
