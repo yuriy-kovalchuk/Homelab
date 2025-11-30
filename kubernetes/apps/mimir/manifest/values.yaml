@@ -79,7 +79,7 @@ mimir-distributed:
   kafka:
     persistence:
       enabled: true
-      size: 10Gi
+      size: 50Gi
 
   # Writes incoming series to long-term storage on the write path and returns series samples for queries on the read path.
   ingester:
@@ -87,7 +87,7 @@ mimir-distributed:
       enabled: false
     persistentVolume:
       enabled: true
-      size: 10Gi
+      size: 50Gi
     replicas: 1
 
   # Receives data from alloy, corrects, devides data to batches and send to ingesters
@@ -102,7 +102,7 @@ mimir-distributed:
     replicas: 1
     persistentVolume:
       enabled: true
-      size: 7Gi
+      size: 50Gi
 
   # Evaluates PromQL expressions by fetching time series and labels on the read path. Uses store-gateway fron minio and ingester for latest data
   querier:
