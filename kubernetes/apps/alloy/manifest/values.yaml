@@ -97,9 +97,7 @@ prometheus-node-exporter:
 
 kube-state-metrics:
 
-  namespaces: []
 
   prometheus:
     monitor:
       enabled: true
-      namespace: "alloy"
