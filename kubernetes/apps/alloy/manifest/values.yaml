@@ -63,8 +63,22 @@ alloy:
           targets = prometheus.exporter.self.self_metrics.targets
           forward_to = [prometheus.remote_write.mimir.receiver]
         }
+        
+        // Watches ALL namespaces
+        prometheus.operator.servicemonitors "k8s_monitors" {
+          forward_to = [prometheus.remote_write.mimir.receiver]
+        }
+
+
 
 
 
 #  serviceMonitor:
 #    enabled: false
+
+prometheus-node-exporter:
+  prometheus:
+    monitor:
+      enabled: true
+      namespace: "alloy"
+      jobLabel: "app.kubernetes.io/name"
