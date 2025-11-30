@@ -23,9 +23,7 @@ alloy:
           format = "logfmt"
         }
         
-        //
-        // Kubernetes Discovery Components
-        //
+        // Kubernetes Discovery Components (Used by the operator internally)
         discovery.kubernetes "pods" {
           role = "pod"
         }
@@ -50,133 +48,85 @@ alloy:
           role = "ingress"
         }
         
-        //
+        // -------------------------------------------------------------
         // Mimir Remote Write Destination
-        //
+        // -------------------------------------------------------------
+
         prometheus.remote_write "mimir" {
           endpoint {
             url = "http://mimir-distributor.mimir.svc.cluster.local:8080/api/v1/push"
           }
+        
+          // 💡 MANDATORY FIX: Add a unique label (like 'cluster') to all metrics.
+          // This is often required by Grafana dashboards to query across clusters.
+          external_labels = {
+            cluster = "my-k8s-cluster-name" // <-- CHANGE THIS TO YOUR CLUSTER NAME!
+          }
         }
         
-        //
-        // Alloy Self-Metrics
-        //
-        prometheus.exporter.self "self_metrics" {}
+        // -------------------------------------------------------------
+        // Prometheus Operator Integration (Where the Fixes Go)
+        // -------------------------------------------------------------
+
+        // Watches ALL namespaces
+        prometheus.operator.servicemonitors "k8s_monitors" {
+          // All metrics from all ServiceMonitors will be forwarded here.
+          forward_to = [prometheus.remote_write.mimir.receiver]
         
+          // This block applies relabeling rules *after* scraping metrics,
+          // which is exactly where the kube-prometheus-stack applies them.
+          metric_relabeling_configs {
+            // 1. 🔑 KSM Namespace Fix:
+            // Moves the 'namespace' label (used internally by Prometheus)
+            // to 'exported_namespace' for Kube-State-Metrics (KSM) to match the
+            // default Prometheus-stack dashboards.
+            rule {
+              action        = "replace"
+              source_labels = ["__name__", "namespace"]
+              regex         = "(kube_.*);(.+)"
+              target_label  = "exported_namespace"
+              replacement   = "$2"
+            }
+        
+            // 2. 🔑 KSM Pod Label Promotion (Labelmap):
+            // Takes Kubernetes pod metadata labels (e.g., __meta_kubernetes_pod_label_app)
+            // and promotes them to official Prometheus labels (e.g., app).
+            // This is vital for selectors like {app="kube-state-metrics"}.
+            rule {
+              action = "labelmap"
+              regex  = "__meta_kubernetes_pod_label_(.+)"
+            }
+        
+            // 3. ⚠️ Critical Drop Rules Placeholder:
+            // You MUST inspect your 'out.yaml' for any 'metricRelabelings' with action: drop
+            // and replicate them here. Ignoring this step can lead to massive cost increase
+            // due to high-cardinality metrics (like cAdvisor or apiserver metrics) being sent.
+            /*
+            rule {
+              action        = "drop"
+              source_labels = ["__name__"]
+              // EXAMPLE: Drop the 'up' metric from all scraped targets
+              regex         = "up|scrape_series_added"
+            }
+            */
+          }
+        }
+        
+        // -------------------------------------------------------------
+        // Alloy Self-Metrics (Monitoring Alloy itself)
+        // -------------------------------------------------------------
+
+        prometheus.exporter.self "self_metrics" {}
+
         prometheus.scrape "self_scrape" {
           targets    = prometheus.exporter.self.self_metrics.targets
           forward_to = [prometheus.remote_write.mimir.receiver]
         }
-        
-        //
-        // Watches ALL ServiceMonitors in ALL namespaces
-        //
-        prometheus.operator.servicemonitors "k8s_monitors" {
-          forward_to = [prometheus.remote_write.mimir.receiver]
-        }
-        
-        //
-        // -----------------------------------------------------------------------------
-        // kube-state-metrics scraping with kube-prometheus-stack label compatibility
-        // -----------------------------------------------------------------------------
-        
-        // Discover the kube-state-metrics service
-        discovery.kubernetes "ksm_svc" {
-          role = "service"
-        
-          selectors {
-            field = "metadata.name=kube-state-metrics"
-          }
-        }
-        
-        prometheus.scrape "kube_state_metrics" {
-          targets = discovery.kubernetes.ksm_svc.targets
-        
-          forward_to = [prometheus.remote_write.mimir.receiver]
-        
-          //
-          // === kube-prometheus-stack compatibility relabeling pack ===
-          //
-        
-          // Map exported_* labels → canonical ones
-          relabel {
-            action        = "replace"
-            source_labels = ["exported_namespace"]
-            target_label  = "namespace"
-          }
-        
-          relabel {
-            action        = "replace"
-            source_labels = ["exported_pod"]
-            target_label  = "pod"
-          }
-        
-          relabel {
-            action        = "replace"
-            source_labels = ["exported_container"]
-            target_label  = "container"
-          }
-        
-          relabel {
-            action        = "replace"
-            source_labels = ["exported_node"]
-            target_label  = "node"
-          }
-        
-          // Workload labels
-          relabel {
-            action        = "replace"
-            source_labels = ["exported_workload"]
-            target_label  = "workload"
-          }
-        
-          relabel {
-            action        = "replace"
-            source_labels = ["exported_workload_kind"]
-            target_label  = "workload_kind"
-          }
-        
-          relabel {
-            action        = "replace"
-            source_labels = ["exported_workload_namespace"]
-            target_label  = "workload_namespace"
-          }
-        
-          // Kubernetes canonical metadata
-          relabel {
-            action        = "replace"
-            source_labels = ["namespace"]
-            target_label  = "kubernetes_namespace"
-          }
-        
-          relabel {
-            action        = "replace"
-            source_labels = ["pod"]
-            target_label  = "kubernetes_pod"
-          }
-        
-          // Normalize metrics_path
-          relabel {
-            action        = "replace"
-            source_labels = ["__metrics_path__"]
-            target_label  = "metrics_path"
-          }
-        
-          // Drop high-noise metrics (kube-prometheus behavior)
-          relabel {
-            action        = "drop"
-            source_labels = ["__name__"]
-            regex         = "container_cpu_(load_average_10s|system_seconds_total|user_seconds_total)|container_memory_(mapped_file|swap)"
-          }
-        
-          relabel {
-            action        = "drop"
-            source_labels = ["__name__", "interface"]
-            regex         = "container_network_.*;(cali|cilium|cni|lxc|nodelocaldns|tunl).*"
-          }
-        }
- 
+
+
+
+
+
 
 
   extraObjects:
