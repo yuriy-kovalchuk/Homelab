@@ -8,7 +8,7 @@ grafana:
           type: prometheus
           uid: mimir-metrics
           access: proxy
-          url: http://mimir-query-frontend.mimir.svc.cluster.local:8080
+          url: http://mimir-query-frontend.mimir.svc.cluster.local:8080/prometheus
           isDefault: true
           version: 1
           editable: true
