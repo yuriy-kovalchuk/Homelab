@@ -1,0 +1,21 @@
+yk:
+  httpRoutes:
+    - parentRefs:
+        - name: main-gateway
+          namespace: envoy-gateway-system
+      name: alloy
+      hostnames:
+        - "alloy.yuriy-lab.cloud"
+      path:
+        type: PathPrefix
+        value: /
+      backend:
+        name: alloy
+        port: 12345
+
+alloy:
+  alloy:
+    enableReporting: false
+
+#  serviceMonitor:
+#    enabled: false
