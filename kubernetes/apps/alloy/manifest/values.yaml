@@ -16,6 +16,28 @@ yk:
 alloy:
   alloy:
     enableReporting: false
+    configMap:
+      content: |
+        // Define the destination for scraped metrics: your Mimir distributor endpoint.
+        // No headers are required in this configuration.
+        prometheus.remote_write "mimir_remote_write" {
+        // Replace with the actual URL of your Mimir Distributor service
+          endpoint {
+            url = "http://mimir-distributor.mimir.svc.cluster.local:8080/api/v1/push"
+          }
+        
+          remote_timeout = "30s"
+        }
+        
+        // Discover targets based on ServiceMonitor CRDs and initiate scraping jobs.
+        prometheus.operator.servicemonitors "k8s_monitors" {
+          // Forward the scraped data to the Mimir remote_write component
+          forward_to = [prometheus.remote_write.mimir_remote_write.receiver]
+      
+          namespaces {
+            names = ["default", "monitoring"]
+          }
+        }
 
 #  serviceMonitor:
 #    enabled: false
