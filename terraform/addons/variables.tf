@@ -25,7 +25,3 @@ variable "argocd_version" {
   default = ""
   type = string
 }
-
-variable "metrics_server_version" {
-  default = ""
-}

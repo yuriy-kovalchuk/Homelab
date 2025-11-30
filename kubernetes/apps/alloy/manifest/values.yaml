@@ -93,3 +93,10 @@ prometheus-node-exporter:
       enabled: true
       namespace: "alloy"
       jobLabel: "app.kubernetes.io/name"
+
+
+kube-state-metrics:
+  prometheus:
+    monitor:
+      enabled: true
+      namespace: "alloy"

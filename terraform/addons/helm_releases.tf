@@ -24,21 +24,4 @@ resource "helm_release" "argo_cd" {
   wait = true
 }
 
-resource "helm_release" "metrics_server" {
-  name       = "metrics-server"
-  namespace  = "kube-system"
-  repository = "https://kubernetes-sigs.github.io/metrics-server/"
-  chart      = "metrics-server"
-  version    = var.metrics_server_version
-
-  set = [
-    {
-      name  = "args[0]"
-      value = "--kubelet-insecure-tls"
-    }
-  ]
-
-  wait = true
-}
-
 # TODO patch coredns forward

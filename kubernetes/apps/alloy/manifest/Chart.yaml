@@ -15,6 +15,6 @@ dependencies:
     version: "4.49.2"
     repository: "https://prometheus-community.github.io/helm-charts"
 
-#  - name: kube-state-metrics
-#    version: "6.4.2"
-#    repository: "https://prometheus-community.github.io/helm-charts"
+  - name: kube-state-metrics
+    version: "6.4.2"
+    repository: "https://prometheus-community.github.io/helm-charts"
