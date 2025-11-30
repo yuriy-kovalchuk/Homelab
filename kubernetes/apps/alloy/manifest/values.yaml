@@ -28,16 +28,7 @@ alloy:
         
           remote_timeout = "30s"
         }
-        
-        // Discover targets based on ServiceMonitor CRDs and initiate scraping jobs.
-        prometheus.operator.servicemonitors "k8s_monitors" {
-          // Forward the scraped data to the Mimir remote_write component
-          forward_to = [prometheus.remote_write.mimir_remote_write.receiver]
-      
-          namespaces {
-            names = ["default", "monitoring"]
-          }
-        }
+
 
 #  serviceMonitor:
 #    enabled: false
