@@ -15,4 +15,4 @@ grafana:
           jsonData:
            httpHeaderName1: X-Scope-OrgID
           secureJsonData:
-            httpHeaderValue1: "1"
+            httpHeaderValue1: "anonymous"
