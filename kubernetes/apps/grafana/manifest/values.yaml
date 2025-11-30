@@ -1,5 +1,19 @@
-grafana:
+yk:
+  httpRoutes:
+    - parentRefs:
+        - name: main-gateway
+          namespace: envoy-gateway-system
+      name: alloy
+      hostnames:
+        - "grafana.yuriy-lab.cloud"
+      path:
+        type: PathPrefix
+        value: /
+      backend:
+        name: grafana
+        port: 80
 
+grafana:
   datasources:
     datasources.yaml:
       apiVersion: 1
