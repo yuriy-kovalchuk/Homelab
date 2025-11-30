@@ -60,14 +60,10 @@ alloy:
           // 💡 MANDATORY FIX: Add a unique label (like 'cluster') to all metrics.
           // This is often required by Grafana dashboards to query across clusters.
           external_labels = {
-            cluster = "my-k8s-cluster-name" // <-- CHANGE THIS TO YOUR CLUSTER NAME!
+            cluster = "my-k8s-cluster-name"
           }
         }
         
-        // -------------------------------------------------------------
-        // Prometheus Operator Integration (Where the Fixes Go)
-        // -------------------------------------------------------------
-
         // Watches ALL namespaces
         prometheus.operator.servicemonitors "k8s_monitors" {
           // All metrics from all ServiceMonitors will be forwarded here.
