@@ -27,6 +27,8 @@ k8s-monitoring:
 
   clusterMetrics:
     enabled: true
+    opencost:
+      enabled: false
 
   clusterEvents:
     enabled: false
