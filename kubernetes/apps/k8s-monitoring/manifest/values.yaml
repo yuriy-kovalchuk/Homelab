@@ -46,10 +46,10 @@ k8s-monitoring:
     namespaces: []
 
   alloy-singleton:
-    enabled: true
+    enabled: false
 
   alloy-metrics:
-    enabled: false
+    enabled: true
 
   alloy-logs:
     enabled: false
