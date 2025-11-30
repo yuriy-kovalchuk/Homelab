@@ -23,6 +23,9 @@ alloy:
           format = "logfmt"
         }
         
+        discovery.kubelet "kubelets" {
+        }
+        
         // Kubernetes Discovery Components
         discovery.kubernetes "pods" {
           role = "pod"
