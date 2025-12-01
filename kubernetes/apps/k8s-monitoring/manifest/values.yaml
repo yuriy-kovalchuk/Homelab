@@ -27,19 +27,31 @@ k8s-monitoring:
 
   clusterMetrics:
     enabled: true
+
+    node-exporter:
+      enabled: true
+      jobLabel: node-exporter
+
+
     controlPlane:
       enabled: true
+
     kubeControllerManager:
       enabled: true
+
     kubeDNS:
       enabled: true
+
     kubeScheduler:
       enabled: true
+
     windows-exporter:
       enabled: false
       deploy: false
+
     opencost:
       enabled: false
+
     kepler:
       enabled: false
 
@@ -61,10 +73,10 @@ k8s-monitoring:
     namespaces: []
 
   autoInstrumentation:
-    enabled: true
+    enabled: false
 
   annotationAutodiscovery:
-    enabled: true
+    enabled: false
 
   prometheusOperatorObjects:
     enabled: true
@@ -75,6 +87,7 @@ k8s-monitoring:
   alloy-metrics:
     enabled: true
 
+
   # ... (lines 240-244) ...
   # @section -- Features - Service Integrations
   integrations:
@@ -84,7 +97,6 @@ k8s-monitoring:
     # -- Which collectors to assign this feature to.
     collector: alloy-metrics
 
-    # ADD THIS SECTION BELOW
     node_exporter:
       enabled: true
       metric_relabel_configs:
