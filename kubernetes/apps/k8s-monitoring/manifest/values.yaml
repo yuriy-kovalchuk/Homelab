@@ -75,6 +75,23 @@ k8s-monitoring:
   alloy-metrics:
     enabled: true
 
+  # ... (lines 240-244) ...
+  # @section -- Features - Service Integrations
+  integrations:
+    # -- The destinations where integration metrics will be sent.
+    destinations: [ ]
+
+    # -- Which collectors to assign this feature to.
+    collector: alloy-metrics
+
+    # ADD THIS SECTION BELOW
+    node_exporter:
+      enabled: true
+      metric_relabel_configs:
+        - source_labels: [ "job" ]
+          target_label: "job"
+          replacement: "node-exporter"
+
   alloy-logs:
     enabled: false
     alloy:
