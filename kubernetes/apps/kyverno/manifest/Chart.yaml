@@ -11,6 +11,6 @@ dependencies:
     version: "3.6.0"
     repository: "https://kyverno.github.io/kyverno/"
   - name: "kyverno-policies"
-    version: "3.6.0"
+    version: "3.6.1"
     repository: "https://kyverno.github.io/kyverno/"
 
