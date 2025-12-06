@@ -13,3 +13,4 @@ oauth2-proxy:
     reverse-proxy: "true"
     set-xauthrequest: "true"
     pass-authorization-header: "true"
+    skip-provider-button: "true"
