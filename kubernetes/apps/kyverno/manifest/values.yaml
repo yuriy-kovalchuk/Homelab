@@ -3,7 +3,6 @@ kyverno:
     replicas: 3
     serviceMonitor:
       enabled: true
-      namespace: monitoring
   backgroundController:
     replicas: 3
   cleanupController:
