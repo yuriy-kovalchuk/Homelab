@@ -75,7 +75,7 @@ k8s-monitoring:
     namespaces: []
 
   autoInstrumentation:
-    enabled: true
+    enabled: false
 
   annotationAutodiscovery:
     enabled: true
