@@ -2,7 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: envoy-gateway-control-plane
-  namespace: monitoring # Your prometheus namespace
+  namespace: envoy-gateway-system
 spec:
   selector:
     matchLabels:

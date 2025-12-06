@@ -2,7 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
   name: envoy-gateway-data-plane
-  namespace: monitoring
+  namespace: envoy-gateway-system
 spec:
   selector:
     matchLabels:
