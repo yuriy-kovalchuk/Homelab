@@ -6,13 +6,14 @@ oauth2-proxy:
     provider: oidc
     oidc-issuer-url: https://login.microsoftonline.com/f6a43c35-26b3-4260-90e9-6d226459c179/v2.0
     pass-access-token: "true"
-    pass-user-headers: true
+    pass-user-headers: "true"
     pass-authorization-header: "true"
     cookie-secure: "true"
     cookie-domain: ".yuriy-lab.cloud"
     whitelist-domain: ".yuriy-lab.cloud"
     reverse-proxy: "true"
     set-xauthrequest: "true"
-    set-authorization-header: true
+    set-authorization-header: "true"
     skip-provider-button: "true"
     upstream: "static://200"
+    scope: "openid profile email"
