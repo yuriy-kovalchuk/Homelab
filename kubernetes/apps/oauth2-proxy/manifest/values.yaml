@@ -21,6 +21,7 @@ oauth2-proxy:
     set-authorization-header: "true"
     skip-provider-button: "true"
 
-    upstream: "static://200"
+#    upstream: "static://200"
+    upstream: "https://httpbin.yuriy-lab.cloud"
 
     oidc-groups-claim: groups
