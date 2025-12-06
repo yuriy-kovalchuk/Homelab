@@ -41,7 +41,6 @@ minio:
     serviceMonitor:
       enabled: true
       includeNode: true
-      namespace: monitoring
 
   buckets:
     - name: mimir-data
