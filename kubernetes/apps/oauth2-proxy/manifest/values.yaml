@@ -17,5 +17,4 @@ oauth2-proxy:
     skip-provider-button: "true"
     upstream: "static://200"
     scope: "openid profile email"
-    set-headers:
-      X-Forwarded-Groups: '{{.Groups}}'
+    oidc-groups-claim: groups
