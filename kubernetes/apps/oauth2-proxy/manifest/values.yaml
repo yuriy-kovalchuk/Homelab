@@ -14,4 +14,3 @@ oauth2-proxy:
     set-xauthrequest: "true"
     pass-authorization-header: "true"
     skip-provider-button: "true"
-    redirect-url-from-header: true
