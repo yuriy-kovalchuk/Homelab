@@ -2,7 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
   name: cnpg-authentik-cluster-monitor
-  namespace: monitoring
+  namespace: authentik
   labels:
     # IMPORTANT: If your Prometheus CRD has a specific selector (e.g., release: prometheus),
     # you MUST add that label here for discovery to work.
