@@ -1,25 +1,25 @@
-apiVersion: kyverno.io/v2
-kind: PolicyException
-metadata:
-  name: allow-node-exporter
-  namespace: monitoring
-spec:
-  exceptions:
-    - policyName: disallow-host-namespaces
-      ruleNames:
-        - autogen-host-namespaces
-    - policyName: disallow-host-path
-      ruleNames:
-        - autogen-host-path
-  match:
-    # Use 'any' to start the list of matching conditions
-    any:
-      - resources:
-          # Match a specific kind and name
-          kinds:
-            - DaemonSet
-          names:
-            - grafana-prometheus-prometheus-node-exporter
-          # It's best practice to explicitly specify the namespace for namespaced resources
-          namespaces:
-            - monitoring
+#apiVersion: kyverno.io/v2
+#kind: PolicyException
+#metadata:
+#  name: allow-node-exporter
+#  namespace: monitoring
+#spec:
+#  exceptions:
+#    - policyName: disallow-host-namespaces
+#      ruleNames:
+#        - autogen-host-namespaces
+#    - policyName: disallow-host-path
+#      ruleNames:
+#        - autogen-host-path
+#  match:
+#    # Use 'any' to start the list of matching conditions
+#    any:
+#      - resources:
+#          # Match a specific kind and name
+#          kinds:
+#            - DaemonSet
+#          names:
+#            - grafana-prometheus-prometheus-node-exporter
+#          # It's best practice to explicitly specify the namespace for namespaced resources
+#          namespaces:
+#            - monitoring
