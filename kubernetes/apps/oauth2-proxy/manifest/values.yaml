@@ -15,4 +15,3 @@ oauth2-proxy:
     pass-authorization-header: "true"
     skip-provider-button: "true"
     upstream: "static://200"
-    set-groups-claim: groups
