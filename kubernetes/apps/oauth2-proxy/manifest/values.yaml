@@ -3,7 +3,7 @@ oauth2-proxy:
     existingSecret: secret
 
   extraArgs:
-    provider: oidc
+    provider: azure
     oidc-issuer-url: https://login.microsoftonline.com/f6a43c35-26b3-4260-90e9-6d226459c179/v2.0
     pass-access-token: "true"
     pass-user-headers: "true"
@@ -16,5 +16,4 @@ oauth2-proxy:
     set-authorization-header: "true"
     skip-provider-button: "true"
     upstream: "static://200"
-    scope: "openid profile email"
     oidc-groups-claim: groups
