@@ -3,7 +3,8 @@ yk:
     - parentRefs:
         - name: main-gateway
           namespace: envoy-gateway-system
-      name: grafana
+      name: hubble
+      securityPolicy: true
       hostnames:
         - "hubble.yuriy-lab.cloud"
       path:
