@@ -13,6 +13,12 @@ yk:
       port: 80
 
 longhorn:
+
+  metrics:
+    serviceMonitor:
+      # -- Setting that allows the creation of a Prometheus ServiceMonitor resource for Longhorn Manager components.
+      enabled: true
+
   extraObjects:
     - apiVersion: v1
       kind: Namespace

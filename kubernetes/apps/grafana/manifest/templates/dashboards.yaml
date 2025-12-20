@@ -1,13 +1,17 @@
+{{- $files := .Files -}}
+{{- range $path, $content := $files.Glob "dashboards/*.json" }}
+{{- $filename := base $path }}
+{{- $dashboardName := (splitList "." $filename) | first }}
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: dashboards-cm
-  namespace: {{ .Release.Namespace }}
+  name: dashboard-{{ $dashboardName }}
+  namespace: {{ $.Release.Namespace }}
   labels:
     grafana_dashboard: "1"
+    dashboard_file: {{ $filename | quote }}
 data:
-{{- $files := .Files }}
-{{- range $path, $_ :=  $files.Glob "dashboards/*.json" }}
-  {{ base $path }}: |-
+  {{ $filename }}: |-
 {{ $files.Get $path | indent 4 }}
 {{- end }}
