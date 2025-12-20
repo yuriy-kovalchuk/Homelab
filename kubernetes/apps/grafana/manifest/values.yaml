@@ -53,4 +53,4 @@ grafana:
       node-exporter-full:
         gnetId: 1860
         revision: 42
-        datasource: Mimir
+        datasource: Prometheus
