@@ -28,7 +28,6 @@ cgroup:
     enabled: false
   hostRoot: /sys/fs/cgroup
 
-
 l2announcements:
   enabled: true
 
@@ -42,14 +41,35 @@ k8sClientRateLimit:
 operator:
   replicas: 3
   rollOutPods: true
+  prometheus:
+    enabled: true
 
 rollOutCiliumPods: true
 
 routing-mode: "native"
 
+prometheus:
+  enabled: true
+  serviceMonitor:
+    enabled: true
 
 hubble:
   enabled: true
+  metrics:
+    enabled:
+      - dns:query;ignoreAAAA
+      - drop:sourceContext=identity;destinationContext=identity
+      - tcp
+      - flow
+      - icmp
+      - 'httpV2:exemplars=true;labelsContext=source_ip,source_namespace,source_workload,destination_ip,destination_namespace,destination_workload,traffic_direction;sourceContext=workload-name|reserved-identity;destinationContext=workload-name|reserved-identity'
+    enableOpenMetrics: true
+    dashboards:
+      enabled: true
+      namespace: grafana
+      annotations:
+        grafana_folder: "Hubble"
+
   relay:
     enabled: true
   ui:
