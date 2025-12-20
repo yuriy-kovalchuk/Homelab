@@ -88,9 +88,11 @@ k8s-monitoring:
       enabled: false
 
   clusterEvents:
-    enabled: false
+    enabled: true
     collector: alloy-logs
     namespaces: []
+    destinations:
+      - loki
 
   nodeLogs:
     enabled: false
