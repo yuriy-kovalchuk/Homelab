@@ -22,7 +22,7 @@ spec:
       namespace: "argo-cd"
     - group: gateway.envoyproxy.io
       kind: SecurityPolicy
-      namespace: "monitoring"
+      namespace: "k8s-monitoring"
   to:
     - group: ''
       kind: Service
