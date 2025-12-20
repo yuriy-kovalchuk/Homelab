@@ -83,12 +83,8 @@ loki:
     replicas: 0
 
   monitoring:
-
     serviceMonitor:
-      # -- If enabled, ServiceMonitor resources for Prometheus Operator are created
       enabled: true
 
-    # Dashboards for monitoring Loki
     dashboards:
-      # -- If enabled, create configmap with dashboards for monitoring Loki
       enabled: true
