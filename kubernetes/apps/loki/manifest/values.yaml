@@ -88,3 +88,4 @@ loki:
 
     dashboards:
       enabled: true
+      namespace: grafana
