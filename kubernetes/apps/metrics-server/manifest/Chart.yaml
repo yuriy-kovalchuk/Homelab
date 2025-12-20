@@ -1,0 +1,12 @@
+apiVersion: v2
+name: metrics-server-yk
+description: Umbrella Helm chart for metrics-server application in Kubernetes
+
+type: application
+version: "3.13.0"
+appVersion: "3.13.0"
+
+dependencies:
+  - name: metrics-server
+    version: "3.13.0"
+    repository: "https://kubernetes-sigs.github.io/metrics-server/"

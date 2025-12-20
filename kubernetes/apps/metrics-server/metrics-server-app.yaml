@@ -1,22 +1,24 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: loki
+  name: metrics-server
   namespace: argo-cd
 spec:
   project: infrastructure
   source:
     repoURL: git@github.com:yuriy-kovalchuk/Homelab.git
     targetRevision: HEAD
-    path: kubernetes/apps/loki/manifest
+    path: kubernetes/apps/metrics-server/manifest
     helm:
-      releaseName: loki
+      releaseName: metrics-server
   destination:
     server: https://kubernetes.default.svc
-    namespace: loki
+    namespace: metrics-server
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
+
