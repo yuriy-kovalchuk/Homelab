@@ -32,10 +32,10 @@
         icon: grafana.svg
         href: "https://grafana.yuriy-lab.cloud"
         description: YK Grafana
-    - Prometheus:
-        icon: prometheus.svg
-        href: "https://prometheus.yuriy-lab.cloud"
-        description: YK Prometheus
+    - Alloy:
+        icon: alloy.svg
+        href: "https://alloy.yuriy-lab.cloud"
+        description: YK Alloy
     - Kyverno:
         icon: "https://repository-images.githubusercontent.com/169108858/35923880-823a-11e9-9089-0c9c102f9e6f"
         href: "https://kyverno-reporter.yuriy-lab.cloud"
@@ -44,10 +44,10 @@
         icon: uptime-kuma.svg
         href: "https://kuma.yuriy-lab.cloud"
         description: internal
-    - Alert Manager:
-        icon: alertmanager.svg
-        href: "https://alertmanager.yuriy-lab.cloud"
-        description: YK Alert Manager
+#    - Alert Manager:
+#        icon: alertmanager.svg
+#        href: "https://alertmanager.yuriy-lab.cloud"
+#        description: YK Alert Manager
 #    - Kiali:
 #        icon: "https://avatars.githubusercontent.com/u/36001875?v=4"
 #        href: "https://kiali.istio.yuriy-lab.cloud"
