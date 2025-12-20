@@ -48,40 +48,9 @@ grafana:
           secureJsonData:
             httpHeaderValue1: "anonymous"
 
-  dashboardProviders:
-    dashboardproviders.yaml:
-      apiVersion: 1
-      providers:
-      - name: 'node'
-        orgId: 1
-        folder: 'Nodes'
-        type: file
-        disableDeletion: false
-        editable: true
-        options:
-          path: /var/lib/grafana/dashboards/default
-      - name: 'kubernetes'
-        orgId: 1
-        folder: 'Kubernetes'
-        type: file
-        disableDeletion: false
-        editable: true
-        options:
-          path: /var/lib/grafana/dashboards/kubernetes
 
-  dashboards:
-    node:
-      node-exporter-full:
-        gnetId: 1860
-        revision: 42
-        datasource: Prometheus
-    kubernetes:
-      k8s-dashboard:
-        gnetId: 15661
-        revision: 2
-        datasource: Prometheus
-      kube-state-metrics:
-        gnetId: 13332
-        revision: 12
-        datasource: Prometheus
+  sidecar:
+    dashboards:
+      enabled: true
+
 
