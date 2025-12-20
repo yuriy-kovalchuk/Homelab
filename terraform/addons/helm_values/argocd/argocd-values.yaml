@@ -13,17 +13,30 @@ controller:
     enabled: true
     serviceMonitor:
       enabled: true
-      namespace: monitoring
+
+dex:
+  metrics:
+    # -- Deploy metrics service
+    enabled: true
+
+redis:
+  metrics:
+    enabled: true
 
 server:
   replicas: 2
-
+  metrics:
+    enabled: true
 
 repoServer:
   replicas: 2
+  metrics:
+    enabled: true
 
 applicationSet:
   replicas: 2
+  metrics:
+    enabled: true
 
 
 # TODO Add authentik integrtation
