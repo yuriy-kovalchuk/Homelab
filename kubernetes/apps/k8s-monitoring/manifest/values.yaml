@@ -4,6 +4,7 @@ yk:
         - name: main-gateway
           namespace: envoy-gateway-system
       name: alloy
+      securityPolicy: true
       hostnames:
         - "alloy.yuriy-lab.cloud"
       path:
