@@ -4,8 +4,8 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     grafana_dashboard: "1"
-  data:
-    k8s-dashboard: |
+data:
+  k8s-dashboard: |
       {
         "annotations": {
           "list": [
