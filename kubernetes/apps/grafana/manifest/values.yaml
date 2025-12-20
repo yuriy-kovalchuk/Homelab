@@ -47,6 +47,18 @@ grafana:
            httpHeaderName1: X-Scope-OrgID
           secureJsonData:
             httpHeaderValue1: "anonymous"
+        - name: Loki
+          type: loki
+          uid: loki-datasource
+          access: proxy
+          url: http://loki-gateway.loki.svc.cluster.local
+          isDefault: false
+          version: 1
+          editable: true
+          jsonData:
+            httpHeaderName1: X-Scope-OrgID
+          secureJsonData:
+            httpHeaderValue1: "anonymous"
 
 
   sidecar:
