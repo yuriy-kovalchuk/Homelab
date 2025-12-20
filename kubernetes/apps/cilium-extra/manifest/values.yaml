@@ -1,0 +1,14 @@
+yk:
+  httpRoutes:
+    - parentRefs:
+        - name: main-gateway
+          namespace: envoy-gateway-system
+      name: grafana
+      hostnames:
+        - "hubble.yuriy-lab.cloud"
+      path:
+        type: PathPrefix
+        value: /
+      backend:
+        name: hubble-ui
+        port: 80
