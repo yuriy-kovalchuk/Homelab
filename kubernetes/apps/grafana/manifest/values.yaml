@@ -52,9 +52,9 @@ grafana:
     dashboardproviders.yaml:
       apiVersion: 1
       providers:
-      - name: 'default'
+      - name: 'node'
         orgId: 1
-        folder: ''
+        folder: 'Nodes'
         type: file
         disableDeletion: false
         editable: true
@@ -62,7 +62,7 @@ grafana:
           path: /var/lib/grafana/dashboards/default
 
   dashboards:
-    default:
+    node:
       node-exporter-full:
         gnetId: 1860
         revision: 42
