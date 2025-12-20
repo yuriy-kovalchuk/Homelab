@@ -3,7 +3,7 @@ yk:
     - parentRefs:
         - name: main-gateway
           namespace: envoy-gateway-system
-      name: alloy
+      name: grafana
       hostnames:
         - "grafana.yuriy-lab.cloud"
       path:
