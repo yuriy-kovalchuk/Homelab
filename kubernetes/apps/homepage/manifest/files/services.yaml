@@ -36,6 +36,10 @@
         icon: alloy.svg
         href: "https://alloy.yuriy-lab.cloud"
         description: YK Alloy
+    - Hubble:
+          icon: cilium.svg
+          href: "https://hubble.yuriy-lab.cloud"
+          description: YK Hubble
     - Kyverno:
         icon: "https://repository-images.githubusercontent.com/169108858/35923880-823a-11e9-9089-0c9c102f9e6f"
         href: "https://kyverno-reporter.yuriy-lab.cloud"
