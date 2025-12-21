@@ -1,0 +1,12 @@
+apiVersion: v2
+name: cilium-yk
+description: Umbrella Helm chart for cilium application in Kubernetes
+
+type: application
+version: 1.18.4
+appVersion: "1.18.4"
+
+dependencies:
+  - name: cilium
+    version: "1.18.4"
+    repository: "https://helm.cilium.io/"
