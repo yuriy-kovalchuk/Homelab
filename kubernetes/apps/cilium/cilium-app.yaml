@@ -21,4 +21,13 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
-
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      jsonPointers:
+        - /spec/replicas
+        - /spec/template/metadata/annotations
+        - /spec/updateStrategy/rollingUpdate/partition
+        - /status
+        - /metadata/creationTimestamp
+        - /spec/volumeClaimTemplates
