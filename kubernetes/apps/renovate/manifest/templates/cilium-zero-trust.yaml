@@ -1,0 +1,42 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "renovate-github-lockdown"
+  namespace: renovate-system
+spec:
+  endpointSelector:
+    matchLabels:
+      app: renovate-daily-helm-scan
+  # 1. Define both PolicyTypes to enable default-deny in both directions
+  policyTypes:
+    - Ingress
+    - Egress
+  # 2. Block all Ingress: An empty list [] means no traffic is allowed in
+  ingress: []
+  # 3. Targeted Egress: Only Allow DNS and GitHub
+  egress:
+    # DNS for resolution
+    - toEndpoints:
+        - matchLabels:
+            "k8s:io.kubernetes.pod.namespace": kube-system
+            "k8s:k8s-app": kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: ANY
+          rules:
+            dns:
+              - matchPattern: "*.github.com"
+              - matchName: "github.com"
+              - matchName: "api.github.com"
+              # Added for GitHub Release/Artifact downloads
+              - matchPattern: "*.githubusercontent.com"
+    # HTTPS to GitHub
+    - toFQDNs:
+        - matchPattern: "*.github.com"
+        - matchName: "github.com"
+        - matchPattern: "*.githubusercontent.com"
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

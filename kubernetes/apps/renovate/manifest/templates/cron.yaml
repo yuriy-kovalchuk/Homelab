@@ -11,6 +11,9 @@ spec:
   jobTemplate:
     spec:
       template:
+        metadata:
+          labels:
+            app: renovate-daily-helm-scan
         spec:
           restartPolicy: OnFailure
           securityContext:
@@ -27,6 +30,7 @@ spec:
           containers:
             - name: renovate
               image: {{ .Values.image }}
+              imagePullPolicy: IfNotPresent
               args:
                 - "--dry-run=null"
               env:
