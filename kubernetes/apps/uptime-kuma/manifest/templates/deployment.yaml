@@ -13,6 +13,16 @@ spec:
       labels:
         app: uptime-kuma
     spec:
+      initContainers:
+        - name: fix-permissions
+          image: busybox
+          command: [ "sh", "-c", "chown -R 1000:1000 /app/data" ]
+          securityContext:
+            runAsUser: 0  # Runs as root JUST to fix the folder
+            privileged: false
+          volumeMounts:
+            - name: uptime-kuma-data
+              mountPath: /app/data
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
