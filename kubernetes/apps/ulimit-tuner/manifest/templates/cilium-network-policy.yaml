@@ -2,7 +2,7 @@
 apiVersion: "cilium.io/v2"
 kind: CiliumNetworkPolicy
 metadata:
-  name: "zero-trust-baseline"
+  name: "ulimit-network-policy"
   namespace: {{ .Release.Namespace }}
 spec:
   endpointSelector:

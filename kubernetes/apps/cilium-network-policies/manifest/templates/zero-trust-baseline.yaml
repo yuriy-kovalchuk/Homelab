@@ -11,6 +11,9 @@ spec:
         values:
           - whoami
           - uptime-kuma
+          - trivy-converter
+          - sealed-secrets
+          - renovate
   ingress:
     - {}
   egress:
