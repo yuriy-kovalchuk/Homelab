@@ -44,3 +44,24 @@ spec:
         - ports:
             - port: "3001"
               protocol: TCP
+---
+# 3. EGRESS: Allow Uptime Kuma to reach the Gateway for Probes
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "uptime-kuma-egress-to-gateway"
+  namespace: {{ .Release.Namespace }}
+spec:
+  endpointSelector:
+    matchLabels:
+      app: uptime-kuma
+  egress:
+    # Allow communication to the Envoy Gateway Proxies
+    - toEndpoints:
+        - matchLabels:
+            gateway.envoyproxy.io/owning-gateway-name: main-gateway
+            io.kubernetes.pod.namespace: envoy-gateway-system
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
