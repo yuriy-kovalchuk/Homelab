@@ -11,6 +11,11 @@ sealed-secrets:
   podSecurityContext:
     enabled: true
     fsGroup: 65534
+    runAsNonRoot: true
+    runAsUser: 10011
+    runAsGroup: 10011
+    seccompProfile:
+      type: RuntimeDefault
 
   containerSecurityContext:
     enabled: true
