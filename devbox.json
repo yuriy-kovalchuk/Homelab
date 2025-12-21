@@ -22,7 +22,8 @@
         "echo \"Error: no test specified\" && exit 1"
       ],
       "k_argo_app":  "./devbox_scripts/new_app.sh $@",
-      "k_ss_create": "./devbox_scripts/create_sealed_secret.sh $1 $2 $3 $4"
+      "k_ss_create": "./devbox_scripts/create_sealed_secret.sh $1 $2 $3 $4",
+      "k-token": "kubectl describe secret headlamp-admin-token -n headlamp"
     }
   }
 }
