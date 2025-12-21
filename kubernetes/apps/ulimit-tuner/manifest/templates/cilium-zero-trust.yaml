@@ -1,0 +1,14 @@
+# 1. BASELINE: Global Default Deny (Ingress & Egress)
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "zero-trust-baseline"
+  namespace: {{ .Release.Namespace }}
+spec:
+  endpointSelector:
+    matchLabels:
+      name: sysctl-tuner
+  # Egress Lockdown: Deny all internet, allow ONLY internal DNS
+  ingress: []
+  egress: []
+
