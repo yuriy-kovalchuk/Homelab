@@ -37,10 +37,7 @@ spec:
             # Matches the Envoy proxy pods in your gateway namespace
             gateway.envoyproxy.io/owning-gateway-name: main-gateway
             gateway.envoyproxy.io/owning-gateway-namespace: envoy-gateway-system
-          namespaceSelector:
-            matchLabels:
-              # Matches the namespace where your Envoy Gateway lives
-              kubernetes.io/metadata.name: envoy-gateway-system
+            io.kubernetes.pod.namespace: envoy-gateway-system
       authentication:
         mode: "required" # This triggers the SPIRE mTLS check
       toPorts:
