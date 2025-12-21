@@ -6,6 +6,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
 spec:
   endpointSelector: {} # Target ALL pods in the namespace
+  ingress: []
   # Egress Lockdown: Deny all internet, allow ONLY internal DNS
   egress:
     - toEndpoints:
@@ -61,3 +62,5 @@ spec:
         - matchLabels:
             gateway.envoyproxy.io/owning-gateway-name: main-gateway
             io.kubernetes.pod.namespace: envoy-gateway-system
+      authentication:
+        mode: "required" # This triggers the SPIRE mTLS check
