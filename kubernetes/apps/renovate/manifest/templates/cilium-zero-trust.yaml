@@ -21,15 +21,10 @@ spec:
       toPorts:
         - ports:
             - port: "53"
-              protocol: UDP
-            - port: "53"
-              protocol: TCP
+              protocol: ANY
           rules:
             dns:
-              - matchPattern: "*.github.com"
-              - matchName: "github.com"
-              - matchName: "api.github.com"
-              - matchPattern: "*.githubusercontent.com"
+              - matchPattern: "*"
 
     # HTTPS to GitHub
     - toFQDNs:
