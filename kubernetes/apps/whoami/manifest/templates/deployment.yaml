@@ -38,7 +38,7 @@ spec:
               drop:
                 - ALL
             runAsNonRoot: true
-            readOnlyRootFilesystem: true
+            readOnlyRootFilesystem: false
           resources:
             limits:
               cpu: "100m"
