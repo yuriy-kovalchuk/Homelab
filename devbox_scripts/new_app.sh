@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# new_app.sh - Create a new Kubernetes app from kubernetes/apps/_template (Devbox script)
+# new_app.sh - Create a new Kubernetes app from kubernetes/_template (Devbox script)
 #
 # Usage:
 #   bash devbox_scripts/new_app.sh <app-name> [--namespace <ns>] [--no-templates] [--repo-url <url>] [--dry-run]
@@ -20,7 +20,7 @@ set -euo pipefail
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 REPO_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
 APPS_DIR="$REPO_ROOT/kubernetes/apps"
-TEMPLATE_DIR="$APPS_DIR/_template"
+TEMPLATE_DIR="$REPO_ROOT/kubernetes/_template"
 
 if [[ ! -d "$TEMPLATE_DIR" ]]; then
   echo "[ERROR] Template directory not found at: $TEMPLATE_DIR" >&2
