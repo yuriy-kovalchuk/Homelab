@@ -1,5 +1,5 @@
 schedule: "0 4 * * *"
-image: renovate/renovate:latest
+image: renovate/renovate:42.64
 configJson: |
   {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
