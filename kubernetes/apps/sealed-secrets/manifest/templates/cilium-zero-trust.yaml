@@ -68,8 +68,7 @@ metadata:
 spec:
   endpointSelector:
     matchLabels:
-      app.kubernetes.io/instance: k8s-monitoring-alloy-metrics
-      app.kubernetes.io/name: alloy-metrics
+      app.kubernetes.io/instance: sealed-secrets
   egress:
     - toEntities:
         - kube-apiserver
