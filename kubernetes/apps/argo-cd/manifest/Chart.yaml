@@ -1,0 +1,12 @@
+apiVersion: v2
+name: argo-cd-yk
+description: Umbrella Helm chart for argo-cd application in Kubernetes
+
+type: application
+version: "9.1.4"
+appVersion: "9.1.4"
+
+dependencies:
+  - name: argo-cd
+    version: "9.1.4"
+    repository: https://argoproj.github.io/argo-helm
