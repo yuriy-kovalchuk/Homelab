@@ -1,12 +1,12 @@
 apiVersion: "cilium.io/v2"
 kind: CiliumNetworkPolicy
 metadata:
-  name: "allow-from-external-gateway"
+  name: "whoami-network-policy"
   namespace: {{ .Release.Namespace }}
 spec:
   endpointSelector:
     matchLabels:
-      app: uptime-kuma # Or use {} to allow Gateway to all pods in this NS
+      app: whoami # Or use {} to allow Gateway to all pods in this NS
   ingress:
     - fromEndpoints:
         - matchLabels:
@@ -18,7 +18,5 @@ spec:
         mode: "required" # This triggers the SPIRE mTLS check
       toPorts:
         - ports:
-            - port: "3001"
+            - port: "80"
               protocol: TCP
----
-
