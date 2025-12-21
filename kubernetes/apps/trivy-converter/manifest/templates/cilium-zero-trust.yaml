@@ -19,3 +19,19 @@ spec:
           rules:
             dns:
               - matchPattern: "*"
+---
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "allow-health-checks"
+  namespace: {{ .Release.Namespace }}
+spec:
+  endpointSelector: {} # Apply to all pods in the namespace
+  ingress:
+    - fromEntities:
+        - host        # Allows Kubelet on the same node
+        - remote-node # Allows Kubelet/probes from other nodes
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
