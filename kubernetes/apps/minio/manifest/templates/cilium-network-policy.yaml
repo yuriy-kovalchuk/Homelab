@@ -3,7 +3,7 @@ kind: CiliumNetworkPolicy
 metadata:
   name: "minio-network-policy"
   namespace: {{ .Release.Namespace }}
-spec:
+spec:  app: minio-job
   endpointSelector:
     matchLabels:
       app: minio
@@ -13,6 +13,15 @@ spec:
             gateway.envoyproxy.io/owning-gateway-name: main-gateway
             gateway.envoyproxy.io/owning-gateway-namespace: envoy-gateway-system
             io.kubernetes.pod.namespace: envoy-gateway-system
+      authentication:
+        mode: "required"
+      toPorts:
+        - ports:
+            - port: "9000"
+              protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            app: minio-job
       authentication:
         mode: "required"
       toPorts:
