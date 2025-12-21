@@ -5,7 +5,7 @@ metadata:
   name: whoami
   namespace: {{ .Release.Namespace }}
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: whoami
