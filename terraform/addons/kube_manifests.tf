@@ -13,6 +13,27 @@ resource "kubernetes_manifest" "cilium_l2_policy" {
   }
 }
 
+
+resource "kubernetes_manifest" "cilium_spire_ns" {
+  manifest = {
+    apiVersion = "v1"
+    kind       = "Namespace"
+    metadata = {
+      name = "cilium-spire"
+      annotations = {
+        "pod-security.kubernetes.io/audit"   = "privileged"
+        "pod-security.kubernetes.io/enforce" = "privileged"
+        "pod-security.kubernetes.io/warn"    = "privileged"
+      }
+      labels = {
+        "pod-security.kubernetes.io/audit"   = "privileged"
+        "pod-security.kubernetes.io/enforce" = "privileged"
+        "pod-security.kubernetes.io/warn"    = "privileged"
+      }
+    }
+  }
+}
+
 resource "kubernetes_manifest" "cilium_lb_pool" {
   depends_on = [helm_release.cilium]
   manifest = {

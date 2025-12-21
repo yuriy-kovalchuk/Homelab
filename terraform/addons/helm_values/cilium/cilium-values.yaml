@@ -48,27 +48,75 @@ rollOutCiliumPods: true
 
 routing-mode: "native"
 
+authentication:
+  mutual:
+    spire:
+      enabled: true
+      install:
+        namespace: cilium-spire
+        existingNamespace: true
+#        agent:
+#          config:
+#            agent:
+#              socket_path: /run/spire/sockets/spire-agent.sock
+        server:
+#          initContainers:
+#            - command:
+#                - /bin/sh
+#                - -c
+#                - |
+#                  chown -R 1000:1000 /run/spire/data
+#                  chown -R 1000:1000 /tmp/spire-server
+#              image: docker.io/library/busybox:1.37.0
+#              imagePullPolicy: IfNotPresent
+#              name: chown
+#              securityContext:
+#                runAsGroup: 0
+#                runAsUser: 0
+#              volumeMounts:
+#                - mountPath: /run/spire/data
+#                  name: spire-data
+#                - mountPath: /tmp/spire-server/private
+#                  name: spire-server-socket
+          securityContext:
+            runAsGroup: 0
+            runAsUser: 0
+          dataStorage:
+            enabled: true
+            size: 1Gi
+            accessMode: ReadWriteOnce
+            storageClass: longhorn
+
 prometheus:
   enabled: true
   serviceMonitor:
     enabled: true
 
+l7Proxy: true
+
+envoyConfig:
+  enabled: true
+
+loadBalancer:
+  l7:
+    backend: envoy
+
 hubble:
   enabled: true
-  metrics:
-    enabled:
-      - dns:query;ignoreAAAA
-      - drop:sourceContext=identity;destinationContext=identity
-      - tcp
-      - flow
-      - icmp
-      - 'httpV2:exemplars=true;labelsContext=source_ip,source_namespace,source_workload,destination_ip,destination_namespace,destination_workload,traffic_direction;sourceContext=workload-name|reserved-identity;destinationContext=workload-name|reserved-identity'
-    enableOpenMetrics: true
-    dashboards:
-      enabled: true
-      namespace: grafana
-      annotations:
-        grafana_folder: "Hubble"
+#  metrics:
+#    enabled:
+#      - dns:query;ignoreAAAA
+#      - drop:sourceContext=identity;destinationContext=identity
+#      - tcp
+#      - flow
+#      - icmp
+#      - 'httpV2:exemplars=true;labelsContext=source_ip,source_namespace,source_workload,destination_ip,destination_namespace,destination_workload,traffic_direction;sourceContext=workload-name|reserved-identity;destinationContext=workload-name|reserved-identity'
+#    enableOpenMetrics: true
+#    dashboards:
+#      enabled: true
+#      namespace: grafana
+#      annotations:
+#        grafana_folder: "Hubble"
 
   relay:
     enabled: true

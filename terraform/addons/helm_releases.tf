@@ -4,9 +4,12 @@ resource "helm_release" "cilium" {
   repository = "https://helm.cilium.io/"
   chart      = "cilium"
   version    = var.cilium_version
-
+  create_namespace = false
   values = [
     file("${path.module}/helm_values/cilium/cilium-values.yaml")
+  ]
+  depends_on = [
+    kubernetes_manifest.cilium_spire_ns
   ]
 }
 
