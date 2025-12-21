@@ -3,7 +3,7 @@ kind: CiliumNetworkPolicy
 metadata:
   name: "minio-network-policy"
   namespace: {{ .Release.Namespace }}
-spec:  app: minio-job
+spec:
   endpointSelector:
     matchLabels:
       app: minio
