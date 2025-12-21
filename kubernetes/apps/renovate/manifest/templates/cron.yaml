@@ -13,6 +13,13 @@ spec:
       template:
         spec:
           restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            runAsGroup: 10001
+            fsGroup: 10001
+            seccompProfile:
+              type: RuntimeDefault
           volumes:
             - name: renovate-config-volume
               configMap:
@@ -36,3 +43,17 @@ spec:
                 - name: renovate-config-volume
                   mountPath: /usr/src/app/config.json
                   subPath: config.json
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                runAsNonRoot: true
+                readOnlyRootFilesystem: true
+              resources:
+                limits:
+                  cpu: "100m"
+                  memory: "128Mi"
+                requests:
+                  cpu: "50m"
+                  memory: "64Mi"
