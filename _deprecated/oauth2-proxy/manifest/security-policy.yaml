@@ -1,0 +1,76 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: myapp-external-auth
+  namespace: httpbin
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: httpbin-route
+  extAuth:
+    headersToExtAuth:
+      - cookie
+    http:
+      headersToBackend:
+        - Authorization
+        - X-Auth-Request-Groups
+      backendRefs:
+        - name: oauth2-proxy
+          namespace: oauth2-proxy
+          port: 80
+    failOpen: false
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: ref-grant
+  namespace: oauth2-proxy
+spec:
+  from:
+  to:
+    - group: ''
+      kind: Service
+      name: oauth2-proxy
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyExtensionPolicy
+metadata:
+  name: lua-inline-check-admin
+  namespace: httpbin
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: httpbin-route
+  lua:
+    - type: Inline
+      inline: |
+        function envoy_on_request(request_handle)
+          local allowed_groups = {
+            "1c916693-e88b-4f5f-bf13-77987a43e6a9",
+            "6a5a0210-2af2-4164-8a27-f6b2b1aee06b", 
+            "another-valid-group-id-12345"
+          }
+
+          local header_value = request_handle:headers():get("X-Auth-Request-Groups")
+          local is_match = false
+                
+          for _, group_id in ipairs(allowed_groups) do
+            if header_value and string.find(header_value, group_id, 1, true) then
+              is_match = true
+              break
+            end
+          end
+          
+          if not is_match then
+            local response_body = "Access Denied. You do not belong to any of the required groups."
+            request_handle:respond({
+              [":status"] = "403",
+              ["content-type"] = "text/plain",
+              ["content-length"] = string.len(response_body)
+            }, response_body)
+            return
+          end
+        end
+        
