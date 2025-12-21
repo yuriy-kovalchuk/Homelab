@@ -1,0 +1,46 @@
+# 1. BASELINE: Global Default Deny (Ingress & Egress)
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "zero-trust-baseline"
+  namespace: {{ .Release.Namespace }}
+spec:
+  endpointSelector: {} # Target ALL pods in the namespace
+  # Egress Lockdown: Deny all internet, allow ONLY internal DNS
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            "k8s:io.kubernetes.pod.namespace": kube-system
+            "k8s:k8s-app": kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: ANY
+          rules:
+            dns:
+              - matchPattern: "*"
+
+---
+# 2. INGRESS: Allow Envoy Gateway (Cross-Namespace)
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "allow-from-external-gateway"
+  namespace: {{ .Release.Namespace }}
+spec:
+  endpointSelector:
+    matchLabels:
+      app: uptime-kuma # Or use {} to allow Gateway to all pods in this NS
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            # Matches the Envoy proxy pods in your gateway namespace
+            gateway.envoyproxy.io/owning-gateway-name: main-gateway
+            gateway.envoyproxy.io/owning-gateway-namespace: envoy-gateway-system
+            io.kubernetes.pod.namespace: envoy-gateway-system
+      authentication:
+        mode: "required" # This triggers the SPIRE mTLS check
+      toPorts:
+        - ports:
+            - port: "3001"
+              protocol: TCP

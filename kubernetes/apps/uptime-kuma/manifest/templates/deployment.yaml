@@ -13,6 +13,13 @@ spec:
       labels:
         app: uptime-kuma
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 3000
+        fsGroup: 2000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: uptime-kuma
           image: louislam/uptime-kuma:latest
@@ -21,6 +28,20 @@ spec:
           volumeMounts:
             - name: uptime-kuma-data
               mountPath: /app/data
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+          resources:
+            limits:
+              cpu: "100m"
+              memory: "128Mi"
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
       volumes:
         - name: uptime-kuma-data
           persistentVolumeClaim:
