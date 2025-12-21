@@ -13,9 +13,17 @@ spec:
       labels:
         app: uptime-kuma
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001 # Handled by Talos/Kubelet, not the container
+        fsGroupChangePolicy: "Always"
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: uptime-kuma
-          image: louislam/uptime-kuma:1 # Explicitly use v1 or v2
+          image: louislam/uptime-kuma:2.0.2-slim-rootless
           securityContext:
             # Add this specific line to override the image default
             runAsUser: 10001
