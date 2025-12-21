@@ -61,7 +61,3 @@ spec:
         - matchLabels:
             gateway.envoyproxy.io/owning-gateway-name: main-gateway
             io.kubernetes.pod.namespace: envoy-gateway-system
-      toPorts:
-        - ports:
-            - port: "10443"
-              protocol: TCP
