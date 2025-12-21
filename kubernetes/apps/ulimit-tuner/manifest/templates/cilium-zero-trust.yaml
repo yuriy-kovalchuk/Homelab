@@ -9,6 +9,8 @@ spec:
     matchLabels:
       name: sysctl-tuner
   # Egress Lockdown: Deny all internet, allow ONLY internal DNS
-  ingress: []
-  egress: []
+  ingress:
+    - {}
+  egress:
+    - {}
 
