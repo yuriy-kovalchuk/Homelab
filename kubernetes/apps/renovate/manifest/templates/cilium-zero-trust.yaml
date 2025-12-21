@@ -1,19 +1,15 @@
-apiVersion: cilium.io/v2
+# 1. BASELINE: Global Default Deny (Ingress & Egress)
+apiVersion: "cilium.io/v2"
 kind: CiliumNetworkPolicy
 metadata:
-  name: renovate-github-lockdown
-  namespace: {{ .Release.Namespace | default "renovate" }}
+  name: "zero-trust-baseline"
+  namespace: {{ .Release.Namespace }}
 spec:
-  endpointSelector:
-    matchLabels:
-      app: renovate-daily-helm-scan
-
+  endpointSelector: {} # Target ALL pods in the namespace
   # Default deny ingress
   ingress: []
-
-  # Allow only DNS + GitHub egress
+  # Egress Lockdown: Deny all internet, allow ONLY internal DNS
   egress:
-    # DNS resolution (kube-dns)
     - toEndpoints:
         - matchLabels:
             "k8s:io.kubernetes.pod.namespace": kube-system
@@ -25,7 +21,18 @@ spec:
           rules:
             dns:
               - matchPattern: "*"
-
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: renovate-github-lockdown
+  namespace: {{ .Release.Namespace | default "renovate" }}
+spec:
+  endpointSelector:
+    matchLabels:
+      app: renovate-daily-helm-scan
+  # Allow only DNS + GitHub egress
+  egress:
     # HTTPS to GitHub
     - toFQDNs:
         - matchPattern: "*"
