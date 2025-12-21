@@ -2,6 +2,7 @@
 .devbox
 .venv
 .playground
+.fleet
 
 # -------------------------
 # Helm & Helm Charts
