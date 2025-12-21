@@ -6,8 +6,9 @@ metadata:
   namespace: {{ .Release.Namespace }}
 spec:
   endpointSelector: {} # Target ALL pods in the namespace
+  ingress:
+    - {}
   # Egress Lockdown: Deny all internet, allow ONLY internal DNS
-  ingress: []
   egress:
     - toEndpoints:
         - matchLabels:
