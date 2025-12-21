@@ -28,9 +28,9 @@ spec:
 
     # HTTPS to GitHub
     - toFQDNs:
-        - matchPattern: "*.github.com"
-        - matchName: "github.com"
-        - matchPattern: "*.githubusercontent.com"
+        - matchPattern: "*"
+        #- matchName: "github.com"
+        #- matchPattern: "*.githubusercontent.com"
       toPorts:
         - ports:
             - port: "443"
