@@ -29,7 +29,7 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       containers:
-        - image: containous/whoami
+        - image: traefik/whoami:v1.11
           imagePullPolicy: Always
           name: whoami
           securityContext:
