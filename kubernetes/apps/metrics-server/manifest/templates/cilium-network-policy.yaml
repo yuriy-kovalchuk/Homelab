@@ -1,0 +1,32 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "metrics-server-network-policy"
+  namespace: {{ .Release.Namespace }}
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/instance: metrics-server
+  ingress:
+    - fromEntities:
+        - host        # Allows Kubelet on the same node
+        - remote-node # Allows Kubelet/probes from other nodes
+      toPorts:
+        - ports:
+            - port: "10250"
+              protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/instance: k8s-monitoring-alloy-metrics
+            app.kubernetes.io/name: alloy-metrics
+            io.kubernetes.pod.namespace: k8s-monitoring
+      authentication:
+        mode: "required" # This triggers the SPIRE mTLS check
+      toPorts:
+        - ports:
+            - port: "10250"
+              protocol: TCP
+  egress:
+    - toEntities:
+        - host
+        - remote-node

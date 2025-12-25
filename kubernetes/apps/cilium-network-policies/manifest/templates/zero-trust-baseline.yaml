@@ -14,7 +14,10 @@ spec:
           - trivy-converter
           - sealed-secrets
           - renovate
+          - netbox
           - minio
+          - mimir
+          - metric-server
   ingress:
     - {}
   egress:
