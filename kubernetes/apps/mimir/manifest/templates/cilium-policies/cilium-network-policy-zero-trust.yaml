@@ -20,6 +20,8 @@ spec:
     - toEndpoints:
         - matchLabels:
             "k8s:io.kubernetes.pod.namespace": {{ .Release.Namespace }}
+      authentication:
+        mode: "required"
     # Rule 2: Allow egress to DNS in kube-system
     - toEndpoints:
         - matchLabels:
