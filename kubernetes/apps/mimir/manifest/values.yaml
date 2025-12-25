@@ -134,3 +134,13 @@ mimir-distributed:
     enabled: false
   minio:
     enabled: false
+
+  metaMonitoring:
+    dashboards:
+      enabled: true
+      namespace: grafana
+      labels:
+        grafana_dashboard: "1"
+
+    serviceMonitor:
+      enabled: true
