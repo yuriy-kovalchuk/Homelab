@@ -8,5 +8,5 @@ appVersion: "1.0.0"
 
 dependencies:
   - name: "netbox"
-    version: "7.2.15"
+    version: "7.2.26"
     repository: "https://charts.netbox.oss.netboxlabs.com"
