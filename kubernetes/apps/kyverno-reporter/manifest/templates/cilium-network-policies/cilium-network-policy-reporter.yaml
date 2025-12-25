@@ -14,7 +14,8 @@ spec:
         - ports:
             - port: "6443"
               protocol: TCP
-    - toEndpoints:
+  ingress:
+    - fromEndpoints:
         - matchLabels:
             app.kubernetes.io/name: policy-reporter-ui
       authentication:
