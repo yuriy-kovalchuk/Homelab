@@ -14,6 +14,7 @@ spec:
           - trivy-converter
           - sealed-secrets
           - renovate
+          - minio
   ingress:
     - {}
   egress:
