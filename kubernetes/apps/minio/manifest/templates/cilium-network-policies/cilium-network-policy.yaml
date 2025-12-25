@@ -56,6 +56,16 @@ spec:
               protocol: TCP
     - fromEndpoints:
         - matchLabels:
+            app.kubernetes.io/component: compactor
+            io.kubernetes.pod.namespace: loki
+      authentication:
+        mode: "required"
+      toPorts:
+        - ports:
+            - port: "9000"
+              protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
             app.kubernetes.io/component: ingester
             io.kubernetes.pod.namespace: mimir
       authentication:
@@ -68,6 +78,16 @@ spec:
         - matchLabels:
             app.kubernetes.io/component: store-gateway
             io.kubernetes.pod.namespace: mimir
+      authentication:
+        mode: "required"
+      toPorts:
+        - ports:
+            - port: "9000"
+              protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/component: index-gateway
+            io.kubernetes.pod.namespace: loki
       authentication:
         mode: "required"
       toPorts:
