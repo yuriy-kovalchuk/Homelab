@@ -11,9 +11,3 @@ spec:
     - toEntities:
         - host
         - remote-node
-    - toFQDNs:
-        - matchName: "mirror.gcr.io"
-      toPorts:
-        - ports:
-            - port: "443"
-              protocol: TCP
