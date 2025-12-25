@@ -14,3 +14,15 @@ spec:
         - ports:
             - port: "443"
               protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: policy-reporter
+      authentication:
+        mode: "required"
+      toPorts:
+        - ports:
+            - port: '8080'
+              protocol: TCP
+          rules:
+            http:
+              - {}
