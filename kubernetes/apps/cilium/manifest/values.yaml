@@ -132,6 +132,7 @@ cilium:
         enabled: true
       dashboards:
         enabled: true
+        namespace: grafana
       enabled:
         - "policy:sourceContext=app|workload-name|pod|reserved-identity;destinationContext=app|workload-name|pod|dns|reserved-identity;labelsContext=source_namespace,destination_namespace"
     #  metrics:
