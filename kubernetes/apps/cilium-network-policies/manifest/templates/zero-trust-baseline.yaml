@@ -20,6 +20,7 @@ spec:
           - metric-server
           - longhorn-system
           - loki
+          - kyverno-reporter
   ingress:
     - {}
   egress:
