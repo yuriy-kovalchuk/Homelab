@@ -1,0 +1,23 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "allow-alloy-metrics"
+  namespace: {{ .Release.Namespace }}
+spec:
+  description: "Allow Alloy metrics"
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/component: distributor
+      app.kubernetes.io/instance: mimir
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/instance: k8s-monitoring-alloy-metrics
+            app.kubernetes.io/name: alloy-metrics
+            io.kubernetes.pod.namespace: k8s-monitoring
+      authentication:
+        mode: "required"
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
