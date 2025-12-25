@@ -126,6 +126,14 @@ cilium:
 
   hubble:
     enabled: true
+    metrics:
+      enableOpenMetrics: true
+      serviceMonitor:
+        enabled: true
+      dashboards:
+        enabled: true
+      enabled:
+        - "policy:sourceContext=app|workload-name|pod|reserved-identity;destinationContext=app|workload-name|pod|dns|reserved-identity;labelsContext=source_namespace,destination_namespace"
     #  metrics:
     #    enabled:
     #      - dns:query;ignoreAAAA
