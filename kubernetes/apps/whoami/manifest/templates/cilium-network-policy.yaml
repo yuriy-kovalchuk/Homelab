@@ -15,7 +15,7 @@ spec:
             gateway.envoyproxy.io/owning-gateway-namespace: envoy-gateway-system
             io.kubernetes.pod.namespace: envoy-gateway-system
       authentication:
-        mode: "required" # This triggers the SPIRE mTLS check
+        mode: "required"
       toPorts:
         - ports:
             - port: "80"

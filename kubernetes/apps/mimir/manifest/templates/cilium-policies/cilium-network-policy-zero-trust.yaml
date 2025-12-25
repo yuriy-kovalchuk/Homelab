@@ -10,6 +10,8 @@ spec:
     - fromEndpoints:
         - matchLabels:
             "k8s:io.kubernetes.pod.namespace": {{ .Release.Namespace }}
+      authentication:
+        mode: "required"
     - fromEntities:
         - host          # Traffic from the local node (where the pod is running)
         - remote-node   # Traffic from other nodes in the cluster
