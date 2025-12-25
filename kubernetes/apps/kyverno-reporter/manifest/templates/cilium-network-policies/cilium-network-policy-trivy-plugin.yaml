@@ -10,6 +10,8 @@ spec:
   egress:
     - toFQDNs:
         - matchName: "mirror.gcr.io"
+        - matchName: "api.github.com"
+        - matchName: "github.com"
       toPorts:
         - ports:
             - port: "443"
