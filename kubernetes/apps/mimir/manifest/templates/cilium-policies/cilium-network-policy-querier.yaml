@@ -1,0 +1,18 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "allow-querier-to-access-minio"
+  namespace: {{ .Release.Namespace }}
+spec:
+  description: "Allow Querier to access Minio"
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/component: querier
+      app.kubernetes.io/instance: mimir
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            app: minio
+            io.kubernetes.pod.namespace: minio
+      authentication:
+        mode: "required"
