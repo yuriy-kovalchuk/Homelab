@@ -8,7 +8,7 @@ appVersion: "1.0.0"
 
 dependencies:
   - name: gateway-helm
-    version: "v1.6.0"
+    version: "1.6.1"
     repository: oci://docker.io/envoyproxy
 
 #  - name: gateway-addons-helm
