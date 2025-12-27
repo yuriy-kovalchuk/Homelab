@@ -79,7 +79,7 @@ mimir-distributed:
   kafka:
     persistence:
       enabled: true
-      size: 50Gi
+      size: 100Gi
 
   # Writes incoming series to long-term storage on the write path and returns series samples for queries on the read path.
   ingester:
