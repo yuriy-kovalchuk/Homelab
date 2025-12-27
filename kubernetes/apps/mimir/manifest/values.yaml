@@ -59,7 +59,7 @@ mimir-distributed:
           wal_compression_enabled: true
 
       compactor:
-        compaction_interval: 30m
+        compaction_interval: 2h
         data_dir: /data/compactor
 
       ingester:
