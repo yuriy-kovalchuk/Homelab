@@ -72,14 +72,17 @@ mimir-distributed:
       store_gateway:
         sharding_ring:
           zone_awareness_enabled: false
-          replication_factor: 1
+          replication_factor: 3
           kvstore:
             store: memberlist
 
-  kafka:
-    persistence:
-      enabled: true
-      size: 100Gi
+
+  # Receives data from alloy, corrects, devides data to batches and send to ingesters
+  distributor:
+    replicas: 3
+    extraArgs:
+      auth.multitenancy-enabled: false
+      log.level: info
 
   # Writes incoming series to long-term storage on the write path and returns series samples for queries on the read path.
   ingester:
@@ -87,15 +90,26 @@ mimir-distributed:
       enabled: false
     persistentVolume:
       enabled: true
-      size: 50Gi
+      size: 20Gi
     replicas: 1
 
-  # Receives data from alloy, corrects, devides data to batches and send to ingesters
-  distributor:
-    extraArgs:
-      auth.multitenancy-enabled: false
-      log.level: info
-    replicas: 1
+  # Evaluates PromQL expressions by fetching time series and labels on the read path. Uses store-gateway fron minio and ingester for latest data
+  querier:
+    replicas: 2
+
+  # "frontend" for querier
+  query_frontend:
+    replicas: 2
+
+  query_scheduler:
+    replicas: 2
+
+
+  # comunication with minio
+  store_gateway:
+    zoneAwareReplication:
+      enabled: false
+    replicas: 3
 
   # Increases query performance and reduces long-term storage usage by combining blocks.
   compactor:
@@ -104,22 +118,11 @@ mimir-distributed:
       enabled: true
       size: 50Gi
 
-  # Evaluates PromQL expressions by fetching time series and labels on the read path. Uses store-gateway fron minio and ingester for latest data
-  querier:
-    replicas: 1
+  kafka:
+    persistence:
+      enabled: true
+      size: 50Gi
 
-  # "frontend" for querier
-  query_frontend:
-    replicas: 1
-
-  # comuniacation with minio
-  store_gateway:
-    zoneAwareReplication:
-      enabled: false
-    replicas: 1
-
-  query_scheduler:
-    replicas: 1
 
   ## Disabled services:
   rollout_operator:
