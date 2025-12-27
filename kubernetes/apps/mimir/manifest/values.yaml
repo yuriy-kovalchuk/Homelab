@@ -52,7 +52,7 @@ mimir-distributed:
         tsdb:
           dir: /data/tsdb
           block_ranges_period: [ 2h ]
-          retention_period: 2h15m
+          retention_period: 10h
           ship_interval: 1m
           flush_blocks_on_shutdown: true
           head_compaction_interval: 1m
