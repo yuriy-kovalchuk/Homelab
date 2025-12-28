@@ -13,7 +13,7 @@ spec:
       releaseName: kyverno-policies
   destination:
     server: https://kubernetes.default.svc
-    namespace: kyverno-policies
+    namespace: kyverno
   syncPolicy:
     automated:
       prune: true
