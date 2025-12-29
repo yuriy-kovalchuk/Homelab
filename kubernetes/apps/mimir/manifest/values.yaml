@@ -67,6 +67,7 @@ mimir-distributed:
         enabled: false  # Explicitly turn off the Kafka logic
 
       ingester:
+        push_grpc_method_enabled: true # Re-enables direct GRPC ingestion
         ring:
           zone_awareness_enabled: false
           replication_factor: 3

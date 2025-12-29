@@ -8,7 +8,6 @@ spec:
     - group: apps
       kind: StatefulSet
       jsonPointers:
-        - /spec/replicas
         - /spec/template/metadata/annotations
         - /spec/updateStrategy/rollingUpdate/partition
         - /status
