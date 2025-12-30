@@ -27,9 +27,6 @@ spec:
       automountServiceAccountToken: true
       dnsPolicy: ClusterFirst
       enableServiceLinks: true
-      securityContext:
-        seccompProfile:
-          type: RuntimeDefault
       containers:
         - name: {{ .Release.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -68,10 +65,6 @@ spec:
               subPath: widgets.yaml
             - mountPath: /app/config/logs
               name: logs
-          securityContext:
-            capabilities:
-              drop:
-                - ALL
       volumes:
         - name: homepage-config
           configMap:
