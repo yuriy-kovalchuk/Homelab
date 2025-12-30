@@ -1,0 +1,23 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "allow-same-namespace-and-dns"
+  namespace: {{ .Release.Namespace }}
+spec:
+  description: "Allow communication within the same namespace and to kube-dns."
+  endpointSelector: {}
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            "k8s:io.kubernetes.pod.namespace": {{ .Release.Namespace }}
+      authentication:
+        mode: "required"
+    - fromEntities:
+        - host
+        - remote-node
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            "k8s:io.kubernetes.pod.namespace": {{ .Release.Namespace }}
+      authentication:
+        mode: "required"

@@ -21,6 +21,7 @@ spec:
           - longhorn-system
           - loki
           - kyverno-reporter
+          - kyverno
   ingress:
     - {}
   egress:
