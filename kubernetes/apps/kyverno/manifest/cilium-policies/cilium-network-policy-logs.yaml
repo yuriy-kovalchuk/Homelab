@@ -5,10 +5,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
 spec:
   description: "Allow Alloy logs"
-  endpointSelector:
-    matchLabels:
-      app.kubernetes.io/component: gateway
-      app.kubernetes.io/instance: loki
+  endpointSelector: {}
   ingress:
     - fromEndpoints:
         - matchLabels:
