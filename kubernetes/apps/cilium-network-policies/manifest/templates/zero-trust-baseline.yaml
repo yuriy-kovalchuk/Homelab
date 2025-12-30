@@ -23,6 +23,7 @@ spec:
           - kyverno-reporter
           - kyverno
           - k8s-monitoring
+          - httpbin
   ingress:
     - {}
   egress:
