@@ -5,9 +5,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     app.kubernetes.io/name: {{ .Release.Name }}
-    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   revisionHistoryLimit: 3
   replicas: {{ .Values.replicaCount }}
@@ -24,9 +22,7 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
       serviceAccountName: {{ .Values.serviceAccount.name }}
-      automountServiceAccountToken: true
-      dnsPolicy: ClusterFirst
-      enableServiceLinks: true
+      # Security Context at Pod Level
       securityContext:
         runAsNonRoot: true
         runAsUser: 10001
@@ -34,6 +30,22 @@ spec:
         fsGroup: 10001
         seccompProfile:
           type: RuntimeDefault
+
+      # 1. INIT CONTAINER: Copies read-only ConfigMap to writable Volume
+      initContainers:
+        - name: init-config
+          image: busybox:latest
+          command: ['sh', '-c', 'cp /tmp/config/* /app/config/ && chmod -R 775 /app/config/']
+          volumeMounts:
+            - name: config-source
+              mountPath: /tmp/config
+            - name: config-writable
+              mountPath: /app/config
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+
       containers:
         - name: {{ .Release.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -45,44 +57,26 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+          # 2. MOUNT WRITABLE VOLUMES
           volumeMounts:
-            - mountPath: /app/config/custom.js
-              name: homepage-config
-              subPath: custom.js
-            - mountPath: /app/config/custom.css
-              name: homepage-config
-              subPath: custom.css
-            - mountPath: /app/config/bookmarks.yaml
-              name: homepage-config
-              subPath: bookmarks.yaml
-            - mountPath: /app/config/docker.yaml
-              name: homepage-config
-              subPath: docker.yaml
-            - mountPath: /app/config/kubernetes.yaml
-              name: homepage-config
-              subPath: kubernetes.yaml
-            - mountPath: /app/config/services.yaml
-              name: homepage-config
-              subPath: services.yaml
-            - mountPath: /app/config/settings.yaml
-              name: homepage-config
-              subPath: settings.yaml
-            - mountPath: /app/config/widgets.yaml
-              name: homepage-config
-              subPath: widgets.yaml
-            - mountPath: /app/config/logs
-              name: logs
+            - name: config-writable
+              mountPath: /app/config
+            - name: logs
+              mountPath: /app/config/logs
           securityContext:
             capabilities:
-              drop:
-                - ALL
-            readOnlyRootFilesystem: false
+              drop: ["ALL"]
+            readOnlyRootFilesystem: true # Hardened: app only writes to mounted volumes
             runAsNonRoot: true
             runAsUser: 10001
             runAsGroup: 10001
+
       volumes:
-        - name: homepage-config
+        # 3. DEFINE VOLUMES
+        - name: config-source
           configMap:
             name: {{ .Release.Name }}
+        - name: config-writable
+          emptyDir: {}
         - name: logs
           emptyDir: {}
