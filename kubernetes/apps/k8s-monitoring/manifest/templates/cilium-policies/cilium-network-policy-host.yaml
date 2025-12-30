@@ -1,0 +1,12 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "allow-egress-to-host"
+  namespace: {{ .Release.Namespace }}
+spec:
+  description: "Allow Alloy logs"
+  endpointSelector: {}
+  egress:
+    - toEntities:
+        - host        # Allows Kubelet on the same node
+        - remote-node # Allows Kubelet/probes from other nodes
