@@ -24,6 +24,7 @@ spec:
           - kyverno
           - k8s-monitoring
           - httpbin
+          - homepage
   ingress:
     - {}
   egress:
