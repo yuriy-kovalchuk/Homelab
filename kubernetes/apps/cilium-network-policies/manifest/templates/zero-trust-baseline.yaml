@@ -25,6 +25,7 @@ spec:
           - k8s-monitoring
           - httpbin
           - homepage
+          - headlamp
   ingress:
     - {}
   egress:

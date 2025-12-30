@@ -1,0 +1,22 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: "ingress-gateway-network-policy"
+  namespace: {{ .Release.Namespace }}
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/instance: headlamp
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            # Matches the Envoy proxy pods in your gateway namespace
+            gateway.envoyproxy.io/owning-gateway-name: main-gateway
+            gateway.envoyproxy.io/owning-gateway-namespace: envoy-gateway-system
+            io.kubernetes.pod.namespace: envoy-gateway-system
+      authentication:
+        mode: "required"
+      toPorts:
+        - ports:
+            - port: "4466"
+              protocol: TCP
