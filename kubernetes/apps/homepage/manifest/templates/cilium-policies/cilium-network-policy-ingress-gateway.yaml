@@ -1,7 +1,7 @@
 apiVersion: "cilium.io/v2"
 kind: CiliumNetworkPolicy
 metadata:
-  name: "whoami-network-policy"
+  name: "ingress-gateway-network-policy"
   namespace: {{ .Release.Namespace }}
 spec:
   endpointSelector:
