@@ -9,6 +9,8 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
+  kubernetes.yaml: |-
+{{ .Files.Get "files/kubernetes.yaml" | indent 4 }}
   settings.yaml: |-
 {{ .Files.Get "files/settings.yaml" | indent 4 }}
   custom.css: |-
