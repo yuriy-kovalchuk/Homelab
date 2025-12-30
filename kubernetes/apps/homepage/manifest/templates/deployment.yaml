@@ -2,46 +2,30 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Release.Name }}
-  namespace: {{ .Release.Namespace }}
-  labels:
-    app.kubernetes.io/name: {{ .Release.Name }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
 spec:
-  revisionHistoryLimit: 3
-  replicas: {{ .Values.replicaCount }}
-  strategy:
-    type: RollingUpdate
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: {{ .Release.Name }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
   template:
-    metadata:
-      labels:
-        app.kubernetes.io/name: {{ .Release.Name }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
-      serviceAccountName: {{ .Values.serviceAccount.name }}
-      # Security Context at Pod Level
+      # POD LEVEL: Only keep fsGroup here
       securityContext:
-        runAsNonRoot: true
-        runAsUser: 10001
-        runAsGroup: 10001
         fsGroup: 10001
         seccompProfile:
           type: RuntimeDefault
 
-      # 1. INIT CONTAINER: Copies read-only ConfigMap to writable Volume
       initContainers:
         - name: init-config
           image: busybox:latest
-          command: ['sh', '-c', 'cp /tmp/config/* /app/config/ && chmod -R 775 /app/config/']
+          # REMOVED chmod: cp is enough because fsGroup handles ownership
+          command: ['sh', '-c', 'cp /tmp/config/* /app/config/']
           volumeMounts:
             - name: config-source
               mountPath: /tmp/config
             - name: config-writable
               mountPath: /app/config
           securityContext:
+            # Init container runs as root (privileged: false) to allow copying
+            # but we keep it safe
+            runAsUser: 0
+            runAsNonRoot: false
             allowPrivilegeEscalation: false
             capabilities:
               drop: ["ALL"]
@@ -49,30 +33,22 @@ spec:
       containers:
         - name: {{ .Release.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          env:
-            - name: HOMEPAGE_ALLOWED_HOSTS
-              value: {{ .Values.homepage.allowedHost | quote }}
-          ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
-              protocol: TCP
-          # 2. MOUNT WRITABLE VOLUMES
+          securityContext:
+            # APP LEVEL: App runs as non-root
+            runAsUser: 10001
+            runAsGroup: 10001
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
           volumeMounts:
             - name: config-writable
               mountPath: /app/config
             - name: logs
               mountPath: /app/config/logs
-          securityContext:
-            capabilities:
-              drop: ["ALL"]
-            readOnlyRootFilesystem: true # Hardened: app only writes to mounted volumes
-            runAsNonRoot: true
-            runAsUser: 10001
-            runAsGroup: 10001
 
       volumes:
-        # 3. DEFINE VOLUMES
         - name: config-source
           configMap:
             name: {{ .Release.Name }}
