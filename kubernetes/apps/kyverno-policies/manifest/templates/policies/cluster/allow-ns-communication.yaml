@@ -15,7 +15,7 @@ spec:
         apiVersion: cilium.io/v2
         kind: CiliumNetworkPolicy
         name: allow-same-namespace
-        namespace: "{{request.object.metadata.name}}"
+        namespace: "{{`{{request.object.metadata.name}}`}}"
         synchronize: true
         data:
           spec:
@@ -24,30 +24,16 @@ spec:
               - fromEndpoints:
                   - {}
             egress:
-              # Same-namespace egress
               - toEndpoints:
                   - {}
-
-              # Hardened DNS access
               - toEndpoints:
                   - matchLabels:
                       "k8s:io.kubernetes.pod.namespace": kube-system
-                      "k8s:k8s-app": kube-dns
-                  - matchLabels:
-                      "k8s:io.kubernetes.pod.namespace": kube-system
-                      "k8s:k8s-app": coredns
+                      "k8s-app": kube-dns
                 toPorts:
                   - ports:
                       - port: "53"
-                        protocol: UDP
+                        protocol: ANY
                     rules:
                       dns:
-                        - matchPattern: "*.svc.cluster.local"
-                        - matchPattern: "*.cluster.local"
-                  - ports:
-                      - port: "53"
-                        protocol: TCP
-                    rules:
-                      dns:
-                        - matchPattern: "*.svc.cluster.local"
-                        - matchPattern: "*.cluster.local"
+                        - matchPattern: "*"
