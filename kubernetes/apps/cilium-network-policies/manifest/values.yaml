@@ -26,9 +26,11 @@ yk:
           - key: io.kubernetes.pod.namespace
             operator: Exists
       ingress:
-        - fromEndpoints: {}
+        - fromEndpoints:
+          - {}
       egress:
-        - toEndpoints: {}
+        - toEndpoints:
+          - {}
         - toEndpoints:
             - matchLabels:
                 "k8s:io.kubernetes.pod.namespace": kube-system
