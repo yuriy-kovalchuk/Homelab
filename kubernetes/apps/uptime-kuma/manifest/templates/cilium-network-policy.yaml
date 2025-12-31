@@ -1,30 +1,25 @@
-apiVersion: "cilium.io/v2"
+{{- range .Values.yk.ciliumNetworkPolicies }}
+apiVersion: cilium.io/v2
+{{ if eq (default "cluster" .type) "namespaced" }}
 kind: CiliumNetworkPolicy
+{{ else }}
+kind: CiliumClusterwideNetworkPolicy
+{{- end }}
 metadata:
-  name: "kuma-network-policy"
-  namespace: {{ .Release.Namespace }}
+  name: cilium-network-policy-{{ .policyName }}
+  {{- if eq (default "cluster" .type) "namespaced" }}
+  namespace: {{ $.Release.Namespace }}
+  {{- end }}
 spec:
   endpointSelector:
-    matchLabels:
-      app: uptime-kuma # Or use {} to allow Gateway to all pods in this NS
-  egress:
-    # Allow communication to the Envoy Gateway Proxies
-    - toEndpoints:
-        - matchLabels:
-            gateway.envoyproxy.io/owning-gateway-name: main-gateway
-            io.kubernetes.pod.namespace: envoy-gateway-system
-      authentication:
-        mode: "required" # This triggers the SPIRE mTLS check
+{{ toYaml .endpointSelector | nindent 4 }}
+  {{- if .ingress }}
   ingress:
-    - fromEndpoints:
-        - matchLabels:
-            # Matches the Envoy proxy pods in your gateway namespace
-            gateway.envoyproxy.io/owning-gateway-name: main-gateway
-            gateway.envoyproxy.io/owning-gateway-namespace: envoy-gateway-system
-            io.kubernetes.pod.namespace: envoy-gateway-system
-      authentication:
-        mode: "required" # This triggers the SPIRE mTLS check
-      toPorts:
-        - ports:
-            - port: "3001"
-              protocol: TCP
+{{ toYaml .ingress | nindent 4 }}
+  {{- end }}
+  {{- if .egress }}
+  egress:
+{{ toYaml .egress | nindent 4 }}
+  {{- end }}
+---
+{{- end }}

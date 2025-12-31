@@ -12,6 +12,3 @@ yk:
       backend:
         name: whoami
         port: 80
-
-#  ciliumNetworkPolicies:
-#    - policyName:

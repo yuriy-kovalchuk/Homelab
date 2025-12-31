@@ -1,0 +1,30 @@
+yk:
+  ciliumNetworkPolicies:
+    - policyName: default-deny-all
+      type: cluster
+      endpointSelector:
+        matchLabels:
+          app: uptime-kuma
+      egress:
+        - toEndpoints:
+            - matchLabels:
+                gateway.envoyproxy.io/owning-gateway-name: main-gateway
+                io.kubernetes.pod.namespace: envoy-gateway-system
+          authentication:
+            mode: "required"
+
+  httpRoutes:
+    - name: kuma
+      parentRefs:
+        - name: main-gateway
+          namespace: envoy-gateway-system
+      securityPolicy: true
+      hostnames:
+        - "kuma.yuriy-lab.cloud"
+        - "uptime.yuriy-lab.cloud"
+      path:
+        type: PathPrefix
+        value: /
+      backend:
+        name: uptime-kuma
+        port: 3001
