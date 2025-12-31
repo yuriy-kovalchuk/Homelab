@@ -1,0 +1,53 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: inject-cilium-namespace-only-policy
+spec:
+  generateExisting: true
+  background: true
+  rules:
+    - name: generate-allow-same-namespace-with-hardened-dns
+      match:
+        resources:
+          kinds:
+            - Namespace
+      generate:
+        apiVersion: cilium.io/v2
+        kind: CiliumNetworkPolicy
+        name: allow-same-namespace
+        namespace: "{{request.object.metadata.name}}"
+        synchronize: true
+        data:
+          spec:
+            endpointSelector: {}
+            ingress:
+              - fromEndpoints:
+                  - {}
+            egress:
+              # Same-namespace egress
+              - toEndpoints:
+                  - {}
+
+              # Hardened DNS access
+              - toEndpoints:
+                  - matchLabels:
+                      "k8s:io.kubernetes.pod.namespace": kube-system
+                      "k8s:k8s-app": kube-dns
+                  - matchLabels:
+                      "k8s:io.kubernetes.pod.namespace": kube-system
+                      "k8s:k8s-app": coredns
+                toPorts:
+                  - ports:
+                      - port: "53"
+                        protocol: UDP
+                    rules:
+                      dns:
+                        - matchPattern: "*.svc.cluster.local"
+                        - matchPattern: "*.cluster.local"
+                  - ports:
+                      - port: "53"
+                        protocol: TCP
+                    rules:
+                      dns:
+                        - matchPattern: "*.svc.cluster.local"
+                        - matchPattern: "*.cluster.local"
