@@ -22,11 +22,15 @@ spec:
           spec:
             endpointSelector: {}
             ingress:
-              - fromEndpoints:
+              - authentication:
+                  mode: "required"
+                fromEndpoints:
                   - {}
             egress:
               - toEndpoints:
                   - {}
+                authentication:
+                  mode: "required"
               - toEndpoints:
                   - matchLabels:
                       "k8s:io.kubernetes.pod.namespace": kube-system
