@@ -1,6 +1,6 @@
 yk:
   ciliumNetworkPolicies:
-    - policyName: default-deny-all
+    - policyName: egress-to-envoy-gw
       type: namespaced
       endpointSelector:
         matchLabels:
