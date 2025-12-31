@@ -1,3 +1,18 @@
+yk:
+  ciliumNetworkPolicies:
+    - policyName: allow-egress-to-kube-api-server
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/name: trivy-operator-polr-adapter
+      egress:
+        - toEntities:
+            - kube-apiserver
+          toPorts:
+            - ports:
+                - port: "6443"
+                  protocol: TCP
+
 trivy-operator-polr-adapter:
 
   resources:
