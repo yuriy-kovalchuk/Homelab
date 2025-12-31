@@ -4,7 +4,7 @@ yk:
       type: namespaced
       endpointSelector:
         matchLabels:
-          app.kubernetes.io/name: trivy-operator
+          app.kubernetes.io/name: trivy-operator-polr-adapter
       egress:
         - toEntities:
             - kube-apiserver
