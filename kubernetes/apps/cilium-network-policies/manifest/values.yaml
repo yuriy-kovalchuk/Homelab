@@ -47,7 +47,7 @@ yk:
                 http:
                   - {}
 
-    - policyName: alloy-metrics-collection
+    - policyName: alloy-ingress-metrics-collection
       type: cluster
       endpointSelector:
         {}
@@ -59,6 +59,19 @@ yk:
                 io.kubernetes.pod.namespace: k8s-monitoring
           authentication:
             mode: "required"
+
+    - policyName: alloy-egress-metrics-collection
+      type: cluster
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/instance: k8s-monitoring-alloy-metrics
+          app.kubernetes.io/name: alloy-metrics
+      egress:
+        - toEndpoints:
+            {}
+          authentication:
+            mode: "required"
+
 
     - policyName: allow-health-checks
       type: cluster
