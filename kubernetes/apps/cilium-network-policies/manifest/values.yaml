@@ -16,7 +16,6 @@ yk:
       - grafana
       - harbor
       - headlamp
-      - local-path-storage
 
   ciliumNetworkPolicies:
     - policyName: default-deny-all
