@@ -7,6 +7,7 @@ spec:
   background: true
   rules:
     - name: generate-allow-same-namespace-with-hardened-dns
+      skipBackgroundRequests: true
       match:
         resources:
           kinds:
