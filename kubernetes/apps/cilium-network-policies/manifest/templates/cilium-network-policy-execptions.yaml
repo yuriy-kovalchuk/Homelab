@@ -1,0 +1,19 @@
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: cilium-network-policy-execptions
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: io.kubernetes.pod.namespace
+        operator: NotIn
+        values:
+        {{- range .Values.yk.ciliumNetwork.excludedNamespaces }}
+            - {{ . | quote }}
+        {{- end }}
+  ingress:
+    - fromEntities:
+        - all # Allows pods, nodes, and external traffic (Internet)
+  egress:
+    - toEntities:
+        - all # Allows access to Internet, Nodes, and Kube-API

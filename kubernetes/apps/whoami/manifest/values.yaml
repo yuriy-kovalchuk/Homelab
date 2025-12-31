@@ -1,0 +1,17 @@
+yk:
+  httpRoutes:
+    - parentRefs:
+        - name: main-gateway
+          namespace: envoy-gateway-system
+      name: whoami
+      hostnames:
+        - "whoami.yuriy-lab.cloud"
+      path:
+        type: PathPrefix
+        value: /
+      backend:
+        name: whoami
+        port: 80
+
+#  ciliumNetworkPolicies:
+#    - policyName:
