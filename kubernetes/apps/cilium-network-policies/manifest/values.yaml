@@ -21,10 +21,7 @@ yk:
   ciliumNetworkPolicies:
     - policyName: same-ns-communication
       type: cluster
-      endpointSelector:
-        matchExpressions:
-          - key: io.kubernetes.pod.namespace
-            operator: Exists
+      endpointSelector: {}
       ingress:
         - fromEndpoints:
           - {}
