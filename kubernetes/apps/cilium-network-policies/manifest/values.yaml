@@ -60,3 +60,12 @@ yk:
           authentication:
             mode: "required"
 
+    - policyName: allow-health-checks
+      type: cluster
+      endpointSelector:
+        {}
+      ingress:
+        - fromEntities:
+            - host
+            - remote-node
+
