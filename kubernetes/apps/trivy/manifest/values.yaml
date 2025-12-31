@@ -22,8 +22,6 @@ yk:
       egress:
         - toFQDNs:
             - matchPattern: "*"
-            #- matchName: "github.com"
-            #- matchPattern: "*.githubusercontent.com"
           toPorts:
             - ports:
                 - port: "443"
