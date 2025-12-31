@@ -8,6 +8,8 @@ yk:
       egress:
         - toEntities:
             - kube-apiserver
+            - remote-node
+            - host
           toPorts:
             - ports:
                 - port: "6443"
