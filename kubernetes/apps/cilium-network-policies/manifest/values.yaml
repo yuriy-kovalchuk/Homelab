@@ -22,8 +22,10 @@ yk:
     - policyName: default-deny-all
       type: cluster
       endpointSelector: {}
-      ingress: []
-      egress: []
+      ingress:
+        - {}
+      egress:
+        - {}
 
 #    - policyName: envoy-gw-communication
 #      type: cluster
