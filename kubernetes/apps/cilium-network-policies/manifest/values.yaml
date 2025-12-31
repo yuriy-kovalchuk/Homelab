@@ -68,7 +68,7 @@ yk:
           app.kubernetes.io/name: alloy-metrics
       egress:
         - toEndpoints:
-            {}
+            - {}
           authentication:
             mode: "required"
 
