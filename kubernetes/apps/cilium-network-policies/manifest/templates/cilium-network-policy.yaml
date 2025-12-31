@@ -13,13 +13,7 @@ metadata:
 spec:
   endpointSelector:
 {{ toYaml .endpointSelector | nindent 4 }}
-  {{- if .ingress }}
-  ingress:
-{{ toYaml .ingress | nindent 4 }}
-  {{- end }}
-  {{- if .egress }}
-  egress:
-{{ toYaml .egress | nindent 4 }}
-  {{- end }}
+  ingress: {{ if .ingress }}{{ toYaml .ingress | nindent 4 }}{{ else }}[]{{ end }}
+  egress: {{ if .egress }}{{ toYaml .egress | nindent 4 }}{{ else }}[]{{ end }}
 ---
 {{- end }}

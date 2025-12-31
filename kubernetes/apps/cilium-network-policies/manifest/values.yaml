@@ -19,26 +19,11 @@ yk:
       - local-path-storage
 
   ciliumNetworkPolicies:
-    - policyName: same-ns-communication
+    - policyName: default-deny-all
       type: cluster
       endpointSelector: {}
-      ingress:
-        - fromEndpoints:
-          - {}
-      egress:
-        - toEndpoints:
-          - {}
-        - toEndpoints:
-            - matchLabels:
-                "k8s:io.kubernetes.pod.namespace": kube-system
-                "k8s:k8s-app": kube-dns
-          toPorts:
-            - ports:
-                - port: "53"
-                  protocol: ANY
-              rules:
-                dns:
-                  - matchPattern: "*"
+      ingress: []
+      egress: []
 
 #    - policyName: envoy-gw-communication
 #      type: cluster
