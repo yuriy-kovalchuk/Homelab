@@ -27,29 +27,29 @@ yk:
       egress:
         - {}
 
-#    - policyName: envoy-gw-communication
-#      type: cluster
-#      endpointSelector:
-#        {}
-#      ingress:
-#        - fromEndpoints:
-#            - matchLabels:
-#                gateway.envoyproxy.io/owning-gateway-name: main-gateway
-#                gateway.envoyproxy.io/owning-gateway-namespace: envoy-gateway-system
-#                io.kubernetes.pod.namespace: envoy-gateway-system
-#          authentication:
-#            mode: "required"
-#
-#    - policyName: alloy-metrics-collection
-#      type: cluster
-#      endpointSelector:
-#        {}
-#      ingress:
-#        - fromEndpoints:
-#            - matchLabels:
-#                app.kubernetes.io/instance: k8s-monitoring-alloy-metrics
-#                app.kubernetes.io/name: alloy-metrics
-#                io.kubernetes.pod.namespace: k8s-monitoring
-#          authentication:
-#            mode: "required"
+    - policyName: envoy-gw-communication
+      type: cluster
+      endpointSelector:
+        {}
+      ingress:
+        - fromEndpoints:
+            - matchLabels:
+                gateway.envoyproxy.io/owning-gateway-name: main-gateway
+                gateway.envoyproxy.io/owning-gateway-namespace: envoy-gateway-system
+                io.kubernetes.pod.namespace: envoy-gateway-system
+          authentication:
+            mode: "required"
+
+    - policyName: alloy-metrics-collection
+      type: cluster
+      endpointSelector:
+        {}
+      ingress:
+        - fromEndpoints:
+            - matchLabels:
+                app.kubernetes.io/instance: k8s-monitoring-alloy-metrics
+                app.kubernetes.io/name: alloy-metrics
+                io.kubernetes.pod.namespace: k8s-monitoring
+          authentication:
+            mode: "required"
 
