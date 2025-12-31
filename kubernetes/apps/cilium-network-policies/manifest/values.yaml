@@ -39,13 +39,6 @@ yk:
                 io.kubernetes.pod.namespace: envoy-gateway-system
           authentication:
             mode: "required"
-          toPorts:
-            - ports:
-                - port: "0"   # matches any port
-                  protocol: TCP
-              rules:
-                http:
-                  - {}
 
     - policyName: alloy-ingress-metrics-collection
       type: cluster
