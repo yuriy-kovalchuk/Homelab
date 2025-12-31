@@ -1,7 +1,7 @@
 yk:
   ciliumNetworkPolicies:
     - policyName: default-deny-all
-      type: cluster
+      type: namespaced
       endpointSelector:
         matchLabels:
           app: uptime-kuma
