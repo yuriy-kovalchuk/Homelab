@@ -6,7 +6,7 @@ spec:
   endpointSelector:
     matchExpressions:
       - key: io.kubernetes.pod.namespace
-        operator: NotIn
+        operator: In
         values:
         {{- range .Values.yk.ciliumNetwork.excludedNamespaces }}
             - {{ . | quote }}
