@@ -62,6 +62,21 @@ yk:
                 - port: "8080"
                   protocol: "TCP"
 
+    - policyName: ingress-from-logs
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/component: gateway
+          app.kubernetes.io/instance: loki
+      ingress:
+        - fromEndpoints:
+            - matchLabels:
+                app.kubernetes.io/name: alloy-logs
+                app.kubernetes.io/instance: k8s-monitoring-alloy-logs
+                io.kubernetes.pod.namespace: k8s-monitoring
+          authentication:
+            mode: "required"
+
 
 loki:
 
