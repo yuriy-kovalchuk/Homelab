@@ -12,6 +12,20 @@ yk:
       name: longhorn-frontend
       port: 80
 
+      
+  ciliumNetworkPolicies:
+    - policyName: egress-longhorn-to-host
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/instance: longhorn
+      egress:
+        - toEntities:
+          - host
+          - remote-node
+
+
+      
 longhorn:
 
   metrics:
