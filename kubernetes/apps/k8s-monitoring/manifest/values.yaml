@@ -9,6 +9,20 @@ yk:
             - host
             - remote-node
 
+    - policyName: allow-egress-to-loki
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/instance: k8s-monitoring-alloy-logs
+          app.kubernetes.io/name: alloy-logs
+      egress:
+        - toEndpoints:
+            - matchLabels:
+                app.kubernetes.io/instance: loki
+                app.kubernetes.io/component: gateway
+                io.kubernetes.pod.namespace: loki
+
+
   httpRoutes:
     - parentRefs:
         - name: main-gateway
