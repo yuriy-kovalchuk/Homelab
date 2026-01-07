@@ -14,17 +14,45 @@ yk:
 
       
   ciliumNetworkPolicies:
-    - policyName: egress-longhorn-to-host
+    - policyName: egress-csi-resizer-to-host
       type: namespaced
       endpointSelector:
         matchLabels:
-          app.kubernetes.io/instance: longhorn
+          app: csi-resizer
       egress:
         - toEntities:
           - host
           - remote-node
 
+    - policyName: egress-csi-attacher-to-host
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app: csi-attacher
+      egress:
+        - toEntities:
+          - host
+          - remote-node
 
+    - policyName: egress-csi-provisioner-to-host
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app: csi-provisioner
+      egress:
+        - toEntities:
+          - host
+          - remote-node
+
+    - policyName: egress-csi-snapshotter-to-host
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app: csi-snapshotter
+      egress:
+        - toEntities:
+          - host
+          - remote-node
       
 longhorn:
 
