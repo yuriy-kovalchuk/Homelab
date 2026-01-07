@@ -1,3 +1,68 @@
+yk:
+
+  ciliumNetworkPolicies:
+    - policyName: egress-compactor-to-minio
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/component: compactor
+          app.kubernetes.io/instance: loki
+      egress:
+        - toEndpoints:
+            - matchLabels:
+                app: minio
+                io.kubernetes.pod.namespace: minio
+          authentication:
+            mode: "required"
+
+    - policyName: egress-index-gateway-to-minio
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/component: index-gateway
+          app.kubernetes.io/instance: loki
+      egress:
+        - toEndpoints:
+            - matchLabels:
+                app: minio
+                io.kubernetes.pod.namespace: minio
+          authentication:
+            mode: "required"
+
+    - policyName: egress-ingester-to-minio
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/component: ingester
+          app.kubernetes.io/instance: loki
+      egress:
+        - toEndpoints:
+            - matchLabels:
+                app: minio
+                io.kubernetes.pod.namespace: minio
+          authentication:
+            mode: "required"
+
+    - policyName: ingress-from-grafana
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/component: gateway
+          app.kubernetes.io/instance: loki
+      ingress:
+        - fromEndpoints:
+            - matchLabels:
+                app.kubernetes.io/name: grafana
+                app.kubernetes.io/instance: grafana
+                io.kubernetes.pod.namespace: grafana
+          authentication:
+            mode: "required"
+          toPorts:
+            - ports:
+                - port: "8080"
+                  protocol: "TCP"
+
+
 loki:
 
   global:
