@@ -52,7 +52,24 @@ yk:
                 io.kubernetes.pod.namespace: minio
           authentication:
             mode: "required"
-
+    - policyName: ingress-query-frontend-from-grafana
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/component: query-frontend
+          app.kubernetes.io/instance: mimir
+      ingress:
+        - fromEndpoints:
+          - matchLabels:
+                app.kubernetes.io/name: grafana
+                app.kubernetes.io/instance: grafana
+                io.kubernetes.pod.namespace: grafana
+          authentication:
+            mode: "required"
+          toPorts:
+            - ports:
+                - port: "8080"
+                  protocol: TCP
 
 
 
