@@ -144,7 +144,7 @@ minio:
 
 
   persistence:
-    size: 20Gi
+    size: 50Gi
 
   resources:
     requests:
