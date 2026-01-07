@@ -13,6 +13,20 @@ yk:
                 io.kubernetes.pod.namespace: minio
           authentication:
             mode: "required"
+    - policyName: egress-ingester-to-minio
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/component: ingester
+          app.kubernetes.io/instance: mimir
+      egress:
+        - toEndpoints:
+            - matchLabels:
+                app: minio
+                io.kubernetes.pod.namespace: minio
+          authentication:
+            mode: "required"
+
 
 
 
