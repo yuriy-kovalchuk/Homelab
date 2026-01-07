@@ -1,4 +1,14 @@
 yk:
+  ciliumNetworkPolicies:
+    - policyName: allow-egress-to-kube-api-server
+      type: namespaced
+      endpointSelector:
+        {}
+      egress:
+        - toEntities:
+            - host
+            - remote-node
+
   httpRoutes:
     - parentRefs:
         - name: main-gateway
