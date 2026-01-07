@@ -1,3 +1,15 @@
+yk:
+  ciliumNetworkPolicies:
+    - policyName: egress-metrics-server-to-host
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/instance: metrics-server
+      egress:
+        - toEntities:
+          - host
+          - remote-node
+
 metrics-server:
 
   defaultArgs:
