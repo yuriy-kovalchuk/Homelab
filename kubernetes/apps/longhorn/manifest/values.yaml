@@ -54,6 +54,16 @@ yk:
           - host
           - remote-node
       
+    - policyName: egress-longhorn-to-host
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/instance: longhorn
+      egress:
+        - toEntities:
+          - host
+          - remote-node
+      
 longhorn:
 
   metrics:
