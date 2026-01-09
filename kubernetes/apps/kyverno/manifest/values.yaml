@@ -11,10 +11,8 @@ yk:
               - port: "6443"
                 protocol: TCP
 
-
-
 kyverno:
-  admissionController
+  admissionController:
     replicas: 3
     serviceMonitor:
       enabled: true
