@@ -48,7 +48,7 @@ yk:
 
     - policyName: egress-reporter-trivy-plugin-to-github
       type: namespaced
-      enpointSelector:
+      endpointSelector:
         matchLabels:
           app.kubernetes.io/name: policy-reporter-trivy-plugin
       egress:
