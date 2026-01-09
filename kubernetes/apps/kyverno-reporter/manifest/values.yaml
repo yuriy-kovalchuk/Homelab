@@ -27,7 +27,19 @@ yk:
                 - port: "6443"
                   protocol: TCP
     
-    - policyName: egress-u
+    - policyName: policy-reporter-kyverno-plugin-to-api-server
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/name: policy-reporter-kyverno-plugin
+      egress:
+        - toEntities:
+            - kube-apiserver
+          toPorts:
+            - ports:
+                - port: "6443"
+                  protocol: TCP
+    - policyName: egress-ui-to-reporter
       type: namespaced
       endpointSelector:
         matchLabels:
