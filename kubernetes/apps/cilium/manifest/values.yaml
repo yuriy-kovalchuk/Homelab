@@ -83,6 +83,8 @@ cilium:
           #            agent:
           #              socket_path: /run/spire/sockets/spire-agent.sock
           server:
+            dataStorage:
+              enabled: false
             #          initContainers:
             #            - command:
             #                - /bin/sh
