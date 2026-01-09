@@ -57,6 +57,12 @@ yk:
               rules:
                 http:
                   - {}
+        - toEntities:
+            - kube-apiserver
+          toPorts:
+            - ports:
+                - port: "6443"
+                  protocol: TCP
 
     - policyName: egress-reporter-trivy-plugin-to-github
       type: namespaced
