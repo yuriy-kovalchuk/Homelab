@@ -83,8 +83,6 @@ cilium:
           #            agent:
           #              socket_path: /run/spire/sockets/spire-agent.sock
           server:
-            dataStorage:
-              enabled: false
             #          initContainers:
             #            - command:
             #                - /bin/sh
@@ -107,7 +105,7 @@ cilium:
               runAsGroup: 0
               runAsUser: 0
             dataStorage:
-              enabled: true
+              enabled: false
               size: 1Gi
               accessMode: ReadWriteOnce
               storageClass: longhorn
