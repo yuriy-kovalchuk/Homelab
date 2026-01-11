@@ -1,5 +1,5 @@
 yk:
-  ciliumNetworkPolcies:
+  ciliumNetworkPolicies:
     - policyName: egress-dns-sycn-to-opnsense
       type: namespaced
       endpointSelector:
