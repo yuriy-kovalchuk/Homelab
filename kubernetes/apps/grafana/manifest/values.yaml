@@ -13,6 +13,20 @@ yk:
         name: grafana
         port: 80
 
+  ciliumNetworkPolicies:
+    - policyName: egress-to-query-frontend
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/name: grafana
+      egress:
+        - toEndpoints:
+            - matchLabels:
+                app.kubernetes.io/component: query-frontend
+                io.kubernetes.pod.namespace: mimir
+          authentication:
+            mode: "required"
+
 grafana:
 
   serviceMonitor:
