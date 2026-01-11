@@ -101,10 +101,10 @@ k8s-monitoring:
       enabled: true
 
     kubeDNS:
-      enabled: false
+      enabled: true
 
     kubeScheduler:
-      enabled: false
+      enabled: true
 
     windows-exporter:
       enabled: false
