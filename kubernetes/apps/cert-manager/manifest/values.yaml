@@ -1,3 +1,32 @@
+yk:
+  ciliumNetworkPolicies:
+    - policyName: egress-ext-secret-to-vault
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/instance: cert-manager
+      egress:
+        - toFQDNs:
+            - matchName: "vault.yuriy-lab.cloud"
+          toPorts:
+            - ports:
+                - port: "443"
+                  protocol: "TCP"
+
+    - policyName: allow-egress-to-kube-api-server
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/instance: cert-manager
+      egress:
+        - toEntities:
+            - kube-apiserver
+            - remote-node
+            - host
+          toPorts:
+            - ports:
+                - port: "6443"
+                  protocol: TCP
+
 cert-manager:
   installCRDs: true
   global:
