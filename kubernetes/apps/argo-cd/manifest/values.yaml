@@ -25,7 +25,7 @@ yk:
           app.kubernetes.io/component: dex-server
       egress:
         - toEndpoints:
-            - matchlabels:
+            - matchLabels:
                 gateway.envoyproxy.io/owning-gateway-name: main-gateway
                 io.kubernetes.pod.namespace: envoy-gateway-system
           authentication:
