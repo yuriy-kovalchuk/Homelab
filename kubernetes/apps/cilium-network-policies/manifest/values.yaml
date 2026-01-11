@@ -4,7 +4,6 @@ yk:
       - kube-system
       - argo-cd
       - authentik
-      - cert-manager
       - cilium-spire
       - envoy-gateway-system
       - harbor
