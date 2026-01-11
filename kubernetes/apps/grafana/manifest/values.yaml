@@ -40,6 +40,18 @@ yk:
           authentication:
             mode: "required"
 
+    - policyName: egress-to-oidc
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/name: grafana
+      egress:
+        - toEndpoints:
+            - matchLabels:
+                gateway.envoyproxy.io/owning-gateway-name: main-gateway
+                io.kubernetes.pod.namespace: envoy-gateway-system
+          authentication:
+            mode: "required"
 
 grafana:
 
