@@ -24,6 +24,8 @@ yk:
             - ports:
                 - port: "53"
                   protocol: "TCP"
+                - port: "53"
+                  protocol: "UDP"
 
     - policyName: allow-egress-to-kube-api-server
       endpointSelector:
