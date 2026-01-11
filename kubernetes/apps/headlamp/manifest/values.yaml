@@ -12,6 +12,18 @@ yk:
       name: headlamp
       port: 80
 
+  ciliumNetworkPolicies:
+    - policyName: allow-egress-to-host
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/instance: headlamp
+      egress:
+        - toEntities:
+            - host
+            - remote-node
+
+      
 headlamp:
 
   replicaCount: 2
