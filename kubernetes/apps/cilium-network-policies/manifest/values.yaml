@@ -15,7 +15,6 @@ yk:
       - external-secrets
       - grafana
       - harbor
-      - headlamp
 
   ciliumNetworkPolicies:
     - policyName: default-deny-all
