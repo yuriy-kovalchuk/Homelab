@@ -1,13 +1,13 @@
 {{- range .Values.yk.ciliumNetworkPolicies }}
 apiVersion: cilium.io/v2
-{{ if eq (default "cluster" .type) "namespaced" }}
-kind: CiliumNetworkPolicy
-{{ else }}
+{{- if eq .type "cluster" }}
 kind: CiliumClusterwideNetworkPolicy
+{{- else }}
+kind: CiliumNetworkPolicy
 {{- end }}
 metadata:
   name: cilium-network-policy-{{ .policyName }}
-  {{- if eq (default "cluster" .type) "namespaced" }}
+  {{- if ne .type "cluster" }}
   namespace: {{ $.Release.Namespace }}
   {{- end }}
 spec:
@@ -23,3 +23,4 @@ spec:
   {{- end }}
 ---
 {{- end }}
+

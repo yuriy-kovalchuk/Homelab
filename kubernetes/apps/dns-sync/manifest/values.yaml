@@ -13,6 +13,21 @@ yk:
                 - port: "443"
                   protocol: "TCP"
 
+
+    - policyName: allow-egress-to-kube-api-server
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/name: dns-sync
+      egress:
+        - toEntities:
+            - kube-apiserver
+            - remote-node
+            - host
+          toPorts:
+            - ports:
+                - port: "6443"
+                  protocol: TCP
+
 namespace:
   create: true
   name: "dns-sync"
