@@ -62,6 +62,7 @@ yk:
         - toFQDNs:
             - matchName: "grafana.com"
             - matchName: "secure.gravatar.com"
+            - matchName: "storage.googleapis.com"
           toPorts:
             - ports:
                 - port: "443"
