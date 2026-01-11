@@ -85,6 +85,20 @@ yk:
           authentication:
             mode: "required"
     
+    - policyName: egress-query-frontend-to-minio
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/component: query-frontend
+          app.kubernetes.io/instance: loki
+      egress:
+        - toEndpoints:
+            - matchLabels:
+                app: minio
+                io.kubernetes.pod.namespace: minio
+          authentication:
+            mode: "required"
+    
     - policyName: ingress-from-grafana
       type: namespaced
       endpointSelector:
