@@ -15,11 +15,12 @@ yk:
               limits:
                 cpu: 100m
                 memory: 512Mi
+
       listeners:
-        - name: https
+        - name: https-grafana
           protocol: HTTPS
           port: 443
-          hostname: "*.yuriy-lab.cloud"
+          hostname: "grafana.yuriy-lab.cloud"
           allowedRoutes:
             namespaces:
               from: All
@@ -28,7 +29,36 @@ yk:
             certificateRefs:
               - kind: Secret
                 group: ""
-                name: main-gw-tls-cert
+                name: grafana-gw-tls-cert
+
+        - name: https-kuma
+          protocol: HTTPS
+          port: 443
+          hostname: "kuma.yuriy-lab.cloud"
+          allowedRoutes:
+            namespaces:
+              from: All
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - kind: Secret
+                group: ""
+                name: kuma-gw-tls-cert
+
+        - name: https-uptime
+          protocol: HTTPS
+          port: 443
+          hostname: "uptime.yuriy-lab.cloud"
+          allowedRoutes:
+            namespaces:
+              from: All
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - kind: Secret
+                group: ""
+                name: uptime-gw-tls-cert
+
         - name: https-whoami
           protocol: HTTPS
           port: 443
@@ -42,6 +72,174 @@ yk:
               - kind: Secret
                 group: ""
                 name: whoami-gw-tls-cert
+
+        - name: https-hubble
+          protocol: HTTPS
+          port: 443
+          hostname: "hubble.yuriy-lab.cloud"
+          allowedRoutes:
+            namespaces:
+              from: All
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - kind: Secret
+                group: ""
+                name: hubble-gw-tls-cert
+
+        - name: https-alloy
+          protocol: HTTPS
+          port: 443
+          hostname: "alloy.yuriy-lab.cloud"
+          allowedRoutes:
+            namespaces:
+              from: All
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - kind: Secret
+                group: ""
+                name: alloy-gw-tls-cert
+
+        - name: https-httpbin
+          protocol: HTTPS
+          port: 443
+          hostname: "httpbin.yuriy-lab.cloud"
+          allowedRoutes:
+            namespaces:
+              from: All
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - kind: Secret
+                group: ""
+                name: httpbin-gw-tls-cert
+
+        - name: https-authentik
+          protocol: HTTPS
+          port: 443
+          hostname: "authentik.yuriy-lab.cloud"
+          allowedRoutes:
+            namespaces:
+              from: All
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - kind: Secret
+                group: ""
+                name: authentik-gw-tls-cert
+
+        - name: https-harbor
+          protocol: HTTPS
+          port: 443
+          hostname: "harbor.yuriy-lab.cloud"
+          allowedRoutes:
+            namespaces:
+              from: All
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - kind: Secret
+                group: ""
+                name: harbor-gw-tls-cert
+
+        - name: https-argocd
+          protocol: HTTPS
+          port: 443
+          hostname: "argocd.yuriy-lab.cloud"
+          allowedRoutes:
+            namespaces:
+              from: All
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - kind: Secret
+                group: ""
+                name: argocd-gw-tls-cert
+
+        - name: https-minio
+          protocol: HTTPS
+          port: 443
+          hostname: "minio.yuriy-lab.cloud"
+          allowedRoutes:
+            namespaces:
+              from: All
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - kind: Secret
+                group: ""
+                name: minio-gw-tls-cert
+
+        - name: https-kyverno-reporter
+          protocol: HTTPS
+          port: 443
+          hostname: "kyverno-reporter.yuriy-lab.cloud"
+          allowedRoutes:
+            namespaces:
+              from: All
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - kind: Secret
+                group: ""
+                name: kyverno-reporter-gw-tls-cert
+
+        - name: https-longhorn
+          protocol: HTTPS
+          port: 443
+          hostname: "longhorn.yuriy-lab.cloud"
+          allowedRoutes:
+            namespaces:
+              from: All
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - kind: Secret
+                group: ""
+                name: longhorn-gw-tls-cert
+
+        - name: https-headlamp
+          protocol: HTTPS
+          port: 443
+          hostname: "headlamp.yuriy-lab.cloud"
+          allowedRoutes:
+            namespaces:
+              from: All
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - kind: Secret
+                group: ""
+                name: headlamp-gw-tls-cert
+
+        - name: https-homepage
+          protocol: HTTPS
+          port: 443
+          hostname: "homepage.yuriy-lab.cloud"
+          allowedRoutes:
+            namespaces:
+              from: All
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - kind: Secret
+                group: ""
+                name: homepage-gw-tls-cert
+
+        - name: https-home
+          protocol: HTTPS
+          port: 443
+          hostname: "home.yuriy-lab.cloud"
+          allowedRoutes:
+            namespaces:
+              from: All
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - kind: Secret
+                group: ""
+                name: home-gw-tls-cert
 
 
 gateway-helm:
