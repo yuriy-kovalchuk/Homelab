@@ -18,7 +18,7 @@ yk:
         - toCIDR:
             - "0.0.0.0/0"
 
-    - policyname: egress-to-oidc
+    - policyName: egress-to-oidc
       type: namespaced
       endpointSelector:
         matchLabels:
