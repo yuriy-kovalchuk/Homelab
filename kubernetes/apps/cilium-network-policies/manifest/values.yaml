@@ -8,7 +8,6 @@ yk:
       - cilium-spire
       - cloudnative-pg
       - default
-      - dns-sync
       - envoy-gateway-system
       - harbor
 
