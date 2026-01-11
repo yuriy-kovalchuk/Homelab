@@ -7,7 +7,7 @@ yk:
           app.kubernetes.io/instance: cert-manager
       egress:
         - toFQDNs:
-            - matchName: "vault.yuriy-lab.cloud"
+            - matchName: "*.letsencrypt.org"
           toPorts:
             - ports:
                 - port: "443"
