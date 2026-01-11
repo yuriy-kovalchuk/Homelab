@@ -18,6 +18,18 @@ yk:
         - toCIDR:
             - "0.0.0.0/0"
 
+    - policyname: egress-to-oidc
+      type: namespaced
+      endpointselector:
+        matchlabels:
+          app.kubernetes.io/component: dex-server
+      egress:
+        - toendpoints:
+            - matchlabels:
+                gateway.envoyproxy.io/owning-gateway-name: main-gateway
+                io.kubernetes.pod.namespace: envoy-gateway-system
+          authentication:
+            mode: "required"
 argo-cd:
   global:
     domain: argocd.yuriy-lab.cloud
