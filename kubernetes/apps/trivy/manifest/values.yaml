@@ -39,6 +39,10 @@ trivy-operator:
     mode: ClientServer
     storageClassEnabled: true
     clientServerSkipUpdate: true
+    skipJavaDBUpdate: true
+    offlineScan: true             # Stops metadata/proxy pings
+    useBuiltinRegoPolicies: false # Disables OCI download of checks
+    useEmbeddedRegoPolicies: true # Uses local binary policies instead
 
     resources:
       requests:
