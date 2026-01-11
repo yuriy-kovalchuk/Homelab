@@ -7,7 +7,6 @@ yk:
       - cert-manager
       - cilium-spire
       - cloudnative-pg
-      - default
       - envoy-gateway-system
       - harbor
 
