@@ -2,6 +2,7 @@ yk:
   ciliumNetworkPolicies:
     - policyName: egress-to-host
       endpointSelector: {}
+      type: namespaced
       egress:
         - toEntities:
             - host
