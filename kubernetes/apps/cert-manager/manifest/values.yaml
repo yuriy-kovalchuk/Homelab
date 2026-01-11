@@ -12,6 +12,8 @@ yk:
             - matchName: "acme-staging-v02.api.letsencrypt.org"
             - matchName: "acme-staging.api.letsencrypt.org"
             - matchName: "api.cloudflare.com"
+            - matchName: "nelly.ns.cloudflare.com"
+            - matchName: "margo.ns.cloudflare.com"
           toPorts:
             - ports:
                 - port: "443"
