@@ -1,0 +1,26 @@
+{{- range .Values.yk.ciliumNetworkPolicies }}
+apiVersion: cilium.io/v2
+{{- if eq .type "cluster" }}
+kind: CiliumClusterwideNetworkPolicy
+{{- else }}
+kind: CiliumNetworkPolicy
+{{- end }}
+metadata:
+  name: cilium-network-policy-{{ .policyName }}
+  {{- if ne .type "cluster" }}
+  namespace: {{ $.Release.Namespace }}
+  {{- end }}
+spec:
+  endpointSelector:
+{{ toYaml .endpointSelector | nindent 4 }}
+  {{- if .ingress }}
+  ingress:
+{{ toYaml .ingress | nindent 4 }}
+  {{- end }}
+  {{- if .egress }}
+  egress:
+{{ toYaml .egress | nindent 4 }}
+  {{- end }}
+---
+{{- end }}
+

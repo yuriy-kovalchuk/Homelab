@@ -1,3 +1,18 @@
+yk:
+  ciliumNetworkPolicies:
+    - policyName: allow-egress-to-kube-api-server
+      endpointSelector: {}
+      egress:
+        - toEntities:
+            - kube-apiserver
+            - remote-node
+            - host
+          toPorts:
+            - ports:
+                - port: "6443"
+                  protocol: TCP
+
+
 argo-cd:
   global:
     domain: argocd.yuriy-lab.cloud
