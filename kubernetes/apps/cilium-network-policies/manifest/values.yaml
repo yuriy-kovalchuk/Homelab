@@ -10,7 +10,6 @@ yk:
       - default
       - dns-sync
       - envoy-gateway-system
-      - external-secrets
       - harbor
 
   ciliumNetworkPolicies:
