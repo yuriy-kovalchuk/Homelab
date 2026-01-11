@@ -31,6 +31,7 @@ yk:
 trivy-operator:
 
   operator:
+    builtInTrivyServer: true
     scanJobTimeout: 1h
     scanJobsConcurrentLimit: 5
     infraAssessmentScannerEnabled: false
@@ -39,6 +40,10 @@ trivy-operator:
     enabled: true
 
   trivy:
+    mode: ClientServer
+    storageClassEnabled: true
+    clientServerSkipUpdate: true
+
     resources:
       requests:
         cpu: 10m
@@ -55,7 +60,7 @@ trivy-operator:
         limits:
           cpu: 200m
           memory: 1Gi
-    storageSize: "1Gi"
+    storageSize: "5Gi"
     slow: false
     timeout: "3h"
     ignoreUnfixed: true
