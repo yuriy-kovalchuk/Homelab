@@ -4,7 +4,7 @@ yk:
       type: namespaced
       endpointSelector:
         matchLabels:
-          app.kubernetes.io/name: grafana
+          app.kubernetes.io/instance: external-secrets
       egress:
         - toFQDNs:
             - matchName: "vault.yuriy-lab.cloud"
