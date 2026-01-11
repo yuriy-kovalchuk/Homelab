@@ -1,3 +1,18 @@
+yk:
+  ciliumNetworkPolicies:
+    - policyName: egress-ext-secret-to-vault
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/name: grafana
+      egress:
+        - toFQDNs:
+            - matchName: "vault.yuriy-lab.cloud"
+          toPorts:
+            - ports:
+                - port: "443"
+                  protocol: "TCP"
+
 external-secrets:
   resources:
     requests:
