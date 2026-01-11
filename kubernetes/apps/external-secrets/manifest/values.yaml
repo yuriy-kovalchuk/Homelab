@@ -13,6 +13,17 @@ yk:
                 - port: "443"
                   protocol: "TCP"
 
+    - policyName: allow-egress-to-kube-api-server
+      endpointSelector: {}
+      egress:
+        - toEntities:
+            - kube-apiserver
+            - remote-node
+            - host
+          toPorts:
+            - ports:
+                - port: "6443"
+                  protocol: TCP
 external-secrets:
   resources:
     requests:
