@@ -6,14 +6,11 @@ yk:
       - authentik
       - cert-manager
       - cilium-spire
-      - clean-pods
       - cloudnative-pg
       - default
       - dns-sync
       - envoy-gateway-system
-      - eraser
       - external-secrets
-      - grafana
       - harbor
 
   ciliumNetworkPolicies:
