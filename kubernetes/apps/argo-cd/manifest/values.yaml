@@ -12,6 +12,11 @@ yk:
                 - port: "6443"
                   protocol: TCP
 
+    - policyName: allow-egress-to-world
+      endpointSelector: {}
+      egress:
+        - toCIDR:
+            - "0.0.0.0/0"
 
 argo-cd:
   global:
