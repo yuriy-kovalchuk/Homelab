@@ -12,11 +12,17 @@ yk:
             - matchName: "acme-staging-v02.api.letsencrypt.org"
             - matchName: "acme-staging.api.letsencrypt.org"
             - matchName: "api.cloudflare.com"
+          toPorts:
+            - ports:
+                - port: "443"
+                  protocol: "TCP"
+
+        - toFQDNs:
             - matchName: "nelly.ns.cloudflare.com"
             - matchName: "margo.ns.cloudflare.com"
           toPorts:
             - ports:
-                - port: "443"
+                - port: "53"
                   protocol: "TCP"
 
     - policyName: allow-egress-to-kube-api-server
