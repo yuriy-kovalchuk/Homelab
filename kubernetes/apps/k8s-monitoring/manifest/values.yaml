@@ -92,6 +92,7 @@ k8s-monitoring:
           - container_spec_memory_limit_bytes
           - machine_cpu_cores
           - container_cpu_cfs_throttled_seconds_total
+          - container_oom_events_total
     controlPlane:
       enabled: true
 
