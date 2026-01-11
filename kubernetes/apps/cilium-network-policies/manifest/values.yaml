@@ -6,7 +6,6 @@ yk:
       - authentik
       - cert-manager
       - cilium-spire
-      - cloudnative-pg
       - envoy-gateway-system
       - harbor
 
