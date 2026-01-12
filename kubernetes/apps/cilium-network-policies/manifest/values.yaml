@@ -2,7 +2,6 @@ yk:
   ciliumNetwork:
     excludedNamespaces:
       - kube-system
-      - authentik
       - cilium-spire
       - envoy-gateway-system
       - harbor
