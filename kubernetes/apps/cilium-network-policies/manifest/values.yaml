@@ -2,7 +2,6 @@ yk:
   ciliumNetwork:
     excludedNamespaces:
       - kube-system
-      - envoy-gateway-system
       - harbor
 
   ciliumNetworkPolicies:
@@ -27,6 +26,21 @@ yk:
           authentication:
             mode: "required"
 
+
+    - policyName: alloy-egress-gw-to-k8s
+      type: cluster
+      endpointSelector:
+        matchLabels:
+          gateway.envoyproxy.io/owning-gateway-name: main-gateway
+          gateway.envoyproxy.io/owning-gateway-namespace: envoy-gateway-system
+          io.kubernetes.pod.namespace: envoy-gateway-system
+      egress:
+        - toEndpoints:
+            - {}
+          authentication:
+            mode: "required"
+
+            
     - policyName: alloy-ingress-metrics-collection
       type: cluster
       endpointSelector:
