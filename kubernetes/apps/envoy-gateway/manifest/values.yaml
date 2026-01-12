@@ -22,7 +22,7 @@ yk:
         matchLabels:
           app.kubernetes.io/component: proxy
           app.kubernetes.io/managed-by: envoy-gateway
-      egress:
+      ingress:
         - fromCIDR:
             - "10.0.1.1/24"
 
