@@ -26,6 +26,22 @@ yk:
         name: authentik-server
         port: 80
 
+  ciliumNetworkPolicies:
+
+    - policyName: allow-ingress-to-authentik-db
+      endpointSelector:
+        matchLabels:
+          cnpg.io/cluster.io: pg-cluster-authentik
+          app.kubernetes.io/name: cloudnative-pg
+      ingress:
+        - fromEndpoints:
+          - matchLabels:
+              io.kubernetes.pod.namespace: cloudnative-pg
+              app.kubernetes.io/name: cloudnative-pg
+          toPorts:
+            - ports:
+                - port: "8000"
+                  protocol: TCP
 
 authentik:
 
