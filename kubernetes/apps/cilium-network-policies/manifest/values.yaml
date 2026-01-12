@@ -2,7 +2,6 @@ yk:
   ciliumNetwork:
     excludedNamespaces:
       - kube-system
-      - cilium-spire
       - envoy-gateway-system
       - harbor
 
@@ -60,6 +59,17 @@ yk:
         {}
       ingress:
         - fromEntities:
+            - host
+            - remote-node
+
+    - policyName: allow-egress-cilium-spire-to-nodes
+      type: cluster
+      endpointSelector:
+        matchLabels:
+          app: spire-server
+          app.kubernetes.io/name: cilium-spire
+      egress:
+        - toEntities:
             - host
             - remote-node
 
