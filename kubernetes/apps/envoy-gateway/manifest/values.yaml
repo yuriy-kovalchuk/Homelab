@@ -1,7 +1,7 @@
 yk:
 
   ciliumNetworkPolicies:
-    - policyName: allow-egress-to-kube-api-server
+    - policyName: allow-egress-envoy-to-kube-api-server
       endpointSelector:
         matchLabels:
           control-plane: envoy-gateway
