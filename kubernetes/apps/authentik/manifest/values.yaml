@@ -32,7 +32,6 @@ yk:
       endpointSelector:
         matchLabels:
           cnpg.io/cluster.io: pg-cluster-authentik
-          app.kubernetes.io/name: cloudnative-pg
       ingress:
         - fromEndpoints:
           - matchLabels:
