@@ -24,6 +24,15 @@ yk:
             - "0.0.0.0/0"
 
 
+    - policyName: allow-vulnerability-to-world
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/managed-by: trivy-operator
+      egress:
+        - toCIDR:
+            - "0.0.0.0/0"
+
 trivy-operator:
 
   operator:
