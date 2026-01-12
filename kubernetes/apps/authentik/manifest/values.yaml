@@ -31,7 +31,7 @@ yk:
     - policyName: allow-ingress-to-authentik-db
       endpointSelector:
         matchLabels:
-          cnpg.io/cluster.io: pg-cluster-authentik
+          cnpg.io/cluster: pg-cluster-authentik
       ingress:
         - fromEndpoints:
           - matchLabels:
