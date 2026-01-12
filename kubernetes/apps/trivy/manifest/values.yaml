@@ -24,7 +24,14 @@ yk:
             - "0.0.0.0/0"
 
 
-
+    - policyName: allow-vulnerability-to-world
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/managed-by: trivy-operator
+      egress:
+        - toCIDR:
+            - "0.0.0.0/0"
 
 trivy-operator:
 
@@ -32,7 +39,7 @@ trivy-operator:
     builtInTrivyServer: true
     scanJobTimeout: 1h
     scanJobsConcurrentLimit: 5
-    infraAssessmentScannerEnabled: false
+    infraAssessmentScannerEnabled: true
 
   serviceMonitor:
     enabled: true
@@ -42,8 +49,8 @@ trivy-operator:
     storageClassEnabled: true
     clientServerSkipUpdate: true
     skipJavaDBUpdate: true
-    useBuiltinRegoPolicies: true # Disables OCI download of checks
-    useEmbeddedRegoPolicies: true # Uses local binary policies instead
+    useBuiltinRegoPolicies: true
+    useEmbeddedRegoPolicies: true
 
     resources:
       requests:
