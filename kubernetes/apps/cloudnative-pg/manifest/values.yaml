@@ -15,6 +15,19 @@ yk:
                   protocol: TCP
 
 
+    - policyName: allow-egress-to-authentik
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/name: cloudnative-pg
+      egress:
+        - toEndpoints:
+          - matchLabels:
+              io.kubernetes.pod.namespace: authentik
+              cnpg.io/cluster: pg-cluster-authentik
+          toPorts:
+            - ports:
+                - port: "8000"
+                  protocol: TCP
 
 
 cloudnative-pg:
