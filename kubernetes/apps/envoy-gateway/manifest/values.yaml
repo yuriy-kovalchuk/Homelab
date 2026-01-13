@@ -26,6 +26,31 @@ yk:
         - fromCIDR:
             - "10.0.1.1/24"
 
+    - policyName: allow-ingress-from-k8s-to-envoy-gw
+      type: cluster
+      endpointSelector:
+        matchLabels:
+          gateway.envoyproxy.io/owning-gateway-name: main-gateway
+          gateway.envoyproxy.io/owning-gateway-namespace: envoy-gateway-system
+          io.kubernetes.pod.namespace: envoy-gateway-system
+      ingress:
+        - fromEndpoints:
+            - matchLabels:
+                app.kubernetes.io/name: authentik-outpost-proxy
+                app: authentik-outpost
+                io.kubernetes.pod.namespace: authentik
+          authentication:
+            mode: "required"
+        - fromEndpoints:
+            - matchLabels:
+                app: uptime-kuma
+                io.kubernetes.pod.namespace: uptime-kuma
+          authentication:
+            mode: "required"
+
+
+
+
   gateways:
     - name: main
       replicas: 3
