@@ -80,7 +80,6 @@ yk:
       endpointSelector:
         matchLabels:
           app: spire-server
-          app.kubernetes.io/name: cilium-spire
       egress:
         - toEntities:
             - host
