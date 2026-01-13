@@ -15,6 +15,20 @@ yk:
                 - port: "6443"
                   protocol: TCP
 
+                
+    - policyName: allow-egress-certgen-to-kube-api-server
+      endpointSelector:
+        matchLabels:
+          app: certgen
+      egress:
+        - toEntities:
+            - kube-apiserver
+            - remote-node
+            - host
+          toPorts:
+            - ports:
+                - port: "6443"
+                  protocol: TCP
 
     - policyName: allow-ingress-from-cidr
       type: namespaced
