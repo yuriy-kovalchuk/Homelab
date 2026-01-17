@@ -8,12 +8,12 @@ spec:
   source:
     repoURL: git@github.com:yuriy-kovalchuk/Homelab.git
     targetRevision: HEAD
-    path: kubernetes/apps/democratic-csi/manifest
+    path: kubernetes/apps/democratic-csi-nfs/manifest
     helm:
       releaseName: democratic-csi-nfs
   destination:
     server: https://kubernetes.default.svc
-    namespace: democrtic-csi-nfs
+    namespace: democratic-csi-nfs
   syncPolicy:
     automated:
       prune: true

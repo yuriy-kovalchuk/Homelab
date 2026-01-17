@@ -18,28 +18,6 @@ democratic-csi:
 
   # 3. TrueNAS Connection Details
   driver:
+    existingConfigSecret: truenas-nfs-secret
     config:
       driver: freenas-api-nfs
-      httpConnection:
-        protocol: http           # Use https if you have SSL set up on TrueNAS
-        host: 10.0.2.3      # YOUR TRUENAS IP
-        port: 80
-        apiKeySecret: truenas-credentials
-        apiKeySecretKey: apiKey
-        allowInsecure: true      # Set to true if using self-signed certs
-      
-      zfs:
-        # This is the path to the dataset you created in TrueNAS
-        datasetParentName: /mnt/tank-1/k8s/talos/nfs/volumes
-        detachedSnapshotsDatasetParentName: /mnt/tank-1/k8s/talos/nfs/snapshots
-        
-        # Permission handling (Crucial for RWX)
-        datasetPermissionsMode: "0777"
-        datasetPermissionsUser: 0
-        datasetPermissionsGroup: 0
-
-      nfs:
-        shareHost: 10.0.2.3  # YOUR TRUENAS IP
-        shareAlloedNetworks: ["0.0.0.0/0"] # Restrict to your K8s node subnet
-        shareMaprootUser: root
-        shareMaprootGroup: wheel
