@@ -1,0 +1,12 @@
+apiVersion: v2
+name: democratic-csi-nfs-yk
+description: Umbrella Helm chart for democratic-csi application in Kubernetes
+
+type: application
+version: 0.15.1
+appVersion: "0.15.1"
+
+dependencies:
+  - name: democratic-csi
+    version: "0.15.1"
+    repository: "https://democratic-csi.github.io/charts/"
