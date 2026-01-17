@@ -15,6 +15,9 @@ democratic-csi:
     mountOptions:
       - noatime
       - nfsvers=4                # Use NFSv4 for better performance/locking
+      - nosuid   # Prevents 'set-user-identifier' bits from working (security)
+      - nodev    # Prevents interpreting character/block devices (security)
+      - noexec   # (Optional) Prevents executing binaries from the share
 
   # 3. TrueNAS Connection Details
   driver:
