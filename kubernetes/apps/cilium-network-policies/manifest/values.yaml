@@ -3,7 +3,8 @@ yk:
     excludedNamespaces:
       - kube-system
       - harbor
-      - democratic-csi
+      - democratic-csi-nfs
+      - democratic-csi-iscsi
   ciliumNetworkPolicies:
     - policyName: default-deny-all
       type: cluster
