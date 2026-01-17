@@ -62,6 +62,12 @@ yk:
                 io.kubernetes.pod.namespace: uptime-kuma
           authentication:
             mode: "required"
+        - fromEndpoints:
+            - matchLabels:
+                app.kubernetes.io/component: dex-server
+                io.kubernetes.pod.namespace: argo-cd
+          authentication:
+            mode: "required"
 
 
 
