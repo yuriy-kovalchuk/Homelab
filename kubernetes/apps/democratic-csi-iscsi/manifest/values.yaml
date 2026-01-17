@@ -18,3 +18,24 @@ democratic-csi:
     existingConfigSecret: truenas-iscsi-secret
     config:
       driver: freenas-api-iscsi
+
+  node:
+    driver:
+      # This allows the CSI pod to use the iscsiadm tool from the Talos host
+      extraVolumeMounts:
+        - name: iscsi-bin
+          mountPath: /usr/local/sbin/iscsiadm
+          subPath: iscsiadm
+          readOnly: true
+        - name: iscsi-info
+          mountPath: /etc/iscsi
+          readOnly: false # Must be false for the driver to set the IQN
+      extraVolumes:
+        - name: iscsi-bin
+          hostPath:
+            path: /usr/local/sbin # Where Talos places extension binaries
+            type: Directory
+        - name: iscsi-info
+          hostPath:
+            path: /var/etc/iscsi # Talos usually persists iscsi info here
+            type: DirectoryOrCreate
