@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: democratic-csi-iscsi
+  namespace: argo-cd
+spec:
+  project: infrastructure
+  source:
+    repoURL: git@github.com:yuriy-kovalchuk/Homelab.git
+    targetRevision: HEAD
+    path: kubernetes/apps/democratic-csi-iscsi/manifest
+    helm:
+      releaseName: democratic-csi-iscsi
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: democratic-csi-iscsi
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+

@@ -1,0 +1,19 @@
+csiDriver:
+  # MUST be unique from your NFS driver name
+  name: "org.democratic-csi.iscsi"
+
+storageClasses:
+- name: truenas-iscsi
+  defaultClass: false
+  reclaimPolicy: Delete
+  volumeBindingMode: Immediate
+  allowVolumeExpansion: true
+  parameters:
+    # iSCSI allows you to choose the filesystem (ext4 or xfs)
+    fsType: ext4
+  mountOptions: []
+
+driver:
+  existingConfigSecret: truenas-iscsi-secret
+  config:
+    driver: freenas-api-iscsi
