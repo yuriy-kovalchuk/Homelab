@@ -6,11 +6,15 @@ resource "authentik_provider_oauth2" "proxmox_provider" {
   authorization_flow = data.authentik_flow.default-authorization-flow.id
   invalidation_flow  = data.authentik_flow.default_invalidation.id
   sub_mode           = "user_email"
-  property_mappings = data.authentik_property_mapping_provider_scope.test.ids
+  property_mappings  = data.authentik_property_mapping_provider_scope.test.ids
   allowed_redirect_uris = [
     {
       matching_mode = "strict",
       url           = "https://firewall.yuriy-lab.cloud:8006",
+    },
+    {
+      matching_mode = "strict",
+      url           = "https://maya.yuriy-lab.cloud:8006",
     }
   ]
 }
@@ -29,7 +33,7 @@ resource "authentik_provider_oauth2" "argocd_provider" {
   client_secret      = var.argocd_provider_client_secret
   authorization_flow = data.authentik_flow.default-authorization-flow.id
   invalidation_flow  = data.authentik_flow.default_invalidation.id
-  property_mappings = data.authentik_property_mapping_provider_scope.test.ids
+  property_mappings  = data.authentik_property_mapping_provider_scope.test.ids
   allowed_redirect_uris = [
     {
       matching_mode = "strict",
@@ -50,8 +54,8 @@ resource "authentik_application" "argocd_application" {
 
 
 resource "authentik_group" "argo_admins_group" {
-  name         = "ArgoCD Admins"
-  users        = [data.authentik_user.akadmin.id]
+  name  = "ArgoCD Admins"
+  users = [data.authentik_user.akadmin.id]
 }
 # -------------------- argocd ---------------------------
 
@@ -79,7 +83,7 @@ resource "authentik_provider_oauth2" "vault_provider" {
   client_secret      = var.vault_provider_client_secret
   authorization_flow = data.authentik_flow.default-authorization-flow.id
   invalidation_flow  = data.authentik_flow.default_invalidation.id
-  property_mappings = data.authentik_property_mapping_provider_scope.profile.ids
+  property_mappings  = data.authentik_property_mapping_provider_scope.profile.ids
   allowed_redirect_uris = [
     {
       matching_mode = "strict",
@@ -106,10 +110,10 @@ resource "authentik_application" "vault_application" {
 
 # -------------------- grafana ---------------------------
 resource "authentik_provider_oauth2" "grafana_provider" {
-  name          = "grafana"
-  client_id     = "ljuHKQWUPCdi2ElfXLUqFqvDrM9w2oa97mY7vRe4"
-  client_secret = var.grafana_provider_client_secret
-  authorization_flow  = data.authentik_flow.default-provider-authorization-implicit-consent.id
+  name               = "grafana"
+  client_id          = "ljuHKQWUPCdi2ElfXLUqFqvDrM9w2oa97mY7vRe4"
+  client_secret      = var.grafana_provider_client_secret
+  authorization_flow = data.authentik_flow.default-provider-authorization-implicit-consent.id
   invalidation_flow  = data.authentik_flow.default_invalidation.id
   allowed_redirect_uris = [
     {
@@ -132,16 +136,16 @@ resource "authentik_application" "grafana_application" {
 }
 
 resource "authentik_group" "grafana_admins" {
-  name    = "Grafana Admins"
-  users        = [data.authentik_user.akadmin.id]
+  name  = "Grafana Admins"
+  users = [data.authentik_user.akadmin.id]
 }
 
 resource "authentik_group" "grafana_editors" {
-  name    = "Grafana Editors"
+  name = "Grafana Editors"
 }
 
 resource "authentik_group" "grafana_viewers" {
-  name    = "Grafana Viewers"
+  name = "Grafana Viewers"
 }
 # -------------------- grafana ---------------------------
 
