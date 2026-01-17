@@ -7,10 +7,14 @@
         icon: argo-cd.svg
         href: https://argocd.yuriy-lab.cloud
         description: YK ArgoCD instance
-    - Proxmox:
+    - Proxmox Firewall:
         icon: proxmox.svg
         href: "https://firewall.yuriy-lab.cloud:8006"
-        description: firewall
+        description: Firewall Instance
+    - Proxmox Maya:
+        icon: proxmox.svg
+        href: "https://maya.yuriy-lab.cloud:8006"
+        description: Maya Instance
     - Authentik:
         icon: authentik.svg
         href: "http://authentik.yuriy-lab.cloud/"
@@ -23,10 +27,6 @@
         icon: vault.svg
         href: "http://vault.yuriy-lab.cloud/"
         description: Vault PRD
-    - Netbox:
-        icon: netbox.svg
-        href: "http://netbox.yuriy-lab.cloud/"
-        description: Netbox PRD
 - Monitoring:
     - Grafana:
         icon: grafana.svg
@@ -52,19 +52,11 @@
 #        icon: alertmanager.svg
 #        href: "https://alertmanager.yuriy-lab.cloud"
 #        description: YK Alert Manager
-#    - Kiali:
-#        icon: "https://avatars.githubusercontent.com/u/36001875?v=4"
-#        href: "https://kiali.istio.yuriy-lab.cloud"
-#        description: YK Kiali
 - Containers:
     - Headlamp:
         icon: headlamp.svg
         href: "https://headlamp.yuriy-lab.cloud"
         description: Headlamp K8S
-    - Portainer:
-        icon: portainer.svg
-        href: "https://portainer.yuriy-lab.cloud"
-        description: docker
     - Harbor:
         icon: harbor.svg
         href: "https://harbor.yuriy-lab.cloud"
