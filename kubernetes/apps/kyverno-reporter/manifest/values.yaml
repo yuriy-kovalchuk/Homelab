@@ -70,14 +70,8 @@ yk:
         matchLabels:
           app.kubernetes.io/name: policy-reporter-trivy-plugin
       egress:
-        - toFQDNs:
-            - matchName: "mirror.grc.io"
-            - matchName: "api.github.com"
-            - matchName: "github.com"
-          toPorts:
-            - ports:
-                - port: "443"
-                  protocol: "TCP"
+        - toCIDR:
+          - "0.0.0.0/0" 
         - toEndpoints:
           - matchLabels:
               app.kubernetes.io/name: policy-reporter
