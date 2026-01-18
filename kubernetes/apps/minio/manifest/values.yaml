@@ -165,6 +165,7 @@ minio:
 
   persistence:
     size: 50Gi
+    storageClass: "truenas-iscsi"
 
   resources:
     requests:
@@ -181,14 +182,6 @@ minio:
 
   buckets:
     - name: mimir-data
-      policy: none
-      purge: false
-      versioning: false
-    - name: loki-admin
-      policy: none
-      purge: false
-      versioning: false
-    - name: loki-ruler
       policy: none
       purge: false
       versioning: false
