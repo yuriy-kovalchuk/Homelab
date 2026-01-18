@@ -85,6 +85,7 @@ trivy-operator:
           cpu: 200m
           memory: 1Gi
     storageSize: "5Gi"
+    storageClassName: "truenas-nfs"
     slow: false
     timeout: "3h"
     ignoreUnfixed: true
