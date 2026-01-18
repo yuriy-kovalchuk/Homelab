@@ -24,6 +24,15 @@ yk:
             - "0.0.0.0/0"
 
 
+    - policyName: allow-node-collector-kube-api
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app: node-collector
+      egress:
+        - toEntities:
+            - kube-apiserver
+
     - policyName: allow-vulnerability-to-world
       type: namespaced
       endpointSelector:
@@ -32,7 +41,6 @@ yk:
       egress:
         - toCIDR:
             - "0.0.0.0/0"
-
     - policyName: allow-vulnerability-operator-to-world
       type: namespaced
       endpointSelector:
