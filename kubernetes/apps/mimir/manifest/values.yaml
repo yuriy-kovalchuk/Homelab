@@ -176,6 +176,7 @@ mimir-distributed:
     persistentVolume:
       enabled: true
       size: 50Gi
+      storageClass: "truenas-iscsi"
     replicas: 3
 
   # Evaluates PromQL expressions by fetching time series and labels on the read path. Uses store-gateway fron minio and ingester for latest data
@@ -192,6 +193,10 @@ mimir-distributed:
 
   # comunication with minio
   store_gateway:
+    persistentVolume:
+      enabled: true
+      size: 2Gi
+      storageClass: "truenas-iscsi"
     zoneAwareReplication:
       enabled: false
     replicas: 3
@@ -202,12 +207,10 @@ mimir-distributed:
     persistentVolume:
       enabled: true
       size: 50Gi
+      storageClass: "truenas-iscsi"
 
   kafka:
     enabled: false
-    persistence:
-      enabled: true
-      size: 50Gi
 
 
   ## Disabled services:
