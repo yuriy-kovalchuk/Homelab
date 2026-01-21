@@ -1,29 +1,28 @@
 {
-  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.14.0/.schema/devbox.schema.json",
-  "packages": [
-    "gettext@0.22.5",
-    "kubectl@1.32.2",
-    "kubernetes-helm@3.17.2",
-    "kubeseal@0.29.0",
-    "terraform@latest",
-    "talosctl@latest",
-    "git@latest",
-    "istioctl@latest",
-    "cilium-cli@latest",
-    "hubble@latest"
-  ],
-  "shell": {
-    "init_hook": [
-      "chmod +x devbox_scripts/*",
-      "export $(cat .env | xargs)"
-    ],
-    "scripts": {
-      "test": [
-        "echo \"Error: no test specified\" && exit 1"
-      ],
-      "k_argo_app":  "./devbox_scripts/new_app.sh $@",
-      "k_ss_create": "./devbox_scripts/create_sealed_secret.sh $1 $2 $3 $4",
-      "k-token": "kubectl describe secret headlamp-admin-token -n headlamp"
-    }
-  }
+	"$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.14.0/.schema/devbox.schema.json",
+	"packages": [
+		"gettext@0.22.5",
+		"kubectl@1.32.2",
+		"kubernetes-helm@3.17.2",
+		"kubeseal@0.29.0",
+		"terraform@latest",
+		"talosctl@latest",
+		"git@latest",
+		"cilium-cli@latest",
+		"hubble@latest"
+	],
+	"shell": {
+		"init_hook": [
+			"chmod +x devbox_scripts/*",
+			"export $(cat .env | xargs)"
+		],
+		"scripts": {
+			"test": [
+				"echo \"Error: no test specified\" && exit 1"
+			],
+			"k_argo_app": "./devbox_scripts/new_app.sh $@",
+			"k_ss_create": "./devbox_scripts/create_sealed_secret.sh $1 $2 $3 $4",
+			"k-token": "kubectl describe secret headlamp-admin-token -n headlamp"
+		}
+	}
 }
