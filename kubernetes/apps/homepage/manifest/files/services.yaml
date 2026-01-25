@@ -32,6 +32,10 @@
         icon: grafana.svg
         href: "https://grafana.yuriy-lab.cloud"
         description: YK Grafana
+    - Pulse:
+        icon: pulse.svg
+        href: "https://pulse.yuriy-lab.cloud"
+        description: YK Pulse Instance
     - Alloy:
         icon: alloy.svg
         href: "https://alloy.yuriy-lab.cloud"
