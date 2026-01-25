@@ -67,6 +67,11 @@ yk:
             - matchLabels:
                 app.kubernetes.io/component: dex-server
                 io.kubernetes.pod.namespace: argo-cd
+        - fromEndpoints:
+            - matchLabels:
+                app.kubernetes.io/instance: grafana
+                io.kubernetes.pod.namespace: grafana
+        
           authentication:
             mode: "required"
 

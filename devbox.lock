@@ -272,54 +272,6 @@
         }
       }
     },
-    "istioctl@latest": {
-      "last_modified": "2025-11-15T07:28:48Z",
-      "resolved": "github:NixOS/nixpkgs/1d4c88323ac36805d09657d13a5273aea1b34f0c#istioctl",
-      "source": "devbox-search",
-      "version": "1.28.0",
-      "systems": {
-        "aarch64-darwin": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/3x4m9yh4n198xg6ng5sgbmzckif7dqgv-istioctl-1.28.0",
-              "default": true
-            }
-          ],
-          "store_path": "/nix/store/3x4m9yh4n198xg6ng5sgbmzckif7dqgv-istioctl-1.28.0"
-        },
-        "aarch64-linux": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/58q87v0d101k43jk30nr5wb3hg6hz6m2-istioctl-1.28.0",
-              "default": true
-            }
-          ],
-          "store_path": "/nix/store/58q87v0d101k43jk30nr5wb3hg6hz6m2-istioctl-1.28.0"
-        },
-        "x86_64-darwin": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/c1njaxnvm8yq5ybsp9n41g7snd7z4myw-istioctl-1.28.0",
-              "default": true
-            }
-          ],
-          "store_path": "/nix/store/c1njaxnvm8yq5ybsp9n41g7snd7z4myw-istioctl-1.28.0"
-        },
-        "x86_64-linux": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/ikid3k54mcd0g8l32i8mbqphb5mc9npl-istioctl-1.28.0",
-              "default": true
-            }
-          ],
-          "store_path": "/nix/store/ikid3k54mcd0g8l32i8mbqphb5mc9npl-istioctl-1.28.0"
-        }
-      }
-    },
     "kubectl@1.32.2": {
       "last_modified": "2025-03-11T17:52:14Z",
       "resolved": "github:NixOS/nixpkgs/0d534853a55b5d02a4ababa1d71921ce8f0aee4c#kubectl",
