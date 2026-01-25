@@ -1,0 +1,10 @@
+ciliumNetworkPolicies:
+    - policyName: allow-egress-kubevirt-to-kube-api-server
+      endpointSelector:
+        matchLabels:
+          kubevirt.io: virt-operator
+      egress:
+        - toEntities:
+            - kube-apiserver
+            - remote-node
+            - host
