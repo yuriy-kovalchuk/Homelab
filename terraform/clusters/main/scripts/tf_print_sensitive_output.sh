@@ -1,2 +1,3 @@
-terraform -chdir=.. output -raw kubeconfig
-terraform -chdir=.. output -raw talos-config
+terraform -chdir=.. output -raw kubeconfig_raw
+echo "------------"
+terraform -chdir=.. output -raw talos_config

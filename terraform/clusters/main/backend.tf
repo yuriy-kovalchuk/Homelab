@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
     bucket = "terraform"
-    key = "talos-prd.tfstate"
+    key    = "talos-prd.tfstate"
 
-    endpoint = var.s3_endpoint
+    endpoint   = var.s3_endpoint
     access_key = var.s3_access_key
     secret_key = var.s3_secret_key
 

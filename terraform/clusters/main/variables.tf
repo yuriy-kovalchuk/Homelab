@@ -4,8 +4,8 @@ variable "control_plane_nodes" {
     ip        = string
     hostname  = string
     interface = string
-    disk      = optional(string)  # only if you want custom disk
-    wipe      = optional(bool)    # only if you want wipe
+    disk      = optional(string) # only if you want custom disk
+    wipe      = optional(bool)   # only if you want wipe
   }))
 }
 
@@ -44,6 +44,25 @@ variable "image_registry" {
   description = "Registry prefix for Talos installer image"
   type        = string
   default     = "factory.talos.dev/nocloud-installer"
+}
+
+variable "allow_scheduling_on_control_planes" {
+  description = "Allow scheduling workloads on control plane nodes"
+  type        = bool
+  default     = true
+}
+
+# Harbor Registry Mirror Configuration
+variable "registry_mirrors_enabled" {
+  description = "Enable Harbor as upstream registry mirror for all image pulls"
+  type        = bool
+  default     = true
+}
+
+variable "harbor_hostname" {
+  description = "Harbor registry hostname (e.g., harbor.example.com)"
+  type        = string
+  default     = "harbor.yuriy-lab.cloud"
 }
 
 variable "s3_access_key" {

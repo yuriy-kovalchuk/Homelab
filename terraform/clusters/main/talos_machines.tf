@@ -8,37 +8,18 @@ resource "talos_machine_configuration_apply" "control_plane" {
   node                        = each.value.ip
 
   config_patches = [
-    yamlencode({
-      machine = {
-
-        install = merge(
-          {
-            image = "${var.image_registry}/${talos_image_factory_schematic.this.id}:${var.talos_version}"
-          },
-            each.value.disk != null ? { disk = each.value.disk } : {},
-            each.value.wipe != null ? { wipe = each.value.wipe } : {}
-        )
-        network = {
-          hostname   = each.value.hostname
-          interfaces = [
-            {
-              interface = each.value.interface
-              dhcp      = false
-              addresses = ["${each.value.ip}/24"]
-              routes = [
-                { network = "0.0.0.0/0", gateway = var.gateway, metric = 1024 }
-              ]
-              mtu = 1500
-            }
-          ]
-          nameservers = [var.gateway]
-        }
-      }
-      cluster = {
-        network = { cni = { name = var.cni_name } }
-        proxy   = { disabled = true }
-        allowSchedulingOnControlPlanes = true
-      }
-    })
+    templatefile("${path.module}/machine_config_patches/controlplane.tftpl", {
+      install_image                      = "${var.image_registry}/${talos_image_factory_schematic.this.id}:${var.talos_version}"
+      install_disk                       = each.value.disk != null ? each.value.disk : ""
+      install_wipe                       = each.value.wipe != null ? each.value.wipe : false
+      hostname                           = each.value.hostname
+      interface                          = each.value.interface
+      ip_address                         = each.value.ip
+      gateway                            = var.gateway
+      cni_name                           = var.cni_name
+      allow_scheduling_on_control_planes = var.allow_scheduling_on_control_planes
+      registry_mirrors_enabled           = var.registry_mirrors_enabled
+      harbor_hostname                    = var.harbor_hostname
+    }),
   ]
 }
