@@ -53,6 +53,17 @@ yk:
           authentication:
             mode: "required"
 
+
+    - policyName: allow-egress-grafana-to-kube-api-server
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/name: grafana
+      egress:
+        - toEntities:
+            - kube-apiserver
+            - remote-node
+            - host
+
     - policyName: egress-grafana-to-world
       type: namespaced
       endpointSelector:
