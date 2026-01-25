@@ -1,8 +1,9 @@
-ciliumNetworkPolicies:
+yk:
+  ciliumNetworkPolicies:
     - policyName: allow-egress-kubevirt-to-kube-api-server
       endpointSelector:
         matchLabels:
-          kubevirt.io: virt-operator
+          io.kubernetes.pod.namespace: kubevirt
       egress:
         - toEntities:
             - kube-apiserver
