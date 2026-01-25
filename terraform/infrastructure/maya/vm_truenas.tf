@@ -12,7 +12,7 @@ resource "proxmox_virtual_environment_vm" "truenas_vm" {
   started     = true
   cpu {
     cores = 2
-    type  = "host" 
+    type  = "host"
   }
 
   memory {
@@ -30,8 +30,8 @@ resource "proxmox_virtual_environment_vm" "truenas_vm" {
 
   # The Boot ISO
   cdrom {
-    enabled  = false # set to true during the first run 
-    file_id  = data.proxmox_virtual_environment_file.truenas_iso.id
+    enabled   = false # set to true during the first run 
+    file_id   = data.proxmox_virtual_environment_file.truenas_iso.id
     interface = "ide2"
   }
 
@@ -42,20 +42,20 @@ resource "proxmox_virtual_environment_vm" "truenas_vm" {
     size         = 32
     file_format  = "raw"
   }
-# Ensure the machine type is q35 for better PCIe support
+  # Ensure the machine type is q35 for better PCIe support
   machine = "q35"
 
   hostpci {
     # The PCI ID of your NVMe (e.g., 0000:01:00.0)
     device = "hostpci0"
-    id   = "0000:03:00.0" 
-    pcie = true
+    id     = "0000:03:00.0"
+    pcie   = true
     rombar = true
   }
 
   network_device {
-    bridge = "vmbr0"
-    model  = "virtio"
+    bridge      = "vmbr0"
+    model       = "virtio"
     mac_address = "BC:24:11:19:5C:66" # reserve a lease in opnsense
   }
 
@@ -70,7 +70,7 @@ resource "proxmox_virtual_environment_vm" "truenas_vm" {
 
 
 
-# LIFECYCLE: This is the most important part for stability
+  # LIFECYCLE: This is the most important part for stability
   lifecycle {
     ignore_changes = [
       # Ignore network changes that Talos handles internally

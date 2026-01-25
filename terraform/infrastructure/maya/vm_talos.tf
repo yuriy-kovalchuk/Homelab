@@ -1,29 +1,27 @@
 resource "proxmox_virtual_environment_download_file" "talos_iso" {
   content_type = "iso"
-  datastore_id = "local"
-  node_name    = "maya"
+  datastore_id = var.proxmox_iso_datastore
+  node_name    = var.proxmox_node_name
 
   # Talos Linux ISO (Metal - AMD64)
-  # You can update the version number in the URL as needed
-  url       = "https://factory.talos.dev/image/70d243b7e2cbe699e4db5e73356a2add6b4bb8e34eadba9db22c823110e79099/v1.12.1/nocloud-amd64.iso"
-  file_name = "talos-v1.12.1-amd64.iso"
-
+  url       = "https://factory.talos.dev/image/${var.talos_image_schematic_id}/v${var.talos_version}/nocloud-amd64.iso"
+  file_name = "talos-v${var.talos_version}-amd64.iso"
 }
 
 
 resource "proxmox_virtual_environment_vm" "talos_vm" {
-  name        = "management-talos-01"
-  description = "Talos Linux node managed by Terraform"
-  node_name   = "maya"
-  vm_id       = 1100
+  name        = var.talos_vm_name
+  description = var.talos_vm_description
+  node_name   = var.proxmox_node_name
+  vm_id       = var.talos_vm_id
 
   cpu {
-    cores = 2
+    cores = var.talos_vm_cpu_cores
     type  = "host" # Recommended for Talos performance
   }
 
   memory {
-    dedicated = 4096 # Talos is lightweight; 4GB is plenty for most roles
+    dedicated = var.talos_vm_memory
   }
 
   # Talos runs best with modern UEFI
@@ -31,7 +29,7 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
 
   machine = "q35"
 
-  # Talos doesn't use a traditional 'installer' once set up, 
+  # Talos doesn't use a traditional 'installer' once set up,
   # but you start by booting the Talos ISO.
   cdrom {
     enabled   = true
@@ -40,24 +38,24 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
   }
 
   efi_disk {
-    datastore_id = "local-lvm"
+    datastore_id = var.proxmox_vm_datastore
     file_format  = "raw"
   }
 
   # Main OS disk
   disk {
-    datastore_id = "local-lvm"
+    datastore_id = var.proxmox_vm_datastore
     interface    = "scsi0"
-    size         = 40
+    size         = var.talos_vm_disk_size
     file_format  = "raw"
     ssd          = true
     discard      = "on"
   }
 
   network_device {
-    bridge = "vmbr0"
-    model  = "virtio"
-    mac_address = "BC:24:11:1A:26:95"
+    bridge      = var.proxmox_network_bridge
+    model       = "virtio"
+    mac_address = var.talos_vm_mac_address
   }
 
   operating_system {
@@ -70,7 +68,7 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
 
   started = true
 
-# LIFECYCLE: This is the most important part for stability
+  # LIFECYCLE: This is the most important part for stability
   lifecycle {
     ignore_changes = [
       # Ignore network changes that Talos handles internally
