@@ -71,6 +71,15 @@ yk:
                 - port: "8080"
                   protocol: TCP
 
+    - policyName: ingress-distributor-from-opencost
+      type: namespaced
+      endpointSelector: {}
+      ingress:
+        - fromEndpoints:
+          - matchLabels:
+                io.kubernetes.pod.namespace: k8s-monitoring
+          authentication:
+            mode: "required"
 
 
 

@@ -22,6 +22,16 @@ yk:
                 app.kubernetes.io/component: gateway
                 io.kubernetes.pod.namespace: loki
 
+    - policyName: allow-egress-opencost-to-mimir
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/name: opencost
+      egress:
+        - toEndpoints:
+            - matchLabels:
+                io.kubernetes.pod.namespace: mimir
+
 
   httpRoutes:
     - parentRefs:
@@ -112,9 +122,42 @@ k8s-monitoring:
 
     opencost:
       enabled: false
+      metricsSource: mimir
+      opencost:
+        ui:
+          enabled: true
+        prometheus:
+          external:
+            url: http://mimir-query-frontend.mimir.svc.cluster.local:8080/prometheus
+        exporter:
+          defaultClusterId: homelab-cluster
+          extraEnv:
+            PROMETHEUS_HEADER_X_SCOPE_ORGID: "anonymous"
 
     kepler:
       enabled: false
+      metricsTuning:
+        # Will keep the default set of metrics and also include these three more
+        useDefaultAllowList: true
+        includeMetrics:
+          - kepler_node_cpu_active_joules_total
+          - kepler_node_cpu_active_watts
+          - kepler_node_cpu_idle_joules_total
+          - kepler_node_cpu_idle_watts
+          - kepler_node_cpu_info
+          - kepler_node_cpu_joules_total
+          - kepler_node_cpu_usage_ratio
+          - kepler_node_cpu_watts
+          - kepler_container_cpu_joules_total
+          - kepler_container_cpu_watts
+          - kepler_process_cpu_joules_total
+          - kepler_process_cpu_seconds_total
+          - kepler_process_cpu_watts
+          - kepler_vm_cpu_joules_total
+          - kepler_vm_cpu_watts
+          - kepler_pod_cpu_joules_total
+          - kepler_pod_cpu_watts
+          - kepler_build_info
 
   clusterEvents:
     enabled: true

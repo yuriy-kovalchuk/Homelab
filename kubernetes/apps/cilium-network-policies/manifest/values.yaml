@@ -2,7 +2,6 @@ yk:
   ciliumNetwork:
     excludedNamespaces:
       - kube-system
-      - harbor
       - playground
       - democratic-csi-nfs
       - democratic-csi-iscsi

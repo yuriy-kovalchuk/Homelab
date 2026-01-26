@@ -404,6 +404,54 @@
         }
       }
     },
+    "kubescape@latest": {
+      "last_modified": "2025-12-31T03:27:36Z",
+      "resolved": "github:NixOS/nixpkgs/f665af0cdb70ed27e1bd8f9fdfecaf451260fc55#kubescape",
+      "source": "devbox-search",
+      "version": "3.0.47",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/pvsz15z7pk124shwjpi4gmzcyzbvmgks-kubescape-3.0.47",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/pvsz15z7pk124shwjpi4gmzcyzbvmgks-kubescape-3.0.47"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/5xvh2k82v70dkx4mdld37i960pp4v432-kubescape-3.0.47",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/5xvh2k82v70dkx4mdld37i960pp4v432-kubescape-3.0.47"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/nv857w9jfajywp6na0xhh3xgqnic7whc-kubescape-3.0.47",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/nv857w9jfajywp6na0xhh3xgqnic7whc-kubescape-3.0.47"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/mkkyxjadlgrlsjwffwmihir426n2g4zv-kubescape-3.0.47",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/mkkyxjadlgrlsjwffwmihir426n2g4zv-kubescape-3.0.47"
+        }
+      }
+    },
     "kubeseal@0.29.0": {
       "last_modified": "2025-04-06T11:26:02Z",
       "resolved": "github:NixOS/nixpkgs/74a40410369a1c35ee09b8a1abee6f4acbedc059#kubeseal",
