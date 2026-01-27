@@ -182,3 +182,70 @@ variable "harbor_insecure" {
   type        = bool
   default     = false
 }
+
+# Vault Configuration (Bank-Vaults)
+variable "vault_operator_version" {
+  description = "Vault Operator Helm chart version"
+  type        = string
+  default     = "1.22.5"
+}
+
+variable "vault_secrets_webhook_version" {
+  description = "Vault Secrets Webhook Helm chart version"
+  type        = string
+  default     = "1.22.2"
+}
+
+variable "vault_image_tag" {
+  description = "HashiCorp Vault image tag"
+  type        = string
+  default     = "1.18.3"
+}
+
+variable "bank_vaults_version" {
+  description = "Bank-Vaults sidecar image version"
+  type        = string
+  default     = "v1.31.3"
+}
+
+variable "vault_hostname" {
+  description = "Hostname for Vault (used in HTTPRoute and API address)"
+  type        = string
+  default     = "vault-intra.yuriy-lab.cloud"
+}
+
+variable "vault_replicas" {
+  description = "Number of Vault replicas (use odd numbers for Raft consensus)"
+  type        = number
+  default     = 3
+}
+
+variable "vault_webhook_replicas" {
+  description = "Number of Vault Secrets Webhook replicas"
+  type        = number
+  default     = 2
+}
+
+variable "vault_storage_size" {
+  description = "Storage size for Vault Raft data"
+  type        = string
+  default     = "1Gi"
+}
+
+variable "vault_cpu_request" {
+  description = "CPU request for Vault pods"
+  type        = string
+  default     = "100m"
+}
+
+variable "vault_memory_request" {
+  description = "Memory request for Vault pods"
+  type        = string
+  default     = "256Mi"
+}
+
+variable "vault_memory_limit" {
+  description = "Memory limit for Vault pods"
+  type        = string
+  default     = "512Mi"
+}

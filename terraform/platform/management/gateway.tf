@@ -37,5 +37,17 @@ resource "kubectl_manifest" "shared_gateway" {
           allowedRoutes:
             namespaces:
               from: All
+        - name: https-vault
+          port: 443
+          protocol: HTTPS
+          hostname: "${var.vault_hostname}"
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - name: vault-tls
+                kind: Secret
+          allowedRoutes:
+            namespaces:
+              from: All
   YAML
 }
