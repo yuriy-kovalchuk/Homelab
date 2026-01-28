@@ -10,3 +10,6 @@ dependencies:
   - name: vpa
     version: "4.10.0"
     repository: "https://charts.fairwinds.com/stable"
+  - name: goldilocks
+    version: "10.2.0"
+    repository: "https://charts.fairwinds.com/stable"

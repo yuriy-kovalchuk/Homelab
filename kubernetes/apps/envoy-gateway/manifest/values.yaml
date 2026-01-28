@@ -320,6 +320,19 @@ yk:
                 group: ""
                 name: home-gw-tls-cert
 
+        - name: https-goldilocks
+          protocol: HTTPS
+          port: 443
+          hostname: "goldilocks.yuriy-lab.cloud"
+          allowedRoutes:
+            namespaces:
+              from: All
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - kind: Secret
+                group: ""
+                name: goldilocks-gw-tls-cert
 
 gateway-helm:
 
