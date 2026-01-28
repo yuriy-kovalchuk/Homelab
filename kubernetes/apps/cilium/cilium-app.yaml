@@ -21,6 +21,10 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+    managedNamespaceMetadata:
+      labels:
+        # This will enable Goldilocks/VPA for the entire namespace
+        goldilocks.fairwinds.com/enabled: "true"
   ignoreDifferences:
     - group: apps
       kind: StatefulSet

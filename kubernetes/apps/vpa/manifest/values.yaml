@@ -1,3 +1,13 @@
+yk:
+  ciliumNetworkPolicies:
+    - policyName: allow-egress-to-host
+      type: namespaced
+      endpointSelector: {}
+      egress:
+        - toEntities:
+            - host
+            - remote-node
+
 vpa:
   recommender:
     extraArgs:

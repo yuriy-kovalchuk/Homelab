@@ -5,7 +5,6 @@ yk:
       - playground
       - democratic-csi-nfs
       - democratic-csi-iscsi
-      - vpa
   ciliumNetworkPolicies:
     - policyName: default-deny-all
       type: cluster
