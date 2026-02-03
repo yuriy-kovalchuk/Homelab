@@ -1,0 +1,13 @@
+yk:
+  ciliumNetworkPolicies:
+    - policyName: egress-to-host
+      endpointSelector: {}
+      type: namespaced
+      egress:
+        - toEntities:
+            - host
+            - remote-node
+          toPorts:
+            - ports:
+              - port: "6443"
+                protocol: TCP

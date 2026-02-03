@@ -1,0 +1,12 @@
+apiVersion: v2
+name: kro-yk
+description: Umbrella Helm chart for kro application in Kubernetes
+
+type: application
+version: 0.8.4
+appVersion: "0.8.4"
+
+dependencies:
+  - name: kro
+    version: "0.8.4"
+    repository: oci://registry.k8s.io/kro/charts
