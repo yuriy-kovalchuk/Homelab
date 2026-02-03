@@ -20,7 +20,7 @@ These variables configure the S3-compatible backend for Terraform state storage.
 | `TF_VAR_s3_secret_key` | S3 backend secret key | `********` |
 | `TF_VAR_s3_endpoint` | S3-compatible endpoint URL | `http://10.0.10.10:9000` |
 
-**Used by:** Talos Terraform init scripts (`terraform/kubernetes/`, `terraform/maya/`)
+**Used by:** All Terraform modules (`terraform/clusters/`, `terraform/infrastructure/`, `terraform/apps/`, `terraform/platform/`)
 
 ### OPNsense API
 
@@ -35,6 +35,54 @@ These variables configure access to the OPNsense firewall API.
 
 **Used by:** dns-sync application
 
+### Vault Secrets Management
+
+These variables configure secrets stored in HashiCorp Vault via `terraform/apps/vault`.
+
+| Variable | Purpose |
+|----------|---------|
+| `TF_VAR_vault_token` | Vault API token |
+| `TF_VAR_cloudflare_token` | Cloudflare API token for cert-manager |
+| `TF_VAR_authentik_pg_user` | Authentik PostgreSQL username |
+| `TF_VAR_authentik_pg_password` | Authentik PostgreSQL password |
+| `TF_VAR_authentik_admin_password` | Authentik admin password |
+| `TF_VAR_grafana_admin_user` | Grafana admin username |
+| `TF_VAR_grafana_admin_password` | Grafana admin password |
+| `TF_VAR_grafana_client_id` | Grafana OIDC client ID |
+| `TF_VAR_grafana_client_secret` | Grafana OIDC client secret |
+| `TF_VAR_minio_*` | MinIO access keys and credentials |
+| `TF_VAR_mimir_*` | Mimir S3 credentials |
+| `TF_VAR_opnsense_secret` | OPNsense API secret |
+| `TF_VAR_truenas_api_key` | TrueNAS API key |
+
+**Used by:** `terraform/apps/vault`
+
+### Authentik OIDC
+
+These variables configure OAuth2 providers in Authentik via `terraform/apps/authentik`.
+
+| Variable | Purpose |
+|----------|---------|
+| `TF_VAR_authentik_token` | Authentik API token |
+| `TF_VAR_proxmox_provider_client_secret` | Proxmox OIDC client secret |
+| `TF_VAR_argocd_provider_client_secret` | ArgoCD OIDC client secret |
+| `TF_VAR_vault_provider_client_secret` | Vault OIDC client secret |
+| `TF_VAR_grafana_provider_client_secret` | Grafana OIDC client secret |
+
+**Used by:** `terraform/apps/authentik`
+
+### Maya Infrastructure (ACME)
+
+These variables configure ACME certificates on the Maya Proxmox node.
+
+| Variable | Purpose |
+|----------|---------|
+| `TF_VAR_acme_email` | Email for Let's Encrypt account |
+| `TF_VAR_acme_cf_account_id` | Cloudflare account ID |
+| `TF_VAR_acme_cf_token` | Cloudflare API token for DNS validation |
+
+**Used by:** `terraform/infrastructure/maya`
+
 ## Example .env File
 
 ```bash
@@ -48,6 +96,21 @@ OPNSENSE_URI=https://10.0.8.254
 OPNSENSE_KEY=your-api-key
 OPNSENSE_SECRET=your-api-secret
 OPNSENSE_SKIP_TLS_VERIFY=true
+
+# Vault (for terraform/apps/vault)
+TF_VAR_vault_token=hvs.xxxxx
+
+# Authentik (for terraform/apps/authentik)
+TF_VAR_authentik_token=your-authentik-api-token
+TF_VAR_proxmox_provider_client_secret=xxx
+TF_VAR_argocd_provider_client_secret=xxx
+TF_VAR_vault_provider_client_secret=xxx
+TF_VAR_grafana_provider_client_secret=xxx
+
+# Maya ACME (for terraform/infrastructure/maya)
+TF_VAR_acme_email=your-email@example.com
+TF_VAR_acme_cf_account_id=cloudflare-account-id
+TF_VAR_acme_cf_token=cloudflare-api-token
 ```
 
 ## Notes

@@ -8,57 +8,88 @@ Quick start:
 
 The Devbox shell `init_hook` (see `devbox.json`) does the following:
 - `chmod +x devbox_scripts/*` to ensure scripts are executable
-- `export $(cat .env | xargs)` to export environment variables from `.env` (optional)
+- `export $(cat .env | xargs)` to export environment variables from `.env`
+- `source devbox_scripts/tf_functions.sh` to load Terraform helper functions
 
-Note: You can also run these scripts directly with Bash, but using `devbox run` ensures all required tools are available in the environment.
+## Terraform Functions
 
-## Commands mapping (from devbox.json)
+These are shell functions loaded into your devbox shell. Run them directly (not via `devbox run`):
 
-- `devbox run argo_new_app [args...]` → `./devbox_scripts/new_app.sh [args...]`
-- `devbox run k_ss_create <name> <key> <value> <namespace>` → `./devbox_scripts/create_sealed_secret.sh <name> <key> <value> <namespace>`
+| Function | Description |
+|----------|-------------|
+| `tf_init` | Initialize terraform with S3 backend credentials |
+| `tf_plan` | Run terraform plan (auto-detects tfvars) |
+| `tf_apply` | Run terraform apply (auto-detects tfvars) |
+| `tf_output [name]` | Print terraform outputs (auto-detects common outputs) |
+| `upgrade_talos` | Upgrade Talos nodes (run from clusters/main) |
 
-## Script details
+**Usage:**
+```bash
+cd terraform/clusters/main
+tf_init
+tf_plan
+tf_apply
+```
 
-### 1) new_app.sh
+The functions auto-detect `vars/terraform.tfvars` or `terraform.tfvars` and pass them to terraform.
+
+## Devbox Run Commands
+
+These are configured in `devbox.json` under `shell.scripts`:
+
+| Command | Script |
+|---------|--------|
+| `devbox run k_argo_app` | `./devbox_scripts/new_app.sh` |
+| `devbox run k_ss_create` | `./devbox_scripts/create_sealed_secret.sh` |
+| `devbox run k-token` | Get Headlamp admin token |
+
+## Script Details
+
+### new_app.sh
+
 Scaffolds a new Kubernetes app folder from `kubernetes/apps/_template`.
 
-- Features:
-  - Copies `_template` to `kubernetes/apps/<app-name>`
-  - Renames `TEMPLATE-app.yaml` to `<app-name>-app.yaml`
-  - Replaces placeholders `__APP_NAME__` and `__NAMESPACE__`
-  - Optional: removes `manifest/templates` with `--no-templates`
-  - Optional: overrides `.spec.source.repoURL` with `--repo-url <url>`
-- Requirements in Devbox: `sed`, `kubectl` not required for scaffolding, only filesystem tools (provided by shell)
-- Usage:
-  - Via Devbox:
-    - `devbox run argo_new_app <app-name>`
-    - Options:
-      - `--namespace <ns>` (default: same as app name)
-      - `--no-templates`
-      - `--repo-url <url>`
-      - `--dry-run`
-    - Examples:
-      - `devbox run argo_new_app myapp`
-      - `devbox run argo_new_app myapp --namespace myns --no-templates`
-      - `devbox run argo_new_app myapp --repo-url "https://github.com/you/Homelab.git"`
-  - Direct:
-    - `bash devbox_scripts/new_app.sh <app-name> [options]`
+**Usage:**
+```bash
+devbox run k_argo_app <app-name> [options]
+```
 
-### 2) create_sealed_secret.sh
-Creates a SealedSecret manifest (sealed_secret.yaml) from given inputs using `kubectl` and `kubeseal`.
+**Options:**
+- `--namespace <ns>` - Override namespace (default: same as app name)
+- `--no-templates` - Remove manifest/templates folder
+- `--repo-url <url>` - Override `.spec.source.repoURL`
+- `--dry-run` - Show what would be done
 
-- Arguments: `<secret-name> <secret-key> <secret-value> <namespace>`
-- Behavior:
-  - Prompts for confirmation
-  - Runs `kubectl create secret ... --dry-run=client -o yaml | kubeseal --controller-namespace sealed-secrets --controller-name sealed-secrets --scope strict -o yaml > sealed_secret.yaml`
-- Prerequisites:
-  - Access to a cluster with the Sealed Secrets controller installed
-  - `kubectl` and `kubeseal` available (provided by Devbox)
-- Usage:
-  - Via Devbox: `devbox run k_ss_create rancher-bootstrap bootstrapPassword 'mySecret123' cattle-system`
-  - Direct: `bash devbox_scripts/create_sealed_secret.sh rancher-bootstrap bootstrapPassword 'mySecret123' cattle-system`
+**Examples:**
+```bash
+devbox run k_argo_app myapp
+devbox run k_argo_app myapp --namespace myns --no-templates
+```
+
+### create_sealed_secret.sh
+
+Creates a SealedSecret manifest from given inputs using `kubectl` and `kubeseal`. Outputs to stdout.
+
+**Usage:**
+```bash
+devbox run k_ss_create <secret-name> <secret-key> <secret-value> <namespace>
+```
+
+**Examples:**
+```bash
+# Output to file
+devbox run k_ss_create vault-token token "hvs.xxx" external-secrets > sealed-secret.yaml
+
+# Apply directly
+devbox run k_ss_create vault-token token "hvs.xxx" external-secrets | kubectl apply -f -
+```
+
+**Prerequisites:**
+- Access to a cluster with Sealed Secrets controller installed
+- `kubectl` and `kubeseal` available (provided by Devbox)
 
 ## Notes
-- All commands are configured in `devbox.json` under `shell.scripts`.
-- Enter `devbox shell` to ensure required tools (kubectl, helm, kubeseal, terraform, talosctl, etc.) are available.
-- The shell exports variables from `.env` on entry; keep secrets safe and consider your workflow before committing `.env`.
+
+- Enter `devbox shell` to ensure required tools (kubectl, helm, kubeseal, terraform, talosctl, etc.) are available
+- The shell exports variables from `.env` on entry; keep secrets safe and don't commit `.env`
+- Terraform functions require `TF_VAR_s3_*` environment variables for backend initialization

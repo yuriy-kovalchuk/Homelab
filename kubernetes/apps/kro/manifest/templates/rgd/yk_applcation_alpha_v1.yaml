@@ -6,14 +6,15 @@ spec:
   schema:
     apiVersion: v1alpha1
     kind: YKApplication
+    group: yuriy-lab.cloud
     
     spec:
       name: string | required=true
       namespace: string | required=true
       image: string | required=true
-      replicas: integer | default=1
+      replicas: integer | default=1 minimum=0 maximum=10
       labels: map[string]string
-      applicationType: string | default="deployment" # deployment | statefulset
+      applicationType: string | enum="deployment,statefulset"default="deployment"
       port: integer | default=80
 
       resources:
@@ -38,16 +39,16 @@ spec:
 
       httpRoute:
         enabled: boolean | default=false
-        hostname: string
+        hostname: string | required=true
         gatewayRef:
-          name: string
-          namespace: string
+          name: string | required=true
+          namespace: string | required=true
 
       # Single PVC configuration - optional
       storage:
         enabled: boolean | default=false
         name: string | default="data"
-        size: string | default="10Gi"
+        size: string | default="1Gi"
         storageClass: string | default="standard"
         mountPath: string | default="/data"
 
