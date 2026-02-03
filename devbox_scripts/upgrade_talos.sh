@@ -2,8 +2,7 @@
 set -euo pipefail
 
 # Talos Cluster Upgrade Script
-# This script upgrades Talos Linux on cluster nodes.
-# Terraform cannot perform in-place upgrades - use this script instead.
+# Usage: cd terraform/clusters/main && devbox run upgrade_talos -- -v v1.12.0 --all
 
 # Colors for output
 RED='\033[0;31m'
@@ -12,15 +11,13 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Default values
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TF_DIR="$(dirname "$SCRIPT_DIR")"
 TALOSCONFIG="${TALOSCONFIG:-$HOME/.talos/config}"
 PRESERVE=true
 DRY_RUN=false
 
 usage() {
     cat <<EOF
-Usage: $(basename "$0") [OPTIONS]
+Usage: cd terraform/clusters/main && devbox run upgrade_talos -- [OPTIONS]
 
 Upgrade Talos Linux on cluster nodes.
 
@@ -35,14 +32,10 @@ OPTIONS:
     -h, --help                Show this help message
 
 EXAMPLES:
-    # Upgrade all nodes to v1.12.0
-    $(basename "$0") -v v1.12.0 --all
-
-    # Upgrade specific node
-    $(basename "$0") -v v1.12.0 -n 10.0.2.20
-
-    # Dry run to see what would happen
-    $(basename "$0") -v v1.12.0 --all --dry-run
+    cd terraform/clusters/main
+    devbox run upgrade_talos -- -v v1.12.0 --all
+    devbox run upgrade_talos -- -v v1.12.0 -n 10.0.2.20
+    devbox run upgrade_talos -- -v v1.12.0 --all --dry-run
 
 NOTES:
     - Control plane nodes are upgraded one at a time to maintain etcd quorum
@@ -64,17 +57,11 @@ log_error() {
 }
 
 get_schematic_from_terraform() {
-    if command -v terraform &> /dev/null && [[ -d "$TF_DIR" ]]; then
-        cd "$TF_DIR"
-        terraform output -raw talos_schematic_id 2>/dev/null || echo ""
-    fi
+    terraform output -raw talos_schematic_id 2>/dev/null || echo ""
 }
 
 get_nodes_from_terraform() {
-    if command -v terraform &> /dev/null && [[ -d "$TF_DIR" ]]; then
-        cd "$TF_DIR"
-        terraform output -json control_plane_ips 2>/dev/null | jq -r '.[]' 2>/dev/null || echo ""
-    fi
+    terraform output -json control_plane_ips 2>/dev/null | jq -r '.[]' 2>/dev/null || echo ""
 }
 
 get_current_version() {
@@ -106,7 +93,6 @@ upgrade_node() {
         log_info "Node $node upgrade initiated successfully"
         log_info "Waiting for node $node to come back online..."
 
-        # Wait for node to be ready
         local retries=60
         while [[ $retries -gt 0 ]]; do
             if talosctl health --nodes "$node" --wait-timeout 10s &>/dev/null; then
@@ -124,6 +110,13 @@ upgrade_node() {
         return 1
     fi
 }
+
+# Check we're in the right directory
+if [[ ! -f "main.tf" ]] && [[ ! -f "versions.tf" ]]; then
+    echo "Error: No terraform files found in current directory"
+    echo "Usage: cd terraform/clusters/main && devbox run upgrade_talos -- -v v1.12.0 --all"
+    exit 1
+fi
 
 # Parse arguments
 NODES=()
@@ -173,19 +166,16 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Validate inputs
 if [[ -z "$TARGET_VERSION" ]]; then
     log_error "Target version is required. Use -v or --version"
     usage
     exit 1
 fi
 
-# Ensure version starts with 'v'
 if [[ ! "$TARGET_VERSION" =~ ^v ]]; then
     TARGET_VERSION="v$TARGET_VERSION"
 fi
 
-# Get schematic ID
 if [[ -z "$SCHEMATIC_ID" ]]; then
     log_info "Detecting schematic ID from Terraform..."
     SCHEMATIC_ID=$(get_schematic_from_terraform)
@@ -197,11 +187,9 @@ fi
 
 log_info "Using schematic ID: $SCHEMATIC_ID"
 
-# Build upgrade image URL
 UPGRADE_IMAGE="factory.talos.dev/installer/${SCHEMATIC_ID}:${TARGET_VERSION}"
 log_info "Upgrade image: $UPGRADE_IMAGE"
 
-# Get nodes to upgrade
 if [[ "$UPGRADE_ALL" == "true" ]]; then
     log_info "Getting nodes from Terraform..."
     mapfile -t NODES < <(get_nodes_from_terraform)
@@ -219,7 +207,6 @@ fi
 
 log_info "Nodes to upgrade: ${NODES[*]}"
 
-# Confirm upgrade
 if [[ "$DRY_RUN" == "false" ]]; then
     echo ""
     log_warn "This will upgrade ${#NODES[@]} node(s) to Talos $TARGET_VERSION"
@@ -231,7 +218,6 @@ if [[ "$DRY_RUN" == "false" ]]; then
     fi
 fi
 
-# Perform upgrades
 FAILED_NODES=()
 for node in "${NODES[@]}"; do
     echo ""
@@ -246,7 +232,6 @@ for node in "${NODES[@]}"; do
     fi
 done
 
-# Summary
 echo ""
 log_info "========================================="
 log_info "Upgrade Summary"

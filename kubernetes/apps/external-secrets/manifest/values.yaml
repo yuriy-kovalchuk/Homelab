@@ -7,7 +7,7 @@ yk:
           app.kubernetes.io/instance: external-secrets
       egress:
         - toFQDNs:
-            - matchName: "vault.yuriy-lab.cloud"
+            - matchName: "vault-intra.yuriy-lab.cloud"
           toPorts:
             - ports:
                 - port: "443"

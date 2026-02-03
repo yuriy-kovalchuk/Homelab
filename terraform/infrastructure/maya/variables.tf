@@ -67,7 +67,7 @@ variable "talos_vm_cpu_cores" {
 variable "talos_vm_memory" {
   description = "Memory in MB for the Talos VM"
   type        = number
-  default     = 4096
+  default     = 6120
 }
 
 variable "talos_vm_disk_size" {

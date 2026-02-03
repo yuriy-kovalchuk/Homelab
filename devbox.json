@@ -14,8 +14,9 @@
   ],
   "shell": {
     "init_hook": [
-      "chmod +x devbox_scripts/*",
-      "export $(cat .env | xargs)"
+      "chmod +x $DEVBOX_PROJECT_ROOT/devbox_scripts/*",
+      "export $(cat $DEVBOX_PROJECT_ROOT/.env | xargs)",
+      "source $DEVBOX_PROJECT_ROOT/devbox_scripts/tf_functions.sh"
     ],
     "scripts": {
       "test": [
