@@ -1,0 +1,182 @@
+apiVersion: kro.run/v1alpha1
+kind: ResourceGraphDefinition
+metadata:
+  name: yk-application-alpha-v1
+spec:
+  schema:
+    apiVersion: v1alpha1
+    kind: YKApplication
+    
+    spec:
+      name: string | required=true
+      namespace: string | required=true
+      image: string | required=true
+      replicas: integer | default=1
+      labels: map[string]string
+      applicationType: string | default="deployment" # deployment | statefulset
+      port: integer | default=80
+
+      resources:
+        requests:
+          cpu: string | default="10m"
+          memory: string | default="128Mi"
+        limits:
+          cpu: string | default="100m"
+          memory: string | default="512Mi"
+
+      service:
+        type: string | default="ClusterIP"
+        port: integer | default=80
+
+      securityContext:
+        runAsNonRoot: boolean | default=true
+        runAsUser: integer | default=10001
+        runAsGroup: integer | default=10001
+        fsGroup: integer | default=10001
+        seccompProfile:
+          type: string | default="RuntimeDefault"
+
+      httpRoute:
+        enabled: boolean | default=false
+        hostname: string
+        gatewayRef:
+          name: string
+          namespace: string
+
+      # Single PVC configuration - optional
+      storage:
+        enabled: boolean | default=false
+        name: string | default="data"
+        size: string | default="10Gi"
+        storageClass: string | default="standard"
+        mountPath: string | default="/data"
+
+    status:
+      deploymentStatus:
+        readyReplicas: "${deployment.status.readyReplicas}"
+        conditions: "${deployment.status.conditions}"
+      statefulsetStatus:
+        readyReplicas: "${statefulset.status.readyReplicas}"
+        conditions: "${statefulset.status.conditions}"
+
+  resources:
+    # -------------------------------------------------
+    # Deployment (with optional storage via volumes)
+    # -------------------------------------------------
+    - id: deployment
+      includeWhen:
+        - ${schema.spec.applicationType == "deployment"}
+      template:
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: ${schema.spec.name}
+          namespace: ${schema.spec.namespace}
+          labels: ${schema.spec.labels}
+        spec:
+          replicas: ${schema.spec.replicas}
+          selector:
+            matchLabels:
+              yk-app: ${schema.spec.name}
+          template:
+            metadata:
+              labels:
+                yk-app: ${schema.spec.name}
+            spec:
+              automountServiceAccountToken: false
+              securityContext: ${schema.spec.securityContext}
+              containers:
+                - name: app
+                  image: ${schema.spec.image}
+                  resources: ${schema.spec.resources}
+                  ports:
+                    - containerPort: ${schema.spec.port}
+
+    # -------------------------------------------------
+    # StatefulSet (with optional volumeClaimTemplates)
+    # -------------------------------------------------
+    - id: statefulset
+      includeWhen:
+        - ${schema.spec.applicationType == "statefulset"}
+      template:
+        apiVersion: apps/v1
+        kind: StatefulSet
+        metadata:
+          name: ${schema.spec.name}
+          namespace: ${schema.spec.namespace}
+          labels: ${schema.spec.labels}
+        spec:
+          replicas: ${schema.spec.replicas}
+          serviceName: ${schema.spec.name}
+          selector:
+            matchLabels:
+              yk-app: ${schema.spec.name}
+          template:
+            metadata:
+              labels:
+                yk-app: ${schema.spec.name}
+            spec:
+              automountServiceAccountToken: false
+              securityContext: ${schema.spec.securityContext}
+              containers:
+                - name: app
+                  image: ${schema.spec.image}
+                  resources: ${schema.spec.resources}
+                  ports:
+                    - containerPort: ${schema.spec.port}
+                  volumeMounts:
+                    - name: ${schema.spec.storage.name}
+                      mountPath: ${schema.spec.storage.mountPath}
+          volumeClaimTemplates:
+            - metadata:
+                name: ${schema.spec.storage.name}
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                storageClassName: ${schema.spec.storage.storageClass}
+                resources:
+                  requests:
+                    storage: ${schema.spec.storage.size}
+
+    # -------------------------------------------------
+    # Service
+    # -------------------------------------------------
+    - id: service
+      template:
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: ${schema.spec.name}
+          namespace: ${schema.spec.namespace}
+          labels: ${schema.spec.labels}
+        spec:
+          type: ${schema.spec.service.type}
+          selector:
+            yk-app: ${schema.spec.name}
+          ports:
+            - port: ${schema.spec.service.port}
+              targetPort: ${schema.spec.port}
+
+    # -------------------------------------------------
+    # HTTPRoute (Gateway API)
+    # -------------------------------------------------
+    - id: httproute
+      includeWhen:
+        - ${schema.spec.httpRoute.enabled == true}
+      template:
+        apiVersion: gateway.networking.k8s.io/v1
+        kind: HTTPRoute
+        metadata:
+          name: ${schema.spec.name}
+          namespace: ${schema.spec.namespace}
+          labels: ${schema.spec.labels}
+        spec:
+          hostnames:
+            - ${schema.spec.httpRoute.hostname}
+          parentRefs:
+            - name: ${schema.spec.httpRoute.gatewayRef.name}
+              namespace: ${schema.spec.httpRoute.gatewayRef.namespace}
+          rules:
+            - backendRefs:
+                - name: ${schema.spec.name}
+                  port: ${schema.spec.service.port}
