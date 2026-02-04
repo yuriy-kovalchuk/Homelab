@@ -1,20 +1,20 @@
 apiVersion: kro.run/v1alpha1
 kind: ResourceGraphDefinition
 metadata:
-  name: yk-application-alpha-v1
+  name: yk-application-alpha-v3
 spec:
   schema:
-    apiVersion: v1alpha1
+    apiVersion: v1alpha3
     kind: YKApplication
-    group: kro.run
-    
+    group: yuriy-lab.cloud
+
     spec:
       name: string | required=true
       namespace: string | required=true
       image: string | required=true
       replicas: integer | default=1 minimum=0 maximum=10
       labels: map[string]string
-      applicationType: string | enum="deployment,statefulset"default="deployment"
+      applicationType: string | enum="deployment,statefulset" default="deployment"
       port: integer | default=80
 
       resources:
@@ -39,18 +39,45 @@ spec:
 
       httpRoute:
         enabled: boolean | default=false
-        hostname: string | required=true
+        hostname: string
         gatewayRef:
-          name: string | required=true
-          namespace: string | required=true
+          name: string
+          namespace: string
 
-      # Single PVC configuration - optional
-      storage:
-        enabled: boolean | default=false
-        name: string | default="data"
-        size: string | default="1Gi"
-        storageClass: string | default="standard"
-        mountPath: string | default="/data"
+      # Environment variables configuration (as map)
+      env: map[string]string | default={}
+      # Example:
+      # env:
+      #   DATABASE_URL: "postgres://localhost:5432/mydb"
+      #   LOG_LEVEL: "info"
+
+      # Volume configuration - supports both hostPath and PVC
+      volumes: map[string]object | default={}
+      # Example:
+      # volumes:
+      #   data:
+      #     type: "pvc"           # or "hostPath"
+      #     mountPath: "/data"
+      #     size: "1Gi"           # for PVC
+      #     storageClass: "standard"  # for PVC
+      #     claimName: "my-pvc"   # for existing PVC
+      #   config:
+      #     type: "hostPath"
+      #     mountPath: "/config"
+      #     path: "/mnt/config"   # host path
+
+      # Multiple PVC configuration using map with foreach logic
+      persistentVolumeClaims: map[string]object | default={}
+      # Example:
+      # persistentVolumeClaims:
+      #   data:
+      #     size: "10Gi"
+      #     storageClass: "standard"
+      #     accessMode: "ReadWriteOnce"
+      #   cache:
+      #     size: "5Gi"
+      #     storageClass: "fast"
+      #     accessMode: "ReadWriteOnce"
 
     status:
       deploymentStatus:
@@ -62,7 +89,7 @@ spec:
 
   resources:
     # -------------------------------------------------
-    # Deployment (with optional storage via volumes)
+    # Deployment (when applicationType is deployment)
     # -------------------------------------------------
     - id: deployment
       includeWhen:
@@ -86,15 +113,30 @@ spec:
             spec:
               automountServiceAccountToken: false
               securityContext: ${schema.spec.securityContext}
+              # Dynamic volumes from volumes map
+              volumes: >-
+                ${dyn(schema.spec.volumes).map(k,
+                  dyn(schema.spec.volumes)[k].type == "hostPath"
+                    ? {"name": k, "hostPath": {"path": dyn(schema.spec.volumes)[k].path, "type": ""}}
+                    : (dyn(schema.spec.volumes)[k].type == "pvc" && has(dyn(schema.spec.volumes)[k].claimName)
+                        ? {"name": k, "persistentVolumeClaim": {"claimName": dyn(schema.spec.volumes)[k].claimName}}
+                        : {})
+                )}
               containers:
                 - name: app
                   image: ${schema.spec.image}
                   resources: ${schema.spec.resources}
                   ports:
                     - containerPort: ${schema.spec.port}
+                  # Environment variables from map
+                  env: >-
+                    ${dyn(schema.spec.env).map(k, {"name": k, "value": dyn(schema.spec.env)[k]})}
+                  # Dynamic volumeMounts from volumes map
+                  volumeMounts: >-
+                    ${dyn(schema.spec.volumes).map(k, {"name": k, "mountPath": dyn(schema.spec.volumes)[k].mountPath})}
 
     # -------------------------------------------------
-    # StatefulSet (with optional volumeClaimTemplates)
+    # StatefulSet (when applicationType is statefulset)
     # -------------------------------------------------
     - id: statefulset
       includeWhen:
@@ -119,25 +161,48 @@ spec:
             spec:
               automountServiceAccountToken: false
               securityContext: ${schema.spec.securityContext}
+              # Dynamic volumes from volumes map
+              volumes: >-
+                ${dyn(schema.spec.volumes).map(k,
+                  dyn(schema.spec.volumes)[k].type == "hostPath"
+                    ? {"name": k, "hostPath": {"path": dyn(schema.spec.volumes)[k].path, "type": ""}}
+                    : (dyn(schema.spec.volumes)[k].type == "pvc" && has(dyn(schema.spec.volumes)[k].claimName)
+                        ? {"name": k, "persistentVolumeClaim": {"claimName": dyn(schema.spec.volumes)[k].claimName}}
+                        : {})
+                )}
               containers:
                 - name: app
                   image: ${schema.spec.image}
                   resources: ${schema.spec.resources}
                   ports:
                     - containerPort: ${schema.spec.port}
-                  volumeMounts:
-                    - name: ${schema.spec.storage.name}
-                      mountPath: ${schema.spec.storage.mountPath}
-          volumeClaimTemplates:
-            - metadata:
-                name: ${schema.spec.storage.name}
-              spec:
-                accessModes:
-                  - ReadWriteOnce
-                storageClassName: ${schema.spec.storage.storageClass}
-                resources:
-                  requests:
-                    storage: ${schema.spec.storage.size}
+                  # Environment variables from map
+                  env: >-
+                    ${dyn(schema.spec.env).map(k, {"name": k, "value": dyn(schema.spec.env)[k]})}
+                  # Dynamic volumeMounts from volumes map
+                  volumeMounts: >-
+                    ${dyn(schema.spec.volumes).map(k, {"name": k, "mountPath": dyn(schema.spec.volumes)[k].mountPath})}
+
+    # -------------------------------------------------
+    # PersistentVolumeClaims (foreach logic for multiple PVCs)
+    # -------------------------------------------------
+    - id: pvc
+      forEach:
+        - pvcName: ${dyn(schema.spec.persistentVolumeClaims).map(k, k)}
+      template:
+        apiVersion: v1
+        kind: PersistentVolumeClaim
+        metadata:
+          name: ${schema.spec.name}-${pvcName}
+          namespace: ${schema.spec.namespace}
+          labels: ${schema.spec.labels}
+        spec:
+          accessModes:
+            - ${dyn(schema.spec.persistentVolumeClaims)[pvcName].accessMode}
+          storageClassName: ${dyn(schema.spec.persistentVolumeClaims)[pvcName].storageClass}
+          resources:
+            requests:
+              storage: ${dyn(schema.spec.persistentVolumeClaims)[pvcName].size}
 
     # -------------------------------------------------
     # Service
