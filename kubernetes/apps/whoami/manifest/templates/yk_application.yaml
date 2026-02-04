@@ -1,4 +1,4 @@
-apiVersion: kro.run/v1alpha1
+apiVersion: yuriy-lab.cloud/v1alpha3
 kind: YKApplication
 metadata:
   name: whoami
@@ -37,6 +37,9 @@ spec:
       name: "main-gateway"
       namespace: "envoy-gateway-system"
 
+  env:
+    APP_NAME: "whoami-ykapp"
+  
   service:
     type: ClusterIP
     port: 80
