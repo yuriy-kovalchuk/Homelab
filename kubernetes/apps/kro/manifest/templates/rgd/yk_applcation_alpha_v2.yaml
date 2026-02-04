@@ -1,0 +1,235 @@
+apiVersion: kro.run/v1alpha1
+kind: ResourceGraphDefinition
+metadata:
+  name: yk-application-alpha-v2
+spec:
+  schema:
+    apiVersion: v1alpha2
+    kind: YKApplication
+    group: yuriy-lab.cloud
+
+    spec:
+      name: string | required=true
+      namespace: string | required=true
+      image: string | required=true
+      replicas: integer | default=1 minimum=0 maximum=10
+      labels: map[string]string
+      applicationType: string | enum="deployment,statefulset" default="deployment"
+      port: integer | default=80
+
+      resources:
+        requests:
+          cpu: string | default="10m"
+          memory: string | default="128Mi"
+        limits:
+          cpu: string | default="100m"
+          memory: string | default="512Mi"
+
+      service:
+        type: string | default="ClusterIP"
+        port: integer | default=80
+
+      securityContext:
+        runAsNonRoot: boolean | default=true
+        runAsUser: integer | default=10001
+        runAsGroup: integer | default=10001
+        fsGroup: integer | default=10001
+        seccompProfile:
+          type: string | default="RuntimeDefault"
+
+      httpRoute:
+        enabled: boolean | default=false
+        hostname: string
+        gatewayRef:
+          name: string
+          namespace: string
+
+      # Volume configuration - supports both hostPath and PVC
+      volumes: map[string]object | default={}
+      # Example:
+      # volumes:
+      #   data:
+      #     type: "pvc"           # or "hostPath"
+      #     mountPath: "/data"
+      #     size: "1Gi"           # for PVC
+      #     storageClass: "standard"  # for PVC
+      #     claimName: "my-pvc"   # for existing PVC
+      #   config:
+      #     type: "hostPath"
+      #     mountPath: "/config"
+      #     path: "/mnt/config"   # host path
+
+      # Multiple PVC configuration using map with foreach logic
+      persistentVolumeClaims: map[string]object | default={}
+      # Example:
+      # persistentVolumeClaims:
+      #   data:
+      #     size: "10Gi"
+      #     storageClass: "standard"
+      #     accessMode: "ReadWriteOnce"
+      #   cache:
+      #     size: "5Gi"
+      #     storageClass: "fast"
+      #     accessMode: "ReadWriteOnce"
+
+    status:
+      deploymentStatus:
+        readyReplicas: "${deployment.status.readyReplicas}"
+        conditions: "${deployment.status.conditions}"
+      statefulsetStatus:
+        readyReplicas: "${statefulset.status.readyReplicas}"
+        conditions: "${statefulset.status.conditions}"
+
+  resources:
+    # -------------------------------------------------
+    # Deployment (when applicationType is deployment)
+    # -------------------------------------------------
+    - id: deployment
+      includeWhen:
+        - ${schema.spec.applicationType == "deployment"}
+      template:
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: ${schema.spec.name}
+          namespace: ${schema.spec.namespace}
+          labels: ${schema.spec.labels}
+        spec:
+          replicas: ${schema.spec.replicas}
+          selector:
+            matchLabels:
+              yk-app: ${schema.spec.name}
+          template:
+            metadata:
+              labels:
+                yk-app: ${schema.spec.name}
+            spec:
+              automountServiceAccountToken: false
+              securityContext: ${schema.spec.securityContext}
+              # Dynamic volumes from volumes map
+              volumes: >-
+                ${dyn(schema.spec.volumes).map(k,
+                  dyn(schema.spec.volumes)[k].type == "hostPath"
+                    ? {"name": k, "hostPath": {"path": dyn(schema.spec.volumes)[k].path, "type": ""}}
+                    : (dyn(schema.spec.volumes)[k].type == "pvc" && has(dyn(schema.spec.volumes)[k].claimName)
+                        ? {"name": k, "persistentVolumeClaim": {"claimName": dyn(schema.spec.volumes)[k].claimName}}
+                        : {})
+                )}
+              containers:
+                - name: app
+                  image: ${schema.spec.image}
+                  resources: ${schema.spec.resources}
+                  ports:
+                    - containerPort: ${schema.spec.port}
+                  # Dynamic volumeMounts from volumes map
+                  volumeMounts: >-
+                    ${dyn(schema.spec.volumes).map(k, {"name": k, "mountPath": dyn(schema.spec.volumes)[k].mountPath})}
+
+    # -------------------------------------------------
+    # StatefulSet (when applicationType is statefulset)
+    # -------------------------------------------------
+    - id: statefulset
+      includeWhen:
+        - ${schema.spec.applicationType == "statefulset"}
+      template:
+        apiVersion: apps/v1
+        kind: StatefulSet
+        metadata:
+          name: ${schema.spec.name}
+          namespace: ${schema.spec.namespace}
+          labels: ${schema.spec.labels}
+        spec:
+          replicas: ${schema.spec.replicas}
+          serviceName: ${schema.spec.name}
+          selector:
+            matchLabels:
+              yk-app: ${schema.spec.name}
+          template:
+            metadata:
+              labels:
+                yk-app: ${schema.spec.name}
+            spec:
+              automountServiceAccountToken: false
+              securityContext: ${schema.spec.securityContext}
+              # Dynamic volumes from volumes map
+              volumes: >-
+                ${dyn(schema.spec.volumes).map(k,
+                  dyn(schema.spec.volumes)[k].type == "hostPath"
+                    ? {"name": k, "hostPath": {"path": dyn(schema.spec.volumes)[k].path, "type": ""}}
+                    : (dyn(schema.spec.volumes)[k].type == "pvc" && has(dyn(schema.spec.volumes)[k].claimName)
+                        ? {"name": k, "persistentVolumeClaim": {"claimName": dyn(schema.spec.volumes)[k].claimName}}
+                        : {})
+                )}
+              containers:
+                - name: app
+                  image: ${schema.spec.image}
+                  resources: ${schema.spec.resources}
+                  ports:
+                    - containerPort: ${schema.spec.port}
+                  # Dynamic volumeMounts from volumes map
+                  volumeMounts: >-
+                    ${dyn(schema.spec.volumes).map(k, {"name": k, "mountPath": dyn(schema.spec.volumes)[k].mountPath})}
+
+    # -------------------------------------------------
+    # PersistentVolumeClaims (foreach logic for multiple PVCs)
+    # -------------------------------------------------
+    - id: pvc
+      forEach:
+        - pvcName: ${dyn(schema.spec.persistentVolumeClaims).map(k, k)}
+      template:
+        apiVersion: v1
+        kind: PersistentVolumeClaim
+        metadata:
+          name: ${schema.spec.name}-${pvcName}
+          namespace: ${schema.spec.namespace}
+          labels: ${schema.spec.labels}
+        spec:
+          accessModes:
+            - ${dyn(schema.spec.persistentVolumeClaims)[pvcName].accessMode}
+          storageClassName: ${dyn(schema.spec.persistentVolumeClaims)[pvcName].storageClass}
+          resources:
+            requests:
+              storage: ${dyn(schema.spec.persistentVolumeClaims)[pvcName].size}
+
+    # -------------------------------------------------
+    # Service
+    # -------------------------------------------------
+    - id: service
+      template:
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: ${schema.spec.name}
+          namespace: ${schema.spec.namespace}
+          labels: ${schema.spec.labels}
+        spec:
+          type: ${schema.spec.service.type}
+          selector:
+            yk-app: ${schema.spec.name}
+          ports:
+            - port: ${schema.spec.service.port}
+              targetPort: ${schema.spec.port}
+
+    # -------------------------------------------------
+    # HTTPRoute (Gateway API)
+    # -------------------------------------------------
+    - id: httproute
+      includeWhen:
+        - ${schema.spec.httpRoute.enabled == true}
+      template:
+        apiVersion: gateway.networking.k8s.io/v1
+        kind: HTTPRoute
+        metadata:
+          name: ${schema.spec.name}
+          namespace: ${schema.spec.namespace}
+          labels: ${schema.spec.labels}
+        spec:
+          hostnames:
+            - ${schema.spec.httpRoute.hostname}
+          parentRefs:
+            - name: ${schema.spec.httpRoute.gatewayRef.name}
+              namespace: ${schema.spec.httpRoute.gatewayRef.namespace}
+          rules:
+            - backendRefs:
+                - name: ${schema.spec.name}
+                  port: ${schema.spec.service.port}
