@@ -9,8 +9,19 @@ spec:
   certificateRotateStrategy: {}
   configuration:
     developerConfiguration:
-      featureGates: []
+      featureGates:
+        - HostDevices
     imagePullPolicy: IfNotPresent
+    permittedHostDevices:
+      pciHostDevices:
+        # AMD Radeon 780M GPU - verify with: lspci -nn | grep -i vga
+        - pciVendorSelector: "1002:15bf"
+          resourceName: "amd.com/780m"
+          externalResourceProvider: false
+        # AMD HD Audio Controller (paired with GPU)
+        - pciVendorSelector: "1002:1640"
+          resourceName: "amd.com/780m-audio"
+          externalResourceProvider: false
   customizeComponents: {}
   imagePullPolicy: IfNotPresent
   workloadUpdateStrategy: {}
