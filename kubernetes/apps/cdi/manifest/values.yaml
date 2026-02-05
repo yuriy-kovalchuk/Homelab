@@ -1,0 +1,25 @@
+yk:
+  ciliumNetworkPolicies:
+    - policyName: allow-egress-cdi-to-kube-api-server
+      endpointSelector:
+        matchLabels:
+          io.kubernetes.pod.namespace: cdi
+      egress:
+        - toEntities:
+            - kube-apiserver
+            - remote-node
+            - host
+    - policyName: allow-egress-cdi-to-world
+      endpointSelector:
+        matchLabels:
+          io.kubernetes.pod.namespace: cdi
+      egress:
+        # CDI needs to download images from external sources
+        - toEntities:
+            - world
+          toPorts:
+            - ports:
+                - port: "443"
+                  protocol: TCP
+                - port: "80"
+                  protocol: TCP
