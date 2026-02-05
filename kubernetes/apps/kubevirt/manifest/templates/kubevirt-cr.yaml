@@ -15,7 +15,7 @@ spec:
     permittedHostDevices:
       pciHostDevices:
         # AMD Radeon 780M GPU - verify with: lspci -nn | grep -i vga
-        - pciVendorSelector: "1002:15bf"
+        - pciVendorSelector: "1002:1900"
           resourceName: "amd.com/780m"
           externalResourceProvider: false
         # AMD HD Audio Controller (paired with GPU)
