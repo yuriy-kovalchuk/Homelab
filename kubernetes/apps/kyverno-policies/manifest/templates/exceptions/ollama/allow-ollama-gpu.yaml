@@ -1,0 +1,28 @@
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: allow-ollama-gpu
+  namespace: ollama
+spec:
+  exceptions:
+    - policyName: disallow-capabilities
+      ruleNames:
+        - adding-capabilities
+    - policyName: disallow-host-path
+      ruleNames:
+        - autogen-host-path
+    - policyName: disallow-privilege-escalation
+      ruleNames:
+        - autogen-privilege-escalation
+    - policyName: disallow-privileged-containers
+      ruleNames:
+        - autogen-privileged-containers
+  match:
+    any:
+      - resources:
+          kinds:
+            - Deployment
+          names:
+            - ollama
+          namespaces:
+            - ollama

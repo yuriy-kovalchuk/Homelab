@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ollama-external
+  namespace: {{ .Release.Namespace }}
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: ollama
+  ports:
+    - protocol: TCP
+      port: 10000
+      targetPort: 11434

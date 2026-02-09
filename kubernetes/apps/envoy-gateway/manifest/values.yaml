@@ -334,6 +334,19 @@ yk:
                 group: ""
                 name: goldilocks-gw-tls-cert
 
+        - name: https-openwebui
+          protocol: HTTPS
+          port: 443
+          hostname: "openwebui.yuriy-lab.cloud"
+          allowedRoutes:
+            namespaces:
+              from: All
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - kind: Secret
+                group: ""
+                name: openwebui-gw-tls-cert
 gateway-helm:
 
   deployment:
