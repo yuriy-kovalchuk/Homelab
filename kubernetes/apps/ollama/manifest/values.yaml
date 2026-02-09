@@ -17,6 +17,65 @@ open-webui:
       enabled: true
       size: 300Gi
 
+    # Vulkan / AMD GPU passthrough
+    ollama:
+      gpu:
+        enabled: true
+        type: "amd"
+        number: 1
+
+    extraEnv:
+      - name: HSA_OVERRIDE_GFX_VERSION
+        value: "11.0.0"
+      - name: HSA_ENABLE_SDMA
+        value: "0"
+      - name: OLLAMA_DEBUG
+        value: "1"
+      - name: OLLAMA_VULKAN
+        value: "1"
+
+    volumes:
+      - name: dev-gpu
+        hostPath:
+          path: /dev/dri
+          type: Directory
+      - name: dev-kfd
+        hostPath:
+          path: /dev/kfd
+          type: CharDevice
+      - name: sys-bus-pci
+        hostPath:
+          path: /sys/bus/pci
+          type: Directory
+      - name: sys-class-kfd
+        hostPath:
+          path: /sys/class/kfd
+          type: Directory
+
+    volumeMounts:
+      - name: dev-gpu
+        mountPath: /dev/dri
+        readOnly: true
+      - name: dev-kfd
+        mountPath: /dev/kfd
+        readOnly: true
+      - name: sys-bus-pci
+        mountPath: /sys/bus/pci
+        readOnly: true
+      - name: sys-class-kfd
+        mountPath: /sys/class/kfd
+        readOnly: true
+
+    securityContext:
+      privileged: true
+      runAsUser: 0
+      capabilities:
+        add:
+          - SYS_PTRACE
+
+    nodeSelector:
+      kubernetes.io/hostname: yulia
+
   # Websocket configuration with hardened Redis
   websocket:
     enabled: true
