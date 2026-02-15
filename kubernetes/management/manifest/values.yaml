@@ -12,8 +12,285 @@ apps:
     labels:
       goldilocks.fairwinds.com/enabled: "true"
   
-  # Placeholder for next apps (disabled for now)
+  # New apps being migrated
+  yk-dns-manager:
+    enabled: true
+    targetRevision: 0.4.0
+    namespace: yk-dns-manager
+    labels:
+      goldilocks.fairwinds.com/enabled: "true"
+  
+  vpa:
+    enabled: true
+    targetRevision: 1.0.0
+    namespace: vpa
+    labels:
+      goldilocks.fairwinds.com/enabled: "true"
+    ignoreDifferences:
+      - group: gateway.networking.k8s.io
+        kind: HTTPRoute
+        jsonPointers:
+          - /spec/parentRefs/0/group
+          - /spec/parentRefs/0/kind
+          - /spec/rules/0/backendRefs/0/group
+          - /spec/rules/0/backendRefs/0/kind
+          - /spec/rules/0/backendRefs/0/weight
+  
+  uptime-kuma:
+    enabled: true
+    targetRevision: 1.0.0
+    namespace: uptime-kuma
+    chart: uptimekuma-yk
+    labels:
+      goldilocks.fairwinds.com/enabled: "true"
+
+  # --- Infrastructure ---
   argo-cd:
-    enabled: false
+    enabled: true
+    targetRevision: 9.1.4
+    namespace: argo-cd
+    labels:
+      goldilocks.fairwinds.com/enabled: "true"
+
+  cert-manager:
+    enabled: true
+    targetRevision: 1.19.1
+    namespace: cert-manager
+    labels:
+      goldilocks.fairwinds.com/enabled: "true"
+
+  sealed-secrets:
+    enabled: true
+    targetRevision: 2.17.9
+    namespace: sealed-secrets
+
+  cilium:
+    enabled: true
+    targetRevision: 1.18.4
+    namespace: kube-system
+    labels:
+      goldilocks.fairwinds.com/enabled: "true"
+    ignoreDifferences:
+      - group: apps
+        kind: StatefulSet
+        jsonPointers:
+          - /spec/replicas
+          - /spec/template/metadata/annotations
+          - /spec/updateStrategy/rollingUpdate/partition
+          - /status
+          - /metadata/creationTimestamp
+          - /spec/volumeClaimTemplates
+
+  cilium-network-policies:
+    enabled: true
+    targetRevision: 1.0.0
+    namespace: kube-system
+
+  envoy-gateway:
+    enabled: true
+    targetRevision: 1.0.0
+    namespace: envoy-gateway-system
+    labels:
+      goldilocks.fairwinds.com/enabled: "true"
+
+  external-secrets:
+    enabled: true
+    targetRevision: 1.1.0
+    namespace: external-secrets
+    labels:
+      goldilocks.fairwinds.com/enabled: "true"
+
+  metrics-server:
+    enabled: true
+    targetRevision: 3.13.0
+    namespace: metrics-server
+
+  # --- Storage ---
+  minio:
+    enabled: true
+    targetRevision: 1.0.0
+    namespace: minio
+    syncOptions:
+      - RespectIgnoreDifferences=true
+    ignoreDifferences:
+      - group: apps
+        kind: StatefulSet
+        jsonPointers:
+          - /spec/template/metadata/annotations
+          - /status
+          - /metadata/creationTimestamp
+          - /spec/volumeClaimTemplates
+
+  longhorn:
+    enabled: true
+    targetRevision: 1.10.1
+    namespace: longhorn-system
+    labels:
+      goldilocks.fairwinds.com/enabled: "true"
+
+  democratic-csi-nfs:
+    enabled: true
+    targetRevision: 0.15.1
+    namespace: democratic-csi-nfs
+    labels:
+      pod-security.kubernetes.io/audit: privileged
+      pod-security.kubernetes.io/enforce: privileged
+      pod-security.kubernetes.io/warn: privileged
+      goldilocks.fairwinds.com/enabled: "true"
+
+  democratic-csi-iscsi:
+    enabled: true
+    targetRevision: 0.15.1
+    namespace: democratic-csi-iscsi
+    labels:
+      pod-security.kubernetes.io/audit: privileged
+      pod-security.kubernetes.io/enforce: privileged
+      pod-security.kubernetes.io/warn: privileged
+      goldilocks.fairwinds.com/enabled: "true"
+
+  cdi:
+    enabled: true
+    targetRevision: 1.64.0
+    namespace: cdi
+    labels:
+      goldilocks.fairwinds.com/enabled: "true"
+
+  # --- Monitoring & Observability ---
+  grafana:
+    enabled: true
+    targetRevision: 10.2.0
+    namespace: grafana
+    labels:
+      goldilocks.fairwinds.com/enabled: "true"
+
+  k8s-monitoring:
+    enabled: true
+    targetRevision: 1.0.0
+    namespace: k8s-monitoring
+    labels:
+      goldilocks.fairwinds.com/enabled: "true"
+
+  loki:
+    enabled: true
+    targetRevision: 6.46.0
+    namespace: loki
+    labels:
+      goldilocks.fairwinds.com/enabled: "true"
+
+  mimir:
+    enabled: true
+    targetRevision: 6.0.3
+    namespace: mimir
+    syncOptions:
+      - RespectIgnoreDifferences=true
+    ignoreDifferences:
+      - group: apps
+        kind: StatefulSet
+        jsonPointers:
+          - /spec/template/metadata/annotations
+          - /spec/updateStrategy/rollingUpdate/partition
+          - /status
+          - /metadata/creationTimestamp
+          - /spec/volumeClaimTemplates
+
+  trivy:
+    enabled: true
+    targetRevision: 0.31.0
+    namespace: trivy
+
+  trivy-converter:
+    enabled: true
+    targetRevision: 1.0.0
+    namespace: trivy-converter
+
+  kyverno-reporter:
+    enabled: true
+    targetRevision: 3.7.0
+    namespace: kyverno-reporter
+
+  # --- Policy & Security ---
+  kyverno:
+    enabled: true
+    targetRevision: 3.6.0
+    namespace: kyverno
+    labels:
+      goldilocks.fairwinds.com/enabled: "true"
+
+  kyverno-policies:
+    enabled: true
+    targetRevision: 1.0.0
+    namespace: kyverno
+
+  cloudnative-pg:
+    enabled: true
+    targetRevision: 0.26.1
+    namespace: cloudnative-pg
+    labels:
+      goldilocks.fairwinds.com/enabled: "true"
+
+  ulimit-tuner:
+    enabled: true
+    targetRevision: 1.0.0
+    namespace: ulimit-tuner
+
+  # --- Applications & Services ---
   authentik:
-    enabled: false
+    enabled: true
+    targetRevision: 2025.10.2
+    namespace: authentik
+    labels:
+      goldilocks.fairwinds.com/enabled: "true"
+
+  homepage:
+    enabled: true
+    targetRevision: 1.0.0
+    namespace: homepage
+    labels:
+      goldilocks.fairwinds.com/enabled: "true"
+
+  headlamp:
+    enabled: true
+    targetRevision: 0.39.0
+    namespace: headlamp
+    labels:
+      goldilocks.fairwinds.com/enabled: "true"
+
+  httpbin:
+    enabled: true
+    targetRevision: 1.0.0
+    namespace: httpbin
+    labels:
+      goldilocks.fairwinds.com/enabled: "true"
+
+  dns-sync:
+    enabled: true
+    targetRevision: 1.0.0
+    namespace: dns-sync
+    labels:
+      goldilocks.fairwinds.com/enabled: "true"
+  
+  kubevirt:
+    enabled: true
+    targetRevision: 1.0.0
+    namespace: kubevirt
+    labels:
+      goldilocks.fairwinds.com/enabled: "true"
+
+  kro:
+    enabled: true
+    targetRevision: 0.8.4
+    namespace: kro
+
+  ollama:
+    enabled: true
+    targetRevision: 1.0.0
+    namespace: ollama
+
+  # --- Utilities ---
+  clean-pods:
+    enabled: true
+    targetRevision: 0.1.0
+    namespace: clean-pods
+    chart: cleanup-pods
+    labels:
+      goldilocks.fairwinds.com/enabled: "true"

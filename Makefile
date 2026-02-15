@@ -4,11 +4,9 @@ HARBOR_URL ?= harbor.yuriy-lab.cloud
 HARBOR_PROJECT ?= charts
 OCI_REPO := oci://$(HARBOR_URL)/$(HARBOR_PROJECT)
 
-# Find manifest directories that contain a Chart.yaml
-# If APP is provided, target only that app's manifest directory.
-# Otherwise, find all manifest directories.
+# Find manifest directories that contain a Chart.yaml, excluding dependencies in 'charts/'
 ifeq ($(APP),)
-CHARTS := $(shell find kubernetes/apps -name "Chart.yaml" -exec dirname {} \;)
+CHARTS := $(shell find kubernetes/apps -name "Chart.yaml" -not -path "*/charts/*" -exec dirname {} \;)
 else
 CHARTS := kubernetes/apps/$(APP)/manifest
 endif
@@ -41,6 +39,14 @@ package:
 	@mkdir -p .build
 	@for chart in $(CHARTS); do \
 		if [ -d "$$chart" ]; then \
+			echo "Cleaning dependencies for $$chart..."; \
+			rm -rf $$chart/charts $$chart/Chart.lock; \
+			if grep -q "dependencies:" $$chart/Chart.yaml; then \
+				echo "Building dependencies for $$chart..."; \
+				helm dependency build $$chart; \
+			else \
+				echo "No dependencies defined for $$chart."; \
+			fi; \
 			echo "Packaging $$chart..."; \
 			helm package $$chart -d .build; \
 		else \
@@ -56,7 +62,7 @@ push: package
 		echo "Pushing $$PKG to $(OCI_REPO)..."; \
 		helm push $$PKG $(OCI_REPO); \
 	else \
-		for pkg in .build/*.tgz; do \
+		for pkg in .build/*-yk-*.tgz; do \
 			echo "Pushing $$pkg to $(OCI_REPO)..."; \
 			helm push $$pkg $(OCI_REPO); \
 		done; \
