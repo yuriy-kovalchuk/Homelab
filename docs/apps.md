@@ -146,13 +146,28 @@ Pod -> PVC -> StorageClass -> Longhorn (replicated)
 
 ## Creating New Applications
 
-Use the helper script to scaffold new applications:
+1. **Scaffold**: Use the helper script to create the chart structure:
+   ```bash
+   devbox run k_argo_app <app-name>
+   ```
+   This creates `kubernetes/apps/<app-name>/manifest/`.
 
-```bash
-devbox run k_argo_app
-```
+2. **Configure**: Edit `Chart.yaml` and `values.yaml` in the new directory.
 
-This runs `devbox_scripts/new_app.sh` which creates the required directory structure and boilerplate files.
+3. **Release**: Push the chart to Harbor:
+   ```bash
+   make release APP=<app-name>
+   ```
+
+4. **Enable**: Add the application to `kubernetes/management/manifest/values.yaml` and enable it:
+   ```yaml
+   <app-name>:
+     enabled: true
+     targetRevision: 1.0.0
+     namespace: <namespace>
+   ```
+
+5. **Deploy**: Commit and push the changes to `kubernetes/management/`. Argo CD will sync the new app.
 
 ---
 
@@ -160,4 +175,3 @@ This runs `devbox_scripts/new_app.sh` which creates the required directory struc
 
 - [Architecture Overview](architecture.md)
 - [Infrastructure](infrastructure.md)
-- [kubernetes/apps/README.md](../kubernetes/apps/README.md) - Detailed app configurations

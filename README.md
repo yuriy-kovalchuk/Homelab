@@ -34,8 +34,10 @@ devbox run <script>    # Run helper scripts
 
 Each top-level area has its own README with details. Start here:
 
-- Kubernetes apps (Argo CD-managed): [kubernetes/apps/README.md](kubernetes/apps/README.md)
-  - Helm charts/manifests plus Argo CD Application definitions for cluster apps.
+- Kubernetes apps (Argo CD-managed): [docs/apps.md](docs/apps.md)
+  - Helm charts (OCI) for cluster applications.
+- Management Layer: [kubernetes/management/](kubernetes/management/)
+  - App of Apps pattern (Root App) for managing cluster deployments.
 - Cluster setup tooling: kubernetes/setup/
   - Contains tooling and IaC to stand up/operate the cluster (e.g., Talos Terraform under kubernetes/setup/talos/). See READMEs inside subfolders when present.
 - Ad‑hoc Kubernetes tests: [kubernetes/test/README.md](kubernetes/test/README.md)

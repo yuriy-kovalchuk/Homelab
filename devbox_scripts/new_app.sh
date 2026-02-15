@@ -160,13 +160,19 @@ main() {
 
   echo "[DONE] New app created at: $TARGET_DIR"
   echo "Next steps:"
-  echo "  - Review $TARGET_DIR/manifest/Chart.yaml and values.yaml"
+  echo "  1. Review $TARGET_DIR/manifest/Chart.yaml and values.yaml"
   if [[ "$INCLUDE_TEMPLATES" -eq 1 ]]; then
-    echo "  - Adjust manifests under $TARGET_DIR/manifest/templates as needed"
+    echo "     - Adjust manifests under $TARGET_DIR/manifest/templates as needed"
   else
-    echo "  - Add dependencies to $TARGET_DIR/manifest/Chart.yaml if using an upstream chart (umbrella)"
+    echo "     - Add dependencies to $TARGET_DIR/manifest/Chart.yaml if using an upstream chart (umbrella)"
   fi
-  echo "  - Apply the Argo CD app: kubectl apply -f $TARGET_DIR/$APP_NAME-app.yaml"
+  echo "  2. Release the chart to Harbor:"
+  echo "     make release APP=$APP_NAME"
+  echo "  3. Enable the app in the Root Application:"
+  echo "     - Edit kubernetes/management/manifest/values.yaml"
+  echo "     - Add '$APP_NAME' to the list with enabled: true"
+  echo "     - Commit and push changes"
+  echo "  (Optional) For testing only, you can apply the standalone manifest: kubectl apply -f $TARGET_DIR/$APP_NAME-app.yaml"
 }
 
 main "$@"

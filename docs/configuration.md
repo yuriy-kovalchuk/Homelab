@@ -83,6 +83,17 @@ These variables configure ACME certificates on the Maya Proxmox node.
 
 **Used by:** `terraform/infrastructure/maya`
 
+### Release Automation
+
+These variables are required to push Helm charts to the Harbor OCI registry using the `Makefile`.
+
+| Variable | Purpose | Example |
+|----------|---------|---------|
+| `HARBOR_USER` | Harbor registry username (e.g., admin) | `admin` |
+| `HARBOR_PASSWORD` | Harbor registry password | `********` |
+
+**Used by:** `Makefile` (run `make login` first)
+
 ## Example .env File
 
 ```bash
