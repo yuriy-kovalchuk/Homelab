@@ -11,6 +11,10 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
+  {{- if $app.ignoreDifferences }}
+  ignoreDifferences:
+    {{- toYaml $app.ignoreDifferences | nindent 4 }}
+  {{- end }}
   project: infrastructure
   source:
     repoURL: {{ $app.repoURL | default $.Values.global.repoURL }}
