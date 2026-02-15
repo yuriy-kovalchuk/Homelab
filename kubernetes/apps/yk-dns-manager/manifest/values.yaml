@@ -1,0 +1,82 @@
+yk:
+  ciliumNetworkPolicies:
+    - policyName: allow-egress-to-host
+      type: namespaced
+      endpointSelector: {}
+      egress:
+        - toEntities:
+            - host
+            - remote-node
+    - policyName: egress-controller-to-opnsense
+      type: namespaced
+      endpointSelector:
+        matchLabels:
+          app.kubernetes.io/instance: yk-dns-manager
+      egress:
+        - toFQDNs:
+            - matchName: "opnsense.yuriy-lab.cloud"
+          toPorts:
+            - ports:
+                - port: "443"
+                  protocol: "TCP"
+
+
+yk-dns-manager:
+  domainMap:
+    "*.yuriy-lab.cloud": "10.0.8.105"
+
+  dnsProvider:
+    provider: opnsense
+    upsert: false
+    settings:
+      base_url: "https://opnsense.yuriy-lab.cloud/api"
+      skip_tls_verify: "false"
+      default_ttl: "300"
+    existingSecret: "dns-manager-provider-credentials"
+
+  metrics:
+    service:
+      port: 9090
+
+  serviceMonitor:
+    enabled: false
+    interval: 30s
+    namespace: ""
+
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 65532
+    runAsGroup: 65532
+    fsGroup: 65532
+    seccompProfile:
+      type: RuntimeDefault
+
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
+
+  livenessProbe:
+    httpGet:
+      path: /healthz
+      port: 8081
+    initialDelaySeconds: 5
+    periodSeconds: 10
+
+  readinessProbe:
+    httpGet:
+      path: /readyz
+      port: 8081
+    initialDelaySeconds: 5
+    periodSeconds: 5
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+

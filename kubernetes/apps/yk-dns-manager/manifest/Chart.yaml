@@ -1,0 +1,12 @@
+apiVersion: v2
+name: yk-dns-manager-yk
+description: Umbrella Helm chart for yk-dns-manager application in Kubernetes
+
+type: application
+version: 0.4.0
+appVersion: "0.4.0"
+
+dependencies:
+  - name: yk-dns-manager
+    version: "0.4.0"
+    repository: oci://ghcr.io/yuriy-kovalchuk/yk-dns-manager-chart
