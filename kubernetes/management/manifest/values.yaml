@@ -1,0 +1,19 @@
+# Global settings for all apps
+global:
+  repoURL: harbor.yuriy-lab.cloud/charts
+  targetRevision: 1.0.0
+
+# App toggles for slow rollout
+apps:
+  whoami:
+    enabled: true
+    targetRevision: 1.0.0
+    namespace: whoami
+    labels:
+      goldilocks.fairwinds.com/enabled: "true"
+  
+  # Placeholder for next apps (disabled for now)
+  argo-cd:
+    enabled: false
+  authentik:
+    enabled: false

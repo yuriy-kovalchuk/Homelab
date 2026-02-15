@@ -62,20 +62,25 @@ Infrastructure code for Maya is located in `terraform/maya/`.
 ## GitOps Workflow
 
 ```
-+-------------+     git push      +------------+     sync      +------------------+
-|  Developer  | ----------------> |   GitHub   | -----------> |    Argo CD       |
-+-------------+                   +------------+               +--------+---------+
-                                                                        |
-                                                               +--------v---------+
-                                                               |   Kubernetes     |
-                                                               |    Cluster       |
-                                                               +------------------+
++-------------+     git push      +------------+     push      +------------------+
+|  Developer  | ----------------> |   GitHub   | -----------> |      Harbor      |
++-------------+                   +------------+              | (OCI Registry)   |
+                                                              +--------+---------+
+                                                                       |
+                                                              +--------v---------+
+                                                              |    Argo CD       |
+                                                              +--------+---------+
+                                                                       |
+                                                              +--------v---------+
+                                                              |   Kubernetes     |
+                                                              |    Cluster       |
+                                                              +------------------+
 ```
 
-1. Changes are made to Kubernetes manifests in this repository
-2. Push to GitHub triggers Argo CD sync
-3. Argo CD applies changes to the cluster
-4. Applications are deployed/updated automatically
+1. Changes are made to Kubernetes manifests and Helm charts in this repository.
+2. Pushing to GitHub (or manual release) triggers a build/push of the Helm chart to the **Harbor OCI Registry**.
+3. Argo CD is configured to track specific versions of these charts in Harbor.
+4. Argo CD pulls the OCI artifact and applies changes to the cluster.
 
 ## Technology Stack
 

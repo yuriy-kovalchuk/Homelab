@@ -1,0 +1,37 @@
+{{- range $name, $app := .Values.apps }}
+{{- if $app.enabled }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ $name }}
+  namespace: argo-cd
+  labels:
+    {{- toYaml $app.labels | nindent 4 }}
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: infrastructure
+  source:
+    repoURL: {{ $app.repoURL | default $.Values.global.repoURL }}
+    chart: {{ $app.chart | default (printf "%s-yk" $name) }}
+    targetRevision: {{ $app.targetRevision | default $.Values.global.targetRevision }}
+    helm:
+      releaseName: {{ $name }}
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{ $app.namespace | default $name }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    {{- if $app.labels }}
+    managedNamespaceMetadata:
+      labels:
+        {{- toYaml $app.labels | nindent 8 }}
+    {{- end }}
+{{- end }}
+{{- end }}

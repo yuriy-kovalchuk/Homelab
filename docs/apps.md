@@ -4,17 +4,29 @@ This document lists all applications deployed to the main Kubernetes cluster via
 
 ## Application Deployment Pattern
 
-All applications follow a consistent structure:
+We use a two-tier management structure:
 
+### 1. Management Layer (App of Apps)
+Located in `kubernetes/management/`, this layer uses the **App of Apps** pattern.
+- **Root Application**: `kubernetes/management/root-app.yaml` (Manually applied once).
+- **Configuration**: `kubernetes/management/manifest/values.yaml` acts as the control plane to enable/disable applications and manage their versions.
+
+### 2. Application Layer (OCI Charts)
+Located in `kubernetes/apps/<app-name>/`, these are the actual workloads.
 ```
 kubernetes/apps/<app-name>/
-├── <app-name>-app.yaml         # Argo CD Application definition
+├── <app-name>-app.yaml         # Standalone Argo CD Application (for reference/bootstrap)
 └── manifest/
     ├── Chart.yaml              # Helm chart metadata
     ├── values.yaml             # Custom values (overrides)
     ├── values_original.yaml    # Original upstream values (reference)
     └── templates/              # Custom K8s templates
 ```
+
+### Deployment Model (OCI-based)
+1.  **Source**: Helm charts are located in `kubernetes/apps/<app-name>/manifest`.
+2.  **Registry**: Charts are linted, packaged, and pushed to `oci://harbor.yuriy-lab.cloud/charts` using the root `Makefile`.
+3.  **Delivery**: The Root App (`kubernetes/management/`) references the chart in Harbor with a specific `targetRevision`.
 
 Applications are managed via Argo CD with:
 - Automatic sync with self-heal enabled

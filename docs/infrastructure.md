@@ -116,7 +116,7 @@ The Talos cluster configuration (secrets, bootstrap) is separate in `terraform/c
 
 The management Kubernetes cluster hosts infrastructure tools that support the main cluster:
 
-- **Harbor Registry** - Container image mirror/cache for container registries
+- **Harbor Registry** - Container image mirror/cache AND OCI registry for Helm charts
 - **Vault** - Secrets management for the main cluster
 - **Cilium** - CNI with BGP support
 - **Cert-manager** - Certificate management
