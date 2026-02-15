@@ -58,7 +58,6 @@ apps:
     enabled: true
     targetRevision: 0.1.0
     namespace: clean-pods
-    chart: cleanup-pods
     labels:
       goldilocks.fairwinds.com/enabled: "true"
 
