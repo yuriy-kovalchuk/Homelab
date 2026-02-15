@@ -9,9 +9,9 @@ output "talos_config" {
   sensitive = true
 }
 
-output "talos_schematic_id" {
-  value       = talos_image_factory_schematic.this.id
-  description = "Talos image schematic ID (used for upgrades with extensions)"
+output "talos_schematic_ids" {
+  value       = { for hostname, schematic in talos_image_factory_schematic.nodes : hostname => schematic.id }
+  description = "Talos image schematic IDs per node (used for upgrades with extensions)"
 }
 
 output "control_plane_ips" {

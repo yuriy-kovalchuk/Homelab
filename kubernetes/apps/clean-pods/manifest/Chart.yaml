@@ -1,5 +1,5 @@
 apiVersion: v2
-name: cleanup-pods
+name: clean-pods-yk
 description: "Helm chart to periodically cleanup Failed and old Succeeded pods"
 type: application
 version: 0.1.0

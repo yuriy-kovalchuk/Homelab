@@ -4,8 +4,19 @@ variable "control_plane_nodes" {
     ip        = string
     hostname  = string
     interface = string
-    disk      = optional(string) # only if you want custom disk
-    wipe      = optional(bool)   # only if you want wipe
+    disk      = optional(string)       # only if you want custom disk
+    wipe      = optional(bool)         # only if you want wipe
+    extensions = optional(list(string)) # node-specific extensions (overrides default)
+    extra_kernel_args = optional(list(string)) # node-specific kernel args
+    gpu_passthrough = optional(object({
+      enabled     = bool
+      pci_devices = list(object({
+        pci_address   = string           # e.g., "0000:c4:00.0"
+        vendor_device = string           # e.g., "1002:1900"
+        resource_name = string           # e.g., "amd.com/780m"
+      }))
+      node_labels = optional(map(string)) # additional labels for GPU scheduling
+    }))
   }))
 }
 
@@ -24,7 +35,7 @@ variable "gateway" {
 variable "talos_version" {
   description = "Talos version for installation"
   type        = string
-  default     = "v1.11.5"
+  default     = "v1.12.2"
 }
 
 
@@ -40,10 +51,16 @@ variable "extensions" {
   default     = ["siderolabs/iscsi-tools", "siderolabs/util-linux-tools"]
 }
 
+variable "extra_kernel_args" {
+  description = "Extra kernel arguments to embed in the Talos image"
+  type        = list(string)
+  default     = []
+}
+
 variable "image_registry" {
   description = "Registry prefix for Talos installer image"
   type        = string
-  default     = "factory.talos.dev/nocloud-installer"
+  default     = "factory.talos.dev/metal-installer"
 }
 
 variable "allow_scheduling_on_control_planes" {

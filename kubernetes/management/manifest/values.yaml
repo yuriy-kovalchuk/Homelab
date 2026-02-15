@@ -88,7 +88,7 @@ apps:
 
   envoy-gateway:
     enabled: true
-    targetRevision: 1.0.0
+    targetRevision: 1.6.0
     namespace: envoy-gateway-system
     labels:
       goldilocks.fairwinds.com/enabled: "true"
@@ -127,6 +127,9 @@ apps:
     namespace: longhorn-system
     labels:
       goldilocks.fairwinds.com/enabled: "true"
+      pod-security.kubernetes.io/audit: privileged
+      pod-security.kubernetes.io/enforce: privileged
+      pod-security.kubernetes.io/warn: privileged
 
   democratic-csi-nfs:
     enabled: true
@@ -262,12 +265,6 @@ apps:
     labels:
       goldilocks.fairwinds.com/enabled: "true"
 
-  dns-sync:
-    enabled: true
-    targetRevision: 1.0.0
-    namespace: dns-sync
-    labels:
-      goldilocks.fairwinds.com/enabled: "true"
   
   kubevirt:
     enabled: true
@@ -291,6 +288,5 @@ apps:
     enabled: true
     targetRevision: 0.1.0
     namespace: clean-pods
-    chart: cleanup-pods
     labels:
       goldilocks.fairwinds.com/enabled: "true"
