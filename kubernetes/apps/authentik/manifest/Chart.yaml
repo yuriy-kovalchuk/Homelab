@@ -3,7 +3,7 @@ name: authentik-yk
 description: Umbrella Helm chart for authentik application in Kubernetes
 
 type: application
-version: 2025.10.2
+version: 1.0.1
 appVersion: "2025.10.2"
 
 

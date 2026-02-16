@@ -13,7 +13,7 @@ apps:
 
   authentik:
     enabled: true
-    targetRevision: 2025.10.2
+    targetRevision: 1.0.1
     namespace: authentik
     labels:
       goldilocks.fairwinds.com/enabled: "true"
