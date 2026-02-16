@@ -27,7 +27,7 @@ apps:
 
   cert-manager:
     enabled: true
-    targetRevision: 1.19.1
+    targetRevision: 1.0.1
     namespace: cert-manager
     labels:
       goldilocks.fairwinds.com/enabled: "true"
