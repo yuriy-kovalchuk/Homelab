@@ -1,5 +1,5 @@
 apiVersion: v2
 name: homepage-yk
 description: Umbrella Helm chart for the homepage application in k8s
-version: 1.0.0
+version: 1.0.1
 appVersion: "1.0.0"

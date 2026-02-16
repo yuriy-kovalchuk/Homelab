@@ -125,7 +125,7 @@ apps:
 
   homepage:
     enabled: true
-    targetRevision: 1.0.0
+    targetRevision: 1.0.1
     namespace: homepage
     labels:
       goldilocks.fairwinds.com/enabled: "true"
