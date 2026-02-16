@@ -88,16 +88,10 @@ apps:
       pod-security.kubernetes.io/warn: privileged
       goldilocks.fairwinds.com/enabled: "true"
 
-  dns-sync:
-    enabled: true
-    targetRevision: 1.0.0
-    namespace: dns-sync
-    labels:
-      goldilocks.fairwinds.com/enabled: "true"
 
   envoy-gateway:
     enabled: true
-    targetRevision: 1.0.0
+    targetRevision: 1.1.0
     namespace: envoy-gateway-system
     labels:
       goldilocks.fairwinds.com/enabled: "true"
@@ -284,7 +278,7 @@ apps:
 
   yk-dns-manager:
     enabled: true
-    targetRevision: 0.4.0
+    targetRevision: 0.5.0
     namespace: yk-dns-manager
     labels:
       goldilocks.fairwinds.com/enabled: "true"
