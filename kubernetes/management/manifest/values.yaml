@@ -182,10 +182,13 @@ apps:
 
   longhorn:
     enabled: true
-    targetRevision: 1.10.1
+    targetRevision: 1.0.4
     namespace: longhorn-system
     labels:
       goldilocks.fairwinds.com/enabled: "true"
+      pod-security.kubernetes.io/audit: privileged
+      pod-security.kubernetes.io/enforce: privileged
+      pod-security.kubernetes.io/warn: privileged
 
   metrics-server:
     enabled: true

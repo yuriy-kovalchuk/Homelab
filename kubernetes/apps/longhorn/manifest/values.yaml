@@ -1,17 +1,17 @@
 yk:
-  httpRoute:
-    parentRefs:
-      - name: main-gateway
-        namespace: envoy-gateway-system
-    hostnames:
-      - "longhorn.yuriy-lab.cloud"
-    path:
-      type: PathPrefix
-      value: /
-    backend:
-      name: longhorn-frontend
-      port: 80
-
+  httpRoutes:
+    - parentRefs:
+        - name: main-gateway
+          namespace: envoy-gateway-system
+      name: longhorn
+      hostnames:
+        - "longhorn.yuriy-lab.cloud"
+      path:
+        type: PathPrefix
+        value: /
+      backend:
+        name: longhorn-frontend
+        port: 80
       
   ciliumNetworkPolicies:
     - policyName: egress-csi-resizer-to-host
