@@ -133,9 +133,12 @@ apps:
 
   k8s-monitoring:
     enabled: true
-    targetRevision: 1.0.0
+    targetRevision: 1.1.0
     namespace: k8s-monitoring
     labels:
+      pod-security.kubernetes.io/audit: privileged
+      pod-security.kubernetes.io/enforce: privileged
+      pod-security.kubernetes.io/warn: privileged
       goldilocks.fairwinds.com/enabled: "true"
 
   kro:
