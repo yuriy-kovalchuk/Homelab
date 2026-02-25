@@ -86,3 +86,12 @@
 # -------------------------
 **/.DS_Store
 **/Thumbs.db
+
+# -------------------------
+# Ansible
+# -------------------------
+**/*.retry
+**/ansible/ansible_collections/
+**/ansible/.ansible/
+**/ansible/roles/external/
+**/bootstrap/firewall/compose/.env
