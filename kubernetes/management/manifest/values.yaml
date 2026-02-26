@@ -34,7 +34,7 @@ apps:
 
   cilium:
     enabled: true
-    targetRevision: 1.18.4
+    targetRevision: 1.2.0
     namespace: kube-system
     labels:
       goldilocks.fairwinds.com/enabled: "true"
