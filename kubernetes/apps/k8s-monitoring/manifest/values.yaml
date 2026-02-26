@@ -84,6 +84,12 @@ k8s-monitoring:
           - node_pressure_memory_waiting_seconds_total
           - node_pressure_io_waiting_seconds_total
           - node_pressure_irq_stalled_seconds_total
+          - node_hwmon_temp_celsius
+          - node_hwmon_temp_crit_alarm_celsius
+          - node_hwmon_temp_crit_celsius
+          - node_hwmon_temp_crit_hyst_celsius
+          - node_hwmon_temp_max_celsius
+          - node_hwmon_.*
     kubelet:
       metricsTuning:
         useDefaultAllowList: true
