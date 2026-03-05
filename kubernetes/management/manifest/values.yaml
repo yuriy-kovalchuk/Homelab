@@ -225,7 +225,7 @@ apps:
 
   ollama:
     enabled: true
-    targetRevision: 1.0.0
+    targetRevision: 1.1.0
     namespace: ollama
 
   sealed-secrets:
