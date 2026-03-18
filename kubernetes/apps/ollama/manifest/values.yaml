@@ -64,7 +64,7 @@ open-webui:
     enabled: true
     fullnameOverride: "ollama"
     image:
-      tag: "0.15.6"
+      tag: "0.17.6"
     # Models will be copied from existing PVC manually
     persistentVolume:
       enabled: true

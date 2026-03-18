@@ -3,7 +3,7 @@ name: cilium-yk
 description: Umbrella Helm chart for cilium application in Kubernetes
 
 type: application
-version: 1.18.4
+version: 1.2.0
 appVersion: "1.18.4"
 
 dependencies:
