@@ -1,7 +1,0 @@
-%{ for device in pci_devices ~}
----
-apiVersion: v1alpha1
-kind: PCIDriverRebindConfig
-pciAddress: "${device.pci_address}"
-targetDriver: vfio-pci
-%{ endfor ~}
