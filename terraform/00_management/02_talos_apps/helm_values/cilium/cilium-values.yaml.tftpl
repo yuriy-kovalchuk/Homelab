@@ -1,0 +1,53 @@
+k8sServiceHost: ${k8s_service_host}
+k8sServicePort: ${k8s_service_port}
+ipam:
+  mode: kubernetes
+kubeProxyReplacement: true
+
+securityContext:
+  capabilities:
+    ciliumAgent:
+      - CHOWN
+      - KILL
+      - NET_ADMIN
+      - NET_RAW
+      - IPC_LOCK
+      - SYS_ADMIN
+      - SYS_RESOURCE
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
+    cleanCiliumState:
+      - NET_ADMIN
+      - SYS_ADMIN
+      - SYS_RESOURCE
+
+cgroup:
+  autoMount:
+    enabled: false
+  hostRoot: /sys/fs/cgroup
+
+operator:
+  replicas: 1
+
+gatewayAPI:
+  enabled: true
+  enabledAlpn: true
+  enabledAppProtocol: true
+
+bpf:
+  masquerade: true
+
+bgpControlPlane:
+  enabled: true
+
+externalIPs:
+  enabled: true
+
+hubble:
+  enabled: true
+  relay:
+    enabled: true
+  ui:
+    enabled: true
