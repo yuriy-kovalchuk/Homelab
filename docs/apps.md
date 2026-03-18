@@ -55,7 +55,7 @@ Applications are managed via Argo CD with:
 
 | Application | Version | Description |
 |-------------|---------|-------------|
-| **minio** | 5.4.0 | S3-compatible object storage |
+| **rustfs** | - | S3-compatible object storage (Firewall node) |
 | **longhorn** | 1.10.1 | Cloud-native distributed block storage |
 | **democratic-csi-nfs** | 0.15.1 | NFS storage provisioner (TrueNAS) |
 | **democratic-csi-iscsi** | 0.15.1 | iSCSI storage provisioner (TrueNAS) |

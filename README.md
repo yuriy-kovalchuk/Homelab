@@ -44,6 +44,8 @@ Each top-level area has its own README with details. Start here:
   - Scratch area for quick manifest experiments (not managed by Argo CD).
 - Custom applications source: [applications/README.md](applications/README.md)
   - Source code and Dockerfiles for custom services running in the cluster.
+- Firewall Bootstrap: [bootstrap/firewall/](bootstrap/firewall/)
+  - Native scripts for provisioning the firewall node and management VMs.
 - Devbox scripts: [devbox_scripts/README.md](devbox_scripts/README.md)
   - All helper scripts are exposed as devbox run commands (configured in devbox.json).
 

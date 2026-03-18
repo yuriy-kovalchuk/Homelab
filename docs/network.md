@@ -31,10 +31,11 @@
 
 | VLAN ID | Name | Subnet | Purpose |
 |---------|------|--------|---------|
-| TBD | Management | TBD | Infrastructure management |
-| TBD | Production | TBD | Kubernetes cluster |
-| TBD | Storage | TBD | iSCSI/NFS traffic |
-| TBD | IoT | TBD | IoT devices (isolated) |
+| vmbr0 | WAN | 192.168.0.0/24 | ISP Uplink |
+| vmbr1 | LAN | 10.0.1.0/24 | Wireless AP / Production |
+| vmbr2 | Kubernetes | 10.0.8.0/24 | Main Cluster nodes |
+| vmbr10 | Virtual Workloads | 10.0.10.0/24 | Management containers (RustFS, NPM) |
+| vmbr3 | Physical Workloads| 10.0.2.0/24 | Maya Node / Baremetal |
 
 ## IP Addressing
 
@@ -42,14 +43,12 @@
 
 | Device/Service | IP Address | Notes |
 |----------------|------------|-------|
-| OPNsense | TBD | Firewall gateway |
-| Proxmox (Firewall Node) | TBD | |
+| OPNsense Gateway| 10.0.10.254 | Primary router |
+| Proxmox (Firewall Node) | 192.168.0.112 | Management IP |
+| Ubuntu Docker VM | 10.0.10.40 | Hosts core services |
+| RustFS | 10.0.10.40:9000 | S3 endpoint |
 | Proxmox (Maya) | 10.0.2.2 | From Terraform config |
 | TrueNAS | TBD | Storage backend |
-| K8s Node 1 | TBD | |
-| K8s Node 2 | TBD | |
-| K8s Node 3 | TBD | |
-| MinIO | 10.0.10.10 | S3 storage (from .env reference) |
 
 ### DHCP Ranges
 
