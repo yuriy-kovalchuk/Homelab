@@ -8,7 +8,7 @@ variable "kubeconfig_path" {
 variable "metrics_server_version" {
   description = "Metrics Server Helm chart version"
   type        = string
-  default     = "3.12.2"
+  default     = "3.13.0"
 }
 
 # Gateway API
@@ -93,7 +93,7 @@ variable "gateway_ip" {
 variable "cert_manager_version" {
   description = "Cert-Manager Helm chart version"
   type        = string
-  default     = "v1.17.2"
+  default     = "v1.20.0"
 }
 
 variable "acme_email" {
