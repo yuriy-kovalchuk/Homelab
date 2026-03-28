@@ -1,0 +1,12 @@
+machine:
+  install:
+    extraKernelArgs:
+%{ for arg in kernel_args ~}
+      - ${arg}
+%{ endfor ~}
+      - vfio-pci.ids=${join(",", [for device in pci_devices : device.vendor_device])}
+  kernel:
+    modules:
+%{ for mod in kernel_modules ~}
+      - name: ${mod}
+%{ endfor ~}

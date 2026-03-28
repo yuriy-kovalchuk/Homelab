@@ -1,0 +1,41 @@
+machine:
+  install:
+    image: ${install_image}
+%{ if install_disk != "" ~}
+    disk: ${install_disk}
+%{ endif ~}
+%{ if install_wipe ~}
+    wipe: true
+%{ endif ~}
+  network:
+    hostname: ${hostname}
+    nameservers:
+      - ${gateway}
+    interfaces:
+      - interface: ${interface}
+        dhcp: false
+        addresses:
+          - ${ip_address}/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: ${gateway}
+            metric: 1024
+        mtu: 1500
+%{ if length(registry_mirrors) > 0 ~}
+  registries:
+    mirrors:
+%{ for registry, endpoints in registry_mirrors ~}
+      ${registry}:
+        endpoints:
+%{ for ep in endpoints ~}
+          - ${ep}
+%{ endfor ~}
+%{ endfor ~}
+%{ endif ~}
+cluster:
+  allowSchedulingOnControlPlanes: ${allow_scheduling_on_control_planes}
+  proxy:
+    disabled: true
+  network:
+    cni:
+      name: ${cni_name}

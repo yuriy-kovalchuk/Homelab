@@ -1,0 +1,5 @@
+machine:
+  nodeLabels:
+%{ for key, value in node_labels ~}
+    ${key}: "${value}"
+%{ endfor ~}

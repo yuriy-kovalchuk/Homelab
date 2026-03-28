@@ -1,0 +1,76 @@
+# -- Enable strict kube-proxy replacement
+kubeProxyReplacement: true
+
+# -- Point to the Talos API server proxy
+k8sServiceHost: localhost
+k8sServicePort: 7445
+
+# -- Kubernetes IPAM mode is standard for Talos
+ipam:
+  mode: kubernetes
+
+# -- Talos specific cgroup mounting
+cgroup:
+  autoMount:
+    enabled: false
+  hostRoot: /sys/fs/cgroup
+
+# -- Required security capabilities for Talos baremetal
+securityContext:
+  capabilities:
+    ciliumAgent:
+      - CHOWN
+      - KILL
+      - NET_ADMIN
+      - NET_RAW
+      - IPC_LOCK
+      - SYS_ADMIN
+      - SYS_RESOURCE
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
+    cleanCiliumState:
+      - NET_ADMIN
+      - SYS_ADMIN
+      - SYS_RESOURCE
+
+# -- Gateway API Configuration
+gatewayAPI:
+  enabled: true
+
+# -- BGP Control Plane Configuration
+bgpControlPlane:
+  enabled: true
+
+# -- Explicitly disable L2 announcements when using BGP
+l2announcements:
+  enabled: false
+
+externalIPs:
+  enabled: true
+
+# -- Enable Envoy DaemonSet (Required for Gateway API)
+envoy:
+  enabled: true
+
+# -- Optional: Enable Hubble for network observability
+hubble:
+  relay:
+    enabled: true
+  ui:
+    enabled: true
+
+# -- eBPF optimization
+bpf:
+  masquerade: true
+  tproxy: true
+
+# -- Standard Operator replicas
+operator:
+  replicas: 1
+
+# BETA TESTING
+encryption:
+  enabled: false
+  type: ztunnel

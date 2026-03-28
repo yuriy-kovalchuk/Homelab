@@ -1,0 +1,43 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: homelab
+  namespace: flux-system
+spec:
+  interval: 3m
+  url: https://github.com/yuriy-kovalchuk/Homelab.git
+  ref:
+    branch: main
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: infrastructure
+  namespace: flux-system
+spec:
+  interval: 10m
+  sourceRef:
+    kind: GitRepository
+    name: homelab
+  path: ./management-cluster/fluxcd/infrastructure
+  prune: true
+  wait: true
+  timeout: 5m
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: apps
+  namespace: flux-system
+spec:
+  interval: 10m
+  dependsOn:
+    - name: infrastructure
+  sourceRef:
+    kind: GitRepository
+    name: homelab
+  path: ./management-cluster/fluxcd/apps
+  prune: true
+  wait: true
+  timeout: 5m
