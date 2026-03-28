@@ -30,17 +30,16 @@ The homelab consists of three main components:
 
 ### 1. Firewall Node (Entry Point)
 
-The firewall node runs **Proxmox** and serves as the network entry point. It hosts several critical services:
+The firewall node runs **Proxmox** and serves as the network entry point. It is provisioned using a native bootstrap script (`bootstrap/firewall/`) and hosts several critical services in Docker on a dedicated Ubuntu VM:
 
 | Service | Purpose |
 |---------|---------|
-| **OPNsense** | Primary firewall and router |
-| **HashiCorp Vault** | Secrets management |
-| **Nginx Proxy Manager** | Reverse proxy for external services |
-| **MinIO** | S3-compatible object storage (Terraform state, backups) |
-| **Pulse** | Monitoring/heartbeat service |
+| **OPNsense** | Primary firewall and router (Manual installation) |
+| **RustFS** | High-performance, S3-compatible object storage (Terraform state) |
+| **Nginx Proxy Manager** | Reverse proxy for external and internal services |
+| **Portainer CE** | Graphical management interface for Docker containers |
 
-> **Note:** This node was configured manually due to the chicken-egg problem with Infrastructure as Code. Future work will address bringing this under Terraform management.
+> **Note:** The Proxmox host and Ubuntu VM are automated via bootstrap scripts. OPNsense currently requires manual installation and initial configuration.
 
 ### 2. Main Kubernetes Cluster (Production)
 

@@ -18,7 +18,7 @@ These variables configure the S3-compatible backend for Terraform state storage.
 |----------|---------|---------|
 | `TF_VAR_s3_access_key` | S3 backend access key | `terraform-prd` |
 | `TF_VAR_s3_secret_key` | S3 backend secret key | `********` |
-| `TF_VAR_s3_endpoint` | S3-compatible endpoint URL | `http://10.0.10.10:9000` |
+| `TF_VAR_s3_endpoint` | S3-compatible endpoint URL | `http://10.0.10.40:9000` |
 
 **Used by:** All Terraform modules (`terraform/clusters/`, `terraform/infrastructure/`, `terraform/apps/`, `terraform/platform/`)
 
@@ -28,7 +28,7 @@ These variables configure access to the OPNsense firewall API.
 
 | Variable | Purpose | Example |
 |----------|---------|---------|
-| `OPNSENSE_URI` | Base URL to OPNsense API | `https://10.0.8.254` |
+| `OPNSENSE_URI` | Base URL to OPNsense API | `https://10.0.10.254` |
 | `OPNSENSE_KEY` | OPNsense API key | `********` |
 | `OPNSENSE_SECRET` | OPNsense API secret | `********` |
 | `OPNSENSE_SKIP_TLS_VERIFY` | Skip TLS verification (self-signed certs) | `true` |
@@ -50,8 +50,8 @@ These variables configure secrets stored in HashiCorp Vault via `terraform/apps/
 | `TF_VAR_grafana_admin_password` | Grafana admin password |
 | `TF_VAR_grafana_client_id` | Grafana OIDC client ID |
 | `TF_VAR_grafana_client_secret` | Grafana OIDC client secret |
-| `TF_VAR_minio_*` | MinIO access keys and credentials |
-| `TF_VAR_mimir_*` | Mimir S3 credentials |
+| `TF_VAR_rustfs_*` | RustFS access keys and credentials |
+| `TF_VAR_mimir_*` | Mimir S3 credentials (RustFS backend) |
 | `TF_VAR_opnsense_secret` | OPNsense API secret |
 | `TF_VAR_truenas_api_key` | TrueNAS API key |
 
@@ -97,13 +97,17 @@ These variables are required to push Helm charts to the Harbor OCI registry usin
 ## Example .env File
 
 ```bash
-# Terraform S3 Backend (MinIO)
-TF_VAR_s3_access_key=terraform-prd
+# Terraform S3 Backend (RustFS)
+TF_VAR_s3_access_key=admin
 TF_VAR_s3_secret_key=your-secret-key-here
-TF_VAR_s3_endpoint=http://10.0.10.10:9000
+TF_VAR_s3_endpoint=http://10.0.10.40:9000
+
+# Proxmox API (Firewall Node)
+FIREWALL_USER=root@pam
+FIREWALL_PASSWORD=your-password
 
 # OPNsense API
-OPNSENSE_URI=https://10.0.8.254
+OPNSENSE_URI=https://10.0.10.254
 OPNSENSE_KEY=your-api-key
 OPNSENSE_SECRET=your-api-secret
 OPNSENSE_SKIP_TLS_VERIFY=true

@@ -4,21 +4,22 @@ This document describes the infrastructure components of the homelab.
 
 ## Firewall Node
 
-The firewall node is the entry point to the network and runs Proxmox VE.
+The firewall node is the entry point to the network and runs Proxmox VE. Foundation setup is automated via `bootstrap/firewall/`.
 
 ### Services Running on Firewall Node
 
+Services are hosted in Docker on a dedicated Ubuntu VM (`vmid: 1001`).
+
 | Service | Description | Status |
 |---------|-------------|--------|
-| **OPNsense** | Primary firewall/router, handles all network traffic | Production |
-| **HashiCorp Vault** | Centralized secrets management | Production |
-| **Nginx Proxy Manager** | Reverse proxy for services outside Kubernetes | Production |
-| **MinIO** | S3-compatible storage for Terraform state and backups | Production |
-| **Pulse** | Monitoring and heartbeat service | Production |
+| **OPNsense** | Primary firewall/router, handles all network traffic | Manual Setup |
+| **RustFS** | S3-compatible storage for Terraform state | Production |
+| **Nginx Proxy Manager** | Reverse proxy for internal and external services | Production |
+| **Portainer CE** | Docker management UI | Production |
 
 ### Configuration Status
 
-> **Manual Configuration:** This node was set up manually due to bootstrap dependencies (chicken-egg problem). Bringing this under IaC management is a planned improvement.
+> **Bootstrap Automation:** The Proxmox network bridges and the Ubuntu management VM are provisioned using native shell scripts located in `bootstrap/firewall/scripts/`. OPNsense is currently a manual installation step.
 
 ---
 
