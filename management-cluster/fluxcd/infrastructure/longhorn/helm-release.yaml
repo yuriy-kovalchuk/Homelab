@@ -28,3 +28,5 @@ spec:
           group: gateway.networking.k8s.io
           kind: Gateway
           sectionName: https-longhorn
+      hostnames:
+        - longhorn-mgmt.yuriy-lab.cloud
