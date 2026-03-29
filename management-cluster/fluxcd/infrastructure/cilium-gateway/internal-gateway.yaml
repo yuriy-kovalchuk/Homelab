@@ -1,9 +1,8 @@
     apiVersion: gateway.networking.k8s.io/v1
     kind: Gateway
     metadata:
-      name: shared-gateway
+      name: internal
       namespace: kube-system
-      annotations:
         cert-manager.io/cluster-issuer: letsencrypt-dns
     spec:
       gatewayClassName: cilium
