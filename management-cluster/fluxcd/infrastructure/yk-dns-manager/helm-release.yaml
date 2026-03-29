@@ -5,13 +5,10 @@ metadata:
   namespace: yk-dns-manager
 spec:
   interval: 30m
-  chart:
-    spec:
-      chart: yk-dns-manager
-      sourceRef:
-        kind: OCIRepository
-        name: yk-dns-manager
-        namespace: yk-dns-manager
+  chartRef:
+    kind: OCIRepository
+    name: yk-dns-manager
+    namespace: yk-dns-manager
   install:
     createNamespace: false
   valuesFrom:
