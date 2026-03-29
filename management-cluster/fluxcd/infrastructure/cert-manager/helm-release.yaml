@@ -15,5 +15,7 @@ spec:
         namespace: flux-system
   install:
     createNamespace: true
-  valuesFiles:
-    - values/values.yaml
+  valuesFrom:
+    - kind: ConfigMap
+      name: cert-manager-values
+      valuesKey: values.yaml
