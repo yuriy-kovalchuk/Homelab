@@ -3,6 +3,8 @@
     metadata:
       name: internal
       namespace: kube-system
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-dns
     spec:
       gatewayClassName: cilium
       addresses:
@@ -15,3 +17,18 @@
           allowedRoutes:
             namespaces:
               from: All
+        - name: https-longhorn
+          port: 443
+          protocol: HTTPS
+          hostname: "longhorn-mgmt.yuriy-lab.cloud"
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - name: longhorn-gw-tls
+                kind: Secret
+          allowedRoutes:
+            namespaces:
+              from: Selector
+              selector:
+                matchLabels:
+                  kubernetes.io/metadata.name: "longhorn-system"
