@@ -16,5 +16,3 @@ spec:
   gracefulRestart:
     enabled: true
     restartTimeSeconds: 120
-  transport:
-    localPort: 179
