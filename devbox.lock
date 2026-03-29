@@ -49,6 +49,102 @@
         }
       }
     },
+    "flux@latest": {
+      "last_modified": "2026-03-21T07:29:51Z",
+      "resolved": "github:NixOS/nixpkgs/09061f748ee21f68a089cd5d91ec1859cd93d0be#flux",
+      "source": "devbox-search",
+      "version": "2013-09-20",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/hh953xijrikxb5xxdrwd6g6vj5rnk17f-flux-2013-09-20",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/hh953xijrikxb5xxdrwd6g6vj5rnk17f-flux-2013-09-20"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/1bmb27i21zil5ypn7fkdlwhsrk7zw06s-flux-2013-09-20",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/1bmb27i21zil5ypn7fkdlwhsrk7zw06s-flux-2013-09-20"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/2nfb3y77m3n11rlxzfklhc5nfj7ma7d6-flux-2013-09-20",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/2nfb3y77m3n11rlxzfklhc5nfj7ma7d6-flux-2013-09-20"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/x8g8i1yi07mgyi0xaas759cif9scpnin-flux-2013-09-20",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/x8g8i1yi07mgyi0xaas759cif9scpnin-flux-2013-09-20"
+        }
+      }
+    },
+    "fluxcd@latest": {
+      "last_modified": "2026-03-21T07:29:51Z",
+      "resolved": "github:NixOS/nixpkgs/09061f748ee21f68a089cd5d91ec1859cd93d0be#fluxcd",
+      "source": "devbox-search",
+      "version": "2.8.3",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/601y2r6zmcgmcvdlqgz26549sywsp3k2-fluxcd-2.8.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/601y2r6zmcgmcvdlqgz26549sywsp3k2-fluxcd-2.8.3"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/m3av4id034grr74w483jmj6x4cxw0amb-fluxcd-2.8.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/m3av4id034grr74w483jmj6x4cxw0amb-fluxcd-2.8.3"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/34v23a2kppjc83cxvdycs9wrd20ndlhg-fluxcd-2.8.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/34v23a2kppjc83cxvdycs9wrd20ndlhg-fluxcd-2.8.3"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/zmr0w9v6b4rsj0xrsygkdfm8g64kcfrb-fluxcd-2.8.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/zmr0w9v6b4rsj0xrsygkdfm8g64kcfrb-fluxcd-2.8.3"
+        }
+      }
+    },
     "gettext@0.22.5": {
       "last_modified": "2025-03-17T10:12:08Z",
       "resolved": "github:NixOS/nixpkgs/096478927c360bc18ea80c8274f013709cf7bdcd#gettext",

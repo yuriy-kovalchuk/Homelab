@@ -10,7 +10,9 @@
     "git@latest",
     "cilium-cli@latest",
     "hubble@latest",
-    "kubescape@latest"
+    "kubescape@latest",
+    "flux@latest",
+    "fluxcd@latest"
   ],
   "shell": {
     "init_hook": [
