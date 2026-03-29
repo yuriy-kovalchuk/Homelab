@@ -3,7 +3,6 @@
     metadata:
       name: internal
       namespace: kube-system
-        cert-manager.io/cluster-issuer: letsencrypt-dns
     spec:
       gatewayClassName: cilium
       addresses:
