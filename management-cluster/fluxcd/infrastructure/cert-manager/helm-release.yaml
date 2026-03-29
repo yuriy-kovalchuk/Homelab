@@ -1,0 +1,19 @@
+apiVersion: 
+kind: HelmRelease
+metadata:
+  name: cert-manager
+  namespace: cert-manager
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: cert-manager
+      version: "v1.20.1"
+      sourceRef:
+        kind: HelmRepository
+        name: 
+        namespace: flux-system
+  install:
+    createNamespace: true
+  valuesFiles:
+    - values/values.yaml

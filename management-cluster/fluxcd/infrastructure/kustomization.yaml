@@ -5,3 +5,4 @@ resources:
   - gateway-api-crds/
   - bgp/
   - cilium-gateway/
+  - cert-manager/
