@@ -6,3 +6,4 @@ resources:
   - bgp/
   - cilium-gateway/
   - cert-manager/
+  - longhorn/

@@ -1,0 +1,7 @@
+networkpolicies:
+  enabled: false
+
+longhornui:
+  replicas: 1
+
+
