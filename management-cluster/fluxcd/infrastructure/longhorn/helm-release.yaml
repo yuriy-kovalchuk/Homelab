@@ -29,4 +29,4 @@ spec:
           kind: Gateway
           sectionName: https-longhorn
       hostnames:
-        - longhorn-mgm.yuriy-lab.cloud
+        - longhorn-mgmt.yuriy-lab.cloud
