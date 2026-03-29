@@ -8,8 +8,3 @@ resources:
 
 namespace: yk-dns-manager
 
-configMapGenerator:
-  - name: yk-dns-manager-values
-    files:
-      - configs/values.yaml
-

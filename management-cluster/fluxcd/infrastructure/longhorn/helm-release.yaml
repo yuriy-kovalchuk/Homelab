@@ -15,7 +15,16 @@ spec:
         namespace: longhorn-system
   install:
     createNamespace: false
-  valuesFrom:
-    - kind: ConfigMap
-      name: longhorn-values
-      valuesKey: values.yaml
+  values:
+    networkpolicies:
+      enabled: false
+    longhornui:
+      replicas: 1
+    httproute:
+      enabled: true
+      parentRefs:
+        - name: internal
+          namespace: kube-system
+          group: gateway.networking.k8s.io
+          kind: Gateway
+          sectionName: https-longhorn

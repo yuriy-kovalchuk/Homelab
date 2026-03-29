@@ -9,8 +9,3 @@ resources:
 
 namespace: cert-manager
 
-configMapGenerator:
-  - name: cert-manager-values
-    files:
-      - configs/values.yaml
-

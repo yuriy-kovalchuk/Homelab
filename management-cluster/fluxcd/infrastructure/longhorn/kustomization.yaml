@@ -5,11 +5,5 @@ resources:
   - helm-repository.yaml
   - helm-release.yaml
 
-
 namespace: longhorn-system
-
-configMapGenerator:
-  - name: longhorn-values
-    files:
-      - configs/values.yaml
 
