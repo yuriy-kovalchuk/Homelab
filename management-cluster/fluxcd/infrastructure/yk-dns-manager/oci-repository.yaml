@@ -1,0 +1,10 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: yk-dns-manager
+  namespace: yk-dns-manager
+spec:
+  interval: 1h
+  url: oci://ghcr.io/yuriy-kovalchuk/yk-dns-manager-chart
+  ref:
+    semver: ">=0.0.5 <0.0.5"
