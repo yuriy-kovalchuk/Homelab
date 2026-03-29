@@ -7,3 +7,4 @@ resources:
   - cilium-gateway/
   - cert-manager/
   - longhorn/
+  - yk-dns-manager/
