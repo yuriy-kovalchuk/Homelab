@@ -32,3 +32,18 @@
               selector:
                 matchLabels:
                   kubernetes.io/metadata.name: "longhorn-system"
+        - name: https-harbor
+          port: 443
+          protocol: HTTPS
+          hostname: "harbor-mgmt.yuriy-lab.cloud"
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - name: harbor-gw-tls
+                kind: Secret
+          allowedRoutes:
+            namespaces:
+              from: Selector
+              selector:
+                matchLabels:
+                  kubernetes.io/metadata.name: "harbor"
