@@ -8,4 +8,5 @@ resources:
   - cert-manager/
   - longhorn/
   - harbor/
+  - vault/
   - yk-dns-manager/

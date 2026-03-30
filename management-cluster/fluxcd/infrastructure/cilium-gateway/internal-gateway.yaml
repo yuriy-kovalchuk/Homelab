@@ -47,3 +47,18 @@
               selector:
                 matchLabels:
                   kubernetes.io/metadata.name: "harbor"
+        - name: https-vault
+          port: 443
+          protocol: HTTPS
+          hostname: "vault-mgmt.yuriy-lab.cloud"
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - name: vault-gw-tls
+                kind: Secret
+          allowedRoutes:
+            namespaces:
+              from: Selector
+              selector:
+                matchLabels:
+                  kubernetes.io/metadata.name: "vault"
