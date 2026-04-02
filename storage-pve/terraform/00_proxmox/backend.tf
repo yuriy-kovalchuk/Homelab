@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket = "terraform"
-    key    = "proxmox-maya-prd.tfstate"
+    key    = "gaia-pve.tfstate"
 
     endpoint   = var.s3_endpoint
     access_key = var.s3_access_key

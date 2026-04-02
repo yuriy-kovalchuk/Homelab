@@ -16,13 +16,13 @@ resource "proxmox_virtual_environment_acme_dns_plugin" "cloudflare_dns_plugin" {
 }
 
 resource "proxmox_virtual_environment_acme_certificate" "prod_cert" {
-  node_name = "maya"
+  node_name = "gaia"
   account   = proxmox_virtual_environment_acme_account.prod.name
   force     = false
 
   domains = [
     {
-      domain = "maya.yuriy-lab.cloud"
+      domain = "gaia.yuriy-lab.cloud"
       plugin = proxmox_virtual_environment_acme_dns_plugin.cloudflare_dns_plugin.plugin
     }
   ]
