@@ -18,7 +18,7 @@ spec:
       provider: opnsense
       upsert: false
       settings:
-        base_url: "https://o.yuriy-lab.cloud/api"
+        base_url: "https://opnsense.yuriy-lab.cloud/api"
         skip_tls_verify: "false"
         default_ttl: "300"
       existingSecret: "dns-manager-provider-credentials"
