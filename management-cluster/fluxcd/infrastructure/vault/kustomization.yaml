@@ -3,7 +3,9 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - helm-repository.yaml
+  - configmap-unseal.yaml
   - helm-release.yaml
+  - cronjob-unseal.yaml
   - httproute.yaml
 
 namespace: vault
