@@ -17,9 +17,12 @@ spec:
             - name: unsealer
               image: alpine/curl:8.17.0
               command: ["/bin/sh", "/scripts/unseal.sh"]
-              envFrom:
-                - secretRef:
-                    name: vault-unseal-key
+              env:
+                - name: UNSEAL_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: vault-unseal-key
+                      key: unseal-key
               volumeMounts:
                 - name: script-volume
                   mountPath: /scripts
@@ -27,4 +30,3 @@ spec:
             - name: script-volume
               configMap:
                 name: vault-unseal-script
-
