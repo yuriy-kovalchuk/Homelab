@@ -1,5 +1,9 @@
 # Vault Manual Commands
 
+## How Auto-Unseal Works
+
+A **sidecar container** runs alongside Vault, waits for it to be ready, then unseals it automatically on pod restart.
+
 ## Setup Unseal Key Secret
 
 For gitops, convert the secret to SealedSecret:
