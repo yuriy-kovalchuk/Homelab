@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - helm-repository.yaml
+  - configmap.yaml
   - helm-release.yaml
   - httproute.yaml
 
