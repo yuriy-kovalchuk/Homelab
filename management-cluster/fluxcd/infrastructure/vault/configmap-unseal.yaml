@@ -6,18 +6,5 @@ metadata:
 data:
   unseal.sh: |
     #!/bin/sh
-    for i in 0 1 2; do
-      POD_URL="http://vault-${i}.vault-internal:8200"
-      
-      STATUS=$(curl -s --max-time 2 ${POD_URL}/v1/sys/seal-status | jq -r .sealed 2>/dev/null)
-      
-      if [ "$STATUS" = "true" ]; then
-        echo "Vault pod vault-${i} is sealed. Sending unseal key..."
-        curl -s --request PUT --data "{\"key\": \"${unseal-key}\"}" ${POD_URL}/v1/sys/unseal > /dev/null
-        echo "Unseal payload sent to vault-${i}."
-      elif [ "$STATUS" = "false" ]; then
-        echo "Vault pod vault-${i} is already unsealed."
-      else
-        echo "Vault pod vault-${i} is offline or unreachable."
-      fi
-    done
+      POD_URL="http://vault-internal:8200"
+      curl --request PUT --data '{"key": "unseal-key"}' $POD_URL/v1/sys/unseal
