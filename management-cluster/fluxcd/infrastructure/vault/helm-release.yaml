@@ -25,6 +25,31 @@ spec:
       auditStorage:
         enabled: true
         size: 1Gi
+      extraInitContainers:
+        - name: vault-unseal
+          image: hashicorp/vault:1.21.2
+          command: ["/bin/sh", "/vault/unseal.sh"]
+          env:
+            - name: UNSEAL_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: vault-unseal-key
+                  key: unseal-key
+          volumeMounts:
+            - name: vault-unseal-script
+              mountPath: /vault
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+      volumes:
+        - name: vault-unseal-script
+          configMap:
+            name: vault-unseal-script
+            defaultMode: 755
     ui:
       enabled: true
       serviceType: ClusterIP
