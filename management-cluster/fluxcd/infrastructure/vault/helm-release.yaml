@@ -49,7 +49,6 @@ spec:
         - name: vault-unseal-script
           configMap:
             name: vault-unseal-script
-            defaultMode: 755
     ui:
       enabled: true
       serviceType: ClusterIP
