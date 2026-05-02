@@ -29,7 +29,6 @@ spec:
         - name: vault-unseal
           image: alpine:3.20
           command: ["/bin/sh", "/vault/unseal.sh"]
-          command: ["/bin/sh", "/vault/unseal.sh"]
           env:
             - name: UNSEAL_KEY
               valueFrom:
@@ -50,7 +49,6 @@ spec:
         - name: vault-unseal-script
           configMap:
             name: vault-unseal-script
-            defaultMode: 0755
     ui:
       enabled: true
       serviceType: ClusterIP
