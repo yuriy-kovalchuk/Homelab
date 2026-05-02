@@ -7,4 +7,4 @@ data:
   unseal.sh: |
     #!/bin/sh
       POD_URL="http://vault-internal:8200"
-      curl --request PUT --data '{"key": "unseal-key"}' $POD_URL/v1/sys/unseal
+      curl --request PUT --data '{"key": "$unseal-key"}' $POD_URL/v1/sys/unseal
