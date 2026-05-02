@@ -31,5 +31,4 @@ spec:
             - name: script-volume
               configMap:
                 name: vault-unseal-script
-                defaultMode: 777
 
