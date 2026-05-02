@@ -25,35 +25,32 @@ spec:
       auditStorage:
         enabled: true
         size: 1Gi
-      lifecycle:
-        postStart:
-          exec:
-            command:
-              - /bin/sh
-              - -c
-              - |
-                export VAULT_ADDR="http://localhost:8200"
-                
-                echo "Waiting for Vault to be ready..."
-                until vault status 2>/dev/null; do
-                  sleep 2
-                done
-                
-                vault status
-                sealed=$(vault status 2>&1 | grep -o 'Sealed.*false' || echo "sealed")
-                if echo "$sealed" | grep -q 'false'; then
-                  echo "Vault already unsealed"
-                  exit 0
-                fi
-                
-                echo "Unsealing Vault..."
-                vault operator unseal "$UNSEAL_KEY"
-                
-                for i in $(seq 1 30); do
-                  vault status 2>/dev/null | grep -q 'Sealed.*false' && break
-                  sleep 2
-                done
-                echo "Vault unseal completed"
+      postStart:
+        - /bin/sh
+        - -c
+        - |
+          export VAULT_ADDR="http://localhost:8200"
+
+          echo "Waiting for Vault to be ready..."
+          until vault status 2>/dev/null; do
+            sleep 2
+          done
+
+          vault status
+          sealed=$(vault status 2>&1 | grep -o 'Sealed.*false' || echo "sealed")
+          if echo "$sealed" | grep -q 'false'; then
+            echo "Vault already unsealed"
+            exit 0
+          fi
+
+          echo "Unsealing Vault..."
+          vault operator unseal "$UNSEAL_KEY"
+
+          for i in $(seq 1 30); do
+            vault status 2>/dev/null | grep -q 'Sealed.*false' && break
+            sleep 2
+          done
+          echo "Vault unseal completed"
       env:
         - name: UNSEAL_KEY
           valueFrom:
