@@ -1,0 +1,165 @@
+---
+# Configures Unbound as the authoritative DNS resolver for all VLANs.
+#
+#   1. DoT upstreams — Unbound forwards all queries to 1.1.1.1/1.0.0.1
+#      over TLS port 853 with certificate verification.
+#
+#   2. Destination NAT rules — per-VLAN transparent DNS redirect. Any port 53
+#      traffic destined for a non-homelab IP is silently rewritten to
+#      127.0.0.1:53 (Unbound). Clients with hardcoded external DNS (8.8.8.8
+#      etc.) are redirected without needing reconfiguration.
+#      Uses the OPNsense 26.x d_nat controller (renamed from "Port Forward").
+#
+#   3. WAN egress block — blocks TCP/UDP port 53 leaving through WAN.
+#      Safety net: if a d_nat rule is missing, DNS fails closed (blocked)
+#      rather than leaking in plaintext.
+#
+#   d_nat field notes (OPNsense 26.x):
+#     destination/source use nested objects, not flat keys.
+#     destination.not = "1" to invert (match traffic NOT in the network).
+#     pass = "pass" to auto-create a companion firewall pass rule.
+#     local-port = redirect target port.
+#
+- name: Configure Unbound DNS with DoT, destination NAT redirect and WAN egress block
+  hosts: opnsense
+  gather_facts: false
+  module_defaults:
+    group/oxlorg.opnsense.all:
+      firewall: "{{ opnsense_host }}"
+      api_key: "{{ opnsense_api_key }}"
+      api_secret: "{{ opnsense_api_secret }}"
+      ssl_verify: "{{ opnsense_ssl_verify }}"
+
+  vars:
+    vlan_interfaces:
+      - interface: opt1
+        description: "dns-redirect opt1 k8s-mgmt port 53 to unbound"
+      - interface: opt2
+        description: "dns-redirect opt2 storage port 53 to unbound"
+      - interface: opt3
+        description: "dns-redirect opt3 k8s-workload port 53 to unbound"
+      - interface: opt4
+        description: "dns-redirect opt4 phys-workload port 53 to unbound"
+      - interface: opt5
+        description: "dns-redirect opt5 private-wifi port 53 to unbound"
+      - interface: opt6
+        description: "dns-redirect opt6 guest-wifi port 53 to unbound"
+
+  tasks:
+    # -------------------------------------------------------------------------
+    # DNS over TLS
+    # -------------------------------------------------------------------------
+
+    - name: DoT upstream — 1.1.1.1 (Cloudflare primary)
+      oxlorg.opnsense.unbound_dot:
+        target: "1.1.1.1"
+        port: 853
+        verify: "cloudflare-dns.com"
+        state: present
+        reload: false
+
+    - name: DoT upstream — 1.0.0.1 (Cloudflare secondary)
+      oxlorg.opnsense.unbound_dot:
+        target: "1.0.0.1"
+        port: 853
+        verify: "cloudflare-dns.com"
+        state: present
+        reload: false
+
+    - name: Reload Unbound
+      oxlorg.opnsense.reload:
+        target: unbound
+
+    # -------------------------------------------------------------------------
+    # WAN egress block
+    # -------------------------------------------------------------------------
+
+    - name: "wan | block port 53 egress"
+      oxlorg.opnsense.rule:
+        sequence: 1
+        interface: ["wan"]
+        direction: out
+        action: block
+        protocol: "TCP/UDP"
+        source_net: "any"
+        destination_net: "any"
+        destination_port: "53"
+        description: "wan-dns block port 53 egress"
+        reload: false
+        match_fields: ["description"]
+
+    # -------------------------------------------------------------------------
+    # Destination NAT — transparent DNS redirect per VLAN.
+    #
+    # Idempotency: search for existing rules by description prefix, delete
+    # them, then recreate. The d_nat controller has no set_rule-with-match
+    # like the filter rule module, so delete+recreate is the correct pattern.
+    #
+    # destination.not = "1" + HOMELAB_ALL means: only intercept DNS going to
+    # IPs outside 10.0.0.0/16. Traffic already aimed at a VLAN gateway
+    # (Unbound) passes through unaffected.
+    #
+    # pass = "pass" auto-creates a companion firewall pass rule so the
+    # redirected traffic is allowed through the filter without a separate rule.
+    # -------------------------------------------------------------------------
+
+    - name: Search existing destination NAT rules
+      oxlorg.opnsense.raw:
+        url: "firewall/d_nat/search_rule"
+        action: post
+        data:
+          current: 1
+          rowCount: 100
+          searchPhrase: "dns-redirect"
+      register: existing_dnat
+      changed_when: false
+      failed_when: false
+
+    - name: Delete stale DNS redirect destination NAT rules
+      oxlorg.opnsense.raw:
+        url: "firewall/d_nat/del_rule/{{ item.uuid }}"
+        action: post
+      loop: >-
+        {{ (existing_dnat.response.rows
+            if (existing_dnat.response is defined and
+                existing_dnat.response.rows is defined and
+                existing_dnat.response.rows is sequence and
+                existing_dnat.response.rows is not mapping)
+            else [])
+           | selectattr('descr', 'search', '^dns-redirect ')
+           | list }}
+
+    - name: Add destination NAT rule per VLAN
+      oxlorg.opnsense.raw:
+        url: "firewall/d_nat/add_rule"
+        action: post
+        data:
+          rule:
+            interface: "{{ item.interface }}"
+            ipprotocol: "inet"
+            protocol: "tcp/udp"
+            source:
+              network: ""
+              port: ""
+              not: "0"
+            destination:
+              network: "HOMELAB_ALL"
+              port: "53"
+              not: "1"
+            target: "127.0.0.1"
+            local-port: "53"
+            log: "0"
+            pass: "pass"
+            descr: "{{ item.description }}"
+      loop: "{{ vlan_interfaces }}"
+
+    - name: Apply destination NAT changes
+      oxlorg.opnsense.raw:
+        url: "firewall/d_nat/apply"
+        action: post
+      failed_when: false
+
+    # Reload the filter rules created by the WAN egress block rule
+    - name: Reload firewall rules
+      oxlorg.opnsense.reload:
+        target: rule

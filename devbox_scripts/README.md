@@ -18,6 +18,7 @@ These are shell functions loaded into your devbox shell. Run them directly (not 
 | Function | Description |
 |----------|-------------|
 | `tf_init` | Initialize terraform with S3 backend credentials |
+| `tf_init_local` | Initialize terraform without backend (local state) |
 | `tf_plan` | Run terraform plan (auto-detects tfvars) |
 | `tf_apply` | Run terraform apply (auto-detects tfvars) |
 | `tf_output [name]` | Print terraform outputs (auto-detects common outputs) |

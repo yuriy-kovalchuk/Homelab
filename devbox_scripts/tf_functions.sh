@@ -17,6 +17,10 @@ tf_init() {
     -backend-config="secret_key=$TF_VAR_s3_secret_key"
 }
 
+tf_init_local() {
+  terraform init
+}
+
 tf_plan() {
   terraform plan $(_tf_var_file) "$@"
 }
@@ -52,6 +56,3 @@ tf_output() {
   fi
 }
 
-upgrade_talos() {
-  "$DEVBOX_PROJECT_ROOT/devbox_scripts/upgrade_talos.sh" "$@"
-}

@@ -1,0 +1,31 @@
+---
+# OPNsense does not expose interface IP configuration via REST API (as of 26.x).
+# These steps must be done manually in the GUI. This playbook prints a checklist.
+#
+- name: Interface configuration checklist
+  hosts: opnsense
+  gather_facts: false
+  tasks:
+    - name: Print manual interface configuration steps
+      ansible.builtin.debug:
+        msg: |
+          ============================================================
+          MANUAL STEPS REQUIRED — run these in the OPNsense GUI
+          ============================================================
+
+          1. Clear the LAN trunk IP (vtnet1 must be a pure trunk):
+             Interfaces → [LAN] → IPv4 Configuration Type → None → Save → Apply
+
+          2. Set gateway IPs on each VLAN interface:
+
+             Interfaces → [K8sMgmt]     → enable → IPv4: Static → 10.0.2.1/24 → Save
+             Interfaces → [Storage]     → enable → IPv4: Static → 10.0.3.1/24 → Save
+             Interfaces → [K8sWorkload] → enable → IPv4: Static → 10.0.4.1/24 → Save
+             Interfaces → [PhysWorkload]→ enable → IPv4: Static → 10.0.5.1/24 → Save
+             Interfaces → [PrivateWifi] → enable → IPv4: Static → 10.0.6.1/24 → Save
+             Interfaces → [GuestWifi]   → enable → IPv4: Static → 10.0.7.1/24 → Save
+
+          3. Click Apply changes after all interfaces are saved.
+
+          Once done, proceed with dhcp.yml and firewall.yml.
+          ============================================================

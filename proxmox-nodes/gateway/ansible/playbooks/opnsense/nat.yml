@@ -1,0 +1,30 @@
+---
+# Outbound NAT is handled by OPNsense's Automatic outbound NAT mode.
+# It dynamically generates masquerade rules for all configured interfaces
+# using whatever the WAN IP is at the time — no static IP needed.
+#
+# Verify the mode is correct: Firewall → NAT → Outbound → Mode = Automatic
+#
+# If VLANs have IPs configured (opt1-opt6) and automatic mode is on,
+# OPNsense generates NAT rules for all VLAN subnets automatically.
+# No manual rules are required here.
+#
+- name: Verify outbound NAT mode
+  hosts: opnsense
+  gather_facts: false
+  module_defaults:
+    group/oxlorg.opnsense.all:
+      firewall: "{{ opnsense_host }}"
+      api_key: "{{ opnsense_api_key }}"
+      api_secret: "{{ opnsense_api_secret }}"
+      ssl_verify: "{{ opnsense_ssl_verify }}"
+  tasks:
+    - name: Check current NAT settings
+      oxlorg.opnsense.raw:
+        url: "firewall/nat/get"
+        action: get
+      register: nat_settings
+
+    - name: Show NAT mode
+      ansible.builtin.debug:
+        msg: "Current outbound NAT mode: {{ nat_settings.response.nat.outbound.mode | default('unknown') }}"

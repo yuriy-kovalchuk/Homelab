@@ -1,0 +1,9 @@
+---
+# Main OPNsense playbook — runs all configuration in order
+- import_playbook: vlans.yml
+- import_playbook: interfaces.yml
+- import_playbook: dhcp.yml
+- import_playbook: nat.yml
+- import_playbook: firewall.yml
+- import_playbook: dns.yml
+- import_playbook: proxmox.yml

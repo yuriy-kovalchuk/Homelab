@@ -1,0 +1,59 @@
+---
+# Configures access to the Proxmox host (192.168.0.254).
+#
+#   - opt4 (phys-workload) → Proxmox on TCP 22 + 8006
+#   - WAN inbound block for the same ports — prevents internet-routed access
+#     and documents that Proxmox should not be reachable from the WAN direction.
+#
+# NOTE: Proxmox (192.168.0.254) and OPNsense WAN (192.168.0.110) share the
+# same L2 home network. Traffic from a home-network device directly to Proxmox
+# does NOT pass through OPNsense and cannot be blocked here. Full isolation
+# requires moving Proxmox's management interface to a VLAN.
+#
+#
+- name: Configure Proxmox management access
+  hosts: opnsense
+  gather_facts: false
+  module_defaults:
+    group/oxlorg.opnsense.all:
+      firewall: "{{ opnsense_host }}"
+      api_key: "{{ opnsense_api_key }}"
+      api_secret: "{{ opnsense_api_secret }}"
+      ssl_verify: "{{ opnsense_ssl_verify }}"
+
+  tasks:
+    - name: Create PROXMOX alias
+      oxlorg.opnsense.alias:
+        name: PROXMOX
+        type: host
+        content: ["192.168.0.254"]
+        description: "Proxmox host"
+        reload: false
+        state: present
+
+    - name: Create PROXMOX_PORTS alias
+      oxlorg.opnsense.alias:
+        name: PROXMOX_PORTS
+        type: port
+        content: ["22", "8006"]
+        description: "Proxmox SSH and web UI"
+        reload: false
+        state: present
+
+    - name: "wan | block Proxmox management inbound"
+      oxlorg.opnsense.rule:
+        sequence: 2
+        interface: ["wan"]
+        direction: in
+        action: block
+        protocol: TCP
+        source_net: "any"
+        destination_net: PROXMOX
+        destination_port: PROXMOX_PORTS
+        description: "wan-02 block proxmox from wan"
+        reload: false
+        match_fields: ["description"]
+
+    - name: Reload firewall rules
+      oxlorg.opnsense.reload:
+        target: rule

@@ -1,0 +1,103 @@
+---
+# Removes all Ansible-managed aliases, firewall rules, d_nat rules, and DNS config:
+#   firewall.yml  — aliases and filter rules
+#   dns.yml       — DoT upstreams, d_nat redirect rules, WAN port-53 block
+#   proxmox.yml   — PROXMOX/PROXMOX_PORTS aliases, opt4 and WAN rules
+#
+- name: Remove Ansible-managed firewall rules, aliases, and DNS config
+  hosts: opnsense
+  gather_facts: false
+  module_defaults:
+    group/oxlorg.opnsense.all:
+      firewall: "{{ opnsense_host }}"
+      api_key: "{{ opnsense_api_key }}"
+      api_secret: "{{ opnsense_api_secret }}"
+      ssl_verify: "{{ opnsense_ssl_verify }}"
+
+  tasks:
+    - name: Remove firewall rules
+      oxlorg.opnsense.rule:
+        description: "{{ item }}"
+        match_fields: ["description"]
+        state: absent
+        reload: false
+      loop:
+        - "wan-01 management access from home network"
+        - "wan-02 block proxmox from wan"
+        - "opt1-10 k8s-mgmt to storage"
+        - "opt1-20 k8s-mgmt to internet"
+        - "opt2-10 storage to internet web only"
+        - "opt3-10 k8s-workload to storage"
+        - "opt3-20 k8s-workload to k8s-mgmt vault harbor"
+        - "opt3-30 k8s-workload to internet"
+        - "opt4-05 phys-workload block to guest"
+        - "opt4-10 phys-workload to homelab"
+        - "opt4-20 phys-workload to internet"
+        - "opt5-10 private-wifi to k8s-mgmt"
+        - "opt5-20 private-wifi to storage nfs"
+        - "opt5-30 private-wifi to internet"
+        - "opt6-10 guest to internet only"
+        - "wan-dns block port 53 egress"
+
+    - name: Remove aliases
+      oxlorg.opnsense.alias:
+        name: "{{ item }}"
+        state: absent
+        reload: false
+      loop:
+        - HOMELAB_ALL
+        - VLAN2_NET
+        - VLAN3_NET
+        - VLAN4_NET
+        - VLAN5_NET
+        - VLAN6_NET
+        - VLAN7_NET
+        - WEB_PORTS
+        - NFS_PORT
+        - VAULT_HARBOR_PORTS
+        - PROXMOX
+        - PROXMOX_PORTS
+
+    # Remove destination NAT rules created by dns.yml
+    - name: Search existing destination NAT rules
+      oxlorg.opnsense.raw:
+        url: "firewall/d_nat/search_rule"
+        action: post
+        data:
+          current: 1
+          rowCount: 100
+          searchPhrase: "dns-redirect"
+      register: existing_dnat
+      changed_when: false
+      failed_when: false
+
+    - name: Delete DNS redirect destination NAT rules
+      oxlorg.opnsense.raw:
+        url: "firewall/d_nat/del_rule/{{ item.uuid }}"
+        action: post
+      loop: >-
+        {{ (existing_dnat.response.rows
+            if (existing_dnat.response is defined and
+                existing_dnat.response.rows is defined and
+                existing_dnat.response.rows is sequence and
+                existing_dnat.response.rows is not mapping)
+            else [])
+           | selectattr('descr', 'search', '^dns-redirect ')
+           | list }}
+
+    - name: Remove DoT upstreams
+      oxlorg.opnsense.unbound_dot:
+        target: "{{ item }}"
+        state: absent
+        reload: false
+      loop:
+        - "1.1.1.1"
+        - "1.0.0.1"
+
+    - name: Reload firewall rules
+      oxlorg.opnsense.reload:
+        target: rule
+
+    - name: Reload Unbound
+      oxlorg.opnsense.reload:
+        target: unbound

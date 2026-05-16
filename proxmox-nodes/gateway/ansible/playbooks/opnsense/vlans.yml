@@ -1,0 +1,31 @@
+---
+- name: Configure OPNsense VLAN sub-interfaces
+  hosts: opnsense
+  gather_facts: false
+  module_defaults:
+    group/oxlorg.opnsense.all:
+      firewall: "{{ opnsense_host }}"
+      api_key: "{{ opnsense_api_key }}"
+      api_secret: "{{ opnsense_api_secret }}"
+      ssl_verify: "{{ opnsense_ssl_verify }}"
+  vars:
+    vlans:
+      - { id: 2, description: "k8s-mgmt" }
+      - { id: 3, description: "storage" }
+      - { id: 4, description: "k8s-workload" }
+      - { id: 5, description: "phys-workload" }
+      - { id: 6, description: "private-wifi" }
+      - { id: 7, description: "guest-wifi" }
+  tasks:
+    - name: Create VLAN sub-interfaces on vtnet1
+      oxlorg.opnsense.interface_vlan:
+        interface: vtnet1
+        vlan: "{{ item.id }}"
+        description: "{{ item.description }}"
+        reload: false
+        state: present
+      loop: "{{ vlans }}"
+
+    - name: Apply VLAN interface config
+      oxlorg.opnsense.reload:
+        target: interface_vlan

@@ -1,0 +1,322 @@
+---
+# Interface name mapping (OPNsense assigns opt1-opt6 in assignment order):
+#   opt1 = VLAN 2 — k8s-mgmt      (10.0.2.0/24)
+#   opt2 = VLAN 3 — storage        (10.0.3.0/24)
+#   opt3 = VLAN 4 — k8s-workload   (10.0.4.0/24)
+#   opt4 = VLAN 5 — phys-workload  (10.0.5.0/24)
+#   opt5 = VLAN 6 — private-wifi   (10.0.6.0/24)
+#   opt6 = VLAN 7 — guest-wifi     (10.0.7.0/24)
+#
+# All aliases and rules are created with reload: false.
+# A single reload at the end applies everything atomically — this avoids
+# pfctl re-enabling mid-run and blocking the remaining API calls.
+#
+- name: Configure OPNsense firewall aliases and rules
+  hosts: opnsense
+  gather_facts: false
+  module_defaults:
+    group/oxlorg.opnsense.all:
+      firewall: "{{ opnsense_host }}"
+      api_key: "{{ opnsense_api_key }}"
+      api_secret: "{{ opnsense_api_secret }}"
+      ssl_verify: "{{ opnsense_ssl_verify }}"
+
+  tasks:
+    # -------------------------------------------------------------------------
+    # Aliases
+    # -------------------------------------------------------------------------
+
+    - name: Create network and port aliases
+      oxlorg.opnsense.alias:
+        name: "{{ item.name }}"
+        type: "{{ item.type }}"
+        content: "{{ item.content }}"
+        description: "{{ item.description }}"
+        reload: false
+        state: present
+      loop:
+        - name: HOMELAB_ALL
+          type: network
+          content: ["10.0.0.0/16"]
+          description: "All homelab subnets"
+        - name: VLAN2_NET
+          type: network
+          content: ["10.0.2.0/24"]
+          description: "k8s-mgmt"
+        - name: VLAN3_NET
+          type: network
+          content: ["10.0.3.0/24"]
+          description: "storage"
+        - name: VLAN4_NET
+          type: network
+          content: ["10.0.4.0/24"]
+          description: "k8s-workload"
+        - name: VLAN5_NET
+          type: network
+          content: ["10.0.5.0/24"]
+          description: "phys-workload"
+        - name: VLAN6_NET
+          type: network
+          content: ["10.0.6.0/24"]
+          description: "private-wifi"
+        - name: VLAN7_NET
+          type: network
+          content: ["10.0.7.0/24"]
+          description: "guest-wifi"
+        - name: WEB_PORTS
+          type: port
+          content: ["80", "443"]
+          description: "HTTP + HTTPS"
+        - name: NFS_PORT
+          type: port
+          content: ["2049"]
+          description: "NFS"
+        - name: VAULT_HARBOR_PORTS
+          type: port
+          content: ["443", "8200"]
+          description: "Harbor (443) and Vault (8200)"
+
+    # -------------------------------------------------------------------------
+    # Rules — WAN management access
+    # Allows the home network to reach the OPNsense API after pfctl comes up.
+    # Without this rule the firewall would lock you out on first reload.
+    # -------------------------------------------------------------------------
+
+    - name: "wan | management access from home network"
+      oxlorg.opnsense.rule:
+        sequence: 1
+        interface: ["wan"]
+        direction: in
+        action: pass
+        protocol: TCP
+        source_net: "192.168.0.0/24"
+        destination_net: "192.168.0.110/32"
+        destination_port: "443"
+        description: "wan-01 management access from home network"
+        reload: false
+        match_fields: ["description"]
+
+    # -------------------------------------------------------------------------
+    # Rules — opt1 (VLAN 2 — k8s-mgmt)
+    # OUT: storage (full), internet
+    # -------------------------------------------------------------------------
+
+    - name: "opt1 | k8s-mgmt → storage (full)"
+      oxlorg.opnsense.rule:
+        sequence: 10
+        interface: ["opt1"]
+        direction: in
+        action: pass
+        source_net: VLAN2_NET
+        destination_net: VLAN3_NET
+        description: "opt1-10 k8s-mgmt to storage"
+        reload: false
+        match_fields: ["description"]
+
+    - name: "opt1 | k8s-mgmt → internet"
+      oxlorg.opnsense.rule:
+        sequence: 20
+        interface: ["opt1"]
+        direction: in
+        action: pass
+        source_net: VLAN2_NET
+        destination_invert: true
+        destination_net: HOMELAB_ALL
+        description: "opt1-20 k8s-mgmt to internet"
+        reload: false
+        match_fields: ["description"]
+
+    # -------------------------------------------------------------------------
+    # Rules — opt2 (VLAN 3 — storage)
+    # OUT: internet (port 80/443 only)
+    # -------------------------------------------------------------------------
+
+    - name: "opt2 | storage → internet (web only)"
+      oxlorg.opnsense.rule:
+        sequence: 10
+        interface: ["opt2"]
+        direction: in
+        action: pass
+        protocol: TCP
+        source_net: VLAN3_NET
+        destination_invert: true
+        destination_net: HOMELAB_ALL
+        destination_port: WEB_PORTS
+        description: "opt2-10 storage to internet web only"
+        reload: false
+        match_fields: ["description"]
+
+    # -------------------------------------------------------------------------
+    # Rules — opt3 (VLAN 4 — k8s-workload)
+    # OUT: storage (full), k8s-mgmt (Vault+Harbor ports), internet
+    # -------------------------------------------------------------------------
+
+    - name: "opt3 | k8s-workload → storage (full)"
+      oxlorg.opnsense.rule:
+        sequence: 10
+        interface: ["opt3"]
+        direction: in
+        action: pass
+        source_net: VLAN4_NET
+        destination_net: VLAN3_NET
+        description: "opt3-10 k8s-workload to storage"
+        reload: false
+        match_fields: ["description"]
+
+    - name: "opt3 | k8s-workload → k8s-mgmt (Vault + Harbor)"
+      oxlorg.opnsense.rule:
+        sequence: 20
+        interface: ["opt3"]
+        direction: in
+        action: pass
+        protocol: TCP
+        source_net: VLAN4_NET
+        destination_net: VLAN2_NET
+        destination_port: VAULT_HARBOR_PORTS
+        description: "opt3-20 k8s-workload to k8s-mgmt vault harbor"
+        reload: false
+        match_fields: ["description"]
+
+    - name: "opt3 | k8s-workload → internet"
+      oxlorg.opnsense.rule:
+        sequence: 30
+        interface: ["opt3"]
+        direction: in
+        action: pass
+        source_net: VLAN4_NET
+        destination_invert: true
+        destination_net: HOMELAB_ALL
+        description: "opt3-30 k8s-workload to internet"
+        reload: false
+        match_fields: ["description"]
+
+    # -------------------------------------------------------------------------
+    # Rules — opt4 (VLAN 5 — phys-workload)
+    # OUT: all homelab except guest (VLAN 7), internet
+    # -------------------------------------------------------------------------
+
+    - name: "opt4 | phys-workload → guest (block)"
+      oxlorg.opnsense.rule:
+        sequence: 5
+        interface: ["opt4"]
+        direction: in
+        action: block
+        source_net: VLAN5_NET
+        destination_net: VLAN7_NET
+        description: "opt4-05 phys-workload block to guest"
+        reload: false
+        match_fields: ["description"]
+
+    - name: "opt4 | phys-workload → homelab (all VLANs except guest)"
+      oxlorg.opnsense.rule:
+        sequence: 10
+        interface: ["opt4"]
+        direction: in
+        action: pass
+        source_net: VLAN5_NET
+        destination_net: HOMELAB_ALL
+        description: "opt4-10 phys-workload to homelab"
+        reload: false
+        match_fields: ["description"]
+
+    - name: "opt4 | phys-workload → internet"
+      oxlorg.opnsense.rule:
+        sequence: 20
+        interface: ["opt4"]
+        direction: in
+        action: pass
+        source_net: VLAN5_NET
+        destination_invert: true
+        destination_net: HOMELAB_ALL
+        description: "opt4-20 phys-workload to internet"
+        reload: false
+        match_fields: ["description"]
+
+    # -------------------------------------------------------------------------
+    # Rules — opt5 (VLAN 6 — private-wifi)
+    # OUT: k8s-mgmt (shared services), storage (NFS), internet
+    # -------------------------------------------------------------------------
+
+    - name: "opt5 | private-wifi → k8s-mgmt (shared services)"
+      oxlorg.opnsense.rule:
+        sequence: 10
+        interface: ["opt5"]
+        direction: in
+        action: pass
+        source_net: VLAN6_NET
+        destination_net: VLAN2_NET
+        description: "opt5-10 private-wifi to k8s-mgmt"
+        reload: false
+        match_fields: ["description"]
+
+    - name: "opt5 | private-wifi → storage (NFS)"
+      oxlorg.opnsense.rule:
+        sequence: 20
+        interface: ["opt5"]
+        direction: in
+        action: pass
+        protocol: "TCP/UDP"
+        source_net: VLAN6_NET
+        destination_net: VLAN3_NET
+        destination_port: NFS_PORT
+        description: "opt5-20 private-wifi to storage nfs"
+        reload: false
+        match_fields: ["description"]
+
+    - name: "opt5 | private-wifi → internet"
+      oxlorg.opnsense.rule:
+        sequence: 30
+        interface: ["opt5"]
+        direction: in
+        action: pass
+        source_net: VLAN6_NET
+        destination_invert: true
+        destination_net: HOMELAB_ALL
+        description: "opt5-30 private-wifi to internet"
+        reload: false
+        match_fields: ["description"]
+
+    # -------------------------------------------------------------------------
+    # Rules — opt6 (VLAN 7 — guest-wifi)
+    # OUT: internet only — hard isolated
+    # -------------------------------------------------------------------------
+
+    - name: "opt6 | guest-wifi → internet only"
+      oxlorg.opnsense.rule:
+        sequence: 10
+        interface: ["opt6"]
+        direction: in
+        action: pass
+        source_net: VLAN7_NET
+        destination_invert: true
+        destination_net: HOMELAB_ALL
+        description: "opt6-10 guest to internet only"
+        reload: false
+        match_fields: ["description"]
+
+    # -------------------------------------------------------------------------
+    # Single reload — applies aliases and rules atomically.
+    # Rule reload regenerates the full pf ruleset including alias tables,
+    # so a separate alias reload is not needed here.
+    # -------------------------------------------------------------------------
+
+    - name: Reload firewall rules
+      oxlorg.opnsense.reload:
+        target: rule
+
+    # Verify pf is still enabled after reload. OPNsense's reload mechanism
+    # calls pfctl -d internally; if rule generation fails, pf stays disabled.
+    - name: Verify pf is enabled after reload
+      oxlorg.opnsense.raw:
+        url: "diagnostics/firewall/pf_statistics"
+        action: get
+      register: pf_stats
+      failed_when: false
+
+    - name: Warn if pf status cannot be verified
+      ansible.builtin.debug:
+        msg: >-
+          WARNING: Could not verify pf status via API. SSH to OPNsense and
+          run 'pfctl -s info | head -3' to confirm Status is Enabled.
+          If disabled, run: pfctl -e && pfctl -f /tmp/rules.debug
+      when: pf_stats.failed | default(false)

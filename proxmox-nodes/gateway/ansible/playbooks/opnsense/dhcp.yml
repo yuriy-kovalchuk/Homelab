@@ -1,0 +1,55 @@
+---
+- name: Configure OPNsense DHCP servers
+  hosts: opnsense
+  gather_facts: false
+  module_defaults:
+    group/oxlorg.opnsense.all:
+      firewall: "{{ opnsense_host }}"
+      api_key: "{{ opnsense_api_key }}"
+      api_secret: "{{ opnsense_api_secret }}"
+      ssl_verify: "{{ opnsense_ssl_verify }}"
+  vars:
+    dhcp_subnets:
+      - subnet: "10.0.2.0/24"
+        description: "k8s-mgmt"
+        gateway: ["10.0.2.1"]
+        pools: ["10.0.2.100 - 10.0.2.200"]
+      - subnet: "10.0.3.0/24"
+        description: "storage"
+        gateway: ["10.0.3.1"]
+        pools: ["10.0.3.100 - 10.0.3.200"]
+      - subnet: "10.0.4.0/24"
+        description: "k8s-workload"
+        gateway: ["10.0.4.1"]
+        pools: ["10.0.4.100 - 10.0.4.200"]
+      - subnet: "10.0.5.0/24"
+        description: "phys-workload"
+        gateway: ["10.0.5.1"]
+        pools: ["10.0.5.100 - 10.0.5.200"]
+      - subnet: "10.0.6.0/24"
+        description: "private-wifi"
+        gateway: ["10.0.6.1"]
+        pools: ["10.0.6.100 - 10.0.6.200"]
+      - subnet: "10.0.7.0/24"
+        description: "guest-wifi"
+        gateway: ["10.0.7.1"]
+        pools: ["10.0.7.100 - 10.0.7.200"]
+        # Guest firewall rule only allows non-homelab destinations, so guests
+        # cannot query the gateway IP (10.0.7.1) for DNS directly. Hand out an
+        # external IP instead — the d_nat redirect silently intercepts it and
+        # forwards to Unbound over DoT.
+        dns: ["8.8.8.8"]
+  tasks:
+    - name: Configure DHCP subnet
+      oxlorg.opnsense.dhcp_subnet:
+        subnet: "{{ item.subnet }}"
+        description: "{{ item.description }}"
+        gateway: "{{ item.gateway }}"
+        pools: "{{ item.pools }}"
+        dns_servers: "{{ item.dns | default(omit) }}"
+        state: present
+      loop: "{{ dhcp_subnets }}"
+
+    - name: Reload DHCP config
+      oxlorg.opnsense.reload:
+        target: dhcp

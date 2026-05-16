@@ -1,0 +1,37 @@
+---
+# Temporary rule: allows phys-workload to reach the guest-wifi VLAN for AP
+# configuration. Sits at sequence 4, before the permanent block at sequence 5.
+#
+# Add:    ansible-playbook -i inventory/hosts.yml playbooks/opnsense/temp_ap_setup.yml
+# Remove: ansible-playbook -i inventory/hosts.yml playbooks/opnsense/temp_ap_setup.yml -e "state=absent"
+#
+- name: Temporary phys-workload → guest-wifi rule for AP setup
+  hosts: opnsense
+  gather_facts: false
+  module_defaults:
+    group/oxlorg.opnsense.all:
+      firewall: "{{ opnsense_host }}"
+      api_key: "{{ opnsense_api_key }}"
+      api_secret: "{{ opnsense_api_secret }}"
+      ssl_verify: "{{ opnsense_ssl_verify }}"
+
+  vars:
+    state: present
+
+  tasks:
+    - name: "opt4 | TEMP phys-workload → guest-wifi (AP setup)"
+      oxlorg.opnsense.rule:
+        sequence: 4
+        interface: ["opt4"]
+        direction: in
+        action: pass
+        source_net: "10.0.5.0/24"
+        destination_net: "10.0.7.0/24"
+        description: "opt4-04 TEMP phys-workload to guest ap setup"
+        state: "{{ state }}"
+        reload: false
+        match_fields: ["description"]
+
+    - name: Reload firewall rules
+      oxlorg.opnsense.reload:
+        target: rule
