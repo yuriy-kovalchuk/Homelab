@@ -150,7 +150,28 @@ kubectl --kubeconfig ~/.kube/mgmt-kubeconfig -n flux-system get pods
 
 ---
 
-## 7. Bootstrap GitOps sync
+## 7. Create cert-manager secrets (manual, one-time)
+
+Before FluxCD reconciles the infrastructure, create the Cloudflare API token secret
+that the `letsencrypt-dns` ClusterIssuer expects:
+
+```bash
+kubectl --kubeconfig ~/.kube/mgmt-kubeconfig create namespace cert-manager
+
+kubectl --kubeconfig ~/.kube/mgmt-kubeconfig create secret generic cloudflare-api-token-secret \
+  --namespace cert-manager \
+  --from-literal=api-token=<your-cloudflare-api-token>
+```
+
+The token needs the `Zone:Read` and `DNS:Edit` permissions in Cloudflare. Create it at
+**Cloudflare Dashboard → My Profile → API Tokens → Create Token**.
+
+> This secret is intentionally not in Git. cert-manager will not be able to issue
+> certificates until this secret exists in the cluster.
+
+---
+
+## 8. Bootstrap GitOps sync
 
 Apply the bootstrap manifests to connect FluxCD to this repository:
 
