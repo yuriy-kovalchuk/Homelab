@@ -102,8 +102,36 @@
 
     # -------------------------------------------------------------------------
     # Rules — opt1 (VLAN 2 — k8s-mgmt)
-    # OUT: storage (full), internet
+    # OUT: storage (full), gateway DNS + NTP, internet
     # -------------------------------------------------------------------------
+
+    - name: "opt1 | k8s-mgmt → gateway (DNS)"
+      oxlorg.opnsense.rule:
+        sequence: 5
+        interface: ["opt1"]
+        direction: in
+        action: pass
+        protocol: "TCP/UDP"
+        source_net: VLAN2_NET
+        destination_net: "10.0.2.1/32"
+        destination_port: "53"
+        description: "opt1-05 k8s-mgmt to gateway dns"
+        reload: false
+        match_fields: ["description"]
+
+    - name: "opt1 | k8s-mgmt → gateway (NTP)"
+      oxlorg.opnsense.rule:
+        sequence: 6
+        interface: ["opt1"]
+        direction: in
+        action: pass
+        protocol: UDP
+        source_net: VLAN2_NET
+        destination_net: "10.0.2.1/32"
+        destination_port: "123"
+        description: "opt1-06 k8s-mgmt to gateway ntp"
+        reload: false
+        match_fields: ["description"]
 
     - name: "opt1 | k8s-mgmt → storage (full)"
       oxlorg.opnsense.rule:
