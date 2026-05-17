@@ -20,6 +20,7 @@ ansible/
 │       ├── firewall.yml           # firewall rules (see NETWORK.md)
 │       ├── dns.yml                # Unbound DoT (1.1.1.1 over TLS) + per-VLAN port-53 redirect
 │       ├── proxmox.yml            # Proxmox management access + WAN block
+│       ├── bgp.yml                # FRR BGP peering with Cilium (management cluster)
 │       └── temp_ap_setup.yml      # temporary: phys-workload → guest-wifi for AP setup
 ├── requirements.yml               # collection dependencies
 ├── .env.example
@@ -210,6 +211,38 @@ Adds a `PROXMOX` alias (`192.168.0.254`) and a `PROXMOX_PORTS` alias (`22`, `800
 > **Note:** Proxmox and OPNsense WAN share the same L2 home network (192.168.0.x). Traffic
 > from a home-network device directly to Proxmox bypasses OPNsense and cannot be blocked
 > here. Full isolation requires moving Proxmox's management interface to a dedicated VLAN.
+
+## BGP — Kubernetes load balancer advertisement
+
+OPNsense uses the **FRR** (Free Range Routing) plugin to peer with Cilium BGP on the
+management cluster.
+
+| Side       | ASN   | IP          |
+|------------|-------|-------------|
+| OPNsense   | 65551 | 10.0.2.1  |
+| mgmt-1     | 65001 | 10.0.2.2    |
+
+**Run the BGP playbook**
+
+```bash
+ansible-playbook -i inventory/ playbooks/opnsense/bgp.yml
+```
+
+This installs the `os-frr` plugin, enables FRR, configures BGP with ASN 65551 and
+router-id 10.0.2.1, and adds the mgmt-1 neighbor at 10.0.2.2.
+
+**3. Verify session**
+
+From OPNsense shell (System → Diagnostics → Execute command or SSH):
+
+```bash
+vtysh -c "show bgp summary"
+```
+
+The neighbor `10.0.2.2` should show state `Established` and a non-zero prefixes received
+count once Cilium has assigned LoadBalancer IPs from the `10.0.2.50–10.0.2.99` pool.
+
+---
 
 ## One-off tasks
 
