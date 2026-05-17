@@ -15,3 +15,8 @@ patches:
       kind: HelmRelease
       name: longhorn
       namespace: longhorn-system
+  - path: gateway/gateway-patch.yaml
+    target:
+      kind: Gateway
+      name: internal
+      namespace: kube-system
