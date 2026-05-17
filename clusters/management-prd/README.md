@@ -11,7 +11,7 @@ management-prd/
 ├── terraform/
 │   ├── cni/         # Installs Cilium as the CNI
 │   └── fluxcd/      # Installs flux-operator + FluxInstance
-├── flux-system/     # FluxCD bootstrap manifests (GitRepository + Kustomizations)
+├── flux-system/     # FluxCD bootstrap manifests (GitRepository, Kustomizations, infrastructure + apps sync)
 └── talos-nodes/     # yk-talos-manager CRs — applied manually, not managed by FluxCD
 ```
 
@@ -48,7 +48,7 @@ See each section below for prerequisites before running each step.
 - Root `.env` sourced — must contain `TF_VAR_s3_access_key`, `TF_VAR_s3_secret_key`, `TF_VAR_s3_endpoint`
 - Node physical NIC connected to the managed switch on VLAN 2 (access port, native VLAN 2, block all tagged)
 - OPNsense reachable and DHCP active on `10.0.2.0/24`
-- Kubeconfig for the cluster available at `~/.kube/talos-management.yaml`
+- Kubeconfig for the cluster available at `~/.kube/mgmt-kubeconfig`
 
 ---
 
@@ -62,7 +62,7 @@ so no manual USB flashing is required.
 **This step is manual.** Place the node definition CR in `talos-nodes/` and apply it:
 
 ```bash
-kubectl --kubeconfig ~/.kube/talos-management.yaml apply -f clusters/management-prd/talos-nodes/
+kubectl --kubeconfig ~/.kube/mgmt-kubeconfig apply -f clusters/management-prd/talos-nodes/
 ```
 
 Wait for yk-talos-manager to complete the boot before proceeding.
@@ -106,7 +106,7 @@ After yk-talos-manager has provisioned the node, confirm it is reachable and the
 is in place:
 
 ```bash
-kubectl --kubeconfig ~/.kube/talos-management.yaml get nodes
+kubectl --kubeconfig ~/.kube/mgmt-kubeconfig get nodes
 ```
 
 Nodes will show `NotReady` until Cilium is installed in the next step.
@@ -125,8 +125,8 @@ tf_apply
 Nodes will transition to `Ready` once Cilium daemonset pods are running. Verify:
 
 ```bash
-kubectl --kubeconfig ~/.kube/talos-management.yaml get nodes
-kubectl --kubeconfig ~/.kube/talos-management.yaml -n kube-system get pods -l app.kubernetes.io/name=cilium
+kubectl --kubeconfig ~/.kube/mgmt-kubeconfig get nodes
+kubectl --kubeconfig ~/.kube/mgmt-kubeconfig -n kube-system get pods -l app.kubernetes.io/name=cilium
 ```
 
 ---
@@ -145,7 +145,7 @@ full FluxCD controller suite (source, kustomize, helm, notification, image contr
 Verify the controllers are running:
 
 ```bash
-kubectl --kubeconfig ~/.kube/talos-management.yaml -n flux-system get pods
+kubectl --kubeconfig ~/.kube/mgmt-kubeconfig -n flux-system get pods
 ```
 
 ---
@@ -155,7 +155,7 @@ kubectl --kubeconfig ~/.kube/talos-management.yaml -n flux-system get pods
 Apply the bootstrap manifests to connect FluxCD to this repository:
 
 ```bash
-kubectl --kubeconfig ~/.kube/talos-management.yaml \
+kubectl --kubeconfig ~/.kube/mgmt-kubeconfig \
   apply -k clusters/management-prd/flux-system/
 ```
 
@@ -168,7 +168,7 @@ This creates:
 Watch the reconciliation:
 
 ```bash
-kubectl --kubeconfig ~/.kube/talos-management.yaml \
+kubectl --kubeconfig ~/.kube/mgmt-kubeconfig \
   -n flux-system get kustomizations -w
 ```
 
