@@ -30,3 +30,8 @@ patches:
       kind: HelmRelease
       name: vault
       namespace: vault
+  - path: harbor/helm-release-patch.yaml
+    target:
+      kind: HelmRelease
+      name: harbor
+      namespace: harbor
