@@ -1,6 +1,12 @@
 # Terraform shell functions for devbox
 # These run in your current directory (unlike devbox scripts)
 
+# Expose S3 backend credentials as standard AWS env vars so the Terraform S3
+# backend picks them up automatically for init, plan, and apply.
+export AWS_ACCESS_KEY_ID="${TF_VAR_s3_access_key}"
+export AWS_SECRET_ACCESS_KEY="${TF_VAR_s3_secret_key}"
+export AWS_ENDPOINT_URL_S3="${TF_VAR_s3_endpoint}"
+
 # Helper to find tfvars file
 _tf_var_file() {
   if [[ -f "vars/terraform.tfvars" ]]; then
@@ -11,10 +17,7 @@ _tf_var_file() {
 }
 
 tf_init() {
-  terraform init \
-    -backend-config="endpoint=$TF_VAR_s3_endpoint" \
-    -backend-config="access_key=$TF_VAR_s3_access_key" \
-    -backend-config="secret_key=$TF_VAR_s3_secret_key"
+  terraform init "$@"
 }
 
 tf_init_local() {

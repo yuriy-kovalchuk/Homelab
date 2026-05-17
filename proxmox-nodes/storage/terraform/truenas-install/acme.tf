@@ -5,7 +5,7 @@ resource "proxmox_virtual_environment_acme_account" "prod" {
   tos       = "https://letsencrypt.org/documents/LE-SA-v1.3-September-21-2022.pdf"
 }
 
-resource "proxmox_virtual_environment_acme_dns_plugin" "cloudflare_dns_plugin" {
+resource "proxmox_virtual_environment_acme_dns_plugin" "cloudflare" {
   plugin = "cf-dns"
   api    = "cf"
 
@@ -15,20 +15,20 @@ resource "proxmox_virtual_environment_acme_dns_plugin" "cloudflare_dns_plugin" {
   }
 }
 
-resource "proxmox_virtual_environment_acme_certificate" "prod_cert" {
-  node_name = "gaia"
+resource "proxmox_virtual_environment_acme_certificate" "prod" {
+  node_name = var.storage_proxmox_node_name
   account   = proxmox_virtual_environment_acme_account.prod.name
   force     = false
 
   domains = [
     {
-      domain = "gaia.yuriy-lab.cloud"
-      plugin = proxmox_virtual_environment_acme_dns_plugin.cloudflare_dns_plugin.plugin
+      domain = var.storage_acme_domain
+      plugin = proxmox_virtual_environment_acme_dns_plugin.cloudflare.plugin
     }
   ]
 
   depends_on = [
     proxmox_virtual_environment_acme_account.prod,
-    proxmox_virtual_environment_acme_dns_plugin.cloudflare_dns_plugin
+    proxmox_virtual_environment_acme_dns_plugin.cloudflare,
   ]
 }

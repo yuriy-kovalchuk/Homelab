@@ -71,6 +71,10 @@
           type: port
           content: ["2049"]
           description: "NFS"
+        - name: NAS_PORTS
+          type: port
+          content: ["445", "2049"]
+          description: "NAS — SMB (445) + NFS (2049)"
         - name: VAULT_HARBOR_PORTS
           type: port
           content: ["443", "8200"]
@@ -128,8 +132,22 @@
 
     # -------------------------------------------------------------------------
     # Rules — opt2 (VLAN 3 — storage)
-    # OUT: internet (port 80/443 only)
+    # OUT: gateway DNS, internet (port 80/443 only)
     # -------------------------------------------------------------------------
+
+    - name: "opt2 | storage → gateway (DNS)"
+      oxlorg.opnsense.rule:
+        sequence: 5
+        interface: ["opt2"]
+        direction: in
+        action: pass
+        protocol: "TCP/UDP"
+        source_net: VLAN3_NET
+        destination_net: "10.0.3.1/32"
+        destination_port: "53"
+        description: "opt2-05 storage to gateway dns"
+        reload: false
+        match_fields: ["description"]
 
     - name: "opt2 | storage → internet (web only)"
       oxlorg.opnsense.rule:
@@ -249,7 +267,7 @@
         reload: false
         match_fields: ["description"]
 
-    - name: "opt5 | private-wifi → storage (NFS)"
+    - name: "opt5 | private-wifi → storage (NAS)"
       oxlorg.opnsense.rule:
         sequence: 20
         interface: ["opt5"]
@@ -258,8 +276,8 @@
         protocol: "TCP/UDP"
         source_net: VLAN6_NET
         destination_net: VLAN3_NET
-        destination_port: NFS_PORT
-        description: "opt5-20 private-wifi to storage nfs"
+        destination_port: NAS_PORTS
+        description: "opt5-20 private-wifi to storage nas"
         reload: false
         match_fields: ["description"]
 

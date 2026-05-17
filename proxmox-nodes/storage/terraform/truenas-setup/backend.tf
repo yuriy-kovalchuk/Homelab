@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
-    bucket = "terraform"
-    key    = "talos-management-cluster-cni.tfstate"
-
+    bucket = "terraform-prd"
+    key    = "proxmox-nodes/storage/truenas-setup.tfstate"
     region = "eu-south-1"
+
     skip_credentials_validation = true
     skip_requesting_account_id  = true
     skip_metadata_api_check     = true
