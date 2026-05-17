@@ -150,7 +150,9 @@ kubectl --kubeconfig ~/.kube/mgmt-kubeconfig -n flux-system get pods
 
 ---
 
-## 7. Create cert-manager secrets (manual, one-time)
+## 7. Create manual secrets (one-time)
+
+### cert-manager
 
 Before FluxCD reconciles the infrastructure, create the Cloudflare API token secret
 that the `letsencrypt-dns` ClusterIssuer expects:
@@ -168,6 +170,53 @@ The token needs the `Zone:Read` and `DNS:Edit` permissions in Cloudflare. Create
 
 > This secret is intentionally not in Git. cert-manager will not be able to issue
 > certificates until this secret exists in the cluster.
+
+### vault
+
+Vault must be initialized manually once after the pod first starts. Initialize
+with a single key share so the unseal sidecar can unseal automatically:
+
+```bash
+kubectl -n vault exec -it vault-0 -- vault operator init \
+  -key-shares=1 \
+  -key-threshold=1
+```
+
+Save the unseal key and root token somewhere safe — they are shown only once.
+
+Then create the secret with the unseal key:
+
+```bash
+kubectl create secret generic vault-unseal-key \
+  --namespace vault \
+  --from-literal=unseal-key=<unseal-key-from-init>
+```
+
+The sidecar will pick it up and unseal Vault automatically on every restart.
+
+> `-key-shares=1 -key-threshold=1` is intentional for a homelab — the 5-of-3
+> default is designed for multiple keyholders. The PVC is protected by the
+> cluster; a single key is sufficient here.
+>
+> This secret is intentionally not in Git.
+
+### yk-dns-manager
+
+Create the OPNsense API credentials secret before Flux reconciles yk-dns-manager:
+
+```bash
+kubectl create namespace yk-dns-manager
+
+kubectl create secret generic dns-provider-credentials \
+  --namespace yk-dns-manager \
+  --from-literal=OPNSENSE_API_KEY=<your-opnsense-api-key> \
+  --from-literal=OPNSENSE_API_SECRET=<your-opnsense-api-secret>
+```
+
+Generate the API key in OPNsense at **System → Access → Users → root → API Keys → Add**.
+
+> This secret is intentionally not in Git. yk-dns-manager will not be able to
+> manage DNS records until this secret exists in the cluster.
 
 ---
 

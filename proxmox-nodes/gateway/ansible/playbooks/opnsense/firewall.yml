@@ -102,7 +102,7 @@
 
     # -------------------------------------------------------------------------
     # Rules — opt1 (VLAN 2 — k8s-mgmt)
-    # OUT: storage (full), gateway DNS + NTP, internet
+    # OUT: storage (full), gateway DNS + NTP + HTTPS API + BGP, internet
     # -------------------------------------------------------------------------
 
     - name: "opt1 | k8s-mgmt → gateway (DNS)"
@@ -130,6 +130,34 @@
         destination_net: "10.0.2.1/32"
         destination_port: "123"
         description: "opt1-06 k8s-mgmt to gateway ntp"
+        reload: false
+        match_fields: ["description"]
+
+    - name: "opt1 | k8s-mgmt → gateway (HTTPS API)"
+      oxlorg.opnsense.rule:
+        sequence: 7
+        interface: ["opt1"]
+        direction: in
+        action: pass
+        protocol: TCP
+        source_net: VLAN2_NET
+        destination_net: "10.0.2.1/32"
+        destination_port: "443"
+        description: "opt1-07 k8s-mgmt to gateway https api"
+        reload: false
+        match_fields: ["description"]
+
+    - name: "opt1 | k8s-mgmt → gateway (BGP)"
+      oxlorg.opnsense.rule:
+        sequence: 8
+        interface: ["opt1"]
+        direction: in
+        action: pass
+        protocol: TCP
+        source_net: VLAN2_NET
+        destination_net: "10.0.2.1/32"
+        destination_port: "179"
+        description: "opt1-08 k8s-mgmt to gateway bgp"
         reload: false
         match_fields: ["description"]
 

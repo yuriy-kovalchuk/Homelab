@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: vault-auto-unseal
+  namespace: vault
+spec:
+  schedule: "* * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: unsealer
+              image: alpine/curl:8.17.0
+              command: ["/bin/sh", "/scripts/unseal.sh"]
+              env:
+                - name: UNSEAL_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: vault-unseal-key
+                      key: unseal-key
+              volumeMounts:
+                - name: script-volume
+                  mountPath: /scripts
+          volumes:
+            - name: script-volume
+              configMap:
+                name: vault-unseal-script

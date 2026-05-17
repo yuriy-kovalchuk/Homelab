@@ -25,3 +25,8 @@ patches:
       kind: HelmRelease
       name: yk-dns-manager
       namespace: yk-dns-manager
+  - path: vault/helm-release-patch.yaml
+    target:
+      kind: HelmRelease
+      name: vault
+      namespace: vault

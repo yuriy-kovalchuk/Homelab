@@ -8,3 +8,4 @@ resources:
   - longhorn/
   - bgp/
   - yk-dns-manager/
+  - vault/
