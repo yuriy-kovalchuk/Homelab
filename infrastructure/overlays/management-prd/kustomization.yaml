@@ -10,3 +10,8 @@ patches:
       kind: HelmRelease
       name: cert-manager
       namespace: cert-manager
+  - path: longhorn/helm-release-patch.yaml
+    target:
+      kind: HelmRelease
+      name: longhorn
+      namespace: longhorn-system

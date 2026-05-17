@@ -4,4 +4,5 @@ resources:
   - gateway-api-crds/
   - metrics-server/
   - cert-manager/
+  - longhorn/
   - bgp/
