@@ -7,3 +7,4 @@ resources:
   - cert-manager/
   - longhorn/
   - bgp/
+  - yk-dns-manager/

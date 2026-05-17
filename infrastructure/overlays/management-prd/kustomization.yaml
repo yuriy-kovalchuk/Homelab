@@ -20,3 +20,8 @@ patches:
       kind: Gateway
       name: internal
       namespace: kube-system
+  - path: yk-dns-manager/helm-release-patch.yaml
+    target:
+      kind: HelmRelease
+      name: yk-dns-manager
+      namespace: yk-dns-manager
