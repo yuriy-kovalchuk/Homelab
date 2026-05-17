@@ -9,3 +9,4 @@ resources:
   - bgp/
   - yk-dns-manager/
   - vault/
+  - harbor/

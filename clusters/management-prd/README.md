@@ -218,6 +218,44 @@ Generate the API key in OPNsense at **System → Access → Users → root → A
 > This secret is intentionally not in Git. yk-dns-manager will not be able to
 > manage DNS records until this secret exists in the cluster.
 
+### harbor
+
+After Harbor is deployed and healthy, run the init script once to create the proxy cache
+registries and projects:
+
+```bash
+HARBOR_PASS=<harbor-admin-password> \
+  bash infrastructure/overlays/management-prd/harbor/harbor-init.sh
+```
+
+The script creates the following upstream registries and a corresponding proxy cache project
+for each:
+
+| Project     | Type        | Registry                    |
+|-------------|-------------|-----------------------------|
+| `local`     | push target | —                           |
+| `dockerhub` | proxy cache | `https://hub.docker.com`    |
+| `ghcr`      | proxy cache | `https://ghcr.io`           |
+| `gcr`       | proxy cache | `https://gcr.io`            |
+| `k8s`       | proxy cache | `https://registry.k8s.io`   |
+| `quay`      | proxy cache | `https://quay.io`           |
+| `ecr-public`| proxy cache | `https://public.ecr.aws`    |
+| `mcr`       | proxy cache | `https://mcr.microsoft.com` |
+
+Push local images with:
+
+```bash
+docker tag myimage harbor.mgmt.yuriy-lab.cloud/local/myimage:tag
+docker push harbor.mgmt.yuriy-lab.cloud/local/myimage:tag
+```
+
+The script is idempotent — re-running it skips resources that already exist.
+
+`HARBOR_URL` and `HARBOR_USER` can be overridden if needed (defaults: `https://harbor.mgmt.yuriy-lab.cloud` / `admin`).
+
+> The Harbor admin password is set during initial Helm deployment. It is intentionally
+> not in Git.
+
 ---
 
 ## 8. Bootstrap GitOps sync

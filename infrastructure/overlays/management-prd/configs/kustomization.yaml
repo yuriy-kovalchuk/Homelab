@@ -4,3 +4,4 @@ resources:
   - cluster-issuer.yaml
   - longhorn-httproute.yaml
   - vault-httproute.yaml
+  - harbor-httproute.yaml
