@@ -10,3 +10,4 @@ resources:
   - yk-dns-manager/
   - vault/
   - harbor/
+  - yk-talos-manager/

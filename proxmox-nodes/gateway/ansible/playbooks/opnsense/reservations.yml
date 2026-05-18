@@ -1,0 +1,37 @@
+---
+- name: Configure DHCP reservations
+  hosts: opnsense
+  gather_facts: false
+  module_defaults:
+    group/oxlorg.opnsense.all:
+      firewall: "{{ opnsense_host }}"
+      api_key: "{{ opnsense_api_key }}"
+      api_secret: "{{ opnsense_api_secret }}"
+      ssl_verify: "{{ opnsense_ssl_verify }}"
+  vars:
+    reservations:
+      - subnet: "10.0.2.0/24"
+        ip: "10.0.2.2"
+        mac: "fc:3f:db:0f:8e:18"
+        hostname: "mgmt-1"
+        description: "mgmt-1 management control-plane"
+      - subnet: "10.0.3.0/24"
+        ip: "10.0.3.3"
+        mac: "bc:24:11:19:5c:66"
+        hostname: "truenas"
+        description: "TrueNAS SCALE VM"
+      - subnet: "10.0.4.0/24"
+        ip: "10.0.4.2"
+        mac: "00:e0:4c:68:10:09"
+        hostname: "node-1"
+        description: "node-1 workload control-plane"
+  tasks:
+    - name: Reserve node IPs
+      oxlorg.opnsense.dhcp_reservation:
+        subnet: "{{ item.subnet }}"
+        ip: "{{ item.ip }}"
+        mac: "{{ item.mac }}"
+        hostname: "{{ item.hostname }}"
+        description: "{{ item.description }}"
+        state: present
+      loop: "{{ reservations }}"

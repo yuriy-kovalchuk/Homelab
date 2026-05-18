@@ -16,6 +16,7 @@ ansible/
 │       ├── vlans.yml              # VLAN sub-interfaces (vtnet1.2–vtnet1.7)
 │       ├── interfaces.yml         # prints manual checklist (no API available)
 │       ├── dhcp.yml               # DHCP server per VLAN
+│       ├── reservations.yml       # static DHCP reservations for all nodes
 │       ├── nat.yml                # outbound NAT masquerade for all VLANs  ⚠️ requires manual step
 │       ├── firewall.yml           # firewall rules (see NETWORK.md)
 │       ├── dns.yml                # Unbound DoT (1.1.1.1 over TLS) + per-VLAN port-53 redirect
@@ -130,7 +131,22 @@ ansible-playbook -i inventory/hosts.yml playbooks/opnsense/interfaces.yml
 ansible-playbook -i inventory/hosts.yml playbooks/opnsense/dhcp.yml
 ```
 
-**Step 4 — Enable NAT (one GUI step + Ansible):**
+**Step 4 — Configure DHCP reservations:**
+```bash
+ansible-playbook -i inventory/hosts.yml playbooks/opnsense/reservations.yml
+```
+
+Reserves static IPs for all known nodes:
+
+| Hostname | IP       | MAC               | Subnet       |
+|----------|----------|-------------------|--------------|
+| mgmt-1   | 10.0.2.2 | fc:3f:db:0f:8e:18 | 10.0.2.0/24  |
+| truenas  | 10.0.3.3 | bc:24:11:19:5c:66 | 10.0.3.0/24  |
+| node-1   | 10.0.4.2 | 00:e0:4c:68:10:09 | 10.0.4.0/24  |
+
+Add new nodes to `reservations.yml` as the cluster grows.
+
+**Step 5 — Enable NAT (one GUI step + Ansible):**
 
 Before running `nat.yml`, switch the outbound NAT mode to **Hybrid** in the GUI —
 otherwise OPNsense ignores manually added rules:
@@ -144,12 +160,12 @@ Then run:
 ansible-playbook -i inventory/hosts.yml playbooks/opnsense/nat.yml
 ```
 
-**Step 5 — Configure firewall rules:**
+**Step 6 — Configure firewall rules:**
 ```bash
 ansible-playbook -i inventory/hosts.yml playbooks/opnsense/firewall.yml
 ```
 
-**Step 6 — Configure DNS:**
+**Step 7 — Configure DNS:**
 ```bash
 ansible-playbook -i inventory/hosts.yml playbooks/opnsense/dns.yml
 ```
@@ -197,7 +213,7 @@ pfctl -e && pfctl -f /tmp/rules.debug
 
 This is a one-time step after the first successful Ansible run.
 
-**Step 7 — Configure Proxmox access:**
+**Step 8 — Configure Proxmox access:**
 ```bash
 ansible-playbook -i inventory/hosts.yml playbooks/opnsense/proxmox.yml
 ```
