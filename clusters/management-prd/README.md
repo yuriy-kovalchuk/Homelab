@@ -248,6 +248,15 @@ Push local images with:
 docker tag myimage harbor.mgmt.yuriy-lab.cloud/local/myimage:tag
 docker push harbor.mgmt.yuriy-lab.cloud/local/myimage:tag
 ```
+| Project     | Registry                    |
+|-------------|-----------------------------|
+| `dockerhub` | `https://hub.docker.com`    |
+| `ghcr`      | `https://ghcr.io`           |
+| `gcr`       | `https://gcr.io`            |
+| `k8s`       | `https://registry.k8s.io`   |
+| `quay`      | `https://quay.io`           |
+| `ecr-public`| `https://public.ecr.aws`    |
+| `mcr`       | `https://mcr.microsoft.com` |
 
 The script is idempotent — re-running it skips resources that already exist.
 

@@ -71,7 +71,6 @@ create_project() {
     )"
 }
 
-create_proxy_project() {
   local name="$1" registry_name="$2"
   if [[ -n "$(get_project_id "$name")" ]]; then
     echo "Project '${name}' already exists, skipping"
