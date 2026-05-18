@@ -7,7 +7,6 @@
     "kubeseal@latest",
     "terraform@latest",
     "talosctl@latest",
-    "git@latest",
     "cilium-cli@latest",
     "hubble@latest",
     "fluxcd@latest"
