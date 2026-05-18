@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket = "terraform-prd"
-    key    = "prd/clusters/workload/cni.tfstate"
+    key    = "clusters/workload-prd/cni.tfstate"
 
     region                      = "eu-south-1"
     skip_credentials_validation = true

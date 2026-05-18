@@ -9,20 +9,8 @@ workloads. Consumes shared infrastructure services (Vault, Harbor, cert-manager)
 | Hostname | IP       | Role          |
 |----------|----------|---------------|
 | node-1   | 10.0.4.2 | control-plane |
+| node-2   | 10.0.4.3 | control-plane |
 
 ## 1. Reserve static IP in Kea
 
-Reservations are managed via Ansible. Run from the gateway ansible directory:
-
-```bash
-cd proxmox-nodes/gateway/ansible
-ansible-playbook -i inventory/hosts.yml playbooks/opnsense/reservations.yml
-```
-
-Reservations configured (all nodes across all VLANs):
-
-| Hostname | IP       | MAC               | Subnet       | Role                      |
-|----------|----------|-------------------|--------------|---------------------------|
-| mgmt-1   | 10.0.2.2 | fc:3f:db:0f:8e:18 | 10.0.2.0/24  | management control-plane  |
-| truenas  | 10.0.3.3 | bc:24:11:19:5c:66 | 10.0.3.0/24  | TrueNAS SCALE VM          |
-| node-1   | 10.0.4.2 | 00:e0:4c:68:10:09 | 10.0.4.0/24  | workload control-plane    |
+Managed via Ansible — see [`proxmox-nodes/gateway/ansible/README.md`](../../proxmox-nodes/gateway/ansible/README.md) step 4 for the full reservations table and run command.

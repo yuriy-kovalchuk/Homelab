@@ -5,3 +5,4 @@ resources:
   - cluster-workload-prd.yaml
   - cluster-bootstrap-workload-prd.yaml
   - node-1-workload-prd.yaml
+  - node-2-workload-prd.yaml
