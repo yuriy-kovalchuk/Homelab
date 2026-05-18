@@ -1,0 +1,7 @@
+apiVersion: talos.yuriykovalchuk.dev/v1alpha1
+kind: TalosClusterBootstrap
+metadata:
+  name: workload-prd-bootstrap
+  namespace: yk-talos-manager-prd-workload
+spec:
+  clusterRef: workload-prd

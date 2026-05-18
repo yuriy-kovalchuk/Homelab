@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - ../../base
   - bgp/
+  - yk-talos-manager-prd-workload/
 
 patches:
   - path: cert-manager/helm-release-patch.yaml

@@ -222,8 +222,64 @@
 
     # -------------------------------------------------------------------------
     # Rules — opt3 (VLAN 4 — k8s-workload)
-    # OUT: storage (full), k8s-mgmt (Vault+Harbor ports), internet
+    # OUT: gateway DNS + NTP + HTTPS API + BGP, storage (full), k8s-mgmt (Vault+Harbor ports), internet
     # -------------------------------------------------------------------------
+
+    - name: "opt3 | k8s-workload → gateway (DNS)"
+      oxlorg.opnsense.rule:
+        sequence: 5
+        interface: ["opt3"]
+        direction: in
+        action: pass
+        protocol: "TCP/UDP"
+        source_net: VLAN4_NET
+        destination_net: "10.0.4.1/32"
+        destination_port: "53"
+        description: "opt3-05 k8s-workload to gateway dns"
+        reload: false
+        match_fields: ["description"]
+
+    - name: "opt3 | k8s-workload → gateway (NTP)"
+      oxlorg.opnsense.rule:
+        sequence: 6
+        interface: ["opt3"]
+        direction: in
+        action: pass
+        protocol: UDP
+        source_net: VLAN4_NET
+        destination_net: "10.0.4.1/32"
+        destination_port: "123"
+        description: "opt3-06 k8s-workload to gateway ntp"
+        reload: false
+        match_fields: ["description"]
+
+    - name: "opt3 | k8s-workload → gateway (HTTPS API)"
+      oxlorg.opnsense.rule:
+        sequence: 7
+        interface: ["opt3"]
+        direction: in
+        action: pass
+        protocol: TCP
+        source_net: VLAN4_NET
+        destination_net: "10.0.4.1/32"
+        destination_port: "443"
+        description: "opt3-07 k8s-workload to gateway https api"
+        reload: false
+        match_fields: ["description"]
+
+    - name: "opt3 | k8s-workload → gateway (BGP)"
+      oxlorg.opnsense.rule:
+        sequence: 8
+        interface: ["opt3"]
+        direction: in
+        action: pass
+        protocol: TCP
+        source_net: VLAN4_NET
+        destination_net: "10.0.4.1/32"
+        destination_port: "179"
+        description: "opt3-08 k8s-workload to gateway bgp"
+        reload: false
+        match_fields: ["description"]
 
     - name: "opt3 | k8s-workload → storage (full)"
       oxlorg.opnsense.rule:
