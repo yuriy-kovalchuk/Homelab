@@ -1,8 +1,0 @@
-all:
-  children:
-    docker_vm:
-      hosts:
-        docker-vm:
-          ansible_host: 10.0.3.4
-          ansible_user: ubuntu
-          ansible_ssh_private_key_file: "{{ lookup('env', 'TF_VAR_docker_vm_ssh_key_path') | replace('.pub', '') }}"

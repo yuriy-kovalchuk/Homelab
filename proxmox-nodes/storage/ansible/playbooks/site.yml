@@ -1,4 +1,0 @@
----
-- import_playbook: update.yml
-- import_playbook: docker.yml
-- import_playbook: compose.yml

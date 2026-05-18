@@ -1,0 +1,21 @@
+---
+- name: System update
+  hosts: docker_vm
+  become: true
+  gather_facts: false
+  roles:
+    - system_update
+
+- name: Install Docker
+  hosts: docker_vm
+  become: true
+  gather_facts: false
+  roles:
+    - docker_install
+
+- name: Deploy compose services
+  hosts: docker_vm
+  become: true
+  gather_facts: false
+  roles:
+    - compose_deploy

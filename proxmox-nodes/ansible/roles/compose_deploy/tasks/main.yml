@@ -1,0 +1,30 @@
+---
+- name: Find local compose services
+  ansible.builtin.find:
+    paths: "{{ compose_src }}"
+    file_type: directory
+    recurse: false
+  register: services
+  delegate_to: localhost
+  become: false
+
+- name: Create service directories on remote
+  ansible.builtin.file:
+    path: "{{ compose_dest }}/{{ item.path | basename }}"
+    state: directory
+    mode: "0750"
+  loop: "{{ services.files }}"
+
+- name: Copy compose files to remote
+  ansible.builtin.copy:
+    src: "{{ item.path }}/"
+    dest: "{{ compose_dest }}/{{ item.path | basename }}"
+    mode: "0640"
+    directory_mode: "0750"
+  loop: "{{ services.files }}"
+
+- name: Run docker compose up
+  community.docker.docker_compose_v2:
+    project_src: "{{ compose_dest }}/{{ item.path | basename }}"
+    state: present
+  loop: "{{ services.files }}"

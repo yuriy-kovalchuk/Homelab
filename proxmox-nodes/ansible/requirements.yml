@@ -1,0 +1,5 @@
+collections:
+  - name: community.docker
+    version: ">=3.0.0"
+  - name: oxlorg.opnsense
+    version: "25.7.8"
