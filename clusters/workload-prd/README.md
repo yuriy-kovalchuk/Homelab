@@ -10,6 +10,7 @@ workloads. Consumes shared infrastructure services (Vault, Harbor, cert-manager)
 |----------|----------|---------------|
 | node-1   | 10.0.4.2 | control-plane |
 | node-2   | 10.0.4.3 | control-plane |
+| node-3   | 10.0.4.4 | control-plane |
 
 ## 1. Reserve static IP in Kea
 

@@ -30,6 +30,11 @@
         mac: "78:55:36:03:b1:e0"
         hostname: "node-2"
         description: "node-2 workload control-plane"
+      - subnet: "10.0.4.0/24"
+        ip: "10.0.4.4"
+        mac: "38:05:25:32:8e:dc"
+        hostname: "node-3"
+        description: "node-3 workload control-plane"
   tasks:
     - name: Reserve node IPs
       oxlorg.opnsense.dhcp_reservation:
