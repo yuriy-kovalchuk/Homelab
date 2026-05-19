@@ -53,4 +53,20 @@
         keepalive: 30
         hold_down: 90
         connect_timer: 120
-        reload: true
+        reload: false
+
+    - name: Add workload cluster BGP neighbors
+      oxlorg.opnsense.frr_bgp_neighbor:
+        ip: "{{ item.ip }}"
+        as_number: 65002
+        description: "{{ item.name }}"
+        next_hop_self: true
+        multi_hop: false
+        keepalive: 30
+        hold_down: 90
+        connect_timer: 120
+        reload: "{{ item.last }}"
+      loop:
+        - { ip: "10.0.4.2", name: node-1, last: false }
+        - { ip: "10.0.4.3", name: node-2, last: false }
+        - { ip: "10.0.4.4", name: node-3, last: true }

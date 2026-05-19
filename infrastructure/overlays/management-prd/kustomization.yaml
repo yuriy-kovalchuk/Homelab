@@ -1,7 +1,16 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ../../base
+  - ../../base/gateway-api-crds
+  - ../../base/gateway
+  - ../../base/metrics-server
+  - ../../base/cert-manager
+  - ../../base/longhorn
+  - ../../base/bgp
+  - ../../base/yk-dns-manager
+  - ../../base/vault
+  - ../../base/harbor
+  - ../../base/yk-talos-manager
   - bgp/
   - yk-talos-manager-prd-workload/
 

@@ -8,6 +8,8 @@ resources:
   - ../../base/longhorn
   - ../../base/bgp
   - ../../base/yk-dns-manager
+  - ../../base/kyverno
+  - ../../base/kyverno-reporter
   - bgp/
   - configs/
 
@@ -32,3 +34,13 @@ patches:
       kind: HelmRelease
       name: yk-dns-manager
       namespace: yk-dns-manager
+  - path: kyverno/helm-release-patch.yaml
+    target:
+      kind: HelmRelease
+      name: kyverno
+      namespace: kyverno
+  - path: kyverno-reporter/helm-release-patch.yaml
+    target:
+      kind: HelmRelease
+      name: policy-reporter
+      namespace: kyverno-reporter
