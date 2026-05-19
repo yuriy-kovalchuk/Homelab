@@ -12,6 +12,7 @@ resources:
   - ../../base/kyverno-reporter
   - bgp/
   - configs/
+  - kyverno/exceptions/
 
 patches:
   - path: cert-manager/helm-release-patch.yaml

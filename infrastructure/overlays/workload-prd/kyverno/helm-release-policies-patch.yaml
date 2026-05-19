@@ -6,11 +6,7 @@ metadata:
 spec:
   values:
     policyType: ValidatingPolicy
+    skipBackgroundRequests: true
     podSecurityStandard: restricted
     podSecuritySeverity: high
     validationFailureAction: Enforce
-    skipBackgroundRequests: true
-    vpolExclude:
-      excludeNamespaces:
-        - kube-system
-        - longhorn-system
