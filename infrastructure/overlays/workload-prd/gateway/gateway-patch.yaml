@@ -1,0 +1,33 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: internal
+  namespace: kube-system
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-dns
+spec:
+  addresses:
+    - type: IPAddress
+      value: "10.0.4.50"
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: https-longhorn
+      port: 443
+      protocol: HTTPS
+      hostname: "longhorn.yuriy-lab.cloud"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: longhorn-gw-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: "longhorn-system"

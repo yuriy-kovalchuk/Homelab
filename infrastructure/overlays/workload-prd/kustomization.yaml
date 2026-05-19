@@ -1,3 +1,34 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-resources: []
+resources:
+  - ../../base/gateway-api-crds
+  - ../../base/gateway
+  - ../../base/metrics-server
+  - ../../base/cert-manager
+  - ../../base/longhorn
+  - ../../base/bgp
+  - ../../base/yk-dns-manager
+  - bgp/
+  - configs/
+
+patches:
+  - path: cert-manager/helm-release-patch.yaml
+    target:
+      kind: HelmRelease
+      name: cert-manager
+      namespace: cert-manager
+  - path: longhorn/helm-release-patch.yaml
+    target:
+      kind: HelmRelease
+      name: longhorn
+      namespace: longhorn-system
+  - path: gateway/gateway-patch.yaml
+    target:
+      kind: Gateway
+      name: internal
+      namespace: kube-system
+  - path: yk-dns-manager/helm-release-patch.yaml
+    target:
+      kind: HelmRelease
+      name: yk-dns-manager
+      namespace: yk-dns-manager
