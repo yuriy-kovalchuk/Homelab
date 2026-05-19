@@ -9,3 +9,7 @@ spec:
     podSecurityStandard: restricted
     podSecuritySeverity: high
     validationFailureAction: Enforce
+    vpolExclude:
+      excludeNamespaces:
+        - kube-system
+        - longhorn-system
