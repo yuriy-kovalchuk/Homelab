@@ -9,6 +9,7 @@ spec:
     podSecurityStandard: restricted
     podSecuritySeverity: high
     validationFailureAction: Enforce
+    skipBackgroundRequests: true
     vpolExclude:
       excludeNamespaces:
         - kube-system
