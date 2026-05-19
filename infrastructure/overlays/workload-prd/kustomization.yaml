@@ -39,6 +39,11 @@ patches:
       kind: HelmRelease
       name: kyverno
       namespace: kyverno
+  - path: kyverno/helm-release-policies-patch.yaml
+    target:
+      kind: HelmRelease
+      name: kyverno-policies
+      namespace: kyverno
   - path: kyverno-reporter/helm-release-patch.yaml
     target:
       kind: HelmRelease

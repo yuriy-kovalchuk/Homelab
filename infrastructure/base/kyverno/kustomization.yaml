@@ -4,5 +4,6 @@ resources:
   - namespace.yaml
   - helm-repository.yaml
   - helm-release.yaml
+  - helm-release-policies.yaml
   - cluster-role.yaml
   - cluster-role-binding.yaml
