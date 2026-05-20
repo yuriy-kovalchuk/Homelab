@@ -16,6 +16,9 @@ spec:
       replicas: 3
       serviceMonitor:
         enabled: false
+      podSecurityContext:
+        seccompProfile:
+          type: RuntimeDefault
       topologySpreadConstraints:
         - maxSkew: 1
           topologyKey: kubernetes.io/hostname
@@ -26,6 +29,9 @@ spec:
               app.kubernetes.io/instance: kyverno
     backgroundController:
       replicas: 3
+      podSecurityContext:
+        seccompProfile:
+          type: RuntimeDefault
       topologySpreadConstraints:
         - maxSkew: 1
           topologyKey: kubernetes.io/hostname
@@ -36,6 +42,9 @@ spec:
               app.kubernetes.io/instance: kyverno
     cleanupController:
       replicas: 3
+      podSecurityContext:
+        seccompProfile:
+          type: RuntimeDefault
       topologySpreadConstraints:
         - maxSkew: 1
           topologyKey: kubernetes.io/hostname
@@ -46,6 +55,9 @@ spec:
               app.kubernetes.io/instance: kyverno
     reportsController:
       replicas: 3
+      podSecurityContext:
+        seccompProfile:
+          type: RuntimeDefault
       topologySpreadConstraints:
         - maxSkew: 1
           topologyKey: kubernetes.io/hostname

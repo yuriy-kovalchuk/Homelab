@@ -1,0 +1,23 @@
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: allow-flux-system
+spec:
+  description: "Allow flux-system controllers to reach kube-apiserver and internet for reconciliation"
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: flux-system
+  ingress:
+    - fromEntities:
+        - cluster
+  egress:
+    - toEntities:
+        - kube-apiserver
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+            - port: "80"
+              protocol: TCP
