@@ -10,9 +10,11 @@ resources:
   - ../../base/yk-dns-manager
   - ../../base/kyverno
   - ../../base/kyverno-reporter
-  - ../../base/cilium-policies
   - bgp/
   - configs/
+  - longhorn/
+  - hubble/
+  - flux-system/
   - kyverno/exceptions/
 
 patches:

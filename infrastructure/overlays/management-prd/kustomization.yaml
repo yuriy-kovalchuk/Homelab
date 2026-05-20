@@ -12,6 +12,10 @@ resources:
   - ../../base/harbor
   - ../../base/yk-talos-manager
   - bgp/
+  - configs/
+  - longhorn/
+  - vault/
+  - harbor/
   - yk-talos-manager-prd-workload/
 
 patches:

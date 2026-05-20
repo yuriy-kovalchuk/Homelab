@@ -3,4 +3,3 @@ kind: Kustomization
 resources: []
 # List app overlays to deploy on the management-prd cluster here, e.g.:
 #   - ../../<app-name>/overlays/management-prd
-# Apps are migrated from kubernetes/apps/ (see REFACTOR.md checklist).

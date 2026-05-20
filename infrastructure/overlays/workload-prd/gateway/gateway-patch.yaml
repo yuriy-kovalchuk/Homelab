@@ -46,3 +46,33 @@ spec:
           selector:
             matchLabels:
               kubernetes.io/metadata.name: "kyverno-reporter"
+    - name: https-hubble
+      port: 443
+      protocol: HTTPS
+      hostname: "hubble.yuriy-lab.cloud"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: hubble-gw-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: "kube-system"
+    - name: https-flux
+      port: 443
+      protocol: HTTPS
+      hostname: "flux.yuriy-lab.cloud"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: flux-gw-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: "flux-system"
