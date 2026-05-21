@@ -6,7 +6,7 @@ metadata:
 spec:
   parentRefs:
     - name: internal
-      namespace: kube-system
+      namespace: main-gateway
       group: gateway.networking.k8s.io
       kind: Gateway
       sectionName: https-vault

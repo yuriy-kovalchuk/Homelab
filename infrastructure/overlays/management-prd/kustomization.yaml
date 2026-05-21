@@ -33,7 +33,7 @@ patches:
     target:
       kind: Gateway
       name: internal
-      namespace: kube-system
+      namespace: main-gateway
   - path: yk-dns-manager/helm-release-patch.yaml
     target:
       kind: HelmRelease

@@ -2,7 +2,7 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: internal
-  namespace: kube-system
+  namespace: main-gateway
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-dns
 spec:

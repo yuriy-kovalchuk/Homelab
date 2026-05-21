@@ -6,7 +6,7 @@ metadata:
 spec:
   parentRefs:
     - name: internal
-      namespace: kube-system
+      namespace: main-gateway
       sectionName: https-flux
   hostnames:
     - "flux.yuriy-lab.cloud"
