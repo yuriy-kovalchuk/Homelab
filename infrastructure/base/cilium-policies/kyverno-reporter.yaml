@@ -5,6 +5,9 @@ metadata:
   namespace: kyverno-reporter
 spec:
   endpointSelector: {}
+  ingress:
+    - fromEntities:
+        - cluster
   egress:
     - toEntities:
         - kube-apiserver

@@ -4,6 +4,8 @@ resources:
   - allow-dns.yaml
   - allow-health-probes.yaml
   - allow-kube-system.yaml
+  - allow-gateway-ingress.yaml
+  - allow-gateway-frontend.yaml
   - allow-flux-system.yaml
   - generate-same-namespace.yaml
   - cert-manager.yaml
