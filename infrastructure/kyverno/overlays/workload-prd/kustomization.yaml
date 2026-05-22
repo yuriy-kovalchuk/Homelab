@@ -3,6 +3,8 @@ kind: Kustomization
 resources:
   - ../../base
   - exceptions
+  - mutate-goldilocks-label.yaml
+  - mutate-goldilocks-label-rbac.yaml
 patches:
   - path: helm-release-patch.yaml
     target:
