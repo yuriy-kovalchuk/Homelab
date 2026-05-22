@@ -5,7 +5,20 @@ metadata:
   namespace: vpa
 spec:
   values:
+    controller:
+      podSecurityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
     dashboard:
+      podSecurityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       httpRoute:
         enabled: true
         parentRefs:
