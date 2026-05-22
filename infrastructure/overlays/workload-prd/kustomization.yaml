@@ -1,56 +1,16 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ../../base/gateway-api-crds
-  - ../../base/gateway
-  - ../../base/metrics-server
-  - ../../base/cert-manager
-  - ../../base/longhorn
-  - ../../base/bgp
-  - ../../base/yk-dns-manager
-  - ../../base/kyverno
-  - ../../base/kyverno-reporter
-  - ../../base/cilium-policies
-  - bgp/
-  - configs/
-  - longhorn/
-  - hubble/
-  - flux-system/
-  - kyverno/exceptions/
-
-patches:
-  - path: cert-manager/helm-release-patch.yaml
-    target:
-      kind: HelmRelease
-      name: cert-manager
-      namespace: cert-manager
-  - path: longhorn/helm-release-patch.yaml
-    target:
-      kind: HelmRelease
-      name: longhorn
-      namespace: longhorn-system
-  - path: gateway/gateway-patch.yaml
-    target:
-      kind: Gateway
-      name: internal
-      namespace: main-gateway
-  - path: yk-dns-manager/helm-release-patch.yaml
-    target:
-      kind: HelmRelease
-      name: yk-dns-manager
-      namespace: yk-dns-manager
-  - path: kyverno/helm-release-patch.yaml
-    target:
-      kind: HelmRelease
-      name: kyverno
-      namespace: kyverno
-  - path: kyverno/helm-release-policies-patch.yaml
-    target:
-      kind: HelmRelease
-      name: kyverno-policies
-      namespace: kyverno
-  - path: kyverno-reporter/helm-release-patch.yaml
-    target:
-      kind: HelmRelease
-      name: policy-reporter
-      namespace: kyverno-reporter
+  - ../../gateway-api-crds/overlays/workload-prd
+  - ../../gateway/overlays/workload-prd
+  - ../../metrics-server/overlays/workload-prd
+  - ../../cert-manager/overlays/workload-prd
+  - ../../longhorn/overlays/workload-prd
+  - ../../bgp/overlays/workload-prd
+  - ../../yk-dns-manager/overlays/workload-prd
+  - ../../kyverno/overlays/workload-prd
+  - ../../kyverno-reporter/overlays/workload-prd
+  - ../../cilium-policies/overlays/workload-prd
+  - ../../cluster-issuer/overlays/workload-prd
+  - ../../hubble/overlays/workload-prd
+  - ../../flux-system/overlays/workload-prd

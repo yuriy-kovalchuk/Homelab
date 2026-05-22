@@ -1,0 +1,14 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: uptime-kuma-egress
+  namespace: uptime-kuma
+spec:
+  description: "Allow uptime-kuma to probe in-cluster and external monitoring targets"
+  endpointSelector:
+    matchLabels:
+      app: uptime-kuma
+  egress:
+    - toEntities:
+        - cluster
+        - world

@@ -1,0 +1,16 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: vpa-egress
+  namespace: vpa
+spec:
+  description: "Allow VPA + Goldilocks to reach the kube-apiserver, and the apiserver to reach the VPA admission webhook"
+  endpointSelector: {}
+  ingress:
+    - fromEntities:
+        - kube-apiserver
+  egress:
+    - toEntities:
+        - kube-apiserver
+        - host
+        - remote-node

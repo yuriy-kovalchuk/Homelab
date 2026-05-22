@@ -1,51 +1,15 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ../../base/gateway-api-crds
-  - ../../base/gateway
-  - ../../base/metrics-server
-  - ../../base/cert-manager
-  - ../../base/longhorn
-  - ../../base/bgp
-  - ../../base/yk-dns-manager
-  - ../../base/vault
-  - ../../base/harbor
-  - ../../base/yk-talos-manager
-  - bgp/
-  - configs/
-  - longhorn/
-  - vault/
-  - harbor/
-  - yk-talos-manager-prd-workload/
-
-patches:
-  - path: cert-manager/helm-release-patch.yaml
-    target:
-      kind: HelmRelease
-      name: cert-manager
-      namespace: cert-manager
-  - path: longhorn/helm-release-patch.yaml
-    target:
-      kind: HelmRelease
-      name: longhorn
-      namespace: longhorn-system
-  - path: gateway/gateway-patch.yaml
-    target:
-      kind: Gateway
-      name: internal
-      namespace: main-gateway
-  - path: yk-dns-manager/helm-release-patch.yaml
-    target:
-      kind: HelmRelease
-      name: yk-dns-manager
-      namespace: yk-dns-manager
-  - path: vault/helm-release-patch.yaml
-    target:
-      kind: HelmRelease
-      name: vault
-      namespace: vault
-  - path: harbor/helm-release-patch.yaml
-    target:
-      kind: HelmRelease
-      name: harbor
-      namespace: harbor
+  - ../../gateway-api-crds/overlays/management-prd
+  - ../../gateway/overlays/management-prd
+  - ../../metrics-server/overlays/management-prd
+  - ../../cert-manager/overlays/management-prd
+  - ../../longhorn/overlays/management-prd
+  - ../../bgp/overlays/management-prd
+  - ../../yk-dns-manager/overlays/management-prd
+  - ../../vault/overlays/management-prd
+  - ../../harbor/overlays/management-prd
+  - ../../yk-talos-manager/overlays/management-prd
+  - ../../cluster-issuer/overlays/management-prd
+  - ../../yk-talos-manager-prd-workload/overlays/management-prd
