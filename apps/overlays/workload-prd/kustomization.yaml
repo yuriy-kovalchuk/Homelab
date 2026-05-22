@@ -6,3 +6,5 @@ resources:
   - ../../httpbin/overlays/workload-prd
   - ../../whoami/overlays/workload-prd
   - ../../uptime-kuma/overlays/workload-prd
+  - ../../trivy/overlays/workload-prd
+  - ../../trivy-converter/overlays/workload-prd

@@ -1,0 +1,56 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: trivy-operator
+  namespace: trivy
+spec:
+  values:
+    operator:
+      builtInTrivyServer: true
+      scanJobTimeout: 1h
+      scanJobsConcurrentLimit: 5
+      infraAssessmentScannerEnabled: true
+    serviceMonitor:
+      enabled: false
+    trivy:
+      mode: ClientServer
+      storageClassEnabled: true
+      clientServerSkipUpdate: true
+      skipJavaDBUpdate: true
+      useBuiltinRegoPolicies: true
+      useEmbeddedRegoPolicies: true
+      resources:
+        requests:
+          cpu: 10m
+          memory: 100M
+        limits:
+          cpu: 200m
+          memory: 800M
+      server:
+        resources:
+          requests:
+            cpu: 20m
+            memory: 512Mi
+          limits:
+            cpu: 200m
+            memory: 1Gi
+      storageSize: "5Gi"
+      storageClassName: "longhorn"
+      slow: false
+      timeout: "3h"
+      ignoreUnfixed: true
+    service:
+      headless: false
+    # Talos: the immutable, systemd-less host lacks the standard control-plane
+    # paths (/lib/systemd, /var/lib/kube-scheduler, /etc/kubernetes, ...), and
+    # mounting them fails with read-only-FS errors. Mount only /etc/os-release so
+    # the node-collector can identify the node without touching nonexistent paths.
+    nodeCollector:
+      volumeMounts:
+        - name: etc-os-release
+          mountPath: /host/etc/os-release
+          readOnly: true
+      volumes:
+        - name: etc-os-release
+          hostPath:
+            path: /etc/os-release
