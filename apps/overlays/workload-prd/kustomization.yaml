@@ -8,3 +8,5 @@ resources:
   - ../../uptime-kuma/overlays/workload-prd
   - ../../trivy/overlays/workload-prd
   - ../../trivy-converter/overlays/workload-prd
+  # standby — re-enable once the monitoring stack (PodMonitor CRD) and authentik are deployed:
+  # - ../../cloudnative-pg/overlays/workload-prd
