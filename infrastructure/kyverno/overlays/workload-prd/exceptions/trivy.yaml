@@ -2,7 +2,7 @@ apiVersion: policies.kyverno.io/v1beta1
 kind: PolicyException
 metadata:
   name: trivy
-  namespace: kyverno
+  namespace: trivy
 spec:
   matchConditions:
     - name: exclude-trivy

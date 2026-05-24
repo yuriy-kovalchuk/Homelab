@@ -2,7 +2,7 @@ apiVersion: policies.kyverno.io/v1beta1
 kind: PolicyException
 metadata:
   name: kube-system
-  namespace: kyverno
+  namespace: kube-system
 spec:
   matchConditions:
     - name: exclude-kube-system

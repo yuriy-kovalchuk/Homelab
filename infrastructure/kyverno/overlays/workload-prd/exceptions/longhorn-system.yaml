@@ -2,7 +2,7 @@ apiVersion: policies.kyverno.io/v1beta1
 kind: PolicyException
 metadata:
   name: longhorn-system
-  namespace: kyverno
+  namespace: longhorn-system
 spec:
   matchConditions:
     - name: exclude-longhorn-system
