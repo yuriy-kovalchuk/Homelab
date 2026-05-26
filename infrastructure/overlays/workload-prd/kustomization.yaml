@@ -2,6 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ../../gateway-api-crds/overlays/workload-prd
+  - ../../prometheus-operator-crds/overlays/workload-prd
   - ../../gateway/overlays/workload-prd
   - ../../metrics-server/overlays/workload-prd
   - ../../cert-manager/overlays/workload-prd
@@ -14,3 +15,10 @@ resources:
   - ../../cluster-issuer/overlays/workload-prd
   - ../../hubble/overlays/workload-prd
   - ../../flux-system/overlays/workload-prd
+  - ../../vpa/overlays/workload-prd
+  - ../../trivy/overlays/workload-prd
+  - ../../trivy-converter/overlays/workload-prd
+  - ../../loki/overlays/workload-prd
+  - ../../mimir/overlays/workload-prd
+  - ../../k8s-monitoring/overlays/workload-prd
+  - ../../grafana/overlays/workload-prd

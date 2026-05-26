@@ -4,3 +4,4 @@ resources:
   - kube-system.yaml
   - longhorn-system.yaml
   - trivy.yaml
+  - k8s-monitoring.yaml

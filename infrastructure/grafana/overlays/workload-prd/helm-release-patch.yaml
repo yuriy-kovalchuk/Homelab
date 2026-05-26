@@ -1,0 +1,51 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: grafana
+  namespace: grafana
+spec:
+  values:
+    admin:
+      existingSecret: grafana-admin-secret
+      userKey: admin-user
+      passwordKey: admin-password
+
+    grafana.ini:
+      server:
+        root_url: "https://grafana.yuriy-lab.cloud"
+
+    sidecar:
+      dashboards:
+        enabled: true
+        searchNamespace: ALL
+        provider:
+          foldersFromFilesStructure: true
+
+    datasources:
+      datasources.yaml:
+        apiVersion: 1
+        datasources:
+          - name: Mimir
+            type: prometheus
+            uid: mimir-metrics
+            access: proxy
+            url: http://mimir-query-frontend.mimir.svc.cluster.local:8080/prometheus
+            isDefault: true
+            version: 1
+            editable: true
+            jsonData:
+              httpHeaderName1: X-Scope-OrgID
+            secureJsonData:
+              httpHeaderValue1: "anonymous"
+          - name: Loki
+            type: loki
+            uid: loki-datasource
+            access: proxy
+            url: http://loki-gateway.loki.svc.cluster.local
+            isDefault: false
+            version: 1
+            editable: true
+            jsonData:
+              httpHeaderName1: X-Scope-OrgID
+            secureJsonData:
+              httpHeaderValue1: "anonymous"

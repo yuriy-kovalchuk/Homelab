@@ -136,3 +136,33 @@ spec:
           selector:
             matchLabels:
               kubernetes.io/metadata.name: "uptime-kuma"
+    - name: https-alloy
+      port: 443
+      protocol: HTTPS
+      hostname: "alloy.yuriy-lab.cloud"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: alloy-gw-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: "k8s-monitoring"
+    - name: https-grafana
+      port: 443
+      protocol: HTTPS
+      hostname: "grafana.yuriy-lab.cloud"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: grafana-gw-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: "grafana"

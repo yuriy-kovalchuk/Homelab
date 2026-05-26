@@ -1,0 +1,150 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: k8s-monitoring
+  namespace: k8s-monitoring
+spec:
+  values:
+    cluster:
+      name: workload-prd
+
+    global:
+      scrapeInterval: 15s
+
+    destinations:
+      loki:
+        type: loki
+        url: http://loki-gateway.loki.svc.cluster.local/loki/api/v1/push
+      mimir:
+        type: prometheus
+        url: http://mimir-distributor.mimir.svc.cluster.local:8080/api/v1/push
+
+    selfReporting:
+      enabled: false
+
+    collectors:
+      alloy-logs:
+        alloy:
+          mounts:
+            varlog: true
+            dockercontainers: false
+          clustering:
+            enabled: true
+      alloy-singleton: {}
+      alloy-metrics:
+        alloy:
+          clustering:
+            enabled: true
+
+    telemetryServices:
+      kube-state-metrics:
+        deploy: true
+        containerSecurityContext:
+          seccompProfile:
+            type: RuntimeDefault
+      node-exporter:
+        deploy: true
+        securityContext:
+          seccompProfile:
+            type: RuntimeDefault
+        containerSecurityContext:
+          seccompProfile:
+            type: RuntimeDefault
+          allowPrivilegeEscalation: false
+
+    alloy-operator:
+      podSecurityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+
+    clusterMetrics:
+      enabled: true
+      collector: alloy-metrics
+      destinations:
+        - mimir
+      kube-state-metrics:
+        metricsTuning:
+          includeMetrics:
+            - kube_namespace_created
+      kubelet:
+        metricsTuning:
+          useDefaultAllowList: true
+          includeMetrics:
+            - kubelet_node_name
+            - kubernetes_build_info
+      cadvisor:
+        metricsTuning:
+          useDefaultAllowList: true
+          includeMetrics:
+            - container_memory_cache
+            - container_memory_rss
+            - container_memory_swap
+            - container_spec_memory_limit_bytes
+            - machine_cpu_cores
+            - container_cpu_cfs_throttled_seconds_total
+            - container_oom_events_total
+            - container_spec_cpu_quota
+      controlPlane:
+        enabled: true
+      kubeControllerManager:
+        enabled: true
+      kubeDNS:
+        enabled: true
+      kubeScheduler:
+        enabled: true
+
+    hostMetrics:
+      enabled: true
+      collector: alloy-metrics
+      destinations:
+        - mimir
+
+    clusterEvents:
+      enabled: true
+      collector: alloy-singleton
+      namespaces: []
+      destinations:
+        - loki
+
+    nodeLogs:
+      enabled: false
+
+    podLogsViaLoki:
+      enabled: true
+      collector: alloy-logs
+      namespaces: []
+      destinations:
+        - loki
+      labels:
+        app_kubernetes_io_name: app.kubernetes.io/name
+        instance: app.kubernetes.io/instance
+        level: level
+        service_name: service.name
+        service_namespace: service.namespace
+        deployment_environment: deployment.environment
+        deployment_environment_name: deployment.environment.name
+      structuredMetadata:
+        pod: pod
+
+    autoInstrumentation:
+      enabled: false
+
+    annotationAutodiscovery:
+      enabled: true
+      collector: alloy-metrics
+      destinations:
+        - mimir
+
+    prometheusOperatorObjects:
+      enabled: true
+      collector: alloy-metrics
+      destinations:
+        - mimir
+
+    integrations:
+      collector: alloy-metrics
+      destinations:
+        - mimir

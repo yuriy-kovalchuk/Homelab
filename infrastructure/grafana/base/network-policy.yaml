@@ -1,0 +1,46 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: grafana-egress-to-mimir
+  namespace: grafana
+spec:
+  endpointSelector: {}
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/component: query-frontend
+            app.kubernetes.io/instance: mimir
+            io.kubernetes.pod.namespace: mimir
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: grafana-egress-to-loki
+  namespace: grafana
+spec:
+  endpointSelector: {}
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/component: gateway
+            app.kubernetes.io/instance: loki
+            io.kubernetes.pod.namespace: loki
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: grafana-egress-to-kube-apiserver
+  namespace: grafana
+spec:
+  endpointSelector: {}
+  egress:
+    - toEntities:
+        - kube-apiserver
