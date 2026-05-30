@@ -29,7 +29,6 @@ spec:
     ports:
       metrics: 8080
       health: 8081
-      webhook: 9443
 
     metrics:
       enabled: false
@@ -40,14 +39,6 @@ spec:
     leaderElection:
       enabled: true
       id: yk-talos-management.lock
-
-    webhooks:
-      enabled: false
-      certManager:
-        enabled: true
-        issuerRef:
-          name: selfsigned-issuer
-          kind: ClusterIssuer
 
     podSecurityContext:
       runAsNonRoot: true
