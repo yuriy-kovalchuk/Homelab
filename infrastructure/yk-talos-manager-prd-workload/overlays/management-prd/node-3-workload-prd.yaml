@@ -7,6 +7,12 @@ spec:
   clusterRef: workload-prd
   role: ControlPlane
   nodeIP: 10.0.4.4
+  talosVersion: v1.13.3
+  systemExtensions:
+    - siderolabs/iscsi-tools
+    - siderolabs/util-linux-tools
+    - siderolabs/amdgpu
+    - siderolabs/amd-ucode
   patches:
     - |
       machine:
