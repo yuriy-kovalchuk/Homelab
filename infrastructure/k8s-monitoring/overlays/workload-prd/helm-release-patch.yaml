@@ -18,6 +18,10 @@ spec:
       mimir:
         type: prometheus
         url: http://mimir-distributor.mimir.svc.cluster.local:8080/api/v1/push
+        writeAheadLog:
+          maxKeepaliveTime: "24h"
+          minKeepaliveTime: "5m"
+          truncateFrequency: "2h"
 
     selfReporting:
       enabled: false
@@ -44,6 +48,11 @@ spec:
             type: RuntimeDefault
       node-exporter:
         deploy: true
+        # extraArgs replaces the chart default array — keep the fs-types-exclude entry
+        extraArgs:
+          - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|erofs|sysfs|tracefs|tmpfs|ramfs)$
+          - --collector.hwmon
+          - --collector.thermal_zone
         securityContext:
           seccompProfile:
             type: RuntimeDefault
@@ -154,6 +163,13 @@ spec:
         enabled: true
         metricsTuning:
           useIntegrationAllowList: true
+          includeMetrics:
+            - node_hwmon_temp_celsius
+            - node_hwmon_temp_max_celsius
+            - node_hwmon_temp_crit_celsius
+            - node_hwmon_fan_rpm
+            - node_hwmon_in_volts
+            - node_thermal_zone_temp
 
     clusterEvents:
       enabled: true

@@ -55,8 +55,8 @@ spec:
 
           tsdb:
             dir: /data/tsdb
-            block_ranges_period: [2h]
-            retention_period: 10h
+            block_ranges_period: [1h]
+            retention_period: 2h
             ship_interval: 1m
             flush_blocks_on_shutdown: true
             head_compaction_interval: 1m
