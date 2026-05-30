@@ -166,3 +166,18 @@ spec:
           selector:
             matchLabels:
               kubernetes.io/metadata.name: "grafana"
+    - name: https-open-webui
+      port: 443
+      protocol: HTTPS
+      hostname: "chat.yuriy-lab.cloud"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: open-webui-gw-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: "open-webui"

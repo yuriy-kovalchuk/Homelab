@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llama-cpp
+  namespace: llm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: llama-cpp
+  template:
+    metadata:
+      labels:
+        app: llama-cpp
+    spec:
+      # TODO: uncomment once AMD GPU extension is applied and GPU node hostname is known
+      # nodeSelector:
+      #   kubernetes.io/hostname: <gpu-node>
+      initContainers:
+        - name: model-download
+          # Downloads the model once into the PVC; skips if already present.
+          # TODO: change MODEL_URL to whichever GGUF you want to serve.
+          image: alpine:3.21
+          command:
+            - sh
+            - -c
+            - |
+              MODEL_PATH="/models/model.gguf"
+              if [ -f "$MODEL_PATH" ]; then
+                echo "model already present, skipping download"
+                exit 0
+              fi
+              echo "downloading model…"
+              wget -q --show-progress \
+                -O "$MODEL_PATH" \
+                "https://huggingface.co/bartowski/Qwen2.5-3B-Instruct-GGUF/resolve/main/Qwen2.5-3B-Instruct-Q4_K_M.gguf"
+          volumeMounts:
+            - name: models
+              mountPath: /models
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+      containers:
+        - name: llama-cpp
+          # TODO: pin to a specific build tag, e.g. server-vulkan-b5186
+          # Vulkan backend: needs /dev/dri only (no ROCm). See LLAMA.md.
+          image: ghcr.io/ggml-org/llama.cpp:server-vulkan
+          args:
+            - --host
+            - "0.0.0.0"
+            - --port
+            - "8080"
+            - --model
+            - /models/model.gguf
+            - --ctx-size
+            - "4096"
+            - --n-gpu-layers
+            - "0"     # TODO (overlay): set to -1 once /dev/dri is mounted
+            - --parallel
+            - "4"
+            - --cont-batching
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - name: models
+              mountPath: /models
+          resources:
+            requests:
+              cpu: "2"
+              memory: 4Gi
+            limits:
+              cpu: "8"
+              memory: 12Gi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            failureThreshold: 3
+      volumes:
+        - name: models
+          persistentVolumeClaim:
+            claimName: llama-cpp-models
