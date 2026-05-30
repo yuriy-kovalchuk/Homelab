@@ -14,5 +14,10 @@ spec:
         kind: HelmRepository
         name: grafana
         namespace: flux-system
+  timeout: 20m
   install:
     createNamespace: false
+  upgrade:
+    timeout: 20m
+    remediation:
+      retries: 3

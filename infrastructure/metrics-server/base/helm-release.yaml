@@ -13,8 +13,15 @@ spec:
         kind: HelmRepository
         name: metrics-server
         namespace: flux-system
+  timeout: 10m
   install:
     createNamespace: false
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+      remediateLastFailure: true
   values:
     args:
       - --kubelet-preferred-address-types=InternalIP

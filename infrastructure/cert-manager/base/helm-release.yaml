@@ -13,8 +13,15 @@ spec:
         kind: HelmRepository
         name: cert-manager
         namespace: flux-system
+  timeout: 10m
   install:
     createNamespace: false
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+      remediateLastFailure: true
   values:
     crds:
       enabled: true

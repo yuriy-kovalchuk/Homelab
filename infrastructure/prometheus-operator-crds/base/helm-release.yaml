@@ -13,8 +13,14 @@ spec:
         kind: HelmRepository
         name: prometheus-community
         namespace: flux-system
+  timeout: 10m
   install:
     createNamespace: false
     crds: CreateReplace
+    remediation:
+      retries: 3
   upgrade:
     crds: CreateReplace
+    remediation:
+      retries: 3
+      remediateLastFailure: true
