@@ -5,7 +5,6 @@ resources:
   - ../../httpbin/overlays/workload-prd
   - ../../whoami/overlays/workload-prd
   - ../../uptime-kuma/overlays/workload-prd
-  - ../../llama-cpp/overlays/workload-prd
   - ../../open-webui/overlays/workload-prd
   # standby — re-enable once the monitoring stack (PodMonitor CRD) and authentik are deployed:
   # - ../../cloudnative-pg/overlays/workload-prd

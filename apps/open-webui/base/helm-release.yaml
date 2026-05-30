@@ -14,21 +14,35 @@ spec:
         kind: HelmRepository
         name: open-webui
         namespace: flux-system
-  timeout: 10m
+  timeout: 20m
   install:
     createNamespace: false
     remediation:
-      retries: 3
+      retries: -1
   upgrade:
     remediation:
-      retries: 3
+      retries: -1
       remediateLastFailure: true
   values:
-    # Disable bundled ollama — we use llama.cpp instead
     ollama:
       enabled: false
-    # Point Open WebUI at llama.cpp's OpenAI-compatible API
+    pipelines:
+      enabled: false
+    websocket:
+      enabled: false
+      redis:
+        enabled: false
     openaiBaseApiUrl: "http://llama-cpp.llm.svc.cluster.local:8080/v1"
-    # Disable built-in ingress — HTTPRoute is managed separately
     ingress:
       enabled: false
+
+    podSecurityContext:
+      seccompProfile:
+        type: RuntimeDefault
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      seccompProfile:
+        type: RuntimeDefault

@@ -16,12 +16,15 @@ spec:
       initContainers:
         - name: wait-for-model
           image: alpine:3.21
+          env:
+            - name: MODEL_FILE
+              value: "Qwen3.6-35B-A3B-UD-Q4_K_M.gguf"
           command:
             - sh
             - -c
             - |
-              until [ -f /models/model.gguf ]; do
-                echo "waiting for model download to complete..."
+              until [ -f "/models/$MODEL_FILE" ]; do
+                echo "waiting for /models/$MODEL_FILE..."
                 sleep 10
               done
           volumeMounts:
@@ -48,17 +51,20 @@ spec:
           # TODO: pin to a specific build tag, e.g. server-vulkan-b5186
           # Vulkan backend: needs /dev/dri only (no ROCm). See LLAMA.md.
           image: ghcr.io/ggml-org/llama.cpp:server-vulkan
+          env:
+            - name: MODEL_FILE
+              value: "Qwen3.6-35B-A3B-UD-Q4_K_M.gguf"
           args:
             - --host
             - "0.0.0.0"
             - --port
             - "8080"
             - --model
-            - /models/model.gguf
+            - /models/$(MODEL_FILE)
             - --ctx-size
             - "4096"
             - --n-gpu-layers
-            - "0"     # TODO (overlay): set to -1 once /dev/dri is mounted
+            - "0"
             - --parallel
             - "4"
             - --cont-batching

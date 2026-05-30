@@ -6,3 +6,4 @@ resources:
   - trivy.yaml
   - k8s-monitoring.yaml
   - llm.yaml
+  - open-webui.yaml
