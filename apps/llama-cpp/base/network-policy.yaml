@@ -16,7 +16,6 @@ spec:
             - port: "8080"
               protocol: TCP
   egress:
-    # DNS
     - toEndpoints:
         - matchLabels:
             io.kubernetes.pod.namespace: kube-system
@@ -27,7 +26,27 @@ spec:
               protocol: UDP
             - port: "53"
               protocol: TCP
-    # HuggingFace model download (init container)
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: model-downloader
+  namespace: llm
+spec:
+  endpointSelector:
+    matchLabels:
+      app: model-downloader
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
     - toEntities:
         - world
       toPorts:

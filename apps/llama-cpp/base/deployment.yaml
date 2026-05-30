@@ -13,36 +13,36 @@ spec:
       labels:
         app: llama-cpp
     spec:
-      # TODO: uncomment once AMD GPU extension is applied and GPU node hostname is known
-      # nodeSelector:
-      #   kubernetes.io/hostname: <gpu-node>
       initContainers:
-        - name: model-download
-          # Downloads the model once into the PVC; skips if already present.
-          # TODO: change MODEL_URL to whichever GGUF you want to serve.
+        - name: wait-for-model
           image: alpine:3.21
           command:
             - sh
             - -c
             - |
-              MODEL_PATH="/models/model.gguf"
-              if [ -f "$MODEL_PATH" ]; then
-                echo "model already present, skipping download"
-                exit 0
-              fi
-              echo "downloading model…"
-              wget -O "$MODEL_PATH" \
-                "https://huggingface.co/bartowski/Qwen2.5-3B-Instruct-GGUF/resolve/main/Qwen2.5-3B-Instruct-Q4_K_M.gguf"
+              until [ -f /models/model.gguf ]; do
+                echo "waiting for model download to complete..."
+                sleep 10
+              done
           volumeMounts:
             - name: models
               mountPath: /models
           resources:
             requests:
-              cpu: 100m
-              memory: 64Mi
+              cpu: 10m
+              memory: 16Mi
             limits:
-              cpu: 500m
-              memory: 256Mi
+              cpu: 50m
+              memory: 32Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 65532
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
       containers:
         - name: llama-cpp
           # TODO: pin to a specific build tag, e.g. server-vulkan-b5186

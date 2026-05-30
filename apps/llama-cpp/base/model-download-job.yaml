@@ -1,0 +1,52 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: model-download
+  namespace: llm
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        app: model-downloader
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: downloader
+          image: alpine:3.21
+          command:
+            - sh
+            - -c
+            - |
+              MODEL_PATH="/models/model.gguf"
+              if [ -f "$MODEL_PATH" ]; then
+                echo "model already present, skipping download"
+                exit 0
+              fi
+              echo "downloading model..."
+              wget -O "$MODEL_PATH" \
+                "https://huggingface.co/bartowski/Qwen2.5-3B-Instruct-GGUF/resolve/main/Qwen2.5-3B-Instruct-Q4_K_M.gguf"
+          volumeMounts:
+            - name: models
+              mountPath: /models
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 65532
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+      volumes:
+        - name: models
+          persistentVolumeClaim:
+            claimName: llama-cpp-models
