@@ -4,6 +4,8 @@ metadata:
   name: llama-cpp
   namespace: llm
 spec:
+  strategy:
+    type: Recreate
   template:
     spec:
       nodeSelector:
@@ -21,7 +23,7 @@ spec:
             - --model
             - /models/$(MODEL_FILE)
             - --ctx-size
-            - "32000"
+            - "262144"
             - --n-gpu-layers
             - "-1"
             - --parallel
