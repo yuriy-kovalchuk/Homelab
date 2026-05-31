@@ -44,15 +44,14 @@ metadata:
 spec:
   endpointSelector:
     matchLabels:
-      app.kubernetes.io/component: ui
-      app.kubernetes.io/instance: longhorn
+      app: longhorn-ui
   ingress:
     - fromEntities:
         - cluster
         - ingress
       toPorts:
         - ports:
-            - port: "80"
+            - port: "8000"
               protocol: TCP
 ---
 apiVersion: cilium.io/v2
