@@ -1,0 +1,18 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: whoami
+  namespace: whoami
+spec:
+  description: "Allow whoami to receive traffic from the gateway and cluster"
+  endpointSelector:
+    matchLabels:
+      app: whoami
+  ingress:
+    - fromEntities:
+        - cluster
+        - ingress
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP

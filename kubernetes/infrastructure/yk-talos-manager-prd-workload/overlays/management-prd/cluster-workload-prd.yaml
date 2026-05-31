@@ -1,0 +1,10 @@
+apiVersion: talos.yuriykovalchuk.dev/v1alpha1
+kind: TalosCluster
+metadata:
+  name: workload-prd
+  namespace: yk-talos-manager-prd-workload
+spec:
+  clusterName: workload-prd
+  endpoints:
+    - 10.0.4.2
+  talosVersion: v1.13

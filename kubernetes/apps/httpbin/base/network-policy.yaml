@@ -1,0 +1,18 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: httpbin
+  namespace: httpbin
+spec:
+  description: "Allow httpbin to receive traffic from the gateway and cluster"
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: httpbin
+  ingress:
+    - fromEntities:
+        - cluster
+        - ingress
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP

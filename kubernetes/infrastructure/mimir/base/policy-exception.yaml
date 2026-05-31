@@ -1,0 +1,12 @@
+apiVersion: policies.kyverno.io/v1beta1
+kind: PolicyException
+metadata:
+  name: mimir
+  namespace: mimir
+spec:
+  matchConditions:
+    - name: exclude-mimir
+      expression: "object.metadata.namespace == 'mimir'"
+  policyRefs:
+    - kind: ValidatingPolicy
+      name: restrict-seccomp-strict

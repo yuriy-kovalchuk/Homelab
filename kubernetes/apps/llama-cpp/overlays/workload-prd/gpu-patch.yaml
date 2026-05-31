@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llama-cpp
+  namespace: llm
+spec:
+  template:
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: node-3
+      containers:
+        - name: llama-cpp
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          args:
+            - --host
+            - "0.0.0.0"
+            - --port
+            - "8080"
+            - --model
+            - /models/$(MODEL_FILE)
+            - --ctx-size
+            - "32000"
+            - --n-gpu-layers
+            - "-1"
+            - --parallel
+            - "4"
+            - --cont-batching
+          volumeMounts:
+            - name: models
+              mountPath: /models
+            - name: dev-dri
+              mountPath: /dev/dri
+            - name: sys-bus-pci
+              mountPath: /sys/bus/pci
+      volumes:
+        - name: models
+          persistentVolumeClaim:
+            claimName: llama-cpp-models
+        - name: dev-dri
+          hostPath:
+            path: /dev/dri
+            type: Directory
+        - name: sys-bus-pci
+          hostPath:
+            path: /sys/bus/pci
+            type: Directory

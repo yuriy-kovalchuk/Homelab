@@ -1,0 +1,43 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: vpa-admission-controller
+  namespace: vpa
+spec:
+  description: "Allow apiserver to reach VPA admission webhook"
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/component: admission-controller
+      app.kubernetes.io/instance: vpa
+  ingress:
+    - fromEntities:
+        - kube-apiserver
+  egress:
+    - toEntities:
+        - kube-apiserver
+        - host
+        - remote-node
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: vpa-recommender-updater
+  namespace: vpa
+spec:
+  description: "Allow VPA recommender and updater to reach kube-apiserver"
+  endpointSelector:
+    matchExpressions:
+      - key: app.kubernetes.io/component
+        operator: In
+        values:
+          - recommender
+          - updater
+      - key: app.kubernetes.io/instance
+        operator: In
+        values:
+          - vpa
+  egress:
+    - toEntities:
+        - kube-apiserver
+        - host
+        - remote-node

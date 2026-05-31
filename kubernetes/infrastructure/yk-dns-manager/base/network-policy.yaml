@@ -1,0 +1,18 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: yk-dns-manager
+  namespace: yk-dns-manager
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: yk-dns-manager
+  egress:
+    - toEntities:
+        - kube-apiserver
+    - toCIDR:
+        - 10.0.0.0/8
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

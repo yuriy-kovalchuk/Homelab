@@ -1,0 +1,61 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: policy-reporter
+  namespace: kyverno-reporter
+spec:
+  values:
+    resources:
+      limits:
+        memory: 200Mi
+        cpu: 100m
+      requests:
+        memory: 75Mi
+        cpu: 5m
+    podSecurityContext:
+      seccompProfile:
+        type: RuntimeDefault
+    securityContext:
+      seccompProfile:
+        type: RuntimeDefault
+    ui:
+      enabled: true
+      displayMode: dark
+      resources:
+        limits:
+          memory: 200Mi
+          cpu: 100m
+        requests:
+          memory: 75Mi
+          cpu: 5m
+      podSecurityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      httproute:
+        enabled: true
+        parentRefs:
+          - name: internal
+            namespace: main-gateway
+            sectionName: https-kyverno-reporter
+        hostnames:
+          - "kyverno-reporter.yuriy-lab.cloud"
+    plugin:
+      kyverno:
+        enabled: true
+        podSecurityContext:
+          seccompProfile:
+            type: RuntimeDefault
+        securityContext:
+          seccompProfile:
+            type: RuntimeDefault
+      trivy:
+        enabled: true
+        podSecurityContext:
+          seccompProfile:
+            type: RuntimeDefault
+        securityContext:
+          seccompProfile:
+            type: RuntimeDefault

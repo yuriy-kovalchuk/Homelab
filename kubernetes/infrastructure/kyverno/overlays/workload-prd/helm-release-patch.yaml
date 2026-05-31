@@ -1,0 +1,72 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kyverno
+  namespace: kyverno
+spec:
+  values:
+    openreports:
+      enabled: true
+      installCrds: true
+    reportsServer:
+      enabled: false
+
+
+    admissionController:
+      replicas: 3
+      serviceMonitor:
+        enabled: false
+      podSecurityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: admission-controller
+              app.kubernetes.io/instance: kyverno
+    backgroundController:
+      replicas: 3
+      podSecurityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: background-controller
+              app.kubernetes.io/instance: kyverno
+    cleanupController:
+      replicas: 3
+      podSecurityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: cleanup-controller
+              app.kubernetes.io/instance: kyverno
+    reportsController:
+      replicas: 3
+      podSecurityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: reports-controller
+              app.kubernetes.io/instance: kyverno
+    features:
+      policyExceptions:
+        enabled: true
+        namespace: "*"

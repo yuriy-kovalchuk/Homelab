@@ -1,0 +1,31 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: generate-same-namespace-network-policy
+spec:
+  background: true
+  rules:
+    - name: generate-allow-same-namespace
+      match:
+        any:
+          - resources:
+              kinds:
+                - Namespace
+      generate:
+        synchronize: true
+        generateExisting: true
+        apiVersion: cilium.io/v2
+        kind: CiliumNetworkPolicy
+        name: allow-same-namespace
+        namespace: "{{request.object.metadata.name}}"
+        data:
+          spec:
+            endpointSelector: {}
+            ingress:
+              - fromEndpoints:
+                  - matchLabels:
+                      io.kubernetes.pod.namespace: "{{request.object.metadata.name}}"
+            egress:
+              - toEndpoints:
+                  - matchLabels:
+                      io.kubernetes.pod.namespace: "{{request.object.metadata.name}}"

@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: llm
+  labels:
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged
+    goldilocks.fairwinds.com/enabled: "true"
+---
+apiVersion: policies.kyverno.io/v1beta1
+kind: PolicyException
+metadata:
+  name: llm
+  namespace: llm
+spec:
+  matchConditions:
+    - name: exclude-llm
+      expression: "object.metadata.namespace == 'llm'"
+  policyRefs:
+    - kind: ValidatingPolicy
+      name: disallow-capabilities
+    - kind: ValidatingPolicy
+      name: disallow-capabilities-strict
+    - kind: ValidatingPolicy
+      name: disallow-host-namespaces
+    - kind: ValidatingPolicy
+      name: disallow-host-path
+    - kind: ValidatingPolicy
+      name: disallow-host-ports
+    - kind: ValidatingPolicy
+      name: disallow-host-process
+    - kind: ValidatingPolicy
+      name: disallow-privilege-escalation
+    - kind: ValidatingPolicy
+      name: disallow-privileged-containers
+    - kind: ValidatingPolicy
+      name: disallow-proc-mount
+    - kind: ValidatingPolicy
+      name: disallow-selinux
+    - kind: ValidatingPolicy
+      name: require-run-as-non-root-user
+    - kind: ValidatingPolicy
+      name: require-run-as-nonroot
+    - kind: ValidatingPolicy
+      name: restrict-apparmor-profiles
+    - kind: ValidatingPolicy
+      name: restrict-seccomp
+    - kind: ValidatingPolicy
+      name: restrict-seccomp-strict
+    - kind: ValidatingPolicy
+      name: restrict-sysctls
+    - kind: ValidatingPolicy
+      name: restrict-volume-types

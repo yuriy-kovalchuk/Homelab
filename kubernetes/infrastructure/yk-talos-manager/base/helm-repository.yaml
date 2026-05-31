@@ -1,0 +1,10 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: yk-talos-manager
+  namespace: yk-talos-manager
+spec:
+  interval: 1h
+  url: oci://ghcr.io/yuriy-kovalchuk/charts/yk-talos-management
+  ref:
+    tag: "0.5.0-alpha"

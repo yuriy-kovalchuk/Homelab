@@ -1,0 +1,45 @@
+# Step 2a — Declare the control plane nodes.
+#
+# Apply after the TalosCluster reaches Ready.
+# Wait for all nodes to reach status.phase=Ready before applying the bootstrap.
+---
+apiVersion: talos.yuriykovalchuk.dev/v1alpha1
+kind: TalosNode
+metadata:
+  name: cp-1
+  namespace: default
+spec:
+  clusterRef: management-prd
+  role: ControlPlane
+  nodeIP: 10.0.2.2
+  patches:
+    - |
+      machine:
+        install:
+          image: factory.talos.dev/metal-installer/613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245:v1.13.2
+          disk: /dev/sdb
+          wipe: true
+        network:
+          hostname: mgmt-1
+          nameservers:
+            - 10.0.2.1
+          interfaces:
+            - interface: eno1
+              dhcp: false
+              addresses:
+                - 10.0.2.2/24
+              routes:
+                - network: 0.0.0.0/0
+                  gateway: 10.0.2.1
+                  metric: 1024
+              mtu: 1500
+        nodeLabels:
+          machineSize: small
+      cluster:
+        allowSchedulingOnControlPlanes: true
+        proxy:
+          disabled: true
+        network:
+          cni:
+            name: none
+

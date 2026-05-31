@@ -1,0 +1,22 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: uptime-kuma-egress
+  namespace: uptime-kuma
+spec:
+  description: "Allow uptime-kuma to probe in-cluster and external monitoring targets"
+  endpointSelector:
+    matchLabels:
+      app: uptime-kuma
+  ingress:
+    - fromEntities:
+        - cluster
+        - ingress
+      toPorts:
+        - ports:
+            - port: "3001"
+              protocol: TCP
+  egress:
+    - toEntities:
+        - cluster
+        - world

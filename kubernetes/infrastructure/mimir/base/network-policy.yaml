@@ -1,0 +1,66 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: mimir-egress-to-s3
+  namespace: mimir
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/component: ingester
+      app.kubernetes.io/instance: mimir
+  egress:
+    - toCIDR:
+        - 10.0.3.4/32
+      toPorts:
+        - ports:
+            - port: "9000"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: mimir-egress-to-kube-apiserver
+  namespace: mimir
+spec:
+  endpointSelector: {}
+  egress:
+    - toEntities:
+        - kube-apiserver
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: mimir-ingress-from-alloy
+  namespace: mimir
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/component: distributor
+      app.kubernetes.io/instance: mimir
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: k8s-monitoring
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: mimir-ingress-from-grafana
+  namespace: mimir
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/component: query-frontend
+      app.kubernetes.io/instance: mimir
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: grafana
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP

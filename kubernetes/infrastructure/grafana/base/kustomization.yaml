@@ -1,0 +1,73 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - helm-release.yaml
+  - policy-exception.yaml
+  - network-policy.yaml
+
+configMapGenerator:
+  - name: grafana-dashboards-kubernetes
+    namespace: grafana
+    files:
+      - dashboards/k8s-api.json
+      - dashboards/k8s-coredns.json
+      - dashboards/k8s-dashboard.json
+      - dashboards/k8s-global.json
+      - dashboards/k8s-namespaces.json
+      - dashboards/k8s-network-mixin.json
+      - dashboards/k8s-nodes.json
+      - dashboards/k8s-pods.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+      annotations:
+        k8s-sidecar-target-directory: /tmp/dashboards/Kubernetes
+
+  - name: grafana-dashboards-infrastructure
+    namespace: grafana
+    files:
+      - dashboards/node-exporter.json
+      - dashboards/cert-manager.json
+      - dashboards/cilium-verdicts.json
+      - dashboards/longhorn.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+      annotations:
+        k8s-sidecar-target-directory: /tmp/dashboards/Infrastructure
+
+  - name: grafana-dashboards-security
+    namespace: grafana
+    files:
+      - dashboards/trivy.json
+      - dashboards/kyverno.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+      annotations:
+        k8s-sidecar-target-directory: /tmp/dashboards/Security
+
+  - name: grafana-dashboards-networking
+    namespace: grafana
+    files:
+      - dashboards/envoy-clusters.json
+      - dashboards/envoy-global.json
+      - dashboards/envoy-mixin.json
+      - dashboards/envoy-proxy-global.json
+      - dashboards/envoy-resource-monitor.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+      annotations:
+        k8s-sidecar-target-directory: /tmp/dashboards/Networking
+
+  - name: grafana-dashboards-storage
+    namespace: grafana
+    files:
+      - dashboards/cloudnative-pg.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+      annotations:
+        k8s-sidecar-target-directory: /tmp/dashboards/Storage

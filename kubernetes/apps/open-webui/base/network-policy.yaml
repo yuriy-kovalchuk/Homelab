@@ -1,0 +1,33 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: open-webui
+  namespace: open-webui
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/component: open-webui
+      app.kubernetes.io/instance: open-webui
+  ingress:
+    - fromEntities:
+        - cluster
+        - ingress
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: llm
+            app: llama-cpp
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    - toEntities:
+        - kube-apiserver
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
