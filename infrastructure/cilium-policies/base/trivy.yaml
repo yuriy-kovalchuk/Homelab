@@ -27,8 +27,8 @@ spec:
     matchLabels:
       app.kubernetes.io/name: trivy-server
   egress:
-    - toCIDR:
-        - "0.0.0.0/0"
+    - toEntities:
+        - world
 ---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
@@ -53,8 +53,8 @@ spec:
     matchLabels:
       app.kubernetes.io/managed-by: trivy-operator
   egress:
-    - toCIDR:
-        - "0.0.0.0/0"
+    - toEntities:
+        - world
 ---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
@@ -66,5 +66,5 @@ spec:
     matchLabels:
       app.kubernetes.io/name: trivy-operator
   egress:
-    - toCIDR:
-        - "0.0.0.0/0"
+    - toEntities:
+        - world

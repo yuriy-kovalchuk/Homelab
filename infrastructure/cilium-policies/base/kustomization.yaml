@@ -13,3 +13,10 @@ resources:
   - kyverno.yaml
   - kyverno-reporter.yaml
   - yk-dns-manager.yaml
+  - k8s-monitoring.yaml
+  - mimir.yaml
+  - loki.yaml
+  - grafana.yaml
+  - trivy.yaml
+  - trivy-converter.yaml
+  - vpa.yaml
