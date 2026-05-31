@@ -25,8 +25,8 @@ spec:
             - --n-gpu-layers
             - "-1"
             - --parallel
-            - "4"
-            - --cont-batching
+            - "1"
+            - --no-cont-batching
           volumeMounts:
             - name: models
               mountPath: /models
