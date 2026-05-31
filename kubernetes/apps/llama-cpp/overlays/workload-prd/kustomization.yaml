@@ -8,3 +8,8 @@ patches:
       kind: Deployment
       name: llama-cpp
       namespace: llm
+  - path: svc-patch.yaml
+    target:
+      kind: Service
+      name: llama-cpp
+      namespace: llm
