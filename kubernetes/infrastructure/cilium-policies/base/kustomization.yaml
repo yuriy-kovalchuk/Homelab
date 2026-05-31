@@ -7,3 +7,4 @@ resources:
   - allow-gateway-frontend.yaml
   - allow-flux-system.yaml
   - generate-same-namespace.yaml
+  - allow-kube-apiserver.yaml

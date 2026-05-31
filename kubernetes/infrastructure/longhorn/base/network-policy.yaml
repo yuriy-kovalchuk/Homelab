@@ -15,7 +15,8 @@ spec:
   egress:
     - toEntities:
         - cluster
-        - kube-apiserver
+    - toServices:
+        - kubeAPIServer: {}
 ---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
@@ -73,6 +74,25 @@ spec:
   ingress:
     - fromEntities:
         - cluster
+  egress:
+    - toEntities:
+        - cluster
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: longhorn-csi-sidecar
+  namespace: longhorn-system
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - csi-attacher
+          - csi-provisioner
+          - csi-resizer
+          - csi-snapshotter
   egress:
     - toEntities:
         - cluster
