@@ -15,6 +15,7 @@ spec:
   egress:
     - toEntities:
         - cluster
+        - kube-apiserver
 ---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
