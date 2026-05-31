@@ -1,8 +1,0 @@
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
-  - pvc.yaml
-  - model-download-qwen36-35b-a3b-udq4km.yaml
-  - deployment.yaml
-  - service.yaml
-  - network-policy.yaml

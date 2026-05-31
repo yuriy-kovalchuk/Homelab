@@ -1,9 +1,0 @@
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: yk-dns-manager
-  namespace: yk-dns-manager
-spec:
-  values:
-    domainMap:
-      "*.yuriy-lab.cloud": "10.0.4.50"
