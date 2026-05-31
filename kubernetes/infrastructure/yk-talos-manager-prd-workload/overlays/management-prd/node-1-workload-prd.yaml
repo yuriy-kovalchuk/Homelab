@@ -42,6 +42,12 @@ spec:
           cni:
             name: none
     - |
+      machine:
+        kernel:
+          modules:
+            - name: coretemp
+            - name: drivetemp
+    - |
       apiVersion: v1alpha1
       kind: RegistryMirrorConfig
       name: docker.io
