@@ -15,6 +15,13 @@ spec:
         - ports:
             - port: "8080"
               protocol: TCP
+    - fromEntities:
+        - ingress
+        - world
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
   egress:
     - toEntities:
         - world
