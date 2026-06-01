@@ -1,0 +1,53 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: external-secrets-controller
+  namespace: external-secrets
+spec:
+  description: "Allow ESO controller to reach Vault and kube-apiserver"
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/component: controller
+      app.kubernetes.io/instance: external-secrets
+  egress:
+    - toEntities:
+        - kube-apiserver
+    - toFQDNs:
+        - matchName: "vault.mgmt.yuriy-lab.cloud"
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: external-secrets-webhook
+  namespace: external-secrets
+spec:
+  description: "Allow kube-apiserver to reach ESO webhook"
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/component: webhook
+      app.kubernetes.io/instance: external-secrets
+  ingress:
+    - fromEntities:
+        - kube-apiserver
+  egress:
+    - toEntities:
+        - kube-apiserver
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: external-secrets-cert-controller
+  namespace: external-secrets
+spec:
+  description: "Allow ESO cert-controller to reach kube-apiserver"
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/component: cert-controller
+      app.kubernetes.io/instance: external-secrets
+  egress:
+    - toEntities:
+        - kube-apiserver
