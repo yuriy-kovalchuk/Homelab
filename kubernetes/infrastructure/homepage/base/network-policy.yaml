@@ -1,0 +1,27 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: homepage
+  namespace: homepage
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: homepage
+  ingress:
+    - fromEntities:
+        - ingress
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP
+  egress:
+    - toEntities:
+        - kube-apiserver
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP

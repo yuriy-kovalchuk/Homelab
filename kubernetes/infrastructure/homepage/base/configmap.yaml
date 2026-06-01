@@ -1,0 +1,201 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homepage
+  namespace: homepage
+data:
+  settings.yaml: |
+    title: "Homelab"
+    background:
+      image: https://images.unsplash.com/photo-1502790671504-542ad42d5189?auto=format&fit=crop&w=2560&q=80
+      blur: sm
+      opacity: 50
+    useEqualHeights: true
+    theme: dark
+    color: slate
+    layout:
+      GitOps:
+        header: true
+        style: row
+        columns: 3
+      Infrastructure:
+        header: true
+        style: row
+        columns: 4
+      Monitoring:
+        header: true
+        style: row
+        columns: 4
+      AI:
+        header: true
+        style: row
+        columns: 4
+      Storage:
+        header: true
+        style: row
+        columns: 3
+      Network:
+        header: true
+        style: row
+        columns: 4
+      Compute:
+        header: true
+        style: row
+        columns: 4
+      Development:
+        header: true
+        style: row
+        columns: 4
+
+  services.yaml: |
+    - GitOps:
+        - Forgejo:
+            icon: gitea.svg
+            href: https://forgejo.yuriy-lab.cloud
+            description: Source control — workload-prd
+        - Flux Workload:
+            icon: flux-cd.svg
+            href: https://fluxcd.yuriy-lab.cloud
+            description: GitOps — workload-prd
+        - Flux Management:
+            icon: flux-cd.svg
+            href: https://fluxcd.mgmt.yuriy-lab.cloud
+            description: GitOps — management-prd
+
+    - Infrastructure:
+        - Vault:
+            icon: vault.svg
+            href: https://vault.mgmt.yuriy-lab.cloud
+            description: Secrets management — management-prd
+        - Harbor:
+            icon: harbor.svg
+            href: https://harbor.mgmt.yuriy-lab.cloud
+            description: Container registry — management-prd
+        - Longhorn Workload:
+            icon: longhorn.svg
+            href: https://longhorn.yuriy-lab.cloud
+            description: Persistent storage — workload-prd
+        - Longhorn Management:
+            icon: longhorn.svg
+            href: https://longhorn.mgmt.yuriy-lab.cloud
+            description: Persistent storage — management-prd
+
+    - Monitoring:
+        - Grafana:
+            icon: grafana.svg
+            href: https://grafana.yuriy-lab.cloud
+            description: Metrics and dashboards
+        - Alloy:
+            icon: grafana-alloy.svg
+            href: https://alloy.yuriy-lab.cloud
+            description: Telemetry collector
+        - Hubble:
+            icon: cilium.svg
+            href: https://hubble.yuriy-lab.cloud
+            description: Cilium network observability
+        - Uptime Kuma:
+            icon: uptime-kuma.svg
+            href: https://uptime.yuriy-lab.cloud
+            description: Uptime monitoring
+        - Kyverno Reporter:
+            icon: kyverno.svg
+            href: https://kyverno-reporter.yuriy-lab.cloud
+            description: Policy compliance reporter
+        - Goldilocks:
+            icon: goldilocks.png
+            href: https://goldilocks.yuriy-lab.cloud
+            description: VPA resource recommendations
+
+    - AI:
+        - Open WebUI:
+            icon: open-webui.svg
+            href: https://chat.yuriy-lab.cloud
+            description: Local LLM chat interface
+
+    - Storage:
+        - TrueNAS:
+            icon: truenas-scale.svg
+            href: https://truenas.yuriy-lab.cloud
+            description: NAS storage
+        - S3 Console:
+            icon: minio.svg
+            href: https://s3.yuriy-lab.cloud
+            description: S3 object storage console
+        - RustFS:
+            icon: minio.svg
+            href: http://10.0.3.4:9001
+            description: RustFS — Docker VM
+
+    - Network:
+        - OPNsense:
+            icon: opnsense.svg
+            href: https://opnsense.yuriy-lab.cloud
+            description: Firewall and router
+        - Nginx Proxy Manager:
+            icon: nginx-proxy-manager.svg
+            href: http://10.0.3.4:81
+            description: Reverse proxy — Docker VM
+
+    - Compute:
+        - Proxmox Storage:
+            icon: proxmox.svg
+            href: https://storage.pve.yuriy-lab.cloud
+            description: Proxmox — storage node
+        - Proxmox Firewall:
+            icon: proxmox.svg
+            href: https://firewall.yuriy-lab.cloud:8006
+            description: Proxmox — firewall node
+        - Proxmox Maya:
+            icon: proxmox.svg
+            href: https://maya.yuriy-lab.cloud:8006
+            description: Proxmox — maya node
+        - Portainer:
+            icon: portainer.svg
+            href: https://10.0.3.4:9443
+            description: Docker management — Docker VM
+
+    - Development:
+        - HTTPBin:
+            icon: http.png
+            href: https://httpbin.yuriy-lab.cloud
+            description: HTTP testing
+        - Whoami:
+            icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@main/svg/traefik.svg
+            href: https://whoami.yuriy-lab.cloud
+            description: Request echo service
+
+  widgets.yaml: |
+    - search:
+        provider: google
+        target: _blank
+    - datetime:
+        text_size: xl
+        format:
+          timeStyle: short
+    - kubernetes:
+        cluster:
+          show: true
+          cpu: true
+          memory: true
+          showLabel: true
+          label: "workload-prd"
+        nodes:
+          show: true
+          cpu: true
+          memory: true
+          showLabel: true
+
+  kubernetes.yaml: |
+    mode: cluster
+
+  bookmarks.yaml: |
+    - Homelab:
+        - GitHub Repo:
+            - abbr: HL
+              href: https://github.com/yuriy-kovalchuk/Homelab
+
+  docker.yaml: |
+    {}
+
+  custom.css: ""
+  custom.js: ""
