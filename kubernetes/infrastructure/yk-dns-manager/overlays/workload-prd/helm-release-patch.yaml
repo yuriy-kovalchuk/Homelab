@@ -7,3 +7,4 @@ spec:
   values:
     domainMap:
       "*.yuriy-lab.cloud": "10.0.4.50"
+      "truenas.yuriy-lab.cloud": "10.0.4.60"
