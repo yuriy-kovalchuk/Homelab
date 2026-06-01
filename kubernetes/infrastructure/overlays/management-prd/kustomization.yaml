@@ -13,3 +13,4 @@ resources:
   - ../../yk-talos-manager/overlays/management-prd
   - ../../cluster-issuer/overlays/management-prd
   - ../../yk-talos-manager-prd-workload/overlays/management-prd
+  - ../../flux-system/overlays/management-prd

@@ -7,9 +7,11 @@ spec:
   parentRefs:
     - name: internal
       namespace: main-gateway
+      group: gateway.networking.k8s.io
+      kind: Gateway
       sectionName: https-fluxcd
   hostnames:
-    - "fluxcd.yuriy-lab.cloud"
+    - "fluxcd.mgmt.yuriy-lab.cloud"
   rules:
     - backendRefs:
         - name: flux-operator

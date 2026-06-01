@@ -61,14 +61,14 @@ spec:
           selector:
             matchLabels:
               kubernetes.io/metadata.name: "kube-system"
-    - name: https-flux
+    - name: https-fluxcd
       port: 443
       protocol: HTTPS
-      hostname: "flux.yuriy-lab.cloud"
+      hostname: "fluxcd.yuriy-lab.cloud"
       tls:
         mode: Terminate
         certificateRefs:
-          - name: flux-gw-tls
+          - name: fluxcd-gw-tls
             kind: Secret
       allowedRoutes:
         namespaces:

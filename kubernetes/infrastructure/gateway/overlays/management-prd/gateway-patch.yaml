@@ -46,6 +46,21 @@ spec:
           selector:
             matchLabels:
               kubernetes.io/metadata.name: "harbor"
+    - name: https-fluxcd
+      port: 443
+      protocol: HTTPS
+      hostname: "fluxcd.mgmt.yuriy-lab.cloud"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: fluxcd-gw-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: "flux-system"
     - name: https-vault
       port: 443
       protocol: HTTPS

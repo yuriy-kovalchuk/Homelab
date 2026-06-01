@@ -7,8 +7,7 @@ spec:
   description: "Allow ESO controller to reach Vault and kube-apiserver"
   endpointSelector:
     matchLabels:
-      app.kubernetes.io/component: controller
-      app.kubernetes.io/instance: external-secrets
+      app.kubernetes.io/name: external-secrets
   egress:
     - toEntities:
         - kube-apiserver
@@ -28,8 +27,7 @@ spec:
   description: "Allow kube-apiserver to reach ESO webhook"
   endpointSelector:
     matchLabels:
-      app.kubernetes.io/component: webhook
-      app.kubernetes.io/instance: external-secrets
+      app.kubernetes.io/name: external-secrets-webhook
   ingress:
     - fromEntities:
         - kube-apiserver
@@ -46,8 +44,7 @@ spec:
   description: "Allow ESO cert-controller to reach kube-apiserver"
   endpointSelector:
     matchLabels:
-      app.kubernetes.io/component: cert-controller
-      app.kubernetes.io/instance: external-secrets
+      app.kubernetes.io/name: external-secrets-cert-controller
   egress:
     - toEntities:
         - kube-apiserver

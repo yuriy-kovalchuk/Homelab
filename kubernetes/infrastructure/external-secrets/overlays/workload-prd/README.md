@@ -6,30 +6,32 @@ short-lived Vault token automatically — no manual secret rotation needed.
 
 ## One-time Vault setup
 
-### 1. Configure the Kubernetes auth method
+### 1. Get the token reviewer token
 
-Kubernetes auth was already enabled (`vault auth enable kubernetes`). Configure
-it with the workload cluster's API endpoint and CA cert.
+The `vault-reviewer` ServiceAccount, Secret, and ClusterRoleBinding are managed
+by Flux via `vault-reviewer.yaml`. Once Flux reconciles, extract the token:
 
 **workload-prd cluster:**
 ```bash
-kubectl config view --minify --raw \
-  -o jsonpath='{.clusters[0].cluster.certificate-authority-data}' | base64 -d > /tmp/k8s-ca.crt
-
-kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}'
+kubectl get secret vault-reviewer-token -n external-secrets \
+  -o jsonpath='{.data.token}' | base64 -d
 ```
+
+### 2. Configure the Kubernetes auth method
 
 **management-prd cluster:**
 ```bash
-CA=$(cat /tmp/k8s-ca.crt)
+CA=$(kubectl --kubeconfig ~/.kube/workload config view --minify --raw \
+  -o jsonpath='{.clusters[0].cluster.certificate-authority-data}' | base64 -d)
 
 kubectl exec -n vault vault-0 -- \
   vault write auth/kubernetes/config \
-    kubernetes_host="https://<workload-cluster-api>:6443" \
-    kubernetes_ca_cert="$CA"
+    kubernetes_host="https://10.0.4.2:6443" \
+    kubernetes_ca_cert="$CA" \
+    token_reviewer_jwt="<token-from-step-1>"
 ```
 
-### 2. Create the read policy
+### 3. Create the read policy
 
 **management-prd cluster:**
 ```bash
@@ -43,7 +45,7 @@ path "kubernetes/metadata/*" {
 EOF'
 ```
 
-### 3. Create the role
+### 4. Create the role
 
 **management-prd cluster:**
 ```bash
@@ -55,7 +57,7 @@ kubectl exec -n vault vault-0 -- \
     ttl=1h
 ```
 
-### 4. Verify the store is ready
+### 5. Verify the store is ready
 
 **workload-prd cluster:**
 ```bash
@@ -73,6 +75,8 @@ default-store   1m    Valid    True
 
 - The `external-secrets` service account is created by the Helm chart — no manual
   secret creation is required.
-- Tokens are 1h TTL and renewed automatically by ESO.
+- The `vault-reviewer` ServiceAccount, Secret, and ClusterRoleBinding are managed
+  by Flux. Only the Vault config update (`token_reviewer_jwt`) is manual.
+- Tokens issued to ESO are 1h TTL and renewed automatically.
 - The Vault auth mount path (`kubernetes`) must match `mountPath` in the
   `ClusterSecretStore` spec.
