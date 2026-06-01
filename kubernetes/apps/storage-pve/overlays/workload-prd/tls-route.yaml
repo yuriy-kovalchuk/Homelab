@@ -1,0 +1,16 @@
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TLSRoute
+metadata:
+  name: storage-pve
+  namespace: storage-pve
+spec:
+  parentRefs:
+    - name: external-services
+      namespace: external-gateway
+      sectionName: tls-storage-pve
+  hostnames:
+    - "storage.pve.yuriy-lab.cloud"
+  rules:
+    - backendRefs:
+        - name: storage-pve
+          port: 8006

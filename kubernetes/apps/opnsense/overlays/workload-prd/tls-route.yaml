@@ -1,0 +1,16 @@
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TLSRoute
+metadata:
+  name: opnsense
+  namespace: opnsense
+spec:
+  parentRefs:
+    - name: external-services
+      namespace: external-gateway
+      sectionName: tls-opnsense
+  hostnames:
+    - "opnsense.yuriy-lab.cloud"
+  rules:
+    - backendRefs:
+        - name: opnsense
+          port: 443

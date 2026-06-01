@@ -8,3 +8,6 @@ spec:
     domainMap:
       "*.yuriy-lab.cloud": "10.0.4.50"
       "truenas.yuriy-lab.cloud": "10.0.4.60"
+
+      "s3.yuriy-lab.cloud": "10.0.4.60"
+      "api.s3.yuriy-lab.cloud": "10.0.4.60"

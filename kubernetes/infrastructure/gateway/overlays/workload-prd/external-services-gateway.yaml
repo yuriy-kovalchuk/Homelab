@@ -26,3 +26,33 @@ spec:
           selector:
             matchLabels:
               kubernetes.io/metadata.name: "truenas"
+    - name: https-s3-console
+      port: 443
+      protocol: HTTPS
+      hostname: "s3.yuriy-lab.cloud"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: s3-console-gw-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: "s3"
+    - name: https-s3-api
+      port: 443
+      protocol: HTTPS
+      hostname: "api.s3.yuriy-lab.cloud"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: s3-api-gw-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: "s3"
