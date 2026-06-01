@@ -7,6 +7,7 @@ resources:
   - ../../metrics-server/overlays/workload-prd
   - ../../cert-manager/overlays/workload-prd
   - ../../external-secrets/overlays/workload-prd
+  - ../../forgejo/overlays/workload-prd
   - ../../longhorn/overlays/workload-prd
   - ../../bgp/overlays/workload-prd
   - ../../yk-dns-manager/overlays/workload-prd

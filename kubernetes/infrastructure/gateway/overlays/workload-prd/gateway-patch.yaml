@@ -61,6 +61,30 @@ spec:
           selector:
             matchLabels:
               kubernetes.io/metadata.name: "kube-system"
+    - name: ssh-forgejo
+      port: 22
+      protocol: TCP
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: "forgejo"
+    - name: https-forgejo
+      port: 443
+      protocol: HTTPS
+      hostname: "forgejo.yuriy-lab.cloud"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: forgejo-gw-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: "forgejo"
     - name: https-fluxcd
       port: 443
       protocol: HTTPS
