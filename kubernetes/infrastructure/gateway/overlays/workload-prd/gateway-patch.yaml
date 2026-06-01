@@ -220,3 +220,18 @@ spec:
           selector:
             matchLabels:
               kubernetes.io/metadata.name: "open-webui"
+    - name: https-llama-cpp
+      port: 443
+      protocol: HTTPS
+      hostname: "llama.yuriy-lab.cloud"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: llama-cpp-gw-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: "llm"

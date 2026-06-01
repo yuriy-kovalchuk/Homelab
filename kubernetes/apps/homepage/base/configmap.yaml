@@ -6,10 +6,6 @@ metadata:
 data:
   settings.yaml: |
     title: "Homelab"
-    background:
-      image: https://images.unsplash.com/photo-1502790671504-542ad42d5189?auto=format&fit=crop&w=2560&q=80
-      blur: sm
-      opacity: 50
     useEqualHeights: true
     theme: dark
     color: slate
@@ -25,27 +21,27 @@ data:
       Monitoring:
         header: true
         style: row
-        columns: 4
+        columns: 3
       AI:
         header: true
         style: row
-        columns: 4
+        columns: 2
       Storage:
         header: true
         style: row
-        columns: 3
+        columns: 2
       Network:
         header: true
         style: row
-        columns: 4
+        columns: 2
       Compute:
         header: true
         style: row
-        columns: 4
+        columns: 3
       Development:
         header: true
         style: row
-        columns: 4
+        columns: 2
 
   services.yaml: |
     - GitOps:
@@ -86,7 +82,7 @@ data:
             href: https://grafana.yuriy-lab.cloud
             description: Metrics and dashboards
         - Alloy:
-            icon: grafana-alloy.svg
+            icon: alloy.svg
             href: https://alloy.yuriy-lab.cloud
             description: Telemetry collector
         - Hubble:
@@ -111,20 +107,20 @@ data:
             icon: open-webui.svg
             href: https://chat.yuriy-lab.cloud
             description: Local LLM chat interface
+        - Llama.cpp:
+            icon: si-meta
+            href: https://llama.yuriy-lab.cloud
+            description: Local LLM inference server
 
     - Storage:
         - TrueNAS:
             icon: truenas-scale.svg
-            href: https://truenas.yuriy-lab.cloud
+            href: https://truenas.yuriy-lab.cloud/ui/
             description: NAS storage
         - S3 Console:
             icon: minio.svg
             href: https://s3.yuriy-lab.cloud
             description: S3 object storage console
-        - RustFS:
-            icon: minio.svg
-            href: http://10.0.3.4:9001
-            description: RustFS — Docker VM
 
     - Network:
         - OPNsense:
@@ -141,14 +137,10 @@ data:
             icon: proxmox.svg
             href: https://storage.pve.yuriy-lab.cloud
             description: Proxmox — storage node
-        - Proxmox Firewall:
+        - Proxmox Gateway:
             icon: proxmox.svg
             href: https://firewall.yuriy-lab.cloud:8006
             description: Proxmox — firewall node
-        - Proxmox Maya:
-            icon: proxmox.svg
-            href: https://maya.yuriy-lab.cloud:8006
-            description: Proxmox — maya node
         - Portainer:
             icon: portainer.svg
             href: https://10.0.3.4:9443
@@ -160,7 +152,7 @@ data:
             href: https://httpbin.yuriy-lab.cloud
             description: HTTP testing
         - Whoami:
-            icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@main/svg/traefik.svg
+            icon: traefik.svg
             href: https://whoami.yuriy-lab.cloud
             description: Request echo service
 
@@ -195,6 +187,9 @@ data:
               href: https://github.com/yuriy-kovalchuk/Homelab
 
   docker.yaml: |
+    {}
+
+  proxmox.yaml: |
     {}
 
   custom.css: ""

@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - ../../external-secrets-config/overlays/workload-prd
   - ../../clean-pods/overlays/workload-prd
+  - ../../homepage/overlays/workload-prd
   - ../../httpbin/overlays/workload-prd
   - ../../whoami/overlays/workload-prd
   - ../../uptime-kuma/overlays/workload-prd

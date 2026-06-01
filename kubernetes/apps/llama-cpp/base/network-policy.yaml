@@ -17,7 +17,6 @@ spec:
               protocol: TCP
     - fromEntities:
         - ingress
-        - world
       toPorts:
         - ports:
             - port: "8080"
