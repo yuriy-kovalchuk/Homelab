@@ -21,7 +21,7 @@ data:
       Monitoring:
         header: true
         style: row
-        columns: 3
+        columns: 4
       AI:
         header: true
         style: row
@@ -85,18 +85,26 @@ data:
             icon: alloy.svg
             href: https://alloy.yuriy-lab.cloud
             description: Telemetry collector
-        - Hubble:
+        - Hubble Workload:
             icon: cilium.svg
             href: https://hubble.yuriy-lab.cloud
-            description: Cilium network observability
+            description: Cilium network observability — workload-prd
+        - Hubble Management:
+            icon: cilium.svg
+            href: https://hubble.mgmt.yuriy-lab.cloud
+            description: Cilium network observability — management-prd
         - Uptime Kuma:
             icon: uptime-kuma.svg
             href: https://uptime.yuriy-lab.cloud
             description: Uptime monitoring
-        - Kyverno Reporter:
+        - Kyverno Reporter Workload:
             icon: kyverno.svg
             href: https://kyverno-reporter.yuriy-lab.cloud
-            description: Policy compliance reporter
+            description: Policy compliance reporter — workload-prd
+        - Kyverno Reporter Management:
+            icon: kyverno.svg
+            href: https://kyverno-reporter.mgmt.yuriy-lab.cloud
+            description: Policy compliance reporter — management-prd
         - Goldilocks:
             icon: goldilocks.png
             href: https://goldilocks.yuriy-lab.cloud

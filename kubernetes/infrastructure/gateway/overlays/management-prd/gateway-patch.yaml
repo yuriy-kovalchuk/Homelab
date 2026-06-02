@@ -91,3 +91,18 @@ spec:
           selector:
             matchLabels:
               kubernetes.io/metadata.name: "kyverno-reporter"
+    - name: https-hubble
+      port: 443
+      protocol: HTTPS
+      hostname: "hubble.mgmt.yuriy-lab.cloud"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: hubble-gw-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: "kube-system"
