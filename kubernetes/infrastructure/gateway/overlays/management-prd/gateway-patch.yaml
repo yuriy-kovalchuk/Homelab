@@ -76,3 +76,18 @@ spec:
           selector:
             matchLabels:
               kubernetes.io/metadata.name: "vault"
+    - name: https-kyverno-reporter
+      port: 443
+      protocol: HTTPS
+      hostname: "kyverno-reporter.mgmt.yuriy-lab.cloud"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: kyverno-reporter-gw-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: "kyverno-reporter"

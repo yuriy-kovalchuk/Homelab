@@ -13,10 +13,20 @@ spec:
       template:
         spec:
           restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
           containers:
             - name: unsealer
               image: alpine/curl:8.17.0
               command: ["/bin/sh", "/scripts/unseal.sh"]
+              securityContext:
+                allowPrivilegeEscalation: false
+                runAsNonRoot: true
+                seccompProfile:
+                  type: RuntimeDefault
               env:
                 - name: UNSEAL_KEY
                   valueFrom:
