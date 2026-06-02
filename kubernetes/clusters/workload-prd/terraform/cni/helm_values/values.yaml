@@ -44,6 +44,10 @@ externalIPs:
 
 envoy:
   enabled: true
+  prometheus:
+    enabled: true
+    serviceMonitor:
+      enabled: true
 
 hubble:
   relay:
@@ -57,3 +61,12 @@ bpf:
 
 operator:
   replicas: 3
+  prometheus:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+
+prometheus:
+  enabled: true
+  serviceMonitor:
+    enabled: true
