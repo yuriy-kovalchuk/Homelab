@@ -146,4 +146,4 @@ spec:
         annotations:
           k8s-sidecar-target-directory: /tmp/dashboards/Mimir Dashboards
       serviceMonitor:
-        enabled: false
+        enabled: true

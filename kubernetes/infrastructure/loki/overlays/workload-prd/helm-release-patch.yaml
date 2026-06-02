@@ -98,7 +98,7 @@ spec:
 
     monitoring:
       serviceMonitor:
-        enabled: false
+        enabled: true
       dashboards:
         enabled: true
         namespace: grafana
