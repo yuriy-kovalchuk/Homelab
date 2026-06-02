@@ -7,3 +7,4 @@ resources:
   - allow-gateway-frontend.yaml
   - allow-flux-system.yaml
   - allow-kube-apiserver.yaml
+  - allow-alloy-metrics-scraping.yaml

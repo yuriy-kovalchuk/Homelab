@@ -1,0 +1,12 @@
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: allow-alloy-metrics-scraping
+spec:
+  description: "Allow alloy-metrics to scrape Prometheus metrics from all pods in the cluster"
+  endpointSelector: {}
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: k8s-monitoring
+            io.cilium.k8s.policy.serviceaccount: k8s-monitoring-alloy-metrics

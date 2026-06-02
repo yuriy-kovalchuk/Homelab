@@ -164,3 +164,17 @@ spec:
     - toEndpoints:
         - matchLabels:
             io.kubernetes.pod.namespace: mimir
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-alloy-metrics-egress-to-cluster
+  namespace: k8s-monitoring
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/instance: k8s-monitoring-alloy-metrics
+      app.kubernetes.io/name: alloy-metrics
+  egress:
+    - toEntities:
+        - cluster

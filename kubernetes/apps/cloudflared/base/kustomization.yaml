@@ -5,3 +5,5 @@ resources:
   - deployment.yaml
   - external-secret.yaml
   - network-policy.yaml
+  - service.yaml
+  - service-monitor.yaml
