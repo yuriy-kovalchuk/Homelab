@@ -22,6 +22,11 @@ resource "cloudflare_tunnel_config" "homelab" {
       service  = "http://whoami.whoami.svc.cluster.local"
     }
 
+    ingress_rule {
+      hostname = "yuriykovalchuk.dev"
+      service  = "http://yk-portfolio.yk-portfolio.svc.cluster.local"
+    }
+
     # Default catch-all — required by Cloudflare
     ingress_rule {
       service = "http_status:404"
@@ -32,6 +37,14 @@ resource "cloudflare_tunnel_config" "homelab" {
 resource "cloudflare_record" "whoami" {
   zone_id = var.cloudflare_zone_id_yuriykovalchuk_dev
   name    = "whoami"
+  type    = "CNAME"
+  value   = "${cloudflare_tunnel.homelab.id}.cfargotunnel.com"
+  proxied = true
+}
+
+resource "cloudflare_record" "yk_portfolio" {
+  zone_id = var.cloudflare_zone_id_yuriykovalchuk_dev
+  name    = "@"
   type    = "CNAME"
   value   = "${cloudflare_tunnel.homelab.id}.cfargotunnel.com"
   proxied = true

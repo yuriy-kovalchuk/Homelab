@@ -35,3 +35,11 @@ spec:
         - ports:
             - port: "8080"
               protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: yk-portfolio
+            app: yk-portfolio
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP

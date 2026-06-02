@@ -235,3 +235,18 @@ spec:
           selector:
             matchLabels:
               kubernetes.io/metadata.name: "llm"
+    - name: https-yk-portfolio
+      port: 443
+      protocol: HTTPS
+      hostname: "portfolio.yuriy-lab.cloud"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: yk-portfolio-gw-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: "yk-portfolio"

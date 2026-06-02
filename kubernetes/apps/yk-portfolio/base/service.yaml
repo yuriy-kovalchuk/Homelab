@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: yk-portfolio
+  namespace: yk-portfolio
+  labels:
+    app: yk-portfolio
+spec:
+  selector:
+    app: yk-portfolio
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080

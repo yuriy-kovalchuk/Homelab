@@ -12,5 +12,6 @@ resources:
   - ../../truenas/overlays/workload-prd
 
   - ../../s3/overlays/workload-prd
+  - ../../yk-portfolio/overlays/workload-prd
   # standby — re-enable once the monitoring stack (PodMonitor CRD) and authentik are deployed:
   # - ../../cloudnative-pg/overlays/workload-prd
