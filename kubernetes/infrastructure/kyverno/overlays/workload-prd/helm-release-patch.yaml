@@ -15,7 +15,7 @@ spec:
     admissionController:
       replicas: 3
       serviceMonitor:
-        enabled: false
+        enabled: true
       podSecurityContext:
         seccompProfile:
           type: RuntimeDefault

@@ -11,7 +11,7 @@ spec:
       scanJobsConcurrentLimit: 5
       infraAssessmentScannerEnabled: true
     serviceMonitor:
-      enabled: false
+      enabled: true
     trivy:
       mode: ClientServer
       storageClassEnabled: true
