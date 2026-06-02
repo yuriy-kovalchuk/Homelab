@@ -5,6 +5,8 @@ metadata:
   namespace: trivy-converter
 spec:
   values:
+    kubeClientQPS: 50
+    kubeClientBurst: 100
     resources:
       limits:
         cpu: 200m
@@ -15,6 +17,8 @@ spec:
     adapters:
       cisKubeBenchReports:
         enabled: false
+      configAuditReports:
+        enabled: true
       complianceReports:
         enabled: true
       rbacAssessmentReports:
