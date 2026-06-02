@@ -11,6 +11,7 @@ spec:
   ingress:
     - fromEntities:
         - cluster
+        - ingress
   egress:
     - toEntities:
         - kube-apiserver
@@ -54,3 +55,4 @@ spec:
   ingress:
     - fromEntities:
         - cluster
+        - ingress

@@ -6,3 +6,4 @@ resources:
   - helm-release.yaml
   - unseal-configmap.yaml
   - unseal-cronjob.yaml
+  - network-policy.yaml
