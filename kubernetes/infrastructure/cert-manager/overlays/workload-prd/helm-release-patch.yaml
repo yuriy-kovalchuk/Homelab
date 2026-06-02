@@ -5,6 +5,9 @@ metadata:
   namespace: cert-manager
 spec:
   values:
+    prometheus:
+      servicemonitor:
+        enabled: true
     crds:
       enabled: true
     config:
