@@ -13,9 +13,13 @@ resource "cloudflare_tunnel_config" "homelab" {
   tunnel_id  = cloudflare_tunnel.homelab.id
 
   config {
+    # cloudflared connects directly to the app's in-cluster Service.
+    # NOTE: it cannot go through a Cilium Gateway VIP — an in-cluster pod
+    # hitting the gateway's own VIP hair-pins (Envoy upstream resolves back to
+    # the VIP / reserved:world) and the request is L7-dropped. See README.
     ingress_rule {
       hostname = "whoami.yuriykovalchuk.dev"
-      service  = "http://10.0.4.51"
+      service  = "http://whoami.whoami.svc.cluster.local"
     }
 
     # Default catch-all — required by Cloudflare
@@ -32,6 +36,7 @@ resource "cloudflare_record" "whoami" {
   value   = "${cloudflare_tunnel.homelab.id}.cfargotunnel.com"
   proxied = true
 }
+
 
 resource "vault_kv_secret_v2" "cloudflared_tunnel" {
   mount               = "kubernetes"

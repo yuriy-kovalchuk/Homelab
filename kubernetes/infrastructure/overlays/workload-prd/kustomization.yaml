@@ -4,7 +4,6 @@ resources:
   - ../../gateway-api-crds/overlays/workload-prd
   - ../../prometheus-operator-crds/overlays/workload-prd
   - ../../gateway/overlays/workload-prd
-  - ../../public-gateway/overlays/workload-prd
   - ../../metrics-server/overlays/workload-prd
   - ../../cert-manager/overlays/workload-prd
   - ../../external-secrets/overlays/workload-prd

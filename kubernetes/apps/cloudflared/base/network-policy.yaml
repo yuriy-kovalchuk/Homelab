@@ -24,3 +24,14 @@ spec:
         - ports:
             - port: "80"
               protocol: TCP
+    # cloudflared connects to each public app's Service directly (not via a
+    # gateway — Cilium gateways can't serve in-cluster clients of their own VIP).
+    # Add one rule per public app.
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: whoami
+            app: whoami
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP

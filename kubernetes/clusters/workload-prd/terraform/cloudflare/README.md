@@ -1,7 +1,15 @@
 # Cloudflare Tunnel — Terraform
 
 Manages the Cloudflare Tunnel for public-facing workload apps.
-Traffic flows: `Internet → Cloudflare edge → cloudflared pod → public gateway (10.0.4.51) → app`.
+Traffic flows: `Internet → Cloudflare edge → cloudflared pod → app Service (ClusterIP) → app`.
+
+> **Why not a Cilium Gateway?** cloudflared is an in-cluster pod. When an
+> in-cluster pod connects to a Cilium Gateway's own LoadBalancer VIP, the
+> request hair-pins: Envoy resolves its upstream back to the VIP (classified
+> `reserved:world`) instead of the backend pods, and the L7 request is dropped
+> (`403 Access denied`). North-south (LAN) traffic is unaffected because the LB
+> DNATs to a real pod first. So cloudflared connects **straight to each app's
+> in-cluster Service** instead of through a gateway.
 
 ## Creating the API token
 
@@ -12,6 +20,7 @@ Go to **dash.cloudflare.com → My Profile → API Tokens → Create Token → C
 | Resource | Permission |
 |---|---|
 | Account → Cloudflare Tunnel | Edit |
+| Account → Access: Apps and Policies | Edit |
 | Zone → DNS (`yuriykovalchuk.dev`) | Edit |
 
 ### Scoping
@@ -44,12 +53,24 @@ ESO picks it up and creates the `cloudflared-token` secret in the `cloudflared` 
 
 ## Adding a new public app
 
-1. Add an `ingress_rule` to `cloudflare_tunnel_config` in `main.tf`:
+1. Add an `ingress_rule` to `cloudflare_tunnel_config` and a `cloudflare_record` in `main.tf`,
+   pointing `service` at the app's in-cluster Service DNS:
    ```hcl
    ingress_rule {
-     hostname = "myapp.yuriy-lab.cloud"
-     service  = "http://10.0.4.51"
+     hostname = "myapp.yuriykovalchuk.dev"
+     service  = "http://myapp.myapp.svc.cluster.local"   # <svc>.<namespace>.svc.cluster.local
    }
    ```
-2. Create an `HTTPRoute` in the app's overlay pointing to the `public` gateway in `public-gateway` namespace.
+   ```hcl
+   resource "cloudflare_record" "myapp" {
+     zone_id = var.cloudflare_zone_id_yuriykovalchuk_dev
+     name    = "myapp"
+     type    = "CNAME"
+     value   = "${cloudflare_tunnel.homelab.id}.cfargotunnel.com"
+     proxied = true
+   }
+   ```
+2. Add an egress rule to the cloudflared CiliumNetworkPolicy
+   (`kubernetes/apps/cloudflared/base/network-policy.yaml`) allowing cloudflared
+   to reach the app's pods on the Service's `targetPort`.
 3. Run `terraform apply`.
