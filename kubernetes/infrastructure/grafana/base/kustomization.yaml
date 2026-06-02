@@ -29,8 +29,7 @@ configMapGenerator:
     files:
       - dashboards/node-exporter.json
       - dashboards/cert-manager.json
-      - dashboards/cilium-verdicts.json
-      - dashboards/longhorn.json
+      - dashboards/hwmon.json
     options:
       labels:
         grafana_dashboard: "1"
@@ -51,11 +50,8 @@ configMapGenerator:
   - name: grafana-dashboards-networking
     namespace: grafana
     files:
-      - dashboards/envoy-clusters.json
-      - dashboards/envoy-global.json
-      - dashboards/envoy-mixin.json
-      - dashboards/envoy-proxy-global.json
-      - dashboards/envoy-resource-monitor.json
+      - dashboards/cilium-verdicts.json
+      - dashboards/cloudflared.json
     options:
       labels:
         grafana_dashboard: "1"
@@ -65,6 +61,7 @@ configMapGenerator:
   - name: grafana-dashboards-storage
     namespace: grafana
     files:
+      - dashboards/longhorn.json
       - dashboards/cloudnative-pg.json
     options:
       labels:

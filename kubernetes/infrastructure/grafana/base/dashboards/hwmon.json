@@ -1,0 +1,334 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 0,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 7,
+      "panels": [],
+      "repeat": "instance",
+      "title": "$instance",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "mimir-metrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Temperature",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "celsius"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/Critical*./"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#E24D42",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 2
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/Max*./"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#EF843C",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 2
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [
+                    10,
+                    10
+                  ],
+                  "fill": "dash"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byValue",
+              "options": {
+                "op": "gte",
+                "reducer": "allIsNull",
+                "value": 0
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": true,
+                  "tooltip": true,
+                  "viz": false
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 14,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "id": 4,
+      "maxPerRow": 2,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "lastNotNull",
+            "max",
+            "min"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "mimir-metrics"
+          },
+          "expr": "# The nicest possible display of a metric...\r\nnode_hwmon_temp_celsius{instance=~\"$instance\"} \n  * on(instance,chip,sensor) group_left(label) node_hwmon_sensor_label \n  * on(instance,chip) group_left(chip_name) node_hwmon_chip_names\n# ...but it may filter out metrics that do not have a label, so as a fallback use the machine sensor name\r\n  or on(instance,chip,sensor) label_replace(node_hwmon_temp_celsius{instance=~\"$instance\"}, \"label\", \"$0\", \"sensor\", \".*\") \r\n    * on(instance,chip) group_left(chip_name) node_hwmon_chip_names\r\n  or on(instance,chip,sensor) label_replace(label_replace(node_hwmon_temp_celsius{instance=~\"$instance\"}, \"label\", \"$0\", \"sensor\", \".*\"), \"chip_name\", \"$0\", \"chip\", \".*\")",
+          "format": "time_series",
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "{{chip_name}}/{{label}}",
+          "refId": "A",
+          "step": 240
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "mimir-metrics"
+          },
+          "expr": "node_hwmon_temp_crit_alarm_celsius{instance=~\"$instance\"}\n  * on(instance,chip,sensor) group_left(label) node_hwmon_sensor_label \r\n  * on(instance,chip) group_left(chip_name) node_hwmon_chip_names\n  or label_replace(node_hwmon_temp_crit_alarm_celsius{instance=~\"$instance\"}, \"label\", \"$0\", \"sensor\", \".*\") \r\n    * on(instance,chip) group_left(chip_name) node_hwmon_chip_names\r\n    unless on(instance,chip,sensor) node_hwmon_sensor_label",
+          "format": "time_series",
+          "hide": false,
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "Critical Alarm {{ chip_name }}/{{ label }}",
+          "refId": "B",
+          "step": 240
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "mimir-metrics"
+          },
+          "expr": "node_hwmon_temp_crit_celsius{instance=~\"$instance\"}\n  * on(instance,chip,sensor) group_left(label) node_hwmon_sensor_label \r\n  * on(instance,chip) group_left(chip_name) node_hwmon_chip_names\n  or label_replace(node_hwmon_temp_crit_celsius{instance=~\"$instance\"}, \"label\", \"$0\", \"sensor\", \".*\") \r\n    * on(instance,chip) group_left(chip_name) node_hwmon_chip_names\r\n    unless on(instance,chip,sensor) node_hwmon_sensor_label",
+          "format": "time_series",
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "Critical  {{ chip_name }}/{{ label }}",
+          "refId": "C",
+          "step": 240
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "mimir-metrics"
+          },
+          "expr": "node_hwmon_temp_crit_hyst_celsius{instance=~\"$instance\"}\n  * on(instance,chip,sensor) group_left(label) node_hwmon_sensor_label \r\n  * on(instance,chip) group_left(chip_name) node_hwmon_chip_names\n  or label_replace(node_hwmon_temp_crit_hyst_celsius{instance=~\"$instance\"}, \"label\", \"$0\", \"sensor\", \".*\") \r\n    * on(instance,chip) group_left(chip_name) node_hwmon_chip_names\r\n    unless on(instance,chip,sensor) node_hwmon_sensor_label",
+          "format": "time_series",
+          "hide": false,
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "Critical Hysteresis  {{ chip_name }}/{{ label }}",
+          "refId": "D",
+          "step": 240
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "mimir-metrics"
+          },
+          "expr": "node_hwmon_temp_max_celsius{instance=~\"$instance\"}\n  * on(instance,chip,sensor) group_left(label) node_hwmon_sensor_label \r\n  * on(instance,chip) group_left(chip_name) node_hwmon_chip_names\n  or label_replace(node_hwmon_temp_max_celsius{instance=~\"$instance\"}, \"label\", \"$0\", \"sensor\", \".*\") \r\n    * on(instance,chip) group_left(chip_name) node_hwmon_chip_names\r\n    unless on(instance,chip,sensor) node_hwmon_sensor_label",
+          "format": "time_series",
+          "hide": false,
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "Max  {{ chip_name }}/{{ label }}",
+          "refId": "E",
+          "step": 240
+        }
+      ],
+      "title": "Temperature",
+      "type": "timeseries"
+    }
+  ],
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 42,
+  "tags": [
+    "linux",
+    "hwmon",
+    "temperature",
+    "fan speed",
+    "voltage",
+    "amperage",
+    "power"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": "mimir-metrics",
+        "definition": "label_values(node_uname_info, instance)",
+        "includeAll": true,
+        "label": "Instance",
+        "multi": true,
+        "name": "instance",
+        "options": [],
+        "query": "label_values(node_uname_info, instance)",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "hwmon",
+  "uid": "JfD8nbvMk",
+  "version": 2
+}
