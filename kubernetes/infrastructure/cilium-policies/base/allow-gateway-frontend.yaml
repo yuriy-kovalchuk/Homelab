@@ -16,6 +16,14 @@ spec:
               protocol: TCP
             - port: "443"
               protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: cloudflared
+            app: cloudflared
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
   egress:
     - toEntities:
         - cluster
