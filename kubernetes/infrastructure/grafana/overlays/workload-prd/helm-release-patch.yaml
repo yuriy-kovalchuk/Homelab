@@ -13,8 +13,24 @@ spec:
     grafana.ini:
       server:
         root_url: "https://grafana.yuriy-lab.cloud"
+      news:
+        news_feed_enabled: false
+      users:
+        default_theme: dark
+      dashboards:
+        default_home_dashboard_path: /tmp/dashboards/Kubernetes/k8s-global.json
+      analytics:
+        reporting_enabled: false
+        check_for_updates: false
+        check_for_plugin_updates: false
+
+    plugins:
+      - grafana-lokiexplore-app
+      - grafana-metricsdrilldown-app
 
     sidecar:
+      image:
+        tag: "2.7.3"
       dashboards:
         enabled: true
         searchNamespace: ALL
@@ -47,5 +63,7 @@ spec:
             editable: true
             jsonData:
               httpHeaderName1: X-Scope-OrgID
+              timeout: 300
+              maxLines: 1000
             secureJsonData:
               httpHeaderValue1: "anonymous"

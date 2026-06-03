@@ -45,7 +45,7 @@ spec:
         chunk_encoding: snappy
 
       querier:
-        max_concurrent: 4
+        max_concurrent: 16
 
       pattern_ingester:
         enabled: true
