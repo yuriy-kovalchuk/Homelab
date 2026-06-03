@@ -50,8 +50,11 @@ configMapGenerator:
   - name: grafana-dashboards-networking
     namespace: grafana
     files:
-      - dashboards/cilium-verdicts.json
-      - dashboards/cloudflared.json
+    - dashboards/cloudflared.json
+    - dashboards/hubble-http.json
+    - dashboards/envoy-overview.json
+    - dashboards/envoy-downstream.json
+    - dashboards/envoy-clusters.json
     options:
       labels:
         grafana_dashboard: "1"

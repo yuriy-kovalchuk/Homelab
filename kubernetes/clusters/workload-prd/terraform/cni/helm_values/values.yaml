@@ -54,6 +54,31 @@ hubble:
     enabled: true
   ui:
     enabled: true
+  metrics:
+    enabled:
+      - "dns:query;ignoreAAAA;labelsContext=source_namespace,source_app,destination_namespace,destination_app"
+      - drop
+      - tcp
+      - flow
+      - port-distribution
+      - icmp
+      - "httpV2:exemplars=true;labelsContext=source_namespace,source_app,destination_namespace,destination_app,traffic_direction"
+      - kafka
+      - "policy:sourceContext=app|workload-name|pod|reserved-identity;destinationContext=app|workload-name|pod|dns|reserved-identity"
+      - flows-to-world:any-drop=true
+    enableOpenMetrics: true
+    serviceMonitor:
+      enabled: true
+    dashboards:
+      enabled: true
+      annotations:
+        k8s-sidecar-target-directory: /tmp/dashboards/Networking
+
+grafana:
+  dashboards:
+    enabled: true
+    annotations:
+      k8s-sidecar-target-directory: /tmp/dashboards/Networking
 
 bpf:
   masquerade: true
