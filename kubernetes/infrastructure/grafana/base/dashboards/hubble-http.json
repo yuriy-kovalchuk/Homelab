@@ -1,8 +1,10 @@
 {
   "__inputs": [],
   "__requires": [],
-  "annotations": { "list": [] },
-  "description": "Hubble L7 HTTP observability — request rate, status codes, latency, and top talkers per workload",
+  "annotations": {
+    "list": []
+  },
+  "description": "Hubble L7 HTTP observability \u2014 request rate, status codes, latency, and top talkers per workload",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
@@ -11,62 +13,109 @@
   "panels": [
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
       "id": 100,
       "title": "Overview",
       "type": "row"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "mimir-metrics"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 10 },
-              { "color": "red", "value": 50 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 10
+              },
+              {
+                "color": "red",
+                "value": 50
+              }
             ]
           },
           "unit": "reqps"
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 1
+      },
       "id": 1,
       "options": {
         "colorMode": "background",
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
         "textMode": "auto"
       },
       "title": "Total Request Rate",
       "type": "stat",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
-          "expr": "sum(rate(hubble_http_requests_total{destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval]))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "mimir-metrics"
+          },
+          "expr": "sum(rate(hubble_http_requests_total{reporter=~\"$reporter\", destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval]))",
           "legendFormat": "req/s",
           "refId": "A"
         }
       ]
     },
     {
-      "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "mimir-metrics"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 1 },
-              { "color": "red", "value": 5 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 5
+              }
             ]
           },
           "unit": "percentunit",
@@ -75,98 +124,162 @@
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 1
+      },
       "id": 2,
       "options": {
         "colorMode": "background",
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
         "textMode": "auto"
       },
       "title": "Error Rate (5xx)",
       "type": "stat",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
-          "expr": "sum(rate(hubble_http_requests_total{destination_namespace=~\"$namespace\", destination_app=~\"$workload\", status=~\"5..\"}[$__rate_interval])) / sum(rate(hubble_http_requests_total{destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval]))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "mimir-metrics"
+          },
+          "expr": "sum(rate(hubble_http_requests_total{reporter=~\"$reporter\", destination_namespace=~\"$namespace\", destination_app=~\"$workload\", status=~\"5..\"}[$__rate_interval])) / sum(rate(hubble_http_requests_total{reporter=~\"$reporter\", destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval]))",
           "legendFormat": "error %",
           "refId": "A"
         }
       ]
     },
     {
-      "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "mimir-metrics"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 0.5 },
-              { "color": "red", "value": 1 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.5
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
             ]
           },
           "unit": "s"
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 1
+      },
       "id": 3,
       "options": {
         "colorMode": "background",
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
         "textMode": "auto"
       },
       "title": "P99 Latency",
       "type": "stat",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
-          "expr": "histogram_quantile(0.99, sum(rate(hubble_http_request_duration_seconds_bucket{destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval])) by (le))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "mimir-metrics"
+          },
+          "expr": "histogram_quantile(0.99, sum(rate(hubble_http_request_duration_seconds_bucket{reporter=~\"$reporter\", destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval])) by (le))",
           "legendFormat": "p99",
           "refId": "A"
         }
       ]
     },
     {
-      "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "mimir-metrics"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null }
+              {
+                "color": "green",
+                "value": null
+              }
             ]
           },
           "unit": "short"
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 1
+      },
       "id": 4,
       "options": {
         "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "auto",
-        "reduceOptions": { "calcs": ["sum"], "fields": "", "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
         "textMode": "auto"
       },
       "title": "Total Requests (window)",
       "type": "stat",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
-          "expr": "sum(increase(hubble_http_requests_total{destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__range]))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "mimir-metrics"
+          },
+          "expr": "sum(increase(hubble_http_requests_total{reporter=~\"$reporter\", destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__range]))",
           "legendFormat": "total",
           "refId": "A"
         }
@@ -174,16 +287,26 @@
     },
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
       "id": 101,
       "title": "Request Rate",
       "type": "row"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "mimir-metrics"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "axisBorderShow": false,
             "axisCenteredZero": false,
@@ -194,45 +317,88 @@
             "drawStyle": "line",
             "fillOpacity": 10,
             "gradientMode": "none",
-            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
             "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 2,
             "pointSize": 5,
-            "scaleDistribution": { "type": "linear" },
+            "scaleDistribution": {
+              "type": "linear"
+            },
             "showPoints": "never",
             "spanNulls": false,
-            "stacking": { "group": "A", "mode": "none" },
-            "thresholdsStyle": { "mode": "off" }
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
           },
           "mappings": [],
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
           "unit": "reqps"
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 6
+      },
       "id": 10,
       "options": {
-        "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "title": "Request Rate by Destination Workload",
       "type": "timeseries",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
-          "expr": "sum(rate(hubble_http_requests_total{destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval])) by (destination_workload, destination_namespace, destination_app)",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "mimir-metrics"
+          },
+          "expr": "sum(rate(hubble_http_requests_total{reporter=~\"$reporter\", destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval])) by (destination_workload, destination_namespace, destination_app)",
           "legendFormat": "{{destination_namespace}}/{{destination_app}}",
           "refId": "A"
         }
       ]
     },
     {
-      "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "mimir-metrics"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "axisBorderShow": false,
             "axisCenteredZero": false,
@@ -243,58 +409,161 @@
             "drawStyle": "line",
             "fillOpacity": 10,
             "gradientMode": "none",
-            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
             "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 2,
             "pointSize": 5,
-            "scaleDistribution": { "type": "linear" },
+            "scaleDistribution": {
+              "type": "linear"
+            },
             "showPoints": "never",
             "spanNulls": false,
-            "stacking": { "group": "A", "mode": "normal" },
-            "thresholdsStyle": { "mode": "off" }
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
           },
           "mappings": [],
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
           "unit": "reqps"
         },
         "overrides": [
-          { "matcher": { "id": "byName", "options": "2xx" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
-          { "matcher": { "id": "byName", "options": "3xx" }, "properties": [{ "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }] },
-          { "matcher": { "id": "byName", "options": "4xx" }, "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }] },
-          { "matcher": { "id": "byName", "options": "5xx" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "2xx"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "3xx"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "4xx"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "5xx"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
         ]
       },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 6
+      },
       "id": 11,
       "options": {
-        "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "title": "Request Rate by HTTP Status Class",
       "type": "timeseries",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
-          "expr": "sum(rate(hubble_http_requests_total{destination_namespace=~\"$namespace\", destination_app=~\"$workload\", status=~\"2..\"}[$__rate_interval]))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "mimir-metrics"
+          },
+          "expr": "sum(rate(hubble_http_requests_total{reporter=~\"$reporter\", destination_namespace=~\"$namespace\", destination_app=~\"$workload\", status=~\"2..\"}[$__rate_interval]))",
           "legendFormat": "2xx",
           "refId": "A"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
-          "expr": "sum(rate(hubble_http_requests_total{destination_namespace=~\"$namespace\", destination_app=~\"$workload\", status=~\"3..\"}[$__rate_interval]))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "mimir-metrics"
+          },
+          "expr": "sum(rate(hubble_http_requests_total{reporter=~\"$reporter\", destination_namespace=~\"$namespace\", destination_app=~\"$workload\", status=~\"3..\"}[$__rate_interval]))",
           "legendFormat": "3xx",
           "refId": "B"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
-          "expr": "sum(rate(hubble_http_requests_total{destination_namespace=~\"$namespace\", destination_app=~\"$workload\", status=~\"4..\"}[$__rate_interval]))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "mimir-metrics"
+          },
+          "expr": "sum(rate(hubble_http_requests_total{reporter=~\"$reporter\", destination_namespace=~\"$namespace\", destination_app=~\"$workload\", status=~\"4..\"}[$__rate_interval]))",
           "legendFormat": "4xx",
           "refId": "C"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
-          "expr": "sum(rate(hubble_http_requests_total{destination_namespace=~\"$namespace\", destination_app=~\"$workload\", status=~\"5..\"}[$__rate_interval]))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "mimir-metrics"
+          },
+          "expr": "sum(rate(hubble_http_requests_total{reporter=~\"$reporter\", destination_namespace=~\"$namespace\", destination_app=~\"$workload\", status=~\"5..\"}[$__rate_interval]))",
           "legendFormat": "5xx",
           "refId": "D"
         }
@@ -302,16 +571,26 @@
     },
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 14
+      },
       "id": 102,
       "title": "Latency",
       "type": "row"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "mimir-metrics"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "axisBorderShow": false,
             "axisCenteredZero": false,
@@ -322,57 +601,106 @@
             "drawStyle": "line",
             "fillOpacity": 5,
             "gradientMode": "none",
-            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
             "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 2,
             "pointSize": 5,
-            "scaleDistribution": { "type": "linear" },
+            "scaleDistribution": {
+              "type": "linear"
+            },
             "showPoints": "never",
             "spanNulls": false,
-            "stacking": { "group": "A", "mode": "none" },
-            "thresholdsStyle": { "mode": "off" }
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
           },
           "mappings": [],
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
           "unit": "s"
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 15 },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 15
+      },
       "id": 20,
       "options": {
-        "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "title": "Latency Percentiles (all workloads)",
       "type": "timeseries",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
-          "expr": "histogram_quantile(0.50, sum(rate(hubble_http_request_duration_seconds_bucket{destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval])) by (le))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "mimir-metrics"
+          },
+          "expr": "histogram_quantile(0.50, sum(rate(hubble_http_request_duration_seconds_bucket{reporter=~\"$reporter\", destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval])) by (le))",
           "legendFormat": "p50",
           "refId": "A"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
-          "expr": "histogram_quantile(0.95, sum(rate(hubble_http_request_duration_seconds_bucket{destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval])) by (le))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "mimir-metrics"
+          },
+          "expr": "histogram_quantile(0.95, sum(rate(hubble_http_request_duration_seconds_bucket{reporter=~\"$reporter\", destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval])) by (le))",
           "legendFormat": "p95",
           "refId": "B"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
-          "expr": "histogram_quantile(0.99, sum(rate(hubble_http_request_duration_seconds_bucket{destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval])) by (le))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "mimir-metrics"
+          },
+          "expr": "histogram_quantile(0.99, sum(rate(hubble_http_request_duration_seconds_bucket{reporter=~\"$reporter\", destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval])) by (le))",
           "legendFormat": "p99",
           "refId": "C"
         }
       ]
     },
     {
-      "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "mimir-metrics"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "axisBorderShow": false,
             "axisCenteredZero": false,
@@ -383,35 +711,73 @@
             "drawStyle": "line",
             "fillOpacity": 5,
             "gradientMode": "none",
-            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
             "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 2,
             "pointSize": 5,
-            "scaleDistribution": { "type": "linear" },
+            "scaleDistribution": {
+              "type": "linear"
+            },
             "showPoints": "never",
             "spanNulls": false,
-            "stacking": { "group": "A", "mode": "none" },
-            "thresholdsStyle": { "mode": "off" }
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
           },
           "mappings": [],
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
           "unit": "s"
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 15 },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 15
+      },
       "id": 21,
       "options": {
-        "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "title": "P99 Latency per Destination Workload",
       "type": "timeseries",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
-          "expr": "histogram_quantile(0.99, sum(rate(hubble_http_request_duration_seconds_bucket{destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval])) by (le, destination_workload, destination_namespace))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "mimir-metrics"
+          },
+          "expr": "histogram_quantile(0.99, sum(rate(hubble_http_request_duration_seconds_bucket{reporter=~\"$reporter\", destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval])) by (le, destination_workload, destination_namespace))",
           "legendFormat": "{{destination_namespace}}/{{destination_app}}",
           "refId": "A"
         }
@@ -419,16 +785,26 @@
     },
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 23 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 23
+      },
       "id": 103,
       "title": "Traffic Breakdown",
       "type": "row"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "mimir-metrics"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "axisBorderShow": false,
             "axisCenteredZero": false,
@@ -439,45 +815,88 @@
             "drawStyle": "line",
             "fillOpacity": 5,
             "gradientMode": "none",
-            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
             "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 2,
             "pointSize": 5,
-            "scaleDistribution": { "type": "linear" },
+            "scaleDistribution": {
+              "type": "linear"
+            },
             "showPoints": "never",
             "spanNulls": false,
-            "stacking": { "group": "A", "mode": "none" },
-            "thresholdsStyle": { "mode": "off" }
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
           },
           "mappings": [],
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
           "unit": "reqps"
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 24
+      },
       "id": 30,
       "options": {
-        "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "title": "Request Rate by HTTP Method",
       "type": "timeseries",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
-          "expr": "sum(rate(hubble_http_requests_total{destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval])) by (method)",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "mimir-metrics"
+          },
+          "expr": "sum(rate(hubble_http_requests_total{reporter=~\"$reporter\", destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval])) by (method)",
           "legendFormat": "{{method}}",
           "refId": "A"
         }
       ]
     },
     {
-      "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "mimir-metrics"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
             "axisBorderShow": false,
             "axisCenteredZero": false,
@@ -488,35 +907,73 @@
             "drawStyle": "line",
             "fillOpacity": 5,
             "gradientMode": "none",
-            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
             "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 2,
             "pointSize": 5,
-            "scaleDistribution": { "type": "linear" },
+            "scaleDistribution": {
+              "type": "linear"
+            },
             "showPoints": "never",
             "spanNulls": false,
-            "stacking": { "group": "A", "mode": "none" },
-            "thresholdsStyle": { "mode": "off" }
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
           },
           "mappings": [],
-          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
           "unit": "reqps"
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 24
+      },
       "id": 31,
       "options": {
-        "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "title": "Request Rate by Source Workload",
       "type": "timeseries",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
-          "expr": "sum(rate(hubble_http_requests_total{destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval])) by (source_app, source_namespace)",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "mimir-metrics"
+          },
+          "expr": "sum(rate(hubble_http_requests_total{reporter=~\"$reporter\", destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval])) by (source_app, source_namespace)",
           "legendFormat": "{{source_namespace}}/{{source_app}}",
           "refId": "A"
         }
@@ -524,65 +981,161 @@
     },
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 32 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 32
+      },
       "id": 104,
       "title": "Top Talkers",
       "type": "row"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "mimir-metrics"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "custom": {
             "align": "auto",
-            "cellOptions": { "type": "auto" },
+            "cellOptions": {
+              "type": "auto"
+            },
             "inspect": false
           },
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 1 },
-              { "color": "red", "value": 5 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 5
+              }
             ]
           }
         },
         "overrides": [
           {
-            "matcher": { "id": "byName", "options": "req/s" },
+            "matcher": {
+              "id": "byName",
+              "options": "req/s"
+            },
             "properties": [
-              { "id": "unit", "value": "reqps" },
-              { "id": "custom.cellOptions", "value": { "mode": "gradient", "type": "gauge" } },
-              { "id": "custom.width", "value": 200 }
+              {
+                "id": "unit",
+                "value": "reqps"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "gradient",
+                  "type": "gauge"
+                }
+              },
+              {
+                "id": "custom.width",
+                "value": 200
+              }
             ]
           },
           {
-            "matcher": { "id": "byName", "options": "error %" },
+            "matcher": {
+              "id": "byName",
+              "options": "error %"
+            },
             "properties": [
-              { "id": "unit", "value": "percentunit" },
-              { "id": "custom.cellOptions", "value": { "mode": "gradient", "type": "gauge" } },
-              { "id": "custom.width", "value": 150 },
-              { "id": "thresholds", "value": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.01 }, { "color": "red", "value": 0.05 }] } }
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "gradient",
+                  "type": "gauge"
+                }
+              },
+              {
+                "id": "custom.width",
+                "value": 150
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0.01
+                    },
+                    {
+                      "color": "red",
+                      "value": 0.05
+                    }
+                  ]
+                }
+              }
             ]
           },
           {
-            "matcher": { "id": "byName", "options": "p99" },
+            "matcher": {
+              "id": "byName",
+              "options": "p99"
+            },
             "properties": [
-              { "id": "unit", "value": "s" },
-              { "id": "custom.width", "value": 100 }
+              {
+                "id": "unit",
+                "value": "s"
+              },
+              {
+                "id": "custom.width",
+                "value": 100
+              }
             ]
           }
         ]
       },
-      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 33 },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 33
+      },
       "id": 40,
       "options": {
         "cellHeight": "sm",
-        "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
         "showHeader": true,
-        "sortBy": [{ "desc": true, "displayName": "req/s" }]
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "req/s"
+          }
+        ]
       },
       "title": "Top Destination Workloads",
       "transformations": [
@@ -605,24 +1158,33 @@
       "type": "table",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
-          "expr": "topk(20, sum(rate(hubble_http_requests_total{destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval])) by (destination_app, destination_namespace))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "mimir-metrics"
+          },
+          "expr": "topk(20, sum(rate(hubble_http_requests_total{reporter=~\"$reporter\", destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval])) by (destination_app, destination_namespace))",
           "legendFormat": "",
           "format": "table",
           "instant": true,
           "refId": "A"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
-          "expr": "topk(20, sum(rate(hubble_http_requests_total{destination_namespace=~\"$namespace\", destination_app=~\"$workload\", status=~\"5..\"}[$__rate_interval])) by (destination_app, destination_namespace) / sum(rate(hubble_http_requests_total{destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval])) by (destination_app, destination_namespace))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "mimir-metrics"
+          },
+          "expr": "topk(20, sum(rate(hubble_http_requests_total{reporter=~\"$reporter\", destination_namespace=~\"$namespace\", destination_app=~\"$workload\", status=~\"5..\"}[$__rate_interval])) by (destination_app, destination_namespace) / sum(rate(hubble_http_requests_total{reporter=~\"$reporter\", destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval])) by (destination_app, destination_namespace))",
           "legendFormat": "",
           "format": "table",
           "instant": true,
           "refId": "B"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
-          "expr": "topk(20, histogram_quantile(0.99, sum(rate(hubble_http_request_duration_seconds_bucket{destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval])) by (le, destination_workload, destination_namespace)))",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "mimir-metrics"
+          },
+          "expr": "topk(20, histogram_quantile(0.99, sum(rate(hubble_http_request_duration_seconds_bucket{reporter=~\"$reporter\", destination_namespace=~\"$namespace\", destination_app=~\"$workload\"}[$__rate_interval])) by (le, destination_workload, destination_namespace)))",
           "legendFormat": "",
           "format": "table",
           "instant": true,
@@ -633,12 +1195,45 @@
   ],
   "refresh": "30s",
   "schemaVersion": 39,
-  "tags": ["cilium", "hubble", "networking", "http"],
+  "tags": [
+    "cilium",
+    "hubble",
+    "networking",
+    "http"
+  ],
   "templating": {
     "list": [
       {
+        "current": {
+          "selected": true,
+          "text": "client",
+          "value": "client"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "mimir-metrics"
+        },
+        "definition": "label_values(hubble_http_requests_total, reporter)",
+        "hide": 0,
+        "includeAll": false,
+        "multi": false,
+        "name": "reporter",
+        "options": [],
+        "query": {
+          "query": "label_values(hubble_http_requests_total, reporter)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "sort": 0,
+        "label": "Reporter",
+        "type": "query"
+      },
+      {
         "current": {},
-        "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "mimir-metrics"
+        },
         "definition": "label_values(hubble_http_requests_total, destination_namespace)",
         "hide": 0,
         "includeAll": true,
@@ -657,7 +1252,10 @@
       },
       {
         "current": {},
-        "datasource": { "type": "prometheus", "uid": "mimir-metrics" },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "mimir-metrics"
+        },
         "definition": "label_values(hubble_http_requests_total{destination_namespace=~\"$namespace\"}, destination_app)",
         "hide": 0,
         "includeAll": true,
@@ -676,7 +1274,10 @@
       }
     ]
   },
-  "time": { "from": "now-1h", "to": "now" },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
   "timepicker": {},
   "timezone": "browser",
   "title": "Hubble HTTP",

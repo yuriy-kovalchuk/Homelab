@@ -55,6 +55,9 @@ configMapGenerator:
     - dashboards/envoy-overview.json
     - dashboards/envoy-downstream.json
     - dashboards/envoy-clusters.json
+    - dashboards/cilium-network.json
+    - dashboards/cilium-dashboard.json
+    - dashboards/cilium-operator-dashboard.json
     options:
       labels:
         grafana_dashboard: "1"
