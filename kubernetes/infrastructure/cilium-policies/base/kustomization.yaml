@@ -8,3 +8,4 @@ resources:
   - allow-flux-system.yaml
   - allow-kube-apiserver.yaml
   - allow-alloy-metrics-scraping.yaml
+  - cloudflared-l7-visibility.yaml
