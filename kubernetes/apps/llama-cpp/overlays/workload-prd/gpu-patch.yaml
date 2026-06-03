@@ -28,7 +28,12 @@ spec:
             - "-1"
             - --parallel
             - "1"
-            - --no-cont-batching
+            - --flash-attn
+            - "auto"
+            - --cache-type-k
+            - "q8_0"
+            - --cache-type-v
+            - "q8_0"
             - --spec-type
             - "draft-mtp"
             - --spec-draft-n-max
