@@ -18,11 +18,6 @@ resource "cloudflare_tunnel_config" "homelab" {
     # hitting the gateway's own VIP hair-pins (Envoy upstream resolves back to
     # the VIP / reserved:world) and the request is L7-dropped. See README.
     ingress_rule {
-      hostname = "whoami.yuriykovalchuk.dev"
-      service  = "http://whoami.whoami.svc.cluster.local"
-    }
-
-    ingress_rule {
       hostname = "yuriykovalchuk.dev"
       service  = "http://yk-portfolio.yk-portfolio.svc.cluster.local"
     }
@@ -32,14 +27,6 @@ resource "cloudflare_tunnel_config" "homelab" {
       service = "http_status:404"
     }
   }
-}
-
-resource "cloudflare_record" "whoami" {
-  zone_id = var.cloudflare_zone_id_yuriykovalchuk_dev
-  name    = "whoami"
-  type    = "CNAME"
-  value   = "${cloudflare_tunnel.homelab.id}.cfargotunnel.com"
-  proxied = true
 }
 
 resource "cloudflare_record" "yk_portfolio" {
