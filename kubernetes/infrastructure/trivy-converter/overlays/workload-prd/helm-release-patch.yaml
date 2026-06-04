@@ -9,13 +9,18 @@ spec:
     kubeClientBurst: 100
     resources:
       limits:
-        cpu: 200m
-        memory: 256Mi
+        cpu: 500m
+        memory: 512Mi
       requests:
         cpu: 100m
-        memory: 128Mi
+        memory: 256Mi
     adapters:
       cisKubeBenchReports:
+        enabled: false
+      # Per-pod vuln reports are extremely numerous (one per pod/replicaset).
+      # ClusterVulnerabilityReports (enabled below) already cover CVE data
+      # cluster-wide with far fewer objects, avoiding the startup cache timeout.
+      vulnerabilityReports:
         enabled: false
       configAuditReports:
         enabled: true
