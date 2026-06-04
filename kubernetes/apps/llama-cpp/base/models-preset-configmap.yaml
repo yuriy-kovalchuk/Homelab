@@ -9,20 +9,20 @@ data:
 
     ; Global defaults applied to all models
     [*]
-    cont-batching = true
     n-gpu-layers = -1
 
     ; --- Add a section per model file (name = filename without .gguf) ---
 
     [Qwen3.6-35B-A3B-UD-Q4_K_M]
     c = 262144
+    cont-batching = true
     parallel = 1
     flash-attn = auto
     cache-type-k = q8_0
     cache-type-v = q8_0
     ; MTP head is built into the model, no separate draft file needed
     spec-type = draft-mtp
-    spec-draft-n-max = 2
+    spec-draft-n-max = 3
     load-on-startup = true
     stop-timeout = 60
 
