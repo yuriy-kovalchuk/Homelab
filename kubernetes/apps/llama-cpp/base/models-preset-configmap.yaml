@@ -26,8 +26,8 @@ data:
     load-on-startup = true
     stop-timeout = 60
 
-    ; [Meta-Llama-3.1-8B-Instruct-Q5_K_M]
-    ; c = 8192
-    ; parallel = 4
-    ; flash-attn = auto
-    ; load-on-startup = false
+    [gemma-4-12b-it-Q4_K_M]
+    c = 32000
+    parallel = 1
+    flash-attn = auto
+    load-on-startup = false
