@@ -39,3 +39,12 @@ data:
     temp = 1.0
     top-p = 0.95
     top-k = 64
+
+    [gemma-4-26B-A4B-it-UD-Q4_K_M]
+    c = 32000
+    parallel = 1
+    flash-attn = auto
+    load-on-startup = false
+    temp = 1.0
+    top-p = 0.95
+    top-k = 64

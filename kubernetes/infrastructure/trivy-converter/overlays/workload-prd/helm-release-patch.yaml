@@ -22,8 +22,12 @@ spec:
       # cluster-wide with far fewer objects, avoiding the startup cache timeout.
       vulnerabilityReports:
         enabled: false
+      # ConfigAuditReports are generated for every K8s resource in every namespace
+      # (Deployments, Services, ConfigMaps, Roles…) making them the most numerous
+      # type. With the rest of the controllers consuming the startup window, this
+      # one never gets its turn before the 2-minute manager deadline.
       configAuditReports:
-        enabled: true
+        enabled: false
       complianceReports:
         enabled: true
       rbacAssessmentReports:
