@@ -23,7 +23,7 @@ data:
     ; MTP head is built into the model, no separate draft file needed
     spec-type = draft-mtp
     spec-draft-n-max = 3
-    load-on-startup = true
+    load-on-startup = false
     stop-timeout = 60
     temp = 1.0
     top-p = 0.95
