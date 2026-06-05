@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: yk-update-checker
-      version: "0.1.0-alpha"
+      version: "0.1.1-alpha-dev"
       sourceRef:
         kind: HelmRepository
         name: yk-charts
