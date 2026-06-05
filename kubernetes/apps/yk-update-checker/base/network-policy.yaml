@@ -1,0 +1,17 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: yk-update-checker
+  namespace: yk-update-checker
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: yk-update-checker
+  ingress:
+    - fromEntities:
+        - cluster
+        - ingress
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP

@@ -1,0 +1,31 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: yk-update-checker
+  namespace: yk-update-checker
+spec:
+  interval: 30m
+  releaseName: yk-update-checker
+  chart:
+    spec:
+      chart: yk-update-checker
+      version: "0.1.0-alpha"
+      sourceRef:
+        kind: HelmRepository
+        name: yk-charts
+        namespace: flux-system
+  timeout: 10m
+  install:
+    createNamespace: false
+    remediation:
+      retries: -1
+  upgrade:
+    remediation:
+      retries: -1
+      remediateLastFailure: true
+  values:
+    update_type: all
+    parallel_checks: 5
+    repos:
+      - name: homelab
+        repo: https://github.com/yuriy-kovalchuk/homelab

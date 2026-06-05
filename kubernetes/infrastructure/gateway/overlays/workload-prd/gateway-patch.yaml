@@ -250,3 +250,18 @@ spec:
           selector:
             matchLabels:
               kubernetes.io/metadata.name: "yk-portfolio"
+    - name: https-yk-updates
+      port: 443
+      protocol: HTTPS
+      hostname: "yk-updates.yuriy-lab.cloud"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: yk-update-checker-gw-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: "yk-update-checker"
