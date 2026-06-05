@@ -1,0 +1,16 @@
+apiVersion: policies.kyverno.io/v1beta1
+kind: PolicyException
+metadata:
+  name: yk-update-checker
+  namespace: yk-update-checker
+spec:
+  matchConditions:
+    - name: exclude-yk-update-checker
+      expression: "object.metadata.namespace == 'yk-update-checker'"
+  policyRefs:
+    - kind: ValidatingPolicy
+      name: restrict-seccomp-strict
+    - kind: ValidatingPolicy
+      name: require-run-as-nonroot
+    - kind: ValidatingPolicy
+      name: disallow-privilege-escalation

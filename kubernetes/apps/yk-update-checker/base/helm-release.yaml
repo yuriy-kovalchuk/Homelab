@@ -24,8 +24,10 @@ spec:
       retries: -1
       remediateLastFailure: true
   values:
-    update_type: all
-    parallel_checks: 5
-    repos:
-      - name: homelab
-        repo: https://github.com/yuriy-kovalchuk/homelab
+    scanner:
+      config:
+        update_type: all
+        parallel_checks: 5
+        repos:
+          - name: homelab
+            repo: https://github.com/yuriy-kovalchuk/homelab
