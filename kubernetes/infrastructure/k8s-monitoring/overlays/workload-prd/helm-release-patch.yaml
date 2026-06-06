@@ -22,6 +22,10 @@ spec:
           maxKeepaliveTime: "24h"
           minKeepaliveTime: "5m"
           truncateFrequency: "2h"
+      tempo:
+        type: otlp
+        url: http://tempo-distributor.tempo.svc.cluster.local:4317
+        protocol: grpc
 
     selfReporting:
       enabled: false
@@ -34,11 +38,18 @@ spec:
             dockercontainers: false
           clustering:
             enabled: true
-      alloy-singleton: {}
+          extraArgs:
+            - --disable-reporting
+      alloy-singleton:
+        alloy:
+          extraArgs:
+            - --disable-reporting
       alloy-metrics:
         alloy:
           clustering:
             enabled: true
+          extraArgs:
+            - --disable-reporting
 
     telemetryServices:
       kube-state-metrics:
@@ -199,6 +210,12 @@ spec:
         pod: pod
         k8s.pod.name: k8s.pod.name
         service.instance.id: service.instance.id
+
+    traces:
+      enabled: true
+      collector: alloy-receiver
+      destinations:
+        - tempo
 
     autoInstrumentation:
       enabled: false

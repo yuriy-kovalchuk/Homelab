@@ -1,0 +1,91 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: tempo-egress-to-s3
+  namespace: tempo
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/instance: tempo
+  egress:
+    - toCIDR:
+        - 10.0.3.4/32
+      toPorts:
+        - ports:
+            - port: "9000"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: tempo-egress-to-kube-apiserver
+  namespace: tempo
+spec:
+  endpointSelector: {}
+  egress:
+    - toEntities:
+        - kube-apiserver
+---
+# metrics-generator writes RED metrics derived from traces to Mimir
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: tempo-egress-to-mimir
+  namespace: tempo
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/component: metrics-generator
+      app.kubernetes.io/instance: tempo
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/component: distributor
+            app.kubernetes.io/instance: mimir
+            io.kubernetes.pod.namespace: mimir
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+---
+# alloy-receiver sends OTLP traces to the distributor
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: tempo-ingress-from-alloy
+  namespace: tempo
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/component: distributor
+      app.kubernetes.io/instance: tempo
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: k8s-monitoring
+      toPorts:
+        - ports:
+            - port: "4317"
+              protocol: TCP
+            - port: "4318"
+              protocol: TCP
+---
+# Grafana queries the query-frontend
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: tempo-ingress-from-grafana
+  namespace: tempo
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/component: query-frontend
+      app.kubernetes.io/instance: tempo
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: grafana
+      toPorts:
+        - ports:
+            - port: "3100"
+              protocol: TCP

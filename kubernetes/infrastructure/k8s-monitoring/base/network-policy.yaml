@@ -168,6 +168,48 @@ spec:
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
+  name: allow-alloy-receiver-egress-to-tempo
+  namespace: k8s-monitoring
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/instance: k8s-monitoring-alloy-receiver
+      app.kubernetes.io/name: alloy-receiver
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/component: distributor
+            app.kubernetes.io/instance: tempo
+            io.kubernetes.pod.namespace: tempo
+      toPorts:
+        - ports:
+            - port: "4317"
+              protocol: TCP
+---
+# alloy-receiver accepts OTLP traces from instrumented apps in any namespace
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-alloy-receiver-ingress-otlp
+  namespace: k8s-monitoring
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/instance: k8s-monitoring-alloy-receiver
+      app.kubernetes.io/name: alloy-receiver
+  ingress:
+    - fromEndpoints:
+        - {}
+      toPorts:
+        - ports:
+            - port: "4317"
+              protocol: TCP
+            - port: "4318"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
   name: allow-alloy-metrics-egress-to-cluster
   namespace: k8s-monitoring
 spec:

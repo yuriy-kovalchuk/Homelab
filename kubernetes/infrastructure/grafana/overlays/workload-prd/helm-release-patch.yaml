@@ -65,5 +65,42 @@ spec:
               httpHeaderName1: X-Scope-OrgID
               timeout: 300
               maxLines: 1000
+              derivedFields:
+                - name: TraceID
+                  matcherRegex: '(?:traceID|trace_id|traceId)=(\w+)'
+                  url: "$${__value.raw}"
+                  datasourceUid: tempo-datasource
             secureJsonData:
               httpHeaderValue1: "anonymous"
+          - name: Tempo
+            type: tempo
+            uid: tempo-datasource
+            access: proxy
+            url: http://tempo-query-frontend.tempo.svc.cluster.local:3100
+            isDefault: false
+            version: 1
+            editable: true
+            jsonData:
+              httpMethod: GET
+              serviceMap:
+                datasourceUid: mimir-metrics
+              nodeGraph:
+                enabled: true
+              lokiSearch:
+                datasourceUid: loki-datasource
+              tracesToLogsV2:
+                datasourceUid: loki-datasource
+                spanStartTimeShift: "-1m"
+                spanEndTimeShift: "1m"
+                filterByTraceID: true
+                filterBySpanID: false
+                tags:
+                  - key: service.name
+                    value: service_name
+              tracesToMetrics:
+                datasourceUid: mimir-metrics
+                spanStartTimeShift: "-1m"
+                spanEndTimeShift: "1m"
+                tags:
+                  - key: service.name
+                    value: job

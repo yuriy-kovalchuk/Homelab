@@ -1,0 +1,88 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: tempo
+  namespace: tempo
+spec:
+  valuesFrom:
+    - kind: Secret
+      name: tempo-s3-secret
+      valuesKey: S3_ACCESS_KEY
+      targetPath: storage.trace.s3.access_key
+    - kind: Secret
+      name: tempo-s3-secret
+      valuesKey: S3_SECRET_KEY
+      targetPath: storage.trace.s3.secret_key
+  values:
+    reportingEnabled: false
+
+    storage:
+      trace:
+        backend: s3
+        s3:
+          bucket: tempo-traces
+          endpoint: 10.0.3.4:9000
+          region: eu-south-1
+          insecure: true
+          forcepathstyle: true
+        wal:
+          path: /var/tempo/wal
+        block:
+          version: vParquet4
+
+    distributor:
+      replicas: 1
+      config:
+        receivers:
+          otlp:
+            protocols:
+              grpc:
+                endpoint: 0.0.0.0:4317
+              http:
+                endpoint: 0.0.0.0:4318
+
+    ingester:
+      replicas: 2
+      zoneAwareReplication:
+        enabled: false
+
+    querier:
+      replicas: 1
+
+    queryFrontend:
+      replicas: 1
+
+    compactor:
+      replicas: 1
+
+    # Generates RED (rate/error/duration) metrics from traces and writes to Mimir.
+    # Powers the Service Graph and Span Metrics panels in Grafana.
+    metricsGenerator:
+      enabled: true
+      replicas: 1
+      config:
+        storage:
+          path: /var/tempo/generator/wal
+        remote_write:
+          - url: http://mimir-distributor.mimir.svc.cluster.local:8080/api/v1/push
+            headers:
+              X-Scope-OrgID: "anonymous"
+      global_overrides:
+        defaults:
+          metrics_generator:
+            processors:
+              - service-graphs
+              - span-metrics
+
+    serviceMonitor:
+      enabled: true
+
+    prometheusRule:
+      enabled: false
+
+    metaMonitoring:
+      dashboards:
+        enabled: true
+        namespace: grafana
+        annotations:
+          k8s-sidecar-target-directory: /tmp/dashboards/Tempo Dashboards

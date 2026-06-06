@@ -1,0 +1,12 @@
+apiVersion: policies.kyverno.io/v1beta1
+kind: PolicyException
+metadata:
+  name: tempo
+  namespace: tempo
+spec:
+  matchConditions:
+    - name: exclude-tempo
+      expression: "object.metadata.namespace == 'tempo'"
+  policyRefs:
+    - kind: ValidatingPolicy
+      name: restrict-seccomp-strict

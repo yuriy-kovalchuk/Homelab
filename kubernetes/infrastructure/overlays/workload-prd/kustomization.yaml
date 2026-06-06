@@ -23,5 +23,6 @@ resources:
   - ../../trivy-converter/overlays/workload-prd
   - ../../loki/overlays/workload-prd
   - ../../mimir/overlays/workload-prd
+  - ../../tempo/overlays/workload-prd
   - ../../k8s-monitoring/overlays/workload-prd
   - ../../grafana/overlays/workload-prd

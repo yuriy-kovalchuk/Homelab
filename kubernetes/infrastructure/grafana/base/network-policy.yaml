@@ -59,6 +59,31 @@ spec:
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
+  name: grafana-egress-to-tempo
+  namespace: grafana
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: In
+        values:
+          - grafana
+          - grafana-sc-dashboard
+          - grafana-sc-datasources
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/component: query-frontend
+            app.kubernetes.io/instance: tempo
+            io.kubernetes.pod.namespace: tempo
+      toPorts:
+        - ports:
+            - port: "3100"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
   name: grafana-egress-to-kube-apiserver
   namespace: grafana
 spec:
