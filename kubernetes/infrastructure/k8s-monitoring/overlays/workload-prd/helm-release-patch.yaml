@@ -50,6 +50,10 @@ spec:
             enabled: true
           extraArgs:
             - --disable-reporting
+      alloy-receiver:
+        alloy:
+          extraArgs:
+            - --disable-reporting
 
     telemetryServices:
       kube-state-metrics:
