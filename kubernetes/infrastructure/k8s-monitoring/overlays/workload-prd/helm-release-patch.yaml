@@ -215,14 +215,32 @@ spec:
         k8s.pod.name: k8s.pod.name
         service.instance.id: service.instance.id
 
-    traces:
+    applicationObservability:
       enabled: true
       collector: alloy-receiver
       destinations:
         - tempo
+      receivers:
+        otlp:
+          grpc:
+            enabled: true
+          http:
+            enabled: true
 
     autoInstrumentation:
-      enabled: false
+      enabled: true
+      collector: alloy-metrics
+      destinations:
+        - mimir
+      beyla:
+        config:
+          data:
+            discovery:
+              instrument:
+                - k8s_pod_labels:
+                    beyla.grafana.com/instrument: "true"
+              exclude_instrument:
+                - exe_path: "{*alloy*,*otelcol*,*beyla*}"
 
     annotationAutodiscovery:
       enabled: true

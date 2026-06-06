@@ -1,0 +1,27 @@
+apiVersion: policies.kyverno.io/v1
+kind: MutatingPolicy
+metadata:
+  name: propagate-beyla-instrument-label
+spec:
+  # non-critical label propagation — never block pod scheduling
+  failurePolicy: Ignore
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  matchConditions:
+    - name: namespace-opted-in
+      expression: >-
+        has(namespaceObject.metadata.labels) &&
+        namespaceObject.metadata.labels[?'beyla.grafana.com/instrument'] == 'true'
+  mutations:
+    - patchType: ApplyConfiguration
+      applyConfiguration:
+        expression: >
+          Object{
+            metadata: Object.metadata{
+              labels: {"beyla.grafana.com/instrument": "true"}
+            }
+          }

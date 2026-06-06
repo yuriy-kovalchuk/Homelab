@@ -5,6 +5,7 @@ resources:
   - exceptions
   - mutate-goldilocks-label.yaml
   - mutate-goldilocks-label-rbac.yaml
+  - mutate-beyla-instrument-label.yaml
 patches:
   - path: helm-release-patch.yaml
     target:

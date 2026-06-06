@@ -12,6 +12,7 @@ spec:
           - alloy-metrics
           - alloy-logs
           - alloy-singleton
+          - alloy-receiver
   egress:
     - toEntities:
         - kube-apiserver
