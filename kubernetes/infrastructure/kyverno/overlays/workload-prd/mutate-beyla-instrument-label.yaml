@@ -2,6 +2,8 @@ apiVersion: policies.kyverno.io/v1
 kind: MutatingPolicy
 metadata:
   name: propagate-beyla-instrument-label
+  annotations:
+    policies.kyverno.io/autogen-controllers: none
 spec:
   # non-critical label propagation — never block pod scheduling
   failurePolicy: Ignore
@@ -15,7 +17,8 @@ spec:
     - name: namespace-opted-in
       expression: >-
         has(namespaceObject.metadata.labels) &&
-        namespaceObject.metadata.labels[?'beyla.grafana.com/instrument'] == 'true'
+        'beyla.grafana.com/instrument' in namespaceObject.metadata.labels &&
+        namespaceObject.metadata.labels['beyla.grafana.com/instrument'] == 'true'
   mutations:
     - patchType: ApplyConfiguration
       applyConfiguration:

@@ -187,7 +187,7 @@ spec:
             - port: "4317"
               protocol: TCP
 ---
-# alloy-receiver accepts OTLP traces from instrumented apps in any namespace
+# alloy-receiver accepts OTLP traces from instrumented apps and from Beyla (hostNetwork → host/remote-node entity)
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
@@ -201,6 +201,15 @@ spec:
   ingress:
     - fromEndpoints:
         - {}
+      toPorts:
+        - ports:
+            - port: "4317"
+              protocol: TCP
+            - port: "4318"
+              protocol: TCP
+    - fromEntities:
+        - host
+        - remote-node
       toPorts:
         - ports:
             - port: "4317"

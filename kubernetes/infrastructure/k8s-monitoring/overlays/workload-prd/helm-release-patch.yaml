@@ -246,6 +246,8 @@ spec:
                 - application_service_graph
                 - application_span
                 - application_host
+            otel_traces_export:
+              endpoint: http://k8s-monitoring-alloy-receiver.k8s-monitoring.svc.cluster.local:4317
             discovery:
               instrument:
                 - k8s_pod_labels:
