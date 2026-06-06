@@ -233,8 +233,19 @@ spec:
       destinations:
         - mimir
       beyla:
+        preset: application
         config:
           data:
+            internal_metrics:
+              prometheus:
+                port: 9091
+            prometheus_export:
+              port: 19090
+              features:
+                - application
+                - application_service_graph
+                - application_span
+                - application_host
             discovery:
               instrument:
                 - k8s_pod_labels:

@@ -7,12 +7,7 @@ spec:
   matchConditions:
     - name: exclude-beyla
       expression: >-
-        object.metadata.namespace == 'k8s-monitoring' &&
-        has(object.metadata.labels) &&
-        (
-          object.metadata.labels[?'app.kubernetes.io/name'] == 'beyla' ||
-          object.metadata.labels[?'app.kubernetes.io/name'] == 'beyla-k8s-cache'
-        )
+        object.metadata.namespace == 'k8s-monitoring'
   policyRefs:
     - kind: ValidatingPolicy
       name: disallow-privileged-containers
