@@ -4,7 +4,7 @@ metadata:
   name: policy-reporter
   namespace: kyverno-reporter
 spec:
-  interval: 30m
+  interval: 5m
   chart:
     spec:
       chart: policy-reporter
@@ -13,7 +13,7 @@ spec:
         kind: HelmRepository
         name: policy-reporter
         namespace: flux-system
-  timeout: 10m
+  timeout: 5m
   install:
     createNamespace: false
     remediation:

@@ -4,7 +4,7 @@ metadata:
   name: httpbin
   namespace: httpbin
 spec:
-  interval: 30m
+  interval: 5m
   releaseName: httpbin
   chart:
     spec:
@@ -14,7 +14,7 @@ spec:
         kind: HelmRepository
         name: estahn
         namespace: flux-system
-  timeout: 10m
+  timeout: 5m
   install:
     createNamespace: false
     remediation:

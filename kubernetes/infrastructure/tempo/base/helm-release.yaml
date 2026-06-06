@@ -4,7 +4,7 @@ metadata:
   name: tempo
   namespace: tempo
 spec:
-  interval: 30m
+  interval: 5m
   releaseName: tempo
   chart:
     spec:

@@ -30,16 +30,15 @@ spec:
         block:
           version: vParquet4
 
+    traces:
+      otlp:
+        grpc:
+          enabled: true
+        http:
+          enabled: true
+
     distributor:
       replicas: 1
-      config:
-        receivers:
-          otlp:
-            protocols:
-              grpc:
-                endpoint: 0.0.0.0:4317
-              http:
-                endpoint: 0.0.0.0:4318
 
     ingester:
       replicas: 2

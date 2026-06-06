@@ -4,7 +4,7 @@ metadata:
   name: trivy-operator
   namespace: trivy
 spec:
-  interval: 30m
+  interval: 5m
   releaseName: trivy-operator
   chart:
     spec:
@@ -14,7 +14,7 @@ spec:
         kind: HelmRepository
         name: aqua
         namespace: flux-system
-  timeout: 10m
+  timeout: 5m
   install:
     createNamespace: false
     remediation:

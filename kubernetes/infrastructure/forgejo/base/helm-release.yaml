@@ -4,12 +4,12 @@ metadata:
   name: forgejo
   namespace: forgejo
 spec:
-  interval: 30m
+  interval: 5m
   chartRef:
     kind: OCIRepository
     name: forgejo
     namespace: forgejo
-  timeout: 10m
+  timeout: 5m
   install:
     createNamespace: false
     remediation:

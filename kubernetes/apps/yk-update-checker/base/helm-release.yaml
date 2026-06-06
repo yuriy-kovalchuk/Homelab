@@ -4,7 +4,7 @@ metadata:
   name: yk-update-checker
   namespace: yk-update-checker
 spec:
-  interval: 30m
+  interval: 5m
   releaseName: yk-update-checker
   chart:
     spec:
@@ -14,7 +14,7 @@ spec:
         kind: HelmRepository
         name: yk-charts
         namespace: flux-system
-  timeout: 10m
+  timeout: 5m
   install:
     createNamespace: false
     remediation:

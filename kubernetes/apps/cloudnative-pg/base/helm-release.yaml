@@ -4,7 +4,7 @@ metadata:
   name: cloudnative-pg
   namespace: cnpg-system
 spec:
-  interval: 30m
+  interval: 5m
   releaseName: cloudnative-pg
   chart:
     spec:
@@ -14,7 +14,7 @@ spec:
         kind: HelmRepository
         name: cloudnative-pg
         namespace: flux-system
-  timeout: 10m
+  timeout: 5m
   install:
     createNamespace: false
     remediation:

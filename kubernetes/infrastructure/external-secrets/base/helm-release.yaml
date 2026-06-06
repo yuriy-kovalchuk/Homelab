@@ -4,7 +4,7 @@ metadata:
   name: external-secrets
   namespace: external-secrets
 spec:
-  interval: 30m
+  interval: 5m
   chart:
     spec:
       chart: external-secrets
@@ -13,7 +13,7 @@ spec:
         kind: HelmRepository
         name: external-secrets
         namespace: flux-system
-  timeout: 10m
+  timeout: 5m
   install:
     createNamespace: false
     remediation:

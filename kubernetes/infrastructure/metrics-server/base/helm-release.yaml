@@ -4,7 +4,7 @@ metadata:
   name: metrics-server
   namespace: kube-system
 spec:
-  interval: 30m
+  interval: 5m
   chart:
     spec:
       chart: metrics-server
@@ -13,7 +13,7 @@ spec:
         kind: HelmRepository
         name: metrics-server
         namespace: flux-system
-  timeout: 10m
+  timeout: 5m
   install:
     createNamespace: false
     remediation:

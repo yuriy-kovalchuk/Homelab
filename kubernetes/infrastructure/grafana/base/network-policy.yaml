@@ -78,7 +78,7 @@ spec:
             io.kubernetes.pod.namespace: tempo
       toPorts:
         - ports:
-            - port: "3100"
+            - port: "3200"
               protocol: TCP
 ---
 apiVersion: cilium.io/v2

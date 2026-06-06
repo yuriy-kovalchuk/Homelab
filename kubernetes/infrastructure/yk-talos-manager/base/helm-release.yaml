@@ -4,12 +4,12 @@ metadata:
   name: yk-talos-manager
   namespace: yk-talos-manager
 spec:
-  interval: 30m
+  interval: 5m
   chartRef:
     kind: OCIRepository
     name: yk-talos-manager
     namespace: yk-talos-manager
-  timeout: 10m
+  timeout: 5m
   install:
     createNamespace: false
     remediation:
