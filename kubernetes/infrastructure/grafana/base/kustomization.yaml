@@ -58,6 +58,7 @@ configMapGenerator:
     - dashboards/cilium-network.json
     - dashboards/cilium-dashboard.json
     - dashboards/cilium-operator-dashboard.json
+    - dashboards/red-metrics.json
     options:
       labels:
         grafana_dashboard: "1"
