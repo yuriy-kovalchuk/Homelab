@@ -56,7 +56,7 @@ spec:
           tsdb:
             dir: /data/tsdb
             block_ranges_period: [1h]
-            retention_period: 6h
+            retention_period: 24h
             ship_interval: 1m
             flush_blocks_on_shutdown: true
             head_compaction_interval: 1m
@@ -64,6 +64,10 @@ spec:
           bucket_store:
             sync_interval: 5m
             ignore_blocks_within: 1h
+
+        querier:
+          query_ingesters_within: 24h
+          query_store_after: 24h
 
         compactor:
           compaction_interval: 2h
