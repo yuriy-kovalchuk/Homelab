@@ -5,6 +5,7 @@ metadata:
   namespace: yk-dns-manager
 spec:
   interval: 5m
+  suspend: true
   chartRef:
     kind: OCIRepository
     name: yk-dns-manager
