@@ -1,0 +1,20 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: llama-cpp-cuda
+  namespace: llm
+spec:
+  parentRefs:
+    - name: internal
+      namespace: main-gateway
+      sectionName: https-llama-cpp-cuda
+  hostnames:
+    - "cuda.yuriy-lab.cloud"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: llama-cpp-cuda
+          port: 8080
