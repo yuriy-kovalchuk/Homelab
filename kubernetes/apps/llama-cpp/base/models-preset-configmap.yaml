@@ -49,6 +49,20 @@ data:
     top-p = 0.95
     top-k = 64
 
+    [gemma-4-12B-it-qat-UD-Q4_K_XL]
+    c = 16384
+    parallel = 1
+    flash-attn = auto
+    cache-type-k = q8_0
+    cache-type-v = q8_0
+    spec-type = draft-mtp
+    spec-draft-n-max = 4
+    model-draft = /models/mtp-gemma-4-12B-it.gguf
+    load-on-startup = false
+    temp = 1.0
+    top-p = 0.95
+    top-k = 64
+
     [Bonsai-8B]
     c = 32768
     parallel = 1

@@ -1,0 +1,67 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: model-download-gemma4-12b-qat
+  namespace: llm
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        app: model-downloader
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        fsGroup: 65532
+      containers:
+        - name: downloader
+          image: alpine:3.21
+          command:
+            - sh
+            - -c
+            - |
+              download() {
+                URL="$1"
+                FILE=$(basename "$URL")
+                DEST="/models/$FILE"
+                TMP="/models/$FILE.$$.tmp"
+                if [ -f "$DEST" ]; then
+                  echo "$FILE already present, skipping"
+                  return 0
+                fi
+                echo "downloading $FILE..."
+                wget -O "$TMP" "$URL" || { rm -f "$TMP"; return 1; }
+                if [ -f "$DEST" ]; then
+                  rm -f "$TMP"
+                  echo "$FILE was downloaded concurrently, skipping rename"
+                  return 0
+                fi
+                mv "$TMP" "$DEST"
+              }
+              BASE="https://huggingface.co/unsloth/gemma-4-12B-it-qat-GGUF/resolve/main"
+              download "$BASE/gemma-4-12B-it-qat-UD-Q4_K_XL.gguf"
+              download "$BASE/mtp-gemma-4-12B-it.gguf"
+          volumeMounts:
+            - name: models
+              mountPath: /models
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 65532
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+      volumes:
+        - name: models
+          persistentVolumeClaim:
+            claimName: llama-cpp-models
