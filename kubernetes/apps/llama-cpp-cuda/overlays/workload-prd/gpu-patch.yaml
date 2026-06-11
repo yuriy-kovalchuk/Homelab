@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llama-cpp-cuda
+  namespace: llm
+spec:
+  strategy:
+    type: Recreate
+  template:
+    spec:
+      runtimeClassName: nvidia
+      nodeSelector:
+        kubernetes.io/hostname: node-3
+      containers:
+        - name: llama-cpp
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          volumeMounts:
+            - name: dev-nvidia0
+              mountPath: /dev/nvidia0
+            - name: dev-nvidiactl
+              mountPath: /dev/nvidiactl
+            - name: dev-nvidia-uvm
+              mountPath: /dev/nvidia-uvm
+            - name: dev-nvidia-uvm-tools
+              mountPath: /dev/nvidia-uvm-tools
+      volumes:
+        - name: dev-nvidia0
+          hostPath:
+            path: /dev/nvidia0
+            type: CharDevice
+        - name: dev-nvidiactl
+          hostPath:
+            path: /dev/nvidiactl
+            type: CharDevice
+        - name: dev-nvidia-uvm
+          hostPath:
+            path: /dev/nvidia-uvm
+            type: CharDevice
+        - name: dev-nvidia-uvm-tools
+          hostPath:
+            path: /dev/nvidia-uvm-tools
+            type: CharDevice

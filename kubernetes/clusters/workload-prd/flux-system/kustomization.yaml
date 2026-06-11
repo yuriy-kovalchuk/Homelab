@@ -5,3 +5,4 @@ resources:
   - infrastructure.yaml
   - apps.yaml
   - apps-llm.yaml
+  - apps-llm-cuda.yaml
