@@ -49,6 +49,17 @@ data:
     top-p = 0.95
     top-k = 64
 
+    [Bonsai-8B]
+    c = 32768
+    parallel = 1
+    flash-attn = auto
+    cache-type-k = q8_0
+    cache-type-v = q8_0
+    load-on-startup = false
+    temp = 0.8
+    top-p = 0.95
+    top-k = 40
+
     [Qwen3.6-27B-Q4_K_M]
     c = 131072
     cont-batching = true
