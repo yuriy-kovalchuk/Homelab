@@ -31,7 +31,7 @@ spec:
           disk: /dev/nvme0n1
           wipe: true
         network:
-          hostname: node-3
+          hostname: worker-1
           nameservers:
             - 10.0.4.1
           interfaces:
