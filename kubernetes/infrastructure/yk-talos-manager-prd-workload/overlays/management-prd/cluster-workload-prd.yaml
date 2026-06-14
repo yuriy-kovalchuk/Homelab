@@ -6,5 +6,5 @@ metadata:
 spec:
   clusterName: workload-prd
   endpoints:
-    - 10.0.4.2
+    - 10.0.4.3
   talosVersion: v1.13

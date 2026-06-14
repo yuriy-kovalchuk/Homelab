@@ -1,11 +1,11 @@
 apiVersion: talos.yuriykovalchuk.dev/v1alpha1
 kind: TalosNode
 metadata:
-  name: node-3
+  name: worker-1
   namespace: yk-talos-manager-prd-workload
 spec:
   clusterRef: workload-prd
-  role: ControlPlane
+  role: Worker
   nodeIP: 10.0.4.4
   talosVersion: v1.13.4
   systemExtensions:
