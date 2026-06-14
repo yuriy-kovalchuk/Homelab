@@ -80,19 +80,19 @@ spec:
           push_grpc_method_enabled: true
           ring:
             zone_awareness_enabled: false
-            replication_factor: 3
+            replication_factor: 2
             kvstore:
               store: memberlist
 
         store_gateway:
           sharding_ring:
             zone_awareness_enabled: false
-            replication_factor: 3
+            replication_factor: 2
             kvstore:
               store: memberlist
 
     distributor:
-      replicas: 3
+      replicas: 2
       extraArgs:
         auth.multitenancy-enabled: false
 
@@ -103,7 +103,7 @@ spec:
         enabled: true
         size: 50Gi
         storageClass: "longhorn"
-      replicas: 3
+      replicas: 2
 
     querier:
       replicas: 2
@@ -121,7 +121,7 @@ spec:
         storageClass: "longhorn"
       zoneAwareReplication:
         enabled: false
-      replicas: 3
+      replicas: 2
 
     compactor:
       replicas: 1
