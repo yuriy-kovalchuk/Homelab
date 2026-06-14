@@ -21,7 +21,7 @@ spec:
           disk: /dev/nvme0n1
           wipe: true
         network:
-          hostname: node-2
+          hostname: controlplane-1
           nameservers:
             - 10.0.4.1
           interfaces:
