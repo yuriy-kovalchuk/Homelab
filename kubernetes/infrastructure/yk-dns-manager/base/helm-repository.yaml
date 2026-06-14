@@ -7,4 +7,4 @@ spec:
   interval: 1h
   url: oci://ghcr.io/yuriy-kovalchuk/charts/yk-dns-manager
   ref:
-    tag: "0.1.0-dev"
+    tag: "0.1.1-dev"
