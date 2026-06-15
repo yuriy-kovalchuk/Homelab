@@ -1,0 +1,75 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kyverno
+  namespace: kyverno
+spec:
+  dependsOn:
+    - name: prometheus-operator-crds
+      namespace: flux-system
+  values:
+    openreports:
+      enabled: true
+      installCrds: true
+    reportsServer:
+      enabled: false
+
+
+    admissionController:
+      replicas: 2
+      serviceMonitor:
+        enabled: true
+      podSecurityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: admission-controller
+              app.kubernetes.io/instance: kyverno
+    backgroundController:
+      replicas: 2
+      podSecurityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: background-controller
+              app.kubernetes.io/instance: kyverno
+    cleanupController:
+      replicas: 2
+      podSecurityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: cleanup-controller
+              app.kubernetes.io/instance: kyverno
+    reportsController:
+      replicas: 2
+      podSecurityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: reports-controller
+              app.kubernetes.io/instance: kyverno
+    features:
+      policyExceptions:
+        enabled: true
+        namespace: "*"

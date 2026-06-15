@@ -45,9 +45,9 @@ externalIPs:
 envoy:
   enabled: true
   prometheus:
-    enabled: true
+    enabled: false
     serviceMonitor:
-      enabled: true
+      enabled: false
 
 hubble:
   relay:
@@ -68,7 +68,7 @@ hubble:
       - flows-to-world:any-drop=true
     enableOpenMetrics: true
     serviceMonitor:
-      enabled: true
+      enabled: false
     dashboards:
       enabled: true
       annotations:
@@ -85,13 +85,13 @@ bpf:
   tproxy: true
 
 operator:
-  replicas: 3
+  replicas: 2
   prometheus:
-    enabled: true
+    enabled: false
     serviceMonitor:
-      enabled: true
+      enabled: false
 
 prometheus:
-  enabled: true
+  enabled: false
   serviceMonitor:
-    enabled: true
+    enabled: false

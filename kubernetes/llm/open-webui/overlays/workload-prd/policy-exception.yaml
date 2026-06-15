@@ -1,0 +1,16 @@
+apiVersion: policies.kyverno.io/v1beta1
+kind: PolicyException
+metadata:
+  name: open-webui
+  namespace: open-webui
+spec:
+  matchConditions:
+    - name: exclude-open-webui
+      expression: "object.metadata.namespace == 'open-webui'"
+  policyRefs:
+    - kind: ValidatingPolicy
+      name: require-run-as-nonroot
+    - kind: ValidatingPolicy
+      name: require-run-as-non-root-user
+    - kind: ValidatingPolicy
+      name: disallow-privilege-escalation

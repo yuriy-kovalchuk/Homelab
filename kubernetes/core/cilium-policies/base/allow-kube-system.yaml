@@ -1,0 +1,32 @@
+# TODO: this policy is still too permissive — ingress CIDR rules and cluster egress
+# need tighter scoping once kube-system component requirements are fully mapped.
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: allow-kube-system
+spec:
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: kube-system
+  ingress:
+    - fromEntities:
+        - ingress
+    - fromCIDR:
+        - 10.0.5.0/24
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
+  egress:
+    - toEntities:
+        - cluster
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP

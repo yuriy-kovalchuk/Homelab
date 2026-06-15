@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../gateway-api-crds/overlays/workload-prd
+  - ../../prometheus-operator-crds/overlays/workload-prd
+  - ../../cert-manager/overlays/workload-prd
+  - ../../external-secrets/overlays/workload-prd
+  - ../../external-secrets-config/overlays/workload-prd
+  - ../../kyverno/overlays/workload-prd
+  - ../../cilium-policies/overlays/workload-prd
