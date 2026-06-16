@@ -1,2 +1,2 @@
-kubeconfig_path = "~/.kube/mgmt-kubeconfig"
-fluxcd_version  = "0.49.0"
+kubeconfig_path = "~/.kube/mgmt"
+fluxcd_version  = "0.52.0"
