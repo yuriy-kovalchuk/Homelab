@@ -7,9 +7,9 @@ spec:
   suspend: true
   values:
     domainMap:
-      "*.yuriy-lab.cloud": "10.0.4.50"
-      "truenas.yuriy-lab.cloud": "10.0.4.60"
+      "*.yuriykovalchuk.dev": "10.0.4.50"
+      "truenas.yuriykovalchuk.dev": "10.0.4.60"
 
-      "s3.yuriy-lab.cloud": "10.0.4.60"
-      "api.s3.yuriy-lab.cloud": "10.0.4.60"
+      "s3.yuriykovalchuk.dev": "10.0.4.60"
+      "api.s3.yuriykovalchuk.dev": "10.0.4.60"
 

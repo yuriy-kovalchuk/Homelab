@@ -15,9 +15,9 @@ spec:
     spec:
       containers:
         - name: llama-cpp
-          # TODO: pin to a specific build tag, e.g. server-vulkan-b5186
           # Vulkan backend: needs /dev/dri only (no ROCm). See LLAMA.md.
-          image: ghcr.io/ggml-org/llama.cpp:server-vulkan
+          # Pinned: server-vulkan floating tag broke Vulkan (undefined shader symbol) in builds after b4740.
+          image: ghcr.io/ggml-org/llama.cpp:server-vulkan-b9570
           args:
             - --host
             - "0.0.0.0"
@@ -29,6 +29,8 @@ spec:
             - /config/presets.ini
             - --models-max
             - "1"
+            - --device
+            - Vulkan1
           ports:
             - name: http
               containerPort: 8080

@@ -16,6 +16,48 @@ spec:
     - toEntities:
         - kube-apiserver
     - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
+    - toEntities:
+        - cluster
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: kyverno-reporter-kyverno-plugin
+  namespace: kyverno-reporter
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: policy-reporter-kyverno-plugin
+      app.kubernetes.io/instance: policy-reporter
+  egress:
+    - toEntities:
+        - kube-apiserver
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
+    - toEntities:
+        - cluster
+    - toEntities:
         - world
       toPorts:
         - ports:
@@ -35,6 +77,17 @@ spec:
   egress:
     - toEntities:
         - kube-apiserver
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
+    - toEntities:
+        - cluster
     - toEntities:
         - world
       toPorts:
@@ -56,3 +109,6 @@ spec:
     - fromEntities:
         - cluster
         - ingress
+  egress:
+    - toEntities:
+        - cluster

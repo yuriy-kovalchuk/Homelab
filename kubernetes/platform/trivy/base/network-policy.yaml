@@ -10,11 +10,14 @@ spec:
   egress:
     - toEntities:
         - kube-apiserver
-        - remote-node
+    - toEntities:
         - host
+        - remote-node
       toPorts:
         - ports:
             - port: "6443"
+              protocol: TCP
+            - port: "443"
               protocol: TCP
 ---
 apiVersion: cilium.io/v2
@@ -42,6 +45,15 @@ spec:
   egress:
     - toEntities:
         - kube-apiserver
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
 ---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy

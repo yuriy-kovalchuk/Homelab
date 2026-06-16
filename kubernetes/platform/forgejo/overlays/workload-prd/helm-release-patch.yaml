@@ -9,15 +9,15 @@ spec:
       enabled: true
       parentRefs:
         - name: internal
-          namespace: main-gateway
+          namespace: kube-system
           sectionName: https-forgejo
       hostnames:
-        - forgejo.yuriy-lab.cloud
+        - forgejo.yuriykovalchuk.dev
 
     tcpRoute:
       enabled: true
       parentRefs:
         - name: internal
-          namespace: main-gateway
+          namespace: kube-system
           sectionName: ssh-forgejo
       port: 22

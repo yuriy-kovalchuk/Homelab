@@ -13,6 +13,21 @@ variable "forgejo_admin_email" {
   sensitive = true
 }
 
+variable "cloudflare_api_token" {
+  type      = string
+  sensitive = true
+}
+
+variable "opnsense_api_key" {
+  type      = string
+  sensitive = true
+}
+
+variable "opnsense_api_secret" {
+  type      = string
+  sensitive = true
+}
+
 variable "tempo_s3_access_key" {
   type      = string
   sensitive = true

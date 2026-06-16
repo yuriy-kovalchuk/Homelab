@@ -3,7 +3,8 @@ kind: Kustomization
 resources:
   - gotk-sync.yaml
   - core.yaml
-  # - platform.yaml
+  - platform.yaml
+  - llm-policies.yaml
   # - observability.yaml
   # - apps.yaml
-  # - llm.yaml
+  - llm.yaml

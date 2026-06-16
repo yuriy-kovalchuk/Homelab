@@ -6,10 +6,10 @@ metadata:
 spec:
   parentRefs:
     - name: internal
-      namespace: main-gateway
+      namespace: kube-system
       sectionName: https-yk-updates
   hostnames:
-    - "yk-updates.yuriy-lab.cloud"
+    - "yk-updates.yuriykovalchuk.dev"
   rules:
     - matches:
         - path:

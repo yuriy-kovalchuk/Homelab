@@ -47,93 +47,93 @@ data:
     - GitOps:
         - Forgejo:
             icon: gitea.svg
-            href: https://forgejo.yuriy-lab.cloud
+            href: https://forgejo.yuriykovalchuk.dev
             description: Source control — workload-prd
         - Flux Workload:
             icon: flux-cd.svg
-            href: https://fluxcd.yuriy-lab.cloud
+            href: https://fluxcd.yuriykovalchuk.dev
             description: GitOps — workload-prd
         - Flux Management:
             icon: flux-cd.svg
-            href: https://fluxcd.mgmt.yuriy-lab.cloud
+            href: https://fluxcd.mgmt.yuriykovalchuk.dev
             description: GitOps — management-prd
 
     - Infrastructure:
         - Vault:
             icon: vault.svg
-            href: https://vault.mgmt.yuriy-lab.cloud
+            href: https://vault.mgmt.yuriykovalchuk.dev
             description: Secrets management — management-prd
         - Harbor:
             icon: harbor.svg
-            href: https://harbor.mgmt.yuriy-lab.cloud
+            href: https://harbor.mgmt.yuriykovalchuk.dev
             description: Container registry — management-prd
         - Longhorn Workload:
             icon: longhorn.svg
-            href: https://longhorn.yuriy-lab.cloud
+            href: https://longhorn.yuriykovalchuk.dev
             description: Persistent storage — workload-prd
         - Longhorn Management:
             icon: longhorn.svg
-            href: https://longhorn.mgmt.yuriy-lab.cloud
+            href: https://longhorn.mgmt.yuriykovalchuk.dev
             description: Persistent storage — management-prd
 
     - Monitoring:
         - Grafana:
             icon: grafana.svg
-            href: https://grafana.yuriy-lab.cloud
+            href: https://grafana.yuriykovalchuk.dev
             description: Metrics and dashboards
         - Alloy:
             icon: alloy.svg
-            href: https://alloy.yuriy-lab.cloud
+            href: https://alloy.yuriykovalchuk.dev
             description: Telemetry collector
         - Hubble Workload:
             icon: cilium.svg
-            href: https://hubble.yuriy-lab.cloud
+            href: https://hubble.yuriykovalchuk.dev
             description: Cilium network observability — workload-prd
         - Hubble Management:
             icon: cilium.svg
-            href: https://hubble.mgmt.yuriy-lab.cloud
+            href: https://hubble.mgmt.yuriykovalchuk.dev
             description: Cilium network observability — management-prd
         - Uptime Kuma:
             icon: uptime-kuma.svg
-            href: https://uptime.yuriy-lab.cloud
+            href: https://uptime.yuriykovalchuk.dev
             description: Uptime monitoring
         - Kyverno Reporter Workload:
             icon: kyverno.svg
-            href: https://kyverno-reporter.yuriy-lab.cloud
+            href: https://kyverno-reporter.yuriykovalchuk.dev
             description: Policy compliance reporter — workload-prd
         - Kyverno Reporter Management:
             icon: kyverno.svg
-            href: https://kyverno-reporter.mgmt.yuriy-lab.cloud
+            href: https://kyverno-reporter.mgmt.yuriykovalchuk.dev
             description: Policy compliance reporter — management-prd
         - Goldilocks:
             icon: goldilocks.png
-            href: https://goldilocks.yuriy-lab.cloud
+            href: https://goldilocks.yuriykovalchuk.dev
             description: VPA resource recommendations
 
     - AI:
         - Open WebUI:
             icon: open-webui.svg
-            href: https://chat.yuriy-lab.cloud
+            href: https://chat.yuriykovalchuk.dev
             description: Local LLM chat interface
         - Llama.cpp:
             icon: si-meta
-            href: https://llama.yuriy-lab.cloud
+            href: https://llama.yuriykovalchuk.dev
             description: Local LLM inference server
 
     - Storage:
         - TrueNAS:
             icon: truenas-scale.svg
-            href: https://truenas.yuriy-lab.cloud/ui/
+            href: https://truenas.yuriykovalchuk.dev/ui/
             description: NAS storage
         - S3 Console:
             icon: minio.svg
-            href: https://s3.yuriy-lab.cloud
+            href: https://s3.yuriykovalchuk.dev
             description: S3 object storage console
 
     - Network:
         - OPNsense:
             icon: opnsense.svg
-            href: https://opnsense.yuriy-lab.cloud
+            href: https://opnsense.yuriykovalchuk.dev
             description: Firewall and router
         - Nginx Proxy Manager:
             icon: nginx-proxy-manager.svg
@@ -143,11 +143,11 @@ data:
     - Compute:
         - Proxmox Storage:
             icon: proxmox.svg
-            href: https://storage.pve.yuriy-lab.cloud
+            href: https://storage.pve.yuriykovalchuk.dev
             description: Proxmox — storage node
         - Proxmox Gateway:
             icon: proxmox.svg
-            href: https://firewall.yuriy-lab.cloud:8006
+            href: https://firewall.yuriykovalchuk.dev:8006
             description: Proxmox — firewall node
         - Portainer:
             icon: portainer.svg
@@ -157,11 +157,11 @@ data:
     - Development:
         - HTTPBin:
             icon: http.png
-            href: https://httpbin.yuriy-lab.cloud
+            href: https://httpbin.yuriykovalchuk.dev
             description: HTTP testing
         - Whoami:
             icon: traefik.svg
-            href: https://whoami.yuriy-lab.cloud
+            href: https://whoami.yuriykovalchuk.dev
             description: Request echo service
 
   widgets.yaml: |

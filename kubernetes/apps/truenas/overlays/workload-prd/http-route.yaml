@@ -9,7 +9,7 @@ spec:
       namespace: external-gateway
       sectionName: https-truenas
   hostnames:
-    - "truenas.yuriy-lab.cloud"
+    - "truenas.yuriykovalchuk.dev"
   rules:
     - matches:
         - path:

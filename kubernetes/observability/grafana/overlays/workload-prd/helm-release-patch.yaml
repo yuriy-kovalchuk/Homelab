@@ -12,7 +12,7 @@ spec:
 
     grafana.ini:
       server:
-        root_url: "https://grafana.yuriy-lab.cloud"
+        root_url: "https://grafana.yuriykovalchuk.dev"
       news:
         news_feed_enabled: false
       users:

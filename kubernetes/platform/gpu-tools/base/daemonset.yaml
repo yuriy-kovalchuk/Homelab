@@ -15,58 +15,31 @@ spec:
       tolerations:
         - operator: Exists
       hostPID: true
-      initContainers:
-        - name: install
-          image: ubuntu:22.04
-          command:
-            - bash
-            - -c
-            - |
-              set -e
-              apt-get update -qq
-              apt-get install -y curl tar lm-sensors jq
-              DOWNLOAD_URL=$(curl -fsSL "https://api.github.com/repos/Umio-Yasuno/amdgpu_top/releases/latest" \
-                | jq -r '.assets[] | select(.name | contains("x86_64-unknown-linux-musl.tar.gz")) | .browser_download_url')
-              curl -fsSL "$DOWNLOAD_URL" | tar xz -C /tools --strip-components=1
-              chmod +x /tools/amdgpu_top
-              cp /usr/bin/sensors /tools/sensors
-              cp /usr/sbin/sensors-detect /tools/sensors-detect 2>/dev/null || true
-              cp -r /usr/lib/x86_64-linux-gnu/libsensors* /tools/ 2>/dev/null || true
-          volumeMounts:
-            - name: tools
-              mountPath: /tools
       containers:
         - name: gpu-tools
-          image: ubuntu:22.04
+          image: ubuntu:24.04
           command:
             - bash
             - -c
             - |
-              /tools/amdgpu_top --dump -s 30 || sleep infinity
+              echo 'Acquire::ForceIPv4 "true";' > /etc/apt/apt.conf.d/99force-ipv4
+              apt-get update -qq
+              apt-get install -y --no-install-recommends lm-sensors pciutils usbutils libdrm2 nvtop radeontop
+              sleep infinity
           securityContext:
             privileged: true
             runAsUser: 0
           volumeMounts:
-            - name: tools
-              mountPath: /tools
-            - name: dev-dri
-              mountPath: /dev/dri
-            - name: sys-bus-pci
-              mountPath: /sys/bus/pci
-            - name: sys-class-hwmon
-              mountPath: /sys/class/hwmon
+            - name: dev
+              mountPath: /dev
+            - name: sys
+              mountPath: /sys
       volumes:
-        - name: tools
-          emptyDir: {}
-        - name: dev-dri
+        - name: dev
           hostPath:
-            path: /dev/dri
+            path: /dev
             type: Directory
-        - name: sys-bus-pci
+        - name: sys
           hostPath:
-            path: /sys/bus/pci
-            type: Directory
-        - name: sys-class-hwmon
-          hostPath:
-            path: /sys/class/hwmon
+            path: /sys
             type: Directory

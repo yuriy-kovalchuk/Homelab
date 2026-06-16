@@ -6,10 +6,10 @@ metadata:
 spec:
   parentRefs:
     - name: internal
-      namespace: main-gateway
+      namespace: kube-system
       sectionName: https-llama-cpp-cuda
   hostnames:
-    - "cuda.yuriy-lab.cloud"
+    - "cuda.yuriykovalchuk.dev"
   rules:
     - matches:
         - path:

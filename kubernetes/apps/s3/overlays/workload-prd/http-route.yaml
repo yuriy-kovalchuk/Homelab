@@ -9,7 +9,7 @@ spec:
       namespace: external-gateway
       sectionName: https-s3-console
   hostnames:
-    - "s3.yuriy-lab.cloud"
+    - "s3.yuriykovalchuk.dev"
   rules:
     - matches:
         - path:
@@ -30,7 +30,7 @@ spec:
       namespace: external-gateway
       sectionName: https-s3-api
   hostnames:
-    - "api.s3.yuriy-lab.cloud"
+    - "api.s3.yuriykovalchuk.dev"
   rules:
     - matches:
         - path:

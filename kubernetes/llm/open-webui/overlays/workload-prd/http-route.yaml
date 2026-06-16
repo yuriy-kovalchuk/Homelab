@@ -6,10 +6,10 @@ metadata:
 spec:
   parentRefs:
     - name: internal
-      namespace: main-gateway
+      namespace: kube-system
       sectionName: https-open-webui
   hostnames:
-    - "chat.yuriy-lab.cloud"
+    - "chat.yuriykovalchuk.dev"
   rules:
     - matches:
         - path:

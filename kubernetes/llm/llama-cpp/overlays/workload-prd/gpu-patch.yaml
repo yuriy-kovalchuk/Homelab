@@ -9,7 +9,7 @@ spec:
   template:
     spec:
       nodeSelector:
-        kubernetes.io/hostname: node-3
+        ai-node: oculink
       containers:
         - name: llama-cpp
           securityContext:

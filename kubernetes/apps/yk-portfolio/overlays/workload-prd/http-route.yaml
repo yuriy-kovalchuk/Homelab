@@ -6,10 +6,10 @@ metadata:
 spec:
   parentRefs:
     - name: internal
-      namespace: main-gateway
+      namespace: kube-system
       sectionName: https-yk-portfolio
   hostnames:
-    - "portfolio.yuriy-lab.cloud"
+    - "portfolio.yuriykovalchuk.dev"
   rules:
     - matches:
         - path:

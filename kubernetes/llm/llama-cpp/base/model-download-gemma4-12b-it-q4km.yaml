@@ -11,6 +11,8 @@ spec:
       labels:
         app: model-downloader
     spec:
+      nodeSelector:
+        ai-node: oculink
       restartPolicy: OnFailure
       securityContext:
         fsGroup: 65532

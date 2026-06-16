@@ -62,7 +62,7 @@ spec:
         server:
           SSH_LISTEN_PORT: 2222
           SSH_PORT: 22
-          SSH_DOMAIN: forgejo.yuriy-lab.cloud
+          SSH_DOMAIN: forgejo.yuriykovalchuk.dev
         database:
           DB_TYPE: sqlite3
       metrics:

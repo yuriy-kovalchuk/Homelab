@@ -2,7 +2,7 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: internal
-  namespace: main-gateway
+  namespace: kube-system
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-dns
 spec:
@@ -19,7 +19,7 @@ spec:
     - name: https-longhorn
       port: 443
       protocol: HTTPS
-      hostname: "longhorn.yuriy-lab.cloud"
+      hostname: "longhorn.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:
@@ -34,7 +34,7 @@ spec:
     - name: https-kyverno-reporter
       port: 443
       protocol: HTTPS
-      hostname: "kyverno-reporter.yuriy-lab.cloud"
+      hostname: "kyverno-reporter.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:
@@ -49,7 +49,7 @@ spec:
     - name: https-hubble
       port: 443
       protocol: HTTPS
-      hostname: "hubble.yuriy-lab.cloud"
+      hostname: "hubble.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:
@@ -73,7 +73,7 @@ spec:
     - name: https-forgejo
       port: 443
       protocol: HTTPS
-      hostname: "forgejo.yuriy-lab.cloud"
+      hostname: "forgejo.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:
@@ -88,7 +88,7 @@ spec:
     - name: https-homepage
       port: 443
       protocol: HTTPS
-      hostname: "homepage.yuriy-lab.cloud"
+      hostname: "homepage.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:
@@ -103,7 +103,7 @@ spec:
     - name: https-fluxcd
       port: 443
       protocol: HTTPS
-      hostname: "fluxcd.yuriy-lab.cloud"
+      hostname: "fluxcd.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:
@@ -118,7 +118,7 @@ spec:
     - name: https-goldilocks
       port: 443
       protocol: HTTPS
-      hostname: "goldilocks.yuriy-lab.cloud"
+      hostname: "goldilocks.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:
@@ -133,7 +133,7 @@ spec:
     - name: https-httpbin
       port: 443
       protocol: HTTPS
-      hostname: "httpbin.yuriy-lab.cloud"
+      hostname: "httpbin.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:
@@ -148,7 +148,7 @@ spec:
     - name: https-whoami
       port: 443
       protocol: HTTPS
-      hostname: "whoami.yuriy-lab.cloud"
+      hostname: "whoami.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:
@@ -163,7 +163,7 @@ spec:
     - name: https-uptime-kuma
       port: 443
       protocol: HTTPS
-      hostname: "uptime.yuriy-lab.cloud"
+      hostname: "uptime.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:
@@ -178,7 +178,7 @@ spec:
     - name: https-alloy
       port: 443
       protocol: HTTPS
-      hostname: "alloy.yuriy-lab.cloud"
+      hostname: "alloy.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:
@@ -193,7 +193,7 @@ spec:
     - name: https-grafana
       port: 443
       protocol: HTTPS
-      hostname: "grafana.yuriy-lab.cloud"
+      hostname: "grafana.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:
@@ -208,7 +208,7 @@ spec:
     - name: https-open-webui
       port: 443
       protocol: HTTPS
-      hostname: "chat.yuriy-lab.cloud"
+      hostname: "chat.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:
@@ -223,7 +223,7 @@ spec:
     - name: https-llama-cpp
       port: 443
       protocol: HTTPS
-      hostname: "llama.yuriy-lab.cloud"
+      hostname: "llama.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:
@@ -238,7 +238,7 @@ spec:
     - name: https-llama-cpp-cuda
       port: 443
       protocol: HTTPS
-      hostname: "cuda.yuriy-lab.cloud"
+      hostname: "cuda.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:
@@ -253,7 +253,7 @@ spec:
     - name: https-yk-portfolio
       port: 443
       protocol: HTTPS
-      hostname: "portfolio.yuriy-lab.cloud"
+      hostname: "portfolio.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:
@@ -268,7 +268,7 @@ spec:
     - name: https-yk-updates
       port: 443
       protocol: HTTPS
-      hostname: "yk-updates.yuriy-lab.cloud"
+      hostname: "yk-updates.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:

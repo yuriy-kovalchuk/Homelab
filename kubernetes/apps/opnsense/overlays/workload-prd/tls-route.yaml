@@ -9,7 +9,7 @@ spec:
       namespace: external-gateway
       sectionName: tls-opnsense
   hostnames:
-    - "opnsense.yuriy-lab.cloud"
+    - "opnsense.yuriykovalchuk.dev"
   rules:
     - backendRefs:
         - name: opnsense

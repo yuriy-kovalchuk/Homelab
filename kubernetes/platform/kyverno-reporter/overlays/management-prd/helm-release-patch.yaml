@@ -38,10 +38,10 @@ spec:
         enabled: true
         parentRefs:
           - name: internal
-            namespace: main-gateway
+            namespace: kube-system
             sectionName: https-kyverno-reporter
         hostnames:
-          - "kyverno-reporter.mgmt.yuriy-lab.cloud"
+          - "kyverno-reporter.mgmt.yuriykovalchuk.dev"
     plugin:
       kyverno:
         enabled: true

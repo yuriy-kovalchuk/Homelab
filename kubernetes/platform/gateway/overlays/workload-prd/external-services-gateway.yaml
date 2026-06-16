@@ -14,7 +14,7 @@ spec:
     - name: https-truenas
       port: 443
       protocol: HTTPS
-      hostname: "truenas.yuriy-lab.cloud"
+      hostname: "truenas.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:
@@ -29,7 +29,7 @@ spec:
     - name: https-s3-console
       port: 443
       protocol: HTTPS
-      hostname: "s3.yuriy-lab.cloud"
+      hostname: "s3.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:
@@ -44,7 +44,7 @@ spec:
     - name: https-s3-api
       port: 443
       protocol: HTTPS
-      hostname: "api.s3.yuriy-lab.cloud"
+      hostname: "api.s3.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:

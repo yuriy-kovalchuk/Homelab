@@ -6,10 +6,10 @@ metadata:
 spec:
   parentRefs:
     - name: internal
-      namespace: main-gateway
+      namespace: kube-system
       sectionName: https-grafana
   hostnames:
-    - "grafana.yuriy-lab.cloud"
+    - "grafana.yuriykovalchuk.dev"
   rules:
     - matches:
         - path:

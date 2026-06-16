@@ -9,7 +9,7 @@ spec:
       namespace: external-gateway
       sectionName: tls-storage-pve
   hostnames:
-    - "storage.pve.yuriy-lab.cloud"
+    - "storage.pve.yuriykovalchuk.dev"
   rules:
     - backendRefs:
         - name: storage-pve

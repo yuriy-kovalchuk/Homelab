@@ -6,10 +6,10 @@ metadata:
 spec:
   parentRefs:
     - name: internal
-      namespace: main-gateway
+      namespace: kube-system
       sectionName: https-whoami
   hostnames:
-    - "whoami.yuriy-lab.cloud"
+    - "whoami.yuriykovalchuk.dev"
   rules:
     - matches:
         - path:

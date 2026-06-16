@@ -4,6 +4,7 @@ resources:
   - ../../cilium-policies/overlays/workload-prd
   - ../../gpu-tools/overlays/workload-prd
   - ../../kyverno-config/overlays/workload-prd
+  - ../../external-secrets-config/overlays/workload-prd
   - ../../gateway/overlays/workload-prd
   - ../../cluster-issuer/overlays/workload-prd
   - ../../bgp/overlays/workload-prd

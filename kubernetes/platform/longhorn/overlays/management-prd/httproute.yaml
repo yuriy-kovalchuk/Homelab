@@ -6,10 +6,10 @@ metadata:
 spec:
   parentRefs:
     - name: internal
-      namespace: main-gateway
+      namespace: kube-system
       sectionName: https-longhorn
   hostnames:
-    - "longhorn.mgmt.yuriy-lab.cloud"
+    - "longhorn.mgmt.yuriykovalchuk.dev"
   rules:
     - backendRefs:
         - name: longhorn-frontend

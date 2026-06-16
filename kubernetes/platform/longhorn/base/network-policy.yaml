@@ -6,8 +6,7 @@ metadata:
 spec:
   endpointSelector:
     matchLabels:
-      app.kubernetes.io/component: manager
-      app.kubernetes.io/instance: longhorn
+      app: longhorn-manager
   ingress:
     - fromEntities:
         - cluster
@@ -15,6 +14,44 @@ spec:
   egress:
     - toEntities:
         - cluster
+    - toEntities:
+        - kube-apiserver
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: longhorn-driver-deployer
+  namespace: longhorn-system
+spec:
+  endpointSelector:
+    matchLabels:
+      app: longhorn-driver-deployer
+  ingress:
+    - fromEntities:
+        - cluster
+  egress:
+    - toEntities:
+        - cluster
+    - toEntities:
+        - kube-apiserver
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
 ---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
@@ -24,11 +61,21 @@ metadata:
 spec:
   endpointSelector:
     matchLabels:
-      app.kubernetes.io/component: instance-manager
-      app.kubernetes.io/instance: longhorn
+      app: longhorn-instance-manager
   egress:
     - toEntities:
         - cluster
+    - toEntities:
+        - kube-apiserver
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
     - toEntities:
         - world
       toPorts:
@@ -57,27 +104,6 @@ spec:
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: longhorn-csi
-  namespace: longhorn-system
-spec:
-  endpointSelector:
-    matchExpressions:
-      - key: app.kubernetes.io/component
-        operator: In
-        values:
-          - csi-controller
-          - csi-plugin
-          - driver-deployer
-  ingress:
-    - fromEntities:
-        - cluster
-  egress:
-    - toEntities:
-        - cluster
----
-apiVersion: cilium.io/v2
-kind: CiliumNetworkPolicy
-metadata:
   name: longhorn-csi-sidecar
   namespace: longhorn-system
 spec:
@@ -93,3 +119,14 @@ spec:
   egress:
     - toEntities:
         - cluster
+    - toEntities:
+        - kube-apiserver
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP

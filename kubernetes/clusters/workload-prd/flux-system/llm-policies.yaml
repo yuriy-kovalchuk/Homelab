@@ -2,15 +2,15 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: llm
+  name: llm-policies
   namespace: flux-system
 spec:
   interval: 2m
   dependsOn:
-    - name: llm-policies
+    - name: platform
   sourceRef:
     kind: GitRepository
     name: homelab
-  path: ./kubernetes/llm/overlays/workload-prd
+  path: ./kubernetes/llm/policies/workload-prd
   prune: true
-  wait: false
+  wait: true
