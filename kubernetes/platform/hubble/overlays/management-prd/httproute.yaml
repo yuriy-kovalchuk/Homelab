@@ -6,10 +6,10 @@ metadata:
 spec:
   parentRefs:
     - name: internal
-      namespace: main-gateway
+      namespace: kube-system
       sectionName: https-hubble
   hostnames:
-    - "hubble.mgmt.yuriy-lab.cloud"
+    - "hubble.mgmt.yuriykovalchuk.dev"
   rules:
     - backendRefs:
         - name: hubble-ui

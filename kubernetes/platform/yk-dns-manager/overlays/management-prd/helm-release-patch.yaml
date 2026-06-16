@@ -6,4 +6,4 @@ metadata:
 spec:
   values:
     domainMap:
-      "*.mgmt.yuriy-lab.cloud": "10.0.2.50"
+      "*.mgmt.yuriykovalchuk.dev": "10.0.2.50"

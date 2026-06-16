@@ -8,6 +8,9 @@ spec:
     matchLabels:
       app: harbor
   ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app: harbor
     - fromEntities:
         - ingress
         - cluster

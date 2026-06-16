@@ -14,7 +14,7 @@ spec:
         enabled: false
       ingress:
         enabled: false
-    externalURL: "https://harbor.mgmt.yuriy-lab.cloud"
+    externalURL: "https://harbor.mgmt.yuriykovalchuk.dev"
     persistence:
       enabled: true
       persistentVolumeClaim:

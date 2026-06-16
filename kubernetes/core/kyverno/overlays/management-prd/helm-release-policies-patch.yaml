@@ -9,4 +9,4 @@ spec:
     skipBackgroundRequests: true
     podSecurityStandard: restricted
     podSecuritySeverity: high
-    validationFailureAction: Enforce
+    validationFailureAction: Audit

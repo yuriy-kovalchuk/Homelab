@@ -6,4 +6,3 @@ resources:
   - ../../cert-manager/overlays/workload-prd
   - ../../external-secrets/overlays/workload-prd
   - ../../kyverno/overlays/workload-prd
-  - ../../cilium-policies/overlays/workload-prd

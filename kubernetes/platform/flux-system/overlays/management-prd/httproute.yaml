@@ -6,12 +6,12 @@ metadata:
 spec:
   parentRefs:
     - name: internal
-      namespace: main-gateway
+      namespace: kube-system
       group: gateway.networking.k8s.io
       kind: Gateway
       sectionName: https-fluxcd
   hostnames:
-    - "fluxcd.mgmt.yuriy-lab.cloud"
+    - "fluxcd.mgmt.yuriykovalchuk.dev"
   rules:
     - backendRefs:
         - name: flux-operator

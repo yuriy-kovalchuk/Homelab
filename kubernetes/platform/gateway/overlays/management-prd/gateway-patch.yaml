@@ -2,7 +2,7 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: internal
-  namespace: main-gateway
+  namespace: kube-system
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-dns
 spec:
@@ -16,25 +16,10 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
-    - name: https-longhorn
-      port: 443
-      protocol: HTTPS
-      hostname: "longhorn.mgmt.yuriy-lab.cloud"
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: longhorn-gw-tls
-            kind: Secret
-      allowedRoutes:
-        namespaces:
-          from: Selector
-          selector:
-            matchLabels:
-              kubernetes.io/metadata.name: "longhorn-system"
     - name: https-harbor
       port: 443
       protocol: HTTPS
-      hostname: "harbor.mgmt.yuriy-lab.cloud"
+      hostname: "harbor.mgmt.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:
@@ -49,7 +34,7 @@ spec:
     - name: https-fluxcd
       port: 443
       protocol: HTTPS
-      hostname: "fluxcd.mgmt.yuriy-lab.cloud"
+      hostname: "fluxcd.mgmt.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:
@@ -64,7 +49,7 @@ spec:
     - name: https-vault
       port: 443
       protocol: HTTPS
-      hostname: "vault.mgmt.yuriy-lab.cloud"
+      hostname: "vault.mgmt.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:
@@ -76,25 +61,10 @@ spec:
           selector:
             matchLabels:
               kubernetes.io/metadata.name: "vault"
-    - name: https-kyverno-reporter
-      port: 443
-      protocol: HTTPS
-      hostname: "kyverno-reporter.mgmt.yuriy-lab.cloud"
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: kyverno-reporter-gw-tls
-            kind: Secret
-      allowedRoutes:
-        namespaces:
-          from: Selector
-          selector:
-            matchLabels:
-              kubernetes.io/metadata.name: "kyverno-reporter"
     - name: https-hubble
       port: 443
       protocol: HTTPS
-      hostname: "hubble.mgmt.yuriy-lab.cloud"
+      hostname: "hubble.mgmt.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:
@@ -106,3 +76,18 @@ spec:
           selector:
             matchLabels:
               kubernetes.io/metadata.name: "kube-system"
+    - name: https-goldilocks
+      port: 443
+      protocol: HTTPS
+      hostname: "goldilocks.mgmt.yuriykovalchuk.dev"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: goldilocks-gw-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: "vpa"

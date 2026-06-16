@@ -6,12 +6,12 @@ metadata:
 spec:
   parentRefs:
     - name: internal
-      namespace: main-gateway
+      namespace: kube-system
       group: gateway.networking.k8s.io
       kind: Gateway
       sectionName: https-vault
   hostnames:
-    - "vault.mgmt.yuriy-lab.cloud"
+    - "vault.mgmt.yuriykovalchuk.dev"
   rules:
     - matches:
         - path:

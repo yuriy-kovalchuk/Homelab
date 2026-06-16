@@ -4,3 +4,4 @@ resources:
   - ../../gateway-api-crds/overlays/management-prd
   - ../../cert-manager/overlays/management-prd
   - ../../local-path-provisioner/overlays/management-prd
+  - ../../kyverno/overlays/management-prd
