@@ -54,6 +54,13 @@ spec:
   ingress:
     - fromEntities:
         - kube-apiserver
+    - fromEntities:
+        - remote-node
+        - host
+      toPorts:
+        - ports:
+            - port: "10250"
+              protocol: TCP
 ---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
