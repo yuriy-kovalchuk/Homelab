@@ -3,8 +3,7 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - pvc.yaml
-  # - model-download-qwen36-35b-a3b-udq4km.yaml
-  # - model-download-gemma4-12b-it-q4km.yaml
+  - model-download-qwen36-35b-a3b-udq4km.yaml
   # - model-download-gemma4-26b-a4b-it-udq4km.yaml
   - model-download-qwen36-27b-mtp-q4km.yaml
   - model-download-bonsai-8b.yaml
