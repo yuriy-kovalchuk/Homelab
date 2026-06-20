@@ -32,6 +32,11 @@ resource "truenas_app" "rustfs" {
           - traefik.http.routers.rustfs-s3.tls.certresolver=letsencrypt
           - traefik.http.routers.rustfs-s3.service=rustfs-s3
           - traefik.http.services.rustfs-s3.loadbalancer.server.port=9000
+        deploy:
+          resources:
+            limits:
+              cpus: '1.0'
+              memory: 1G
         networks:
           - proxy
 

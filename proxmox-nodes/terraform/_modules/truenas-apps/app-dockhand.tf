@@ -16,6 +16,11 @@ resource "truenas_app" "dockhand" {
           - traefik.http.routers.dockhand.entrypoints=websecure
           - traefik.http.routers.dockhand.tls.certresolver=letsencrypt
           - traefik.http.services.dockhand.loadbalancer.server.port=3000
+        deploy:
+          resources:
+            limits:
+              cpus: '0.5'
+              memory: 1024M
         networks:
           - proxy
 

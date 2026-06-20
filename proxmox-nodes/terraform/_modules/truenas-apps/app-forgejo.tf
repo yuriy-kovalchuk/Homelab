@@ -30,6 +30,11 @@ resource "truenas_app" "forgejo" {
           - traefik.http.routers.forgejo.entrypoints=websecure
           - traefik.http.routers.forgejo.tls.certresolver=letsencrypt
           - traefik.http.services.forgejo.loadbalancer.server.port=3000
+        deploy:
+          resources:
+            limits:
+              cpus: '1.0'
+              memory: 512M
         networks:
           - proxy
 

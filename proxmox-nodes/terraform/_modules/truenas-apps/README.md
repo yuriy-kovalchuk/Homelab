@@ -78,6 +78,52 @@ Every new Docker Compose app that should be routed through Traefik needs to:
      - traefik.http.routers.myapp.tls.certresolver=letsencrypt
    ```
 
+## Vault — manual unseal after restart
+
+Vault uses Shamir seal (default). After every TrueNAS reboot or container restart, Vault starts sealed and must be manually unsealed before any secrets can be served.
+
+```bash
+ssh root@10.0.3.3
+docker exec -e VAULT_ADDR=http://127.0.0.1:8200 ix-vault-vault-1 vault operator unseal <key>
+```
+
+Single key is sufficient (threshold = 1 for a homelab single-node setup). The unseal key and root token were generated during `vault operator init`. Auto-unseal would require an external KMS — not currently set up.
+
+## Vault — Kubernetes auth setup
+
+Vault authenticates External Secrets Operator (ESO) in the workload cluster via the Kubernetes auth method. This was configured manually (not via Terraform — auth config rarely changes).
+
+**Auth flow:** ESO presents its SA token → Vault calls the K8s TokenReview API to verify it → Vault issues a short-lived Vault token.
+
+**Requirements:**
+- OPNsense firewall rule: VLAN 3 (storage, 10.0.3.0/24) → VLAN 4 (k8s-workload) port 6443 — Vault must reach the K8s API to run TokenReview. This rule is in `firewall.yml` as `opt2-15`.
+- `vault-reviewer` ServiceAccount in the `external-secrets` namespace with `system:auth-delegator` ClusterRoleBinding.
+- Static token for `vault-reviewer` stored as a Secret (named `vault-reviewer-token`).
+
+**Reconfiguring after CA cert rotation:** If the workload cluster CA cert is rotated, update Vault:
+
+```bash
+# Get new CA cert
+kubectl --kubeconfig ~/.kube/workload get configmap kube-root-ca.crt -n kube-system -o jsonpath='{.data.ca\.crt}' > /tmp/k8s-ca.crt
+
+# Get vault-reviewer token
+kubectl --kubeconfig ~/.kube/workload get secret vault-reviewer-token -n external-secrets \
+  -o jsonpath='{.data.token}' | base64 -d > /tmp/reviewer-jwt.txt
+
+# Copy into Vault container and update config
+scp /tmp/k8s-ca.crt root@10.0.3.3:/tmp/k8s-ca.crt
+ssh root@10.0.3.3 "
+  docker cp /tmp/k8s-ca.crt ix-vault-vault-1:/tmp/k8s-ca.crt
+  docker cp /tmp/reviewer-jwt.txt ix-vault-vault-1:/tmp/reviewer-jwt.txt
+  docker exec -e VAULT_ADDR=http://127.0.0.1:8200 -e VAULT_TOKEN=<root-token> ix-vault-vault-1 \
+    sh -c 'vault write auth/kubernetes/config \
+      kubernetes_host=https://10.0.4.3:6443 \
+      kubernetes_ca_cert=@/tmp/k8s-ca.crt \
+      token_reviewer_jwt=\$(cat /tmp/reviewer-jwt.txt) \
+      disable_iss_validation=true'
+"
+```
+
 ## Proxying TrueNAS UI through Traefik
 
 Once TrueNAS UI is on port 8443, add this service to `apps.tf` to route `truenas.yuriykovalchuk.dev` through Traefik with a proper TLS cert:

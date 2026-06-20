@@ -21,6 +21,11 @@ resource "truenas_app" "immich" {
             condition: service_healthy
           redis:
             condition: service_healthy
+        deploy:
+          resources:
+            limits:
+              cpus: '2.0'
+              memory: 2G
         labels:
           - traefik.enable=true
           - traefik.http.routers.immich.rule=Host(`immich.yuriykovalchuk.dev`)
@@ -39,6 +44,11 @@ resource "truenas_app" "immich" {
           interval: 10s
           timeout: 5s
           retries: 5
+        deploy:
+          resources:
+            limits:
+              cpus: '0.5'
+              memory: 256M
         networks:
           - internal
 
@@ -58,6 +68,11 @@ resource "truenas_app" "immich" {
           interval: 10s
           timeout: 5s
           retries: 5
+        deploy:
+          resources:
+            limits:
+              cpus: '1.0'
+              memory: 512M
         networks:
           - internal
 

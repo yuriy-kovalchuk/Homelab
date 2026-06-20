@@ -41,6 +41,11 @@ resource "truenas_app" "traefik" {
           - traefik.http.routers.dashboard.entrypoints=websecure
           - traefik.http.routers.dashboard.tls.certresolver=letsencrypt
           - traefik.http.routers.dashboard.service=api@internal
+        deploy:
+          resources:
+            limits:
+              cpus: '0.5'
+              memory: 128M
         networks:
           - proxy
 

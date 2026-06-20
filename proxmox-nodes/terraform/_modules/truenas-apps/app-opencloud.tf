@@ -11,13 +11,14 @@ resource "truenas_app" "opencloud" {
           - /bin/sh
           - -c
           - |
-            opencloud init || true
+            opencloud init --insecure yes --config-path /var/lib/opencloud/config --admin-password "$$INITIAL_ADMIN_PASSWORD" -q || true
             opencloud server
         volumes:
           - /mnt/tank/opencloud:/var/lib/opencloud
         environment:
           OC_URL: https://opencloud.yuriykovalchuk.dev
           OC_DOMAIN: opencloud.yuriykovalchuk.dev
+          OC_CONFIG_DIR: /var/lib/opencloud/config
           OC_LOG_LEVEL: warn
           PROXY_TLS: "false"
           IDM_CREATE_DEMO_USERS: "false"
@@ -28,6 +29,11 @@ resource "truenas_app" "opencloud" {
           - traefik.http.routers.opencloud.entrypoints=websecure
           - traefik.http.routers.opencloud.tls.certresolver=letsencrypt
           - traefik.http.services.opencloud.loadbalancer.server.port=9200
+        deploy:
+          resources:
+            limits:
+              cpus: '1.0'
+              memory: 1G
         networks:
           - proxy
 

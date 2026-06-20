@@ -8,6 +8,6 @@ terraform {
 }
 
 provider "vault" {
-  address = "https://vault.mgmt.yuriykovalchuk.dev"
+  address = "https://vault.yuriykovalchuk.dev"
   # Token sourced from VAULT_TOKEN environment variable
 }

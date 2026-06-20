@@ -206,7 +206,7 @@
 
     # -------------------------------------------------------------------------
     # Rules — opt2 (VLAN 3 — storage)
-    # OUT: gateway DNS, internet (port 80/443 only)
+    # OUT: gateway DNS, internet (port 80/443 only), k8s-workload K8s API (Vault→TokenReview)
     # -------------------------------------------------------------------------
 
     - name: "opt2 | storage → gateway (DNS)"
@@ -250,6 +250,20 @@
         destination_net: HOMELAB_ALL
         destination_port: WEB_PORTS
         description: "opt2-10 storage to internet web only"
+        reload: false
+        match_fields: ["description"]
+
+    - name: "opt2 | storage → k8s-workload (K8s API)"
+      oxlorg.opnsense.rule:
+        sequence: 15
+        interface: ["opt2"]
+        direction: in
+        action: pass
+        protocol: TCP
+        source_net: VLAN3_NET
+        destination_net: VLAN4_NET
+        destination_port: "6443"
+        description: "opt2-15 storage to k8s-workload k8s api"
         reload: false
         match_fields: ["description"]
 

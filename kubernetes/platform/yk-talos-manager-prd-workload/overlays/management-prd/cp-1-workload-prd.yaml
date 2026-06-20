@@ -48,47 +48,47 @@ spec:
       kind: RegistryMirrorConfig
       name: docker.io
       endpoints:
-        - url: https://harbor.mgmt.yuriykovalchuk.dev/v2/dockerhub
+        - url: https://zot.yuriykovalchuk.dev/v2/dockerhub
           overridePath: true
     - |
       apiVersion: v1alpha1
       kind: RegistryMirrorConfig
       name: ghcr.io
       endpoints:
-        - url: https://harbor.mgmt.yuriykovalchuk.dev/v2/ghcr
+        - url: https://zot.yuriykovalchuk.dev/v2/ghcr
           overridePath: true
     - |
       apiVersion: v1alpha1
       kind: RegistryMirrorConfig
       name: gcr.io
       endpoints:
-        - url: https://harbor.mgmt.yuriykovalchuk.dev/v2/gcr
+        - url: https://zot.yuriykovalchuk.dev/v2/gcr
           overridePath: true
     - |
       apiVersion: v1alpha1
       kind: RegistryMirrorConfig
       name: registry.k8s.io
       endpoints:
-        - url: https://harbor.mgmt.yuriykovalchuk.dev/v2/k8s
+        - url: https://zot.yuriykovalchuk.dev/v2/k8s
           overridePath: true
     - |
       apiVersion: v1alpha1
       kind: RegistryMirrorConfig
       name: quay.io
       endpoints:
-        - url: https://harbor.mgmt.yuriykovalchuk.dev/v2/quay
+        - url: https://zot.yuriykovalchuk.dev/v2/quay
           overridePath: true
     - |
       apiVersion: v1alpha1
       kind: RegistryMirrorConfig
       name: public.ecr.aws
       endpoints:
-        - url: https://harbor.mgmt.yuriykovalchuk.dev/v2/ecr-public
+        - url: https://zot.yuriykovalchuk.dev/v2/ecr-public
           overridePath: true
     - |
       apiVersion: v1alpha1
       kind: RegistryMirrorConfig
       name: mcr.microsoft.com
       endpoints:
-        - url: https://harbor.mgmt.yuriykovalchuk.dev/v2/mcr
+        - url: https://zot.yuriykovalchuk.dev/v2/mcr
           overridePath: true

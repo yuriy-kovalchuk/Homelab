@@ -20,13 +20,18 @@ resource "truenas_app" "vault" {
         volumes:
           - /mnt/tank/vault:/vault/data
         environment:
-          VAULT_LOCAL_CONFIG: '{"ui":true,"storage":{"raft":{"path":"/vault/data","node_id":"node1"}},"listener":[{"tcp":{"address":"0.0.0.0:8200","tls_disable":true}}],"cluster_addr":"http://vault:8201","api_addr":"https://vault.yuriykovalchuk.dev"}'
+          VAULT_LOCAL_CONFIG: '{"ui":true,"disable_mlock":true,"storage":{"raft":{"path":"/vault/data","node_id":"node1"}},"listener":[{"tcp":{"address":"0.0.0.0:8200","tls_disable":true}}],"cluster_addr":"http://vault:8201","api_addr":"https://vault.yuriykovalchuk.dev"}'
         labels:
           - traefik.enable=true
           - traefik.http.routers.vault.rule=Host(`vault.yuriykovalchuk.dev`)
           - traefik.http.routers.vault.entrypoints=websecure
           - traefik.http.routers.vault.tls.certresolver=letsencrypt
           - traefik.http.services.vault.loadbalancer.server.port=8200
+        deploy:
+          resources:
+            limits:
+              cpus: '0.5'
+              memory: 1024M
         networks:
           - proxy
 
