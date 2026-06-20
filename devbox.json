@@ -10,7 +10,8 @@
     "cilium-cli@latest",
     "hubble@latest",
     "fluxcd@latest",
-    "terragrunt@latest"
+    "terragrunt@latest",
+    "aws@latest"
   ],
   "shell": {
     "init_hook": [
@@ -18,7 +19,7 @@
       "set -a; source $DEVBOX_PROJECT_ROOT/.env; set +a",
       "source $DEVBOX_PROJECT_ROOT/devbox_scripts/tf_functions.sh"
     ],
-"scripts": {
+    "scripts": {
       "test": [
         "echo \"Error: no test specified\" && exit 1"
       ]

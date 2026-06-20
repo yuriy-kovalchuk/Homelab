@@ -223,6 +223,21 @@
         reload: false
         match_fields: ["description"]
 
+    - name: "opt2 | storage → internet (DNS)"
+      oxlorg.opnsense.rule:
+        sequence: 8
+        interface: ["opt2"]
+        direction: in
+        action: pass
+        protocol: "TCP/UDP"
+        source_net: VLAN3_NET
+        destination_invert: true
+        destination_net: HOMELAB_ALL
+        destination_port: "53"
+        description: "opt2-08 storage to internet dns"
+        reload: false
+        match_fields: ["description"]
+
     - name: "opt2 | storage → internet (web only)"
       oxlorg.opnsense.rule:
         sequence: 10

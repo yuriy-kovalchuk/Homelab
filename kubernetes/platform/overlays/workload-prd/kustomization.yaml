@@ -12,7 +12,6 @@ resources:
   - ../../cilium-observability/overlays/workload-prd
   - ../../longhorn/overlays/workload-prd
   - ../../metrics-server/overlays/workload-prd
-  - ../../forgejo/overlays/workload-prd
   - ../../flux-system/overlays/workload-prd
   - ../../kyverno-reporter/overlays/workload-prd
   - ../../vpa/overlays/workload-prd

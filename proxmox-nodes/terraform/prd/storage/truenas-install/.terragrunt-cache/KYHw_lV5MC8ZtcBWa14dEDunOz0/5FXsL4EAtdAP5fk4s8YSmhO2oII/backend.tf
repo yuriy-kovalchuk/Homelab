@@ -7,7 +7,7 @@ terraform {
       s3 = "https://rustfs.yuriykovalchuk.dev"
     }
     insecure                    = true
-    key                         = "proxmox-nodes/storage/docker-vm.tfstate"
+    key                         = "proxmox-nodes/storage/truenas-install.tfstate"
     region                      = "eu-south-1"
     secret_key                  = "G7IPKSJ0U5zR7M4Wh7dgOP5RP1fsrPundhY4kinX"
     skip_credentials_validation = true
