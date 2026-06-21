@@ -13,7 +13,7 @@ data:
       GitOps:
         header: true
         style: row
-        columns: 3
+        columns: 2
       Infrastructure:
         header: true
         style: row
@@ -37,7 +37,7 @@ data:
       Compute:
         header: true
         style: row
-        columns: 3
+        columns: 2
       Development:
         header: true
         style: row
@@ -48,33 +48,29 @@ data:
         - Forgejo:
             icon: gitea.svg
             href: https://forgejo.yuriykovalchuk.dev
-            description: Source control — workload-prd
-        - Flux Workload:
+            description: Source control
+        - Flux:
             icon: flux-cd.svg
             href: https://fluxcd.yuriykovalchuk.dev
             description: GitOps — workload-prd
-        - Flux Management:
-            icon: flux-cd.svg
-            href: https://fluxcd.mgmt.yuriykovalchuk.dev
-            description: GitOps — management-prd
 
     - Infrastructure:
         - Vault:
             icon: vault.svg
-            href: https://vault.mgmt.yuriykovalchuk.dev
-            description: Secrets management — management-prd
-        - Harbor:
+            href: https://vault.yuriykovalchuk.dev
+            description: Secrets management — TrueNAS
+        - Zot:
             icon: harbor.svg
-            href: https://harbor.mgmt.yuriykovalchuk.dev
-            description: Container registry — management-prd
-        - Longhorn Workload:
+            href: https://zot.yuriykovalchuk.dev
+            description: Container registry — TrueNAS
+        - Longhorn:
             icon: longhorn.svg
             href: https://longhorn.yuriykovalchuk.dev
             description: Persistent storage — workload-prd
-        - Longhorn Management:
-            icon: longhorn.svg
-            href: https://longhorn.mgmt.yuriykovalchuk.dev
-            description: Persistent storage — management-prd
+        - Dockhand:
+            icon: docker.svg
+            href: https://dockhand.yuriykovalchuk.dev
+            description: Container management — TrueNAS
 
     - Monitoring:
         - Grafana:
@@ -85,26 +81,14 @@ data:
             icon: alloy.svg
             href: https://alloy.yuriykovalchuk.dev
             description: Telemetry collector
-        - Hubble Workload:
+        - Hubble:
             icon: cilium.svg
             href: https://hubble.yuriykovalchuk.dev
-            description: Cilium network observability — workload-prd
-        - Hubble Management:
-            icon: cilium.svg
-            href: https://hubble.mgmt.yuriykovalchuk.dev
-            description: Cilium network observability — management-prd
-        - Uptime Kuma:
-            icon: uptime-kuma.svg
-            href: https://uptime.yuriykovalchuk.dev
-            description: Uptime monitoring
-        - Kyverno Reporter Workload:
+            description: Cilium network observability
+        - Kyverno Reporter:
             icon: kyverno.svg
             href: https://kyverno-reporter.yuriykovalchuk.dev
-            description: Policy compliance reporter — workload-prd
-        - Kyverno Reporter Management:
-            icon: kyverno.svg
-            href: https://kyverno-reporter.mgmt.yuriykovalchuk.dev
-            description: Policy compliance reporter — management-prd
+            description: Policy compliance reporter
         - Goldilocks:
             icon: goldilocks.png
             href: https://goldilocks.yuriykovalchuk.dev
@@ -125,20 +109,24 @@ data:
             icon: truenas-scale.svg
             href: https://truenas.yuriykovalchuk.dev/ui/
             description: NAS storage
-        - S3 Console:
+        - RustFS:
             icon: minio.svg
-            href: https://s3.yuriykovalchuk.dev
-            description: S3 object storage console
+            href: https://rustfs.yuriykovalchuk.dev
+            description: S3 object storage — TrueNAS
+        - Immich:
+            icon: immich.png
+            href: https://immich.yuriykovalchuk.dev
+            description: Photo management — TrueNAS
+        - OpenCloud:
+            icon: nextcloud.svg
+            href: https://opencloud.yuriykovalchuk.dev
+            description: File sharing — TrueNAS
 
     - Network:
         - OPNsense:
             icon: opnsense.svg
             href: https://opnsense.yuriykovalchuk.dev
             description: Firewall and router
-        - Nginx Proxy Manager:
-            icon: nginx-proxy-manager.svg
-            href: http://10.0.3.4:81
-            description: Reverse proxy — Docker VM
 
     - Compute:
         - Proxmox Storage:
@@ -149,10 +137,6 @@ data:
             icon: proxmox.svg
             href: https://firewall.yuriykovalchuk.dev:8006
             description: Proxmox — firewall node
-        - Portainer:
-            icon: portainer.svg
-            href: https://10.0.3.4:9443
-            description: Docker management — Docker VM
 
     - Development:
         - HTTPBin:

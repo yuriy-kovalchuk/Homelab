@@ -16,12 +16,6 @@ spec:
         - remote-node
     - fromEntities:
         - cluster
-      toPorts:
-        - ports:
-            - port: "53"
-              protocol: UDP
-            - port: "53"
-              protocol: TCP
     - fromCIDR:
         - 10.0.5.0/24
       toPorts:
