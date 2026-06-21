@@ -4,6 +4,8 @@ resources:
   - ../../clean-pods/overlays/workload-prd
   - ../../httpbin/overlays/workload-prd
   - ../../whoami/overlays/workload-prd
+  - ../../yk-portfolio/overlays/workload-prd
+  - ../../yk-update-checker/overlays/workload-prd
   # pending review:
   # - ../../cloudflared/overlays/workload-prd
   # - ../../homepage/overlays/workload-prd

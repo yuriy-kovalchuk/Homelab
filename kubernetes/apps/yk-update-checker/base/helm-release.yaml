@@ -24,7 +24,23 @@ spec:
       retries: -1
       remediateLastFailure: true
   values:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 64Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
     scanner:
+
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 100m
+          memory: 512Mi
+
       config:
         update_type: all
         parallel_checks: 5
