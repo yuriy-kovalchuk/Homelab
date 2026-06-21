@@ -24,34 +24,26 @@ Homelab/
 
 ## Cluster topology
 
-Two bare-metal **Talos Linux** clusters managed by FluxCD.
-
-### management-prd
-| Node | IP | Role |
-|------|----|------|
-| mgmt-1 | 10.0.2.2 | control-plane (scheduling enabled) |
-
-- VLAN 2 — `10.0.2.0/24`, gateway `10.0.2.1` (OPNsense)
-- Hosts: Vault, Harbor, cert-manager, Longhorn, yk-talos-manager
-- BGP pool: `10.0.2.50–10.0.2.99`, peer OPNsense (ASN 65551 ↔ 65001)
+One bare-metal **Talos Linux** cluster managed by FluxCD.
 
 ### workload-prd
 | Node | IP | Role |
 |------|----|------|
-| node-1 | 10.0.4.2 | control-plane |
-| node-2 | 10.0.4.3 | control-plane |
-| node-3 | 10.0.4.4 | control-plane + **AMD 780M GPU** |
+| controlplane-1 | 10.0.4.3 | control-plane |
+| controlplane-2 | 10.0.4.5 | control-plane |
+| controlplane-3 | 10.0.4.6 | control-plane (offline, coming back) |
+| worker-1 | 10.0.4.4 | worker + **AMD 780M GPU** |
 
 - VLAN 4 — `10.0.4.0/24`, gateway `10.0.4.1` (OPNsense)
-- Hosts: all user-facing workloads, LLM stack, observability
-- BGP pool: `10.0.4.50–10.0.4.99`
-- `node-3` is the GPU node — LLM workloads pinned there via `nodeSelector: kubernetes.io/hostname: node-3`
+- Hosts: all user-facing workloads, LLM stack, observability, infrastructure (Vault on TrueNAS)
+- BGP pool: `10.0.4.50–10.0.4.99`, peer OPNsense (ASN 65551 ↔ 65001)
+- `worker-1` is the GPU node — LLM workloads pinned there via `nodeSelector: kubernetes.io/hostname: worker-1`
 
 ### VLAN map
 | VLAN | Subnet | Purpose |
 |------|--------|---------|
-| 2 | 10.0.2.0/24 | Management cluster |
-| 3 | 10.0.3.0/24 | Storage (TrueNAS 10.0.3.3, MinIO/S3 10.0.3.4) |
+| 2 | 10.0.2.0/24 | Deprecated — pending removal |
+| 3 | 10.0.3.0/24 | Storage (TrueNAS 10.0.3.3 — NAS + Vault + Zot + RustFS) |
 | 4 | 10.0.4.0/24 | Workload cluster |
 | 5 | 10.0.5.0/24 | Physical workload devices |
 | 6 | 10.0.6.0/24 | Private wireless |
@@ -119,7 +111,7 @@ All follow `base/ + overlays/{cluster}/` pattern. HelmRepositories live in `flux
 
 | App | Namespace | Purpose |
 |-----|-----------|---------|
-| llama-cpp | llm | LLM inference server — llama.cpp router mode, Vulkan GPU, AMD 780M on node-3 |
+| llama-cpp | llm | LLM inference server — llama.cpp router mode, Vulkan GPU, AMD 780M on worker-1 |
 | open-webui | open-webui | Chat UI — connects to `llama-cpp.llm.svc.cluster.local:8080/v1` |
 | homepage | homepage | Dashboard landing page |
 | cloudflared | cloudflared | Cloudflare Tunnel agent |
@@ -219,7 +211,7 @@ destinations:
 
 **Key files:**
 - `kubernetes/apps/llama-cpp/base/deployment.yaml` — base Deployment (CPU, no GPU)
-- `kubernetes/apps/llama-cpp/overlays/workload-prd/gpu-patch.yaml` — hardware-only patch (node-3, privileged, `/dev/dri`, `/sys/bus/pci`)
+- `kubernetes/apps/llama-cpp/overlays/workload-prd/gpu-patch.yaml` — hardware-only patch (worker-1, privileged, `/dev/dri`, `/sys/bus/pci`)
 - `kubernetes/apps/llama-cpp/base/models-preset-configmap.yaml` — `presets.ini` ConfigMap
 - `kubernetes/apps/llama-cpp/base/model-download-*.yaml` — one Job per model
 
@@ -231,7 +223,7 @@ destinations:
 --models-max 1
 ```
 
-**GPU patch adds:** `nodeSelector: node-3`, `securityContext: privileged + runAsUser: 0`, `volumes: dev-dri + sys-bus-pci`
+**GPU patch adds:** `nodeSelector: worker-1`, `securityContext: privileged + runAsUser: 0`, `volumes: dev-dri + sys-bus-pci`
 
 **presets.ini structure:**
 ```ini
@@ -326,6 +318,6 @@ valuesFrom:
 | `kubernetes/infrastructure/tempo/overlays/workload-prd/helm-release-patch.yaml` | Tempo S3 config, metrics-generator |
 | `kubernetes/infrastructure/vault/overlays/management-prd/helm-release-patch.yaml` | Vault storage, HA config |
 | `kubernetes/apps/llama-cpp/base/models-preset-configmap.yaml` | Per-model inference parameters |
-| `kubernetes/apps/llama-cpp/overlays/workload-prd/gpu-patch.yaml` | GPU hardware access (node-3) |
+| `kubernetes/apps/llama-cpp/overlays/workload-prd/gpu-patch.yaml` | GPU hardware access (worker-1) |
 | `docs/NETWORK.md` | VLAN layout, BGP, firewall rules |
 | `docs/DEVICES.md` | All device IPs |

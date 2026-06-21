@@ -14,6 +14,7 @@
 # Local Terraform directories
 **/.terraform/
 **/.terraform.lock.hcl
+**/.terragrunt-cache/
 
 # Terraform state files
 **/*.tfstate

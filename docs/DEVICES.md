@@ -10,13 +10,13 @@ All static/reserved devices on the homelab network. Update this file whenever a 
 | 192.168.0.110   | opnsense          | OPNsense VM         | WAN IP, firewall/router      |
 | 192.168.0.254   | gateway-pve       | Proxmox (gateway)   | Homelab hypervisor — gateway |
 
-## VLAN 2 — k8s-mgmt (10.0.2.0/24, opt1)
+## VLAN 2 — deprecated (10.0.2.0/24, opt1)
+
+No active devices. Pending removal from switch and OPNsense config.
 
 | IP              | Hostname | Device            | Notes                              |
 |-----------------|----------|-------------------|------------------------------------|
 | 10.0.2.1        | —        | OPNsense opt1     | VLAN gateway                       |
-| 10.0.2.2        | mgmt-1   | Talos node        | Management cluster control-plane   |
-| 10.0.2.50–.99   | —        | LB pool           | Cilium BGP LoadBalancer IP pool    |
 
 ## VLAN 3 — storage (10.0.3.0/24, opt2)
 
@@ -24,17 +24,18 @@ All static/reserved devices on the homelab network. Update this file whenever a 
 |------------|--------------|---------------------|-----------------------------------------------|
 | 10.0.3.1   | —            | OPNsense opt2       | VLAN gateway                                  |
 | 10.0.3.2   | storage      | Proxmox (storage)   | Storage node hypervisor                       |
-| 10.0.3.3   | truenas      | TrueNAS SCALE VM    | NAS — NFS/SMB                                 |
-| 10.0.3.4   | docker-vm    | Ubuntu 24.04 VM     | Docker host — Garage S3, Portainer, NPM       |
+| 10.0.3.3   | truenas      | TrueNAS SCALE VM    | NAS — NFS/SMB, Vault, Zot, RustFS, apps      |
 
 ## VLAN 4 — k8s-workload (10.0.4.0/24, opt3)
 
-| IP         | Hostname | Device        | Notes                             |
-|------------|----------|---------------|-----------------------------------|
-| 10.0.4.1   | —        | OPNsense opt3 | VLAN gateway                      |
-| 10.0.4.2   | node-1   | Talos node    | Workload cluster control-plane    |
-| 10.0.4.3   | node-2   | Talos node    | Workload cluster control-plane    |
-| 10.0.4.4   | node-3   | Talos node    | Workload cluster control-plane    |
+| IP         | Hostname        | Device        | Notes                                          |
+|------------|-----------------|---------------|------------------------------------------------|
+| 10.0.4.1   | —               | OPNsense opt3 | VLAN gateway                                   |
+| 10.0.4.6   | controlplane-3  | Talos node    | Workload control-plane (offline, coming back)  |
+| 10.0.4.3   | controlplane-1  | Talos node    | Workload control-plane                         |
+| 10.0.4.4   | worker-1        | Talos node    | Workload worker — AMD 780M GPU                 |
+| 10.0.4.5   | controlplane-2  | Talos node    | Workload control-plane                         |
+| 10.0.4.50–.99 | —            | LB pool       | Cilium BGP LoadBalancer IP pool                |
 
 ## VLAN 5 — phys-workload (10.0.5.0/24, opt4)
 

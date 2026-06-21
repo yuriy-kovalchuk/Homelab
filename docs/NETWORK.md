@@ -13,43 +13,25 @@ OPNsense owns all VLAN routing. The managed switch does VLAN tagging per port. `
 
 | VLAN | Subnet       | Purpose                        | Gateway    |
 |------|--------------|--------------------------------|------------|
-| 2    | 10.0.2.0/24  | Management k8s cluster         | 10.0.2.1   |
+| 2    | 10.0.2.0/24  | Deprecated — pending removal   | 10.0.2.1   |
 | 3    | 10.0.3.0/24  | Storage                        | 10.0.3.1   |
-| 4    | 10.0.4.0/24  | Main k8s workload cluster      | 10.0.4.1   |
+| 4    | 10.0.4.0/24  | k8s workload cluster           | 10.0.4.1   |
 | 5    | 10.0.5.0/24  | Physical workload              | 10.0.5.1   |
 | 6    | 10.0.6.0/24  | Private wireless               | 10.0.6.1   |
 | 7    | 10.0.7.0/24  | Guest wireless                 | 10.0.7.1   |
 
-> **Note on VLAN 2:** This is not a traditional management VLAN. It hosts the management k8s cluster which runs shared infrastructure services (Vault, Harbor, etc.) consumed by other VLANs. Its services must be reachable from VLAN 4, 5, and 6.
-
 ## Firewall Rules
-
-### Management k8s — VLAN 2
-
-| Direction | Target              | Notes                                    |
-|-----------|---------------------|------------------------------------------|
-| OUT       | 10.0.2.1 :53        | DNS to gateway                           |
-| OUT       | 10.0.2.1 :123       | NTP to gateway                           |
-| OUT       | 10.0.2.1 :443       | HTTPS API to gateway                     |
-| OUT       | 10.0.2.1 :179       | BGP to gateway                           |
-| OUT       | VLAN 3 (full)       | Full storage access                      |
-| OUT       | VLAN 4 :6443+50000  | Kubernetes + Talos API (yk-talos-manager)|
-| OUT       | Internet            |                                          |
-| IN        | VLAN 4              | Vault, Harbor and other shared services  |
-| IN        | VLAN 5              | Vault, Harbor and other shared services  |
-| IN        | VLAN 6              | Vault, Harbor and other shared services  |
 
 ### Storage — VLAN 3
 
 | Direction | Target          | Notes                              |
 |-----------|-----------------|------------------------------------|
 | OUT       | Internet        | Updates only (port 80/443)         |
-| IN        | VLAN 2          | Full access                        |
 | IN        | VLAN 4          | Full access                        |
 | IN        | VLAN 5          | Full access                        |
 | IN        | VLAN 6          | NFS only (port 2049)               |
 
-### Main k8s workload — VLAN 4
+### k8s workload — VLAN 4
 
 | Direction | Target            | Notes                              |
 |-----------|-------------------|------------------------------------|
@@ -58,9 +40,7 @@ OPNsense owns all VLAN routing. The managed switch does VLAN tagging per port. `
 | OUT       | 10.0.4.1 :443     | HTTPS API to gateway               |
 | OUT       | 10.0.4.1 :179     | BGP to gateway                     |
 | OUT       | VLAN 3 (full)     | Storage access                     |
-| OUT       | VLAN 2 :443+8200  | Vault + Harbor only                |
 | OUT       | Internet          |                                    |
-| IN        | VLAN 2            | Management access                  |
 | IN        | VLAN 5            |                                    |
 | IN        | VLAN 6            |                                    |
 
@@ -69,7 +49,6 @@ OPNsense owns all VLAN routing. The managed switch does VLAN tagging per port. `
 | Direction | Target          | Notes                              |
 |-----------|-----------------|------------------------------------|
 | OUT       | Full access     | All VLANs except VLAN 7 + internet |
-| IN        | VLAN 2          |                                    |
 | IN        | VLAN 4          |                                    |
 | IN        | VLAN 6          |                                    |
 
@@ -77,8 +56,8 @@ OPNsense owns all VLAN routing. The managed switch does VLAN tagging per port. `
 
 | Direction | Target          | Notes                              |
 |-----------|-----------------|------------------------------------|
-| OUT       | VLAN 2          | Shared services access             |
 | OUT       | VLAN 3          | NFS shares (port 2049)             |
+| OUT       | VLAN 4          | Access to workload services        |
 | OUT       | Internet        |                                    |
 | IN        | —               | Not a server VLAN                  |
 
@@ -104,7 +83,7 @@ vmbr1 (VLAN-aware trunk)
    │
 Managed Switch
    ├── Port 1 : Trunk — Proxmox uplink (all VLANs tagged)
-   ├── Port 2 : VLAN 2  — management k8s nodes / Proxmox hosts (future)
+   ├── Port 2 : VLAN 2  — reserved (WiFi AP management)
    ├── Port 3 : VLAN 3  — storage nodes (TrueNAS, NAS)
    ├── Port 4 : VLAN 4  — main k8s workload nodes
    ├── Port 5 : VLAN 5  — physical workload devices
@@ -115,30 +94,29 @@ Managed Switch
 ## Key Design Decisions
 
 - **VLAN tag = third octet** — easy to derive any IP from the VLAN ID without looking it up (VLAN 2 = `10.0.2.x`, VLAN 3 = `10.0.3.x`, etc.). VLAN 1 is reserved by 802.1Q.
-- **VLAN 2 hosts shared services** — Vault, Harbor and similar tools run here and are consumed by VLAN 4, 5, and 6. Not a traditional management VLAN.
+- **VLAN 2 is deprecated** — no active devices, pending full removal from switch and OPNsense config.
+- **Shared infrastructure runs on VLAN 3 (TrueNAS)** — Vault, Zot registry, RustFS S3 and other services run here via TrueNAS apps and are consumed by VLAN 4, 5, and 6.
 - **Storage never initiates intra-VLAN connections** — only accepts them. Outbound is internet-only for updates.
 - **Physical workload has full outbound** — most permissive VLAN, intended for generic workloads that may need broad access.
-- **Private wireless is client-only** — no services run here, only outbound to VLAN 2, VLAN 3, and internet.
-- **Proxmox hosts land on VLAN 2** — currently on home LAN (`192.168.0.x`), will move to VLAN 2 when internal network is ready (see `FUTURE.md`).
+- **Private wireless is client-only** — no services run here, only outbound to VLAN 3, VLAN 4, and internet.
 
 ## BGP — Kubernetes LoadBalancer IPs
 
-OPNsense peers with Cilium BGP Control Plane on the management cluster to advertise
-LoadBalancer service IPs. IPs are allocated from a pool within VLAN 2 so they are
-routable on the same segment without additional static routes.
+OPNsense peers with Cilium BGP Control Plane on the workload cluster to advertise
+LoadBalancer service IPs. IPs are allocated from a pool within VLAN 4.
 
-| Side       | ASN   | IP        | Role                        |
-|------------|-------|-----------|-----------------------------|
-| OPNsense   | 65551 | 10.0.2.1  | Router, BGP speaker         |
-| mgmt-1     | 65001 | 10.0.2.2  | Kubernetes node, BGP peer   |
+| Side            | ASN   | IP        | Role                        |
+|-----------------|-------|-----------|-----------------------------|
+| OPNsense        | 65551 | 10.0.4.1  | Router, BGP speaker         |
+| controlplane-1  | 65001 | 10.0.4.3  | Kubernetes node, BGP peer   |
 
-**LoadBalancer IP pool:** `10.0.2.50–10.0.2.99` (VLAN 2 — K8sMgmt)
+**LoadBalancer IP pool:** `10.0.4.50–10.0.4.99` (VLAN 4 — k8s-workload)
 
 Cilium announces allocated IPs via eBGP to OPNsense. OPNsense installs them as
 host routes and forwards traffic to the node that holds the service.
 
-Configured via `proxmox-nodes/gateway/ansible/playbooks/opnsense/bgp.yml` (FRR plugin)
-and `infrastructure/overlays/management-prd/bgp/` (Cilium side).
+Configured via `proxmox-nodes/ansible/playbooks/opnsense/bgp.yml` (FRR plugin)
+and `kubernetes/platform/bgp/overlays/workload-prd/` (Cilium side).
 
 ## OPNsense Setup
 
@@ -149,7 +127,7 @@ run order. Summary:
 2. Manual GUI — assign interfaces, set gateway IPs (OPNsense has no API for this)
 3. `dhcp.yml` — configures DHCP pools per VLAN
 4. `firewall.yml` — applies aliases and rules from the tables above
-5. `bgp.yml` — installs FRR plugin and configures BGP peering with the management cluster
+5. `bgp.yml` — installs FRR plugin and configures BGP peering with the workload cluster
 
 ## Managed Switch Setup (UniFi)
 

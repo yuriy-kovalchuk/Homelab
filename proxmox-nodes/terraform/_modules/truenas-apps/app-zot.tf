@@ -24,8 +24,8 @@ resource "truenas_app" "zot" {
         deploy:
           resources:
             limits:
-              cpus: '1.0'
-              memory: 1G
+              cpus: '2.0'
+              memory: 2G
         networks:
           - proxy
 
