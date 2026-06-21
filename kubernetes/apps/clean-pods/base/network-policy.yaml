@@ -4,18 +4,23 @@ metadata:
   name: clean-pods-egress
   namespace: clean-pods
 spec:
-  description: "Allow the cleanup CronJob to reach the kube-apiserver and pull apk packages"
+  description: "Allow the cleanup CronJob to reach the kube-apiserver"
   endpointSelector: {}
   egress:
     - toEntities:
         - kube-apiserver
-        - host
-        - remote-node
-    - toEntities:
-        - world
       toPorts:
         - ports:
+            - port: "6443"
+              protocol: TCP
             - port: "443"
               protocol: TCP
-            - port: "80"
+    - toEntities:
+        - remote-node
+        - host
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+            - port: "443"
               protocol: TCP

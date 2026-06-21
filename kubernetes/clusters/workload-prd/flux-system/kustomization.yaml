@@ -6,5 +6,5 @@ resources:
   - platform.yaml
   - llm-policies.yaml
   # - observability.yaml
-  # - apps.yaml
+  - apps.yaml
   - llm.yaml
