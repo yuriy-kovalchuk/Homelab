@@ -92,7 +92,7 @@ All follow `base/ + overlays/{cluster}/` pattern. HelmRepositories live in `flux
 | harbor | harbor | harbor | 1.x | harbor | Private container registry |
 | longhorn | longhorn-system | longhorn | 1.11.2 | longhorn | HA block storage |
 | gateway-api-crds | — | — | — | — | Gateway API CRD installation |
-| gateway | main-gateway | — | — | — | Cilium Gateway, HTTPS ingress |
+| gateway | kube-system | — | — | — | Cilium Gateway, HTTPS ingress |
 | metrics-server | kube-system | metrics-server | — | — | K8s HPA/VPA metrics |
 | kyverno | kyverno | kyverno | 3.8.1 | kyverno | Policy engine |
 | kyverno-reporter | kyverno-reporter | policy-reporter | — | kyverno | Policy reporting UI |
@@ -141,7 +141,7 @@ All follow `base/ + overlays/{cluster}/` pattern. HelmRepositories live in `flux
 
 **Gateway pattern:**
 - GatewayClass: `cilium`
-- Gateway name: `internal` in namespace `main-gateway`
+- Gateway name: `internal` in namespace `kube-system`
 - One HTTPS listener per hostname, named `https-{app-name}` — must match HTTPRoute `sectionName`
 - Cert refs live in the app namespace
 - Config: `kubernetes/infrastructure/gateway/overlays/workload-prd/gateway-patch.yaml`
@@ -150,7 +150,7 @@ All follow `base/ + overlays/{cluster}/` pattern. HelmRepositories live in `flux
 ```yaml
 parentRefs:
   - name: internal
-    namespace: main-gateway
+    namespace: kube-system
     sectionName: https-{app-name}   # must match gateway listener name
 hostnames:
   - {app-name}.yuriy-lab.cloud
