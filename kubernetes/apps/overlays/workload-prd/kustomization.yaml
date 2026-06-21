@@ -6,8 +6,8 @@ resources:
   - ../../whoami/overlays/workload-prd
   - ../../yk-portfolio/overlays/workload-prd
   - ../../yk-update-checker/overlays/workload-prd
+  - ../../cloudflared/overlays/workload-prd
   # pending review:
-  # - ../../cloudflared/overlays/workload-prd
   # - ../../homepage/overlays/workload-prd
   # - ../../yk-portfolio/overlays/workload-prd
   # - ../../yk-update-checker/overlays/workload-prd

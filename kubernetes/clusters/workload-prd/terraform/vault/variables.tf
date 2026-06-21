@@ -18,6 +18,11 @@ variable "cloudflare_api_token" {
   sensitive = true
 }
 
+variable "cloudflared_tunnel_token" {
+  type      = string
+  sensitive = true
+}
+
 variable "opnsense_api_key" {
   type      = string
   sensitive = true
