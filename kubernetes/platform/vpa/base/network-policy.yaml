@@ -61,6 +61,35 @@ spec:
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
+  name: goldilocks
+  namespace: vpa
+spec:
+  description: "Allow Goldilocks controller and dashboard to reach kube-apiserver"
+  endpointSelector:
+    matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: In
+        values:
+          - goldilocks
+  ingress:
+    - fromEntities:
+        - ingress
+  egress:
+    - toEntities:
+        - kube-apiserver
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
   name: vpa-recommender-updater
   namespace: vpa
 spec:
