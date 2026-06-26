@@ -23,6 +23,21 @@ spec:
           - nodev
           - noexec
 
+    controller:
+      driver:
+        image:
+          tag: "v1.9.5@sha256:746bf6b373ae75f5da8b1e412d13c3e8d0e2e1494654268b9dd6fe1f1e55aade"
+          pullPolicy: IfNotPresent
+
+    node:
+      driver:
+        image:
+          tag: "v1.9.5@sha256:746bf6b373ae75f5da8b1e412d13c3e8d0e2e1494654268b9dd6fe1f1e55aade"
+          pullPolicy: IfNotPresent
+
+    csiProxy:
+      enabled: false
+
     driver:
       existingConfigSecret: truenas-nfs-secret
       config:

@@ -24,7 +24,7 @@ resource "truenas_app" "zot" {
         deploy:
           resources:
             limits:
-              cpus: '2.0'
+              cpus: '2.5'
               memory: 2G
         networks:
           - proxy
@@ -34,7 +34,7 @@ resource "truenas_app" "zot" {
         content: |
           {
             "distSpecVersion": "1.1.0",
-            "storage": { "rootDirectory": "/var/lib/registry" },
+            "storage": { "rootDirectory": "/var/lib/registry", "dedupe": true, "gc": true },
             "http": { "address": "0.0.0.0", "port": "5000" },
             "log": { "level": "warn" },
             "extensions": {

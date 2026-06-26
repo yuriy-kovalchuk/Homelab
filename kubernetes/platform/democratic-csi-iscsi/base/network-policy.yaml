@@ -6,7 +6,7 @@ metadata:
 spec:
   endpointSelector:
     matchLabels:
-      app.kubernetes.io/component: controller-manager
+      app.kubernetes.io/component: controller-linux
   ingress:
     - fromEntities:
         - cluster
@@ -39,7 +39,7 @@ metadata:
 spec:
   endpointSelector:
     matchLabels:
-      app.kubernetes.io/component: node
+      app.kubernetes.io/component: node-linux
   egress:
     - toEntities:
         - cluster

@@ -25,3 +25,10 @@ resource "truenas_dataset" "kubernetes_nfs_snapshots" {
 
   depends_on = [truenas_dataset.kubernetes]
 }
+
+resource "truenas_dataset" "kubernetes_iscsi_snapshots" {
+  pool = var.truenas_pool_name
+  path = "kubernetes/iscsi-snapshots"
+
+  depends_on = [truenas_dataset.kubernetes]
+}

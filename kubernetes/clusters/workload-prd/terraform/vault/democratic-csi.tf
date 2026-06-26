@@ -5,12 +5,13 @@ resource "vault_kv_secret_v2" "democratic_csi_nfs" {
 
   data_json = jsonencode({
     "driver-config-file.yaml" = yamlencode({
+      driver = "freenas-api-nfs"
       httpConnection = {
         host          = "10.0.3.3"
         port          = 8443
         username      = "truenas_admin"
         password      = var.truenas_token
-        allowInsecure = false
+        allowInsecure = true
       }
       zfs = {
         datasetParentName                  = "tank/kubernetes/nfs"
@@ -41,16 +42,18 @@ resource "vault_kv_secret_v2" "democratic_csi_iscsi" {
 
   data_json = jsonencode({
     "driver-config-file.yaml" = yamlencode({
+      driver = "freenas-api-iscsi"
       httpConnection = {
         host          = "10.0.3.3"
         port          = 8443
         username      = "truenas_admin"
         password      = var.truenas_token
-        allowInsecure = false
+        allowInsecure = true
       }
       zfs = {
-        datasetParentName      = "tank/kubernetes/iscsi"
-        zvolEnableReservation  = false
+        datasetParentName                  = "tank/kubernetes/iscsi"
+        detachedSnapshotsDatasetParentName = "tank/kubernetes/iscsi-snapshots"
+        zvolEnableReservation              = false
       }
       iscsi = {
         targetPortal = "10.0.3.3:3260"
