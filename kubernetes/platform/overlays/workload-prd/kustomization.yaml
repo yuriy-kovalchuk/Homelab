@@ -11,6 +11,8 @@ resources:
   - ../../hubble/overlays/workload-prd
   - ../../cilium-observability/overlays/workload-prd
   - ../../longhorn/overlays/workload-prd
+  - ../../democratic-csi-nfs/overlays/workload-prd
+  - ../../democratic-csi-iscsi/overlays/workload-prd
   - ../../metrics-server/overlays/workload-prd
   - ../../flux-system/overlays/workload-prd
   - ../../kyverno-reporter/overlays/workload-prd

@@ -7,5 +7,5 @@ patches:
   - path: helm-release-patch.yaml
     target:
       kind: HelmRelease
-      name: forgejo
-      namespace: forgejo
+      name: democratic-csi-iscsi
+      namespace: democratic-csi-iscsi

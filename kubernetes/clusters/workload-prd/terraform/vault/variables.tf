@@ -33,3 +33,9 @@ variable "opnsense_api_secret" {
   sensitive = true
 }
 
+variable "truenas_token" {
+  description = "TrueNAS API token for democratic-csi"
+  type        = string
+  sensitive   = true
+}
+

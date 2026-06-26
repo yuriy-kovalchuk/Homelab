@@ -4,6 +4,5 @@ resources:
   - namespace.yaml
   - helm-repository.yaml
   - helm-release.yaml
-  - unseal-configmap.yaml
-  - unseal-cronjob.yaml
+  - external-secret.yaml
   - network-policy.yaml
