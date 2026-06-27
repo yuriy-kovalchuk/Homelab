@@ -1,0 +1,40 @@
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: cdi-egress-api
+spec:
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: cdi
+  egress:
+    - toEntities:
+        - kube-apiserver
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
+    - toEntities:
+        - cluster
+---
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: cdi-egress-world
+spec:
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: cdi
+  egress:
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+            - port: "80"
+              protocol: TCP

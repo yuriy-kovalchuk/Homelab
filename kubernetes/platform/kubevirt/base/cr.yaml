@@ -1,0 +1,27 @@
+apiVersion: kubevirt.io/v1
+kind: KubeVirt
+metadata:
+  name: kubevirt
+  namespace: kubevirt
+spec:
+  configuration:
+    developerConfiguration:
+      featureGates:
+        - HostDevices
+        - Sidecar
+        - NetworkBindingPlugins
+    network:
+      binding:
+        passt:
+          domainAttachmentType: managedTap
+    imagePullPolicy: IfNotPresent
+    permittedHostDevices:
+      pciHostDevices:
+        - pciVendorSelector: "1002:1900"
+          resourceName: "amd.com/780m"
+          externalResourceProvider: false
+        - pciVendorSelector: "1002:1640"
+          resourceName: "amd.com/780m-audio"
+          externalResourceProvider: false
+  imagePullPolicy: IfNotPresent
+  workloadUpdateStrategy: {}

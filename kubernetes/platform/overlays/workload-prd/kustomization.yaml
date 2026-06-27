@@ -13,6 +13,8 @@ resources:
   - ../../longhorn/overlays/workload-prd
   - ../../democratic-csi-nfs/overlays/workload-prd
   - ../../democratic-csi-iscsi/overlays/workload-prd
+  - ../../kubevirt/overlays/workload-prd
+  - ../../cdi/overlays/workload-prd
   - ../../metrics-server/overlays/workload-prd
   - ../../flux-system/overlays/workload-prd
   - ../../kyverno-reporter/overlays/workload-prd

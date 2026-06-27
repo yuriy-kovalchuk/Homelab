@@ -9,8 +9,7 @@ resource "vault_kv_secret_v2" "democratic_csi_nfs" {
       httpConnection = {
         host          = "10.0.3.3"
         port          = 8443
-        username      = "truenas_admin"
-        password      = var.truenas_token
+        apiKey        = var.truenas_token
         allowInsecure = true
       }
       zfs = {
@@ -46,8 +45,7 @@ resource "vault_kv_secret_v2" "democratic_csi_iscsi" {
       httpConnection = {
         host          = "10.0.3.3"
         port          = 8443
-        username      = "truenas_admin"
-        password      = var.truenas_token
+        apiKey        = var.truenas_token
         allowInsecure = true
       }
       zfs = {

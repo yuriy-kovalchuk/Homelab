@@ -84,6 +84,9 @@ bpf:
   masquerade: true
   tproxy: true
 
+socketLB:
+  hostNamespaceOnly: true
+
 operator:
   replicas: 2
   prometheus:
