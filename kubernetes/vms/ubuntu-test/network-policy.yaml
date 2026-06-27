@@ -1,0 +1,55 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: cdi-importer-egress
+  namespace: kubevirt-ubuntu-test
+spec:
+  endpointSelector:
+    matchLabels:
+      app: containerized-data-importer
+  egress:
+    - toEntities:
+        - kube-apiserver
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+            - port: "80"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: virt-launcher-egress
+  namespace: kubevirt-ubuntu-test
+spec:
+  endpointSelector:
+    matchLabels:
+      kubevirt.io: virt-launcher
+  egress:
+    - toEntities:
+        - world
+    - toEntities:
+        - cluster
+    - toEntities:
+        - kube-apiserver
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP

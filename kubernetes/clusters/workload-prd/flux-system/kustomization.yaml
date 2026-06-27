@@ -8,3 +8,4 @@ resources:
   # - observability.yaml
   - apps.yaml
   - llm.yaml
+  - vms.yaml

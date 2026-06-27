@@ -39,3 +39,15 @@ variable "truenas_token" {
   sensitive   = true
 }
 
+variable "kubevirt_ubuntu_test_username" {
+  description = "Username for the default user in the ubuntu-test VM"
+  type        = string
+  sensitive   = true
+}
+
+variable "kubevirt_ubuntu_test_passwd" {
+  description = "Password for the default user in the ubuntu-test VM"
+  type        = string
+  sensitive   = true
+}
+
