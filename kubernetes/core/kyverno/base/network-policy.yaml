@@ -45,3 +45,19 @@ spec:
   egress:
     - toEntities:
         - kube-apiserver
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: kyverno-migrate
+  namespace: kyverno
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: job-name
+        operator: In
+        values:
+          - kyverno-migrate-resources
+  egress:
+    - toEntities:
+        - kube-apiserver
