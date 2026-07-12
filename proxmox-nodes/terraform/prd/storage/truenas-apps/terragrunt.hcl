@@ -3,6 +3,9 @@ include "root" {
   expose = true
 }
 
+# Note: this stack manages the RustFS app hosting this same S3 backend, so
+# an apply that restarts RustFS fails its final state save. Recovery:
+#   terragrunt state push errored.tfstate && rm errored.tfstate
 remote_state {
   backend = "s3"
   generate = {

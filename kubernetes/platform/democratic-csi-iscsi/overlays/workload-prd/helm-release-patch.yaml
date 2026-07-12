@@ -26,6 +26,11 @@ spec:
 
     node:
       hostPID: true
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
       driver:
         image:
           tag: "v1.9.5@sha256:746bf6b373ae75f5da8b1e412d13c3e8d0e2e1494654268b9dd6fe1f1e55aade"

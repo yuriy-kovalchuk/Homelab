@@ -41,9 +41,13 @@ spec:
       replicas: 1
 
     ingester:
-      replicas: 2
+      replicas: 3
       zoneAwareReplication:
         enabled: false
+      # WAL survives pod restarts; blocks flush to S3 continuously
+      persistence:
+        enabled: true
+        size: 5Gi
 
     querier:
       replicas: 1

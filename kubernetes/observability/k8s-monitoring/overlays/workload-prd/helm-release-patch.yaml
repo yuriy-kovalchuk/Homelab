@@ -34,6 +34,12 @@ spec:
 
     collectors:
       alloy-logs:
+        controller:
+          tolerations:
+            - key: workload
+              operator: Equal
+              value: gpu
+              effect: NoSchedule
         alloy:
           mounts:
             varlog: true
@@ -47,12 +53,24 @@ spec:
           extraArgs:
             - --disable-reporting
       alloy-metrics:
+        controller:
+          tolerations:
+            - key: workload
+              operator: Equal
+              value: gpu
+              effect: NoSchedule
         alloy:
           clustering:
             enabled: true
           extraArgs:
             - --disable-reporting
       alloy-receiver:
+        controller:
+          tolerations:
+            - key: workload
+              operator: Equal
+              value: gpu
+              effect: NoSchedule
         alloy:
           extraArgs:
             - --disable-reporting
@@ -65,6 +83,11 @@ spec:
             type: RuntimeDefault
       node-exporter:
         deploy: true
+        tolerations:
+          - key: workload
+            operator: Equal
+            value: gpu
+            effect: NoSchedule
         # extraArgs replaces the chart default array — keep the fs-types-exclude entry
         extraArgs:
           - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|erofs|sysfs|tracefs|tmpfs|ramfs)$
@@ -235,6 +258,11 @@ spec:
       destinations:
         - mimir
       beyla:
+        tolerations:
+          - key: workload
+            operator: Equal
+            value: gpu
+            effect: NoSchedule
         preset: application
         config:
           data:

@@ -59,9 +59,17 @@ spec:
         delete_request_store: s3
 
     ingester:
-      replicas: 2
+      replicas: 3
       zoneAwareReplication:
         enabled: false
+      # WAL survives pod restarts; small because chunks flush to S3 within ~2h
+      persistence:
+        enabled: true
+        claims:
+          - name: data
+            size: 5Gi
+            accessModes:
+              - ReadWriteOnce
 
     querier:
       replicas: 2
@@ -100,6 +108,13 @@ spec:
       replicas: 0
     singleBinary:
       replicas: 0
+
+    lokiCanary:
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
 
     monitoring:
       serviceMonitor:

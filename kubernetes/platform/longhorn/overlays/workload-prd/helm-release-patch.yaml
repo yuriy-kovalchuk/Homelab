@@ -5,10 +5,24 @@ metadata:
   namespace: longhorn-system
 spec:
   values:
+    # Tolerate the worker-1 GPU taint: Longhorn must still run there to
+    # serve worker-local volumes (longhorn-gpu StorageClass)
+    global:
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
     defaultSettings:
-      defaultReplicaCount: 1
+      defaultReplicaCount: 3
+      taintToleration: workload=gpu:NoSchedule
     persistence:
-      defaultClassReplicaCount: 1
+      defaultClassReplicaCount: 3
+      # Replicas of the default class only on nodes tagged "always-on"
+      # (control planes) so data survives worker-1 shutdowns
+      defaultNodeSelector:
+        enable: true
+        selector: "always-on"
     csi:
       attacher:
         replicaCount: 2

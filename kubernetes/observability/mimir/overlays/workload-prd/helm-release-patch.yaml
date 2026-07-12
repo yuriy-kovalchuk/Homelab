@@ -80,14 +80,14 @@ spec:
           push_grpc_method_enabled: true
           ring:
             zone_awareness_enabled: false
-            replication_factor: 2
+            replication_factor: 3
             kvstore:
               store: memberlist
 
         store_gateway:
           sharding_ring:
             zone_awareness_enabled: false
-            replication_factor: 2
+            replication_factor: 3
             kvstore:
               store: memberlist
 
@@ -101,9 +101,11 @@ spec:
         enabled: false
       persistentVolume:
         enabled: true
-        size: 50Gi
+        # sized for ~26h of homelab metrics; 3 Longhorn replicas land on
+        # every control plane, so keep volumes small (cp-1/2 have ~93Gi free)
+        size: 10Gi
         storageClass: "longhorn"
-      replicas: 2
+      replicas: 3
 
     querier:
       replicas: 2
@@ -121,13 +123,13 @@ spec:
         storageClass: "longhorn"
       zoneAwareReplication:
         enabled: false
-      replicas: 2
+      replicas: 3
 
     compactor:
       replicas: 1
       persistentVolume:
         enabled: true
-        size: 50Gi
+        size: 20Gi
         storageClass: "longhorn"
 
     kafka:

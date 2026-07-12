@@ -10,6 +10,11 @@ spec:
     spec:
       nodeSelector:
         ai-node: oculink
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
       containers:
         - name: llama-cpp
           securityContext:
