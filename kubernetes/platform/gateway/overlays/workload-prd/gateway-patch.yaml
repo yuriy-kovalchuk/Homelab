@@ -280,3 +280,33 @@ spec:
           selector:
             matchLabels:
               kubernetes.io/metadata.name: "yk-update-checker"
+    - name: https-immich
+      port: 443
+      protocol: HTTPS
+      hostname: "immich.yuriykovalchuk.dev"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: immich-gw-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: "immich"
+    - name: https-opencloud
+      port: 443
+      protocol: HTTPS
+      hostname: "opencloud.yuriykovalchuk.dev"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: opencloud-gw-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: "opencloud"

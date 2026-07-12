@@ -35,3 +35,22 @@ spec:
         - ports:
             - port: "8000"
               protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-egress-to-immich
+  namespace: cnpg-system
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: cloudnative-pg
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: immich
+            cnpg.io/cluster: pg-cluster-immich
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP

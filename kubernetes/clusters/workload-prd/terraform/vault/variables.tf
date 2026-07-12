@@ -73,3 +73,15 @@ variable "grafana_admin_password" {
   sensitive = true
 }
 
+variable "immich_db_password" {
+  description = "Password for the immich CNPG database user"
+  type        = string
+  sensitive   = true
+}
+
+variable "opencloud_admin_password" {
+  description = "Initial admin password for OpenCloud"
+  type        = string
+  sensitive   = true
+}
+
