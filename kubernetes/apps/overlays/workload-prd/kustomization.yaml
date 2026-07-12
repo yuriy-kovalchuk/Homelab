@@ -8,5 +8,4 @@ resources:
   - ../../yk-update-checker/overlays/workload-prd
   - ../../cloudflared/overlays/workload-prd
   - ../../homepage/overlays/workload-prd
-  # standby — re-enable once monitoring stack (PodMonitor CRD) and authentik are deployed:
-  # - ../../cloudnative-pg/overlays/workload-prd
+  - ../../cloudnative-pg/overlays/workload-prd
