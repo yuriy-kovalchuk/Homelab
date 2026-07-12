@@ -17,7 +17,7 @@ spec:
         - name: llama-cpp
           # Vulkan backend: needs /dev/dri only (no ROCm). See LLAMA.md.
           # Pinned: server-vulkan floating tag broke Vulkan (undefined shader symbol) in builds after b4740.
-          image: ghcr.io/ggml-org/llama.cpp:server-vulkan-b9570
+          image: ghcr.io/ggml-org/llama.cpp:server-vulkan-b9967
           args:
             - --host
             - "0.0.0.0"
