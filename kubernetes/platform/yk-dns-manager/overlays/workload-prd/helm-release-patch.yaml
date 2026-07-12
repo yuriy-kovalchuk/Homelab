@@ -8,8 +8,7 @@ spec:
   values:
     domainMap:
       "*.yuriykovalchuk.dev": "10.0.4.50"
-      "truenas.yuriykovalchuk.dev": "10.0.4.60"
 
-      "s3.yuriykovalchuk.dev": "10.0.4.60"
-      "api.s3.yuriykovalchuk.dev": "10.0.4.60"
+      "s3.yuriykovalchuk.dev": "10.0.3.3"
+      "rustfs.yuriykovalchuk.dev": "10.0.3.3"
 

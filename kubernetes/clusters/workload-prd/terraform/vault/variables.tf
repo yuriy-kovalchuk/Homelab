@@ -51,3 +51,25 @@ variable "kubevirt_ubuntu_test_passwd" {
   sensitive   = true
 }
 
+variable "rustfs_access_key" {
+  description = "RustFS S3 access key (loki/mimir/tempo object storage)"
+  type        = string
+  sensitive   = true
+}
+
+variable "rustfs_secret_key" {
+  description = "RustFS S3 secret key (loki/mimir/tempo object storage)"
+  type        = string
+  sensitive   = true
+}
+
+variable "grafana_admin_username" {
+  type      = string
+  sensitive = true
+}
+
+variable "grafana_admin_password" {
+  type      = string
+  sensitive = true
+}
+

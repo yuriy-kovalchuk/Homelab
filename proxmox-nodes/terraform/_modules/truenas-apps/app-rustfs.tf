@@ -5,8 +5,15 @@ resource "truenas_app" "rustfs" {
   compose_config = <<-EOT
     services:
       rustfs:
-        image: rustfs/rustfs:latest
+        # Pinned to the digest of the image validated on 2026-07-12 — console
+        # and S3 host-parsing behavior change between releases, do not float
+        image: rustfs/rustfs@sha256:fa19210ac4697c79d7ccca1ec9b0eb91aebacc6691991ffb14014bb3c67e6cc3
         restart: unless-stopped
+        # Direct host ports for the console — the embedded console cannot
+        # authenticate behind a split-domain reverse proxy (rustfs/rustfs#3062)
+        ports:
+          - "9000:9000"
+          - "9001:9001"
         volumes:
           - /mnt/tank/rustfs:/data
         environment:
@@ -14,11 +21,9 @@ resource "truenas_app" "rustfs" {
           RUSTFS_SECRET_KEY: "${var.rustfs_secret_key}"
           RUSTFS_CONSOLE_ENABLE: "true"
           RUSTFS_ADDRESS: ":9000"
-          RUSTFS_SERVER_DOMAINS: "rustfs.yuriykovalchuk.dev"
         command: >-
           --address :9000
           --console-enable
-          --server-domains rustfs.yuriykovalchuk.dev
           /data
         labels:
           - traefik.enable=true

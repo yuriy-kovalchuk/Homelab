@@ -5,7 +5,7 @@ resources:
   - core.yaml
   - platform.yaml
   - llm-policies.yaml
-  # - observability.yaml
+  - observability.yaml
   - apps.yaml
   - llm.yaml
   - vms.yaml

@@ -1,13 +1,22 @@
 # ubuntu-test VM
 
-Ubuntu 24.04 (Noble) test VM running on KubeVirt in the `vms` namespace on `worker-1`.
+Ubuntu 24.04 (Noble) test VM running on KubeVirt in the `kubevirt-ubuntu-test` namespace on `worker-1`.
 
 ## Specs
 
-- 2 vCPU, 4 GB RAM
-- 30 GB Longhorn PVC (RWO — no live migration)
+- 4 vCPU, 8 GB RAM
+- 50 GB Longhorn PVC (RWO — no live migration)
 - Networking: KubeVirt bridge mode (VM shares pod IP, no iptables/passt required)
 - Desktop: XFCE4 + LightDM
+
+## First boot setup
+
+After the VM boots for the first time, install the desktop environment:
+
+```bash
+sudo apt update && sudo apt install -y xfce4 xfce4-goodies lightdm lightdm-gtk-greeter dbus-x11
+sudo reboot
+```
 
 ## Access
 
@@ -17,7 +26,7 @@ Requires `virtctl` and a VNC client (e.g. TigerVNC Viewer).
 
 ```bash
 # Start the VNC proxy on localhost:5901
-virtctl --kubeconfig ~/.kube/workload vnc ubuntu-test -n vms --proxy-only --port 5901 &
+virtctl --kubeconfig ~/.kube/workload vnc ubuntu-test -n kubevirt-ubuntu-test --proxy-only --port 5901 &
 
 # Open TigerVNC Viewer and connect to 127.0.0.1:5901 (no password)
 ```
@@ -63,7 +72,7 @@ kubectl --kubeconfig ~/.kube/workload apply -f kubernetes/vms/ubuntu-test/vnc-se
 **3. Get the assigned IP:**
 
 ```bash
-kubectl --kubeconfig ~/.kube/workload get svc ubuntu-test-vnc -n vms
+kubectl --kubeconfig ~/.kube/workload get svc ubuntu-test-vnc -n kubevirt-ubuntu-test
 ```
 
 Connect TigerVNC Viewer to `<EXTERNAL-IP>:5900`.
@@ -71,7 +80,7 @@ Connect TigerVNC Viewer to `<EXTERNAL-IP>:5900`.
 ## Console access
 
 ```bash
-virtctl --kubeconfig ~/.kube/workload console ubuntu-test -n vms
+virtctl --kubeconfig ~/.kube/workload console ubuntu-test -n kubevirt-ubuntu-test
 ```
 
 Exit with `Ctrl+]`.
@@ -80,20 +89,19 @@ Exit with `Ctrl+]`.
 
 ```bash
 # Start
-virtctl --kubeconfig ~/.kube/workload start ubuntu-test -n vms
+virtctl --kubeconfig ~/.kube/workload start ubuntu-test -n kubevirt-ubuntu-test
 
 # Stop
-virtctl --kubeconfig ~/.kube/workload stop ubuntu-test -n vms
+virtctl --kubeconfig ~/.kube/workload stop ubuntu-test -n kubevirt-ubuntu-test
 
 # Restart
-virtctl --kubeconfig ~/.kube/workload restart ubuntu-test -n vms
+virtctl --kubeconfig ~/.kube/workload restart ubuntu-test -n kubevirt-ubuntu-test
 ```
 
 ## Credentials
 
-| User | Password |
-|------|----------|
-| ubuntu | ubuntu |
+Credentials are managed via Vault → ExternalSecret → `ubuntu-test-cloudinit` Secret.
+See `kubernetes/clusters/workload-prd/terraform/vault/kubevirt-ubuntu-test.tf`.
 
 ## Networking notes
 

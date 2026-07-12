@@ -8,8 +8,9 @@ locals {
         shell: /bin/bash
         groups: sudo
         lock_passwd: false
-        passwd: "${var.kubevirt_ubuntu_test_passwd}"
     chpasswd:
+      list: |
+        ${var.kubevirt_ubuntu_test_username}:${var.kubevirt_ubuntu_test_passwd}
       expire: false
     ssh_pwauth: true
     EOT

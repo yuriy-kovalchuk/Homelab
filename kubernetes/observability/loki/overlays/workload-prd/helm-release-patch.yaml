@@ -22,10 +22,10 @@ spec:
       storage:
         type: s3
         s3:
-          endpoint: http://10.0.3.4:9000
+          endpoint: https://s3.yuriykovalchuk.dev
           region: eu-south-1
           s3ForcePathStyle: true
-          insecure: true
+          insecure: false
         bucketNames:
           chunks: loki-chunks
           ruler: loki-ruler
@@ -52,6 +52,11 @@ spec:
 
       limits_config:
         volume_enabled: true
+        retention_period: 168h
+
+      compactor:
+        retention_enabled: true
+        delete_request_store: s3
 
     ingester:
       replicas: 2

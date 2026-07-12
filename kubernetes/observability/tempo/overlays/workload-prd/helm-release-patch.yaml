@@ -21,9 +21,9 @@ spec:
         backend: s3
         s3:
           bucket: tempo-traces
-          endpoint: 10.0.3.4:9000
+          endpoint: s3.yuriykovalchuk.dev:443
           region: eu-south-1
-          insecure: true
+          insecure: false
           forcepathstyle: true
         wal:
           path: /var/tempo/wal
