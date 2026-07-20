@@ -9,4 +9,4 @@ spec:
   storageClassName: truenas-iscsi
   resources:
     requests:
-      storage: 400Gi
+      storage: 100Gi

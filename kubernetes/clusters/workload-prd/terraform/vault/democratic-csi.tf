@@ -22,6 +22,7 @@ resource "vault_kv_secret_v2" "democratic_csi_nfs" {
         datasetPermissionsGroup            = 0
       }
       nfs = {
+        shareHost           = "10.0.3.3"
         shareAlldirs        = false
         shareAllowedHosts   = []
         shareAllowedNetworks = []
@@ -55,7 +56,7 @@ resource "vault_kv_secret_v2" "democratic_csi_iscsi" {
       }
       iscsi = {
         targetPortal = "10.0.3.3:3260"
-        namePrefix   = "iqn.2005-10.org.freenas.ctl:"
+        namePrefix   = ""
         nameSuffix   = ""
         targetGroups = [
           {

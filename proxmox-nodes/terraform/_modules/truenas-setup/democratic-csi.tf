@@ -14,7 +14,7 @@ resource "truenas_dataset" "kubernetes_nfs" {
 resource "truenas_dataset" "kubernetes_iscsi" {
   pool  = var.truenas_pool_name
   path  = "kubernetes/iscsi"
-  quota = "107374182400" # 100GB
+  quota = "407374182400"
 
   depends_on = [truenas_dataset.kubernetes]
 }
