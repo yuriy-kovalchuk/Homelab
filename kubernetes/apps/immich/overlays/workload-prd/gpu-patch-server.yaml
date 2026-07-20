@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: immich-server
+  namespace: immich
+spec:
+  template:
+    spec:
+      nodeSelector:
+        ai-node: oculink
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
+      containers:
+        - name: immich-server
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          volumeMounts:
+            - name: dev-dri
+              mountPath: /dev/dri
+      volumes:
+        - name: dev-dri
+          hostPath:
+            path: /dev/dri
+            type: Directory

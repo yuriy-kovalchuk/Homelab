@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opencloud
+  namespace: opencloud
+  labels:
+    app: opencloud
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: opencloud
+  template:
+    metadata:
+      labels:
+        app: opencloud
+    spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: opencloud
+          image: opencloudeu/opencloud-rolling:latest
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              opencloud init --insecure yes --config-path /var/lib/opencloud/config --admin-password "$INITIAL_ADMIN_PASSWORD" -q || true
+              exec opencloud server
+          env:
+            - name: OC_URL
+              value: https://opencloud.yuriykovalchuk.dev
+            - name: OC_DOMAIN
+              value: opencloud.yuriykovalchuk.dev
+            - name: OC_CONFIG_DIR
+              value: /var/lib/opencloud/config
+            - name: OC_LOG_LEVEL
+              value: warn
+            - name: PROXY_TLS
+              value: "false"
+            - name: IDM_CREATE_DEMO_USERS
+              value: "false"
+            - name: INITIAL_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: opencloud-admin
+                  key: password
+          ports:
+            - name: http
+              containerPort: 9200
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/opencloud
+          readinessProbe:
+            tcpSocket:
+              port: 9200
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "1"
+              memory: "2Gi"
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: opencloud-data

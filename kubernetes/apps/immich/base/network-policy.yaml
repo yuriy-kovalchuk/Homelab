@@ -1,0 +1,136 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: immich-server
+  namespace: immich
+spec:
+  description: "Immich server — traffic from gateway/cluster, egress to db, cache, ML and internet (geodata, map tiles)"
+  endpointSelector:
+    matchLabels:
+      app: immich-server
+  ingress:
+    - fromEntities:
+        - cluster
+        - ingress
+      toPorts:
+        - ports:
+            - port: "2283"
+              protocol: TCP
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            cnpg.io/cluster: pg-cluster-immich
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            app: immich-valkey
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            app: immich-machine-learning
+      toPorts:
+        - ports:
+            - port: "3003"
+              protocol: TCP
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: immich-machine-learning
+  namespace: immich
+spec:
+  description: "Immich ML — requests from the server, egress to internet for model downloads"
+  endpointSelector:
+    matchLabels:
+      app: immich-machine-learning
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app: immich-server
+      toPorts:
+        - ports:
+            - port: "3003"
+              protocol: TCP
+  egress:
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: immich-postgres
+  namespace: immich
+spec:
+  description: "Immich CNPG cluster — server connects, operator manages, instance manager reaches the API server"
+  endpointSelector:
+    matchLabels:
+      cnpg.io/cluster: pg-cluster-immich
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app: immich-server
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: cnpg-system
+            app.kubernetes.io/name: cloudnative-pg
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
+  egress:
+    - toEntities:
+        - kube-apiserver
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
+    - toEntities:
+        - remote-node
+        - host
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: immich-valkey
+  namespace: immich
+spec:
+  description: "Immich cache — only the server may connect"
+  endpointSelector:
+    matchLabels:
+      app: immich-valkey
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app: immich-server
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP

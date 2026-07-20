@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: immich-machine-learning
+  namespace: immich
+spec:
+  template:
+    spec:
+      nodeSelector:
+        ai-node: oculink
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
+      containers:
+        - name: immich-machine-learning
+          image: ghcr.io/immich-app/immich-machine-learning:release-rocm
+          env:
+            # 780M is gfx1103 — not officially supported by ROCm, spoof gfx1100
+            - name: HSA_OVERRIDE_GFX_VERSION
+              value: "11.0.0"
+            # Node has two GPUs (R9700 + 780M iGPU) — restrict ROCm to the 780M only.
+            # PLACEHOLDER index: verify with `rocminfo` on the node and set the iGPU's
+            # device index here (flip to "1" if inference lands on the R9700).
+            - name: HIP_VISIBLE_DEVICES
+              value: "0"
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          volumeMounts:
+            - name: dev-dri
+              mountPath: /dev/dri
+      volumes:
+        - name: dev-dri
+          hostPath:
+            path: /dev/dri
+            type: Directory

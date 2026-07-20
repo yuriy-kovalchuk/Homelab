@@ -9,3 +9,5 @@ resources:
   - ../../cloudflared/overlays/workload-prd
   - ../../homepage/overlays/workload-prd
   - ../../cloudnative-pg/overlays/workload-prd
+  - ../../immich/overlays/workload-prd
+  - ../../opencloud/overlays/workload-prd
