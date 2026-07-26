@@ -73,7 +73,7 @@ spec:
     - name: https-forgejo
       port: 443
       protocol: HTTPS
-      hostname: "forgejo.yuriykovalchuk.dev"
+      hostname: "git.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:

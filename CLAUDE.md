@@ -118,6 +118,7 @@ HelmRepositories live next to each component (`base/helm-repository.yaml`, names
 | yk-dns-manager | custom (OCIRepository) | — | DNS records on OPNsense |
 | trivy | trivy-operator | 0.34.0 | Vulnerability scanning |
 | trivy-converter | trivy-operator-polr-adapter | 0.11.5 | Trivy reports → PolicyReports |
+| forgejo | forgejo-helm (OCI) | 17.1.3 | Git server, `git.` hostname + SSH (port 22 via TCPRoute), CNPG `pg-cluster-forgejo`, `truenas-iscsi` PVC for repo data |
 
 Present in tree but **not wired into any overlay** (do not assume deployed): `core/local-path-provisioner`, `platform/harbor`, `platform/yk-talos-manager`.
 
@@ -153,7 +154,9 @@ PolicyExceptions for llm live in `kubernetes/llm/llama-cpp/base/policy-exception
 | immich | immich | Photos — server + ML (ROCm on 780M) + Valkey + CNPG `pg-cluster-immich` (VectorChord image) |
 | opencloud | opencloud | File cloud (OpenCloud/oCIS fork), single pod, `truenas-iscsi` PVC |
 
-Note: the gateway patch still carries listeners for services that are no longer cluster apps (`forgejo` — now a TrueNAS app; `uptime-kuma` — removed).
+Note: the gateway patch still carries a listener for `uptime-kuma`, which has been removed as a cluster app.
+
+Note: `forgejo` (platform layer, `git.yuriykovalchuk.dev`) and the TrueNAS Docker `forgejo` app (`forgejo.yuriykovalchuk.dev`) both currently exist — the k8s one is a fresh instance with no data migrated yet. Different hostnames, so no DNS conflict; decide later whether/how to consolidate.
 
 ---
 

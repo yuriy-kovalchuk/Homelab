@@ -13,6 +13,12 @@ variable "forgejo_admin_email" {
   sensitive = true
 }
 
+variable "forgejo_db_password" {
+  description = "Password for the forgejo CNPG database user"
+  type        = string
+  sensitive   = true
+}
+
 variable "cloudflare_api_token" {
   type      = string
   sensitive = true

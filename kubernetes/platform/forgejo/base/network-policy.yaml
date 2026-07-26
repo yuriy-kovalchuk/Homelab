@@ -1,0 +1,81 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: forgejo
+  namespace: forgejo
+spec:
+  description: "Forgejo — HTTP/SSH from gateway and cluster, egress to its CNPG database and internet (federation, avatars, remote mirrors)"
+  endpointSelector:
+    matchLabels:
+      app: forgejo
+  ingress:
+    - fromEntities:
+        - cluster
+        - ingress
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP
+            - port: "2222"
+              protocol: TCP
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            cnpg.io/cluster: pg-cluster-forgejo
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+            - port: "80"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: forgejo-postgres
+  namespace: forgejo
+spec:
+  description: "Forgejo CNPG cluster — app connects, operator manages, instance manager reaches the API server"
+  endpointSelector:
+    matchLabels:
+      cnpg.io/cluster: pg-cluster-forgejo
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app: forgejo
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: cnpg-system
+            app.kubernetes.io/name: cloudnative-pg
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
+  egress:
+    - toEntities:
+        - kube-apiserver
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
+    - toEntities:
+        - remote-node
+        - host
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
