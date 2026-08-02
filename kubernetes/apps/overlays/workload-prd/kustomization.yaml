@@ -1,13 +1,10 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ../../clean-pods/overlays/workload-prd
   - ../../httpbin/overlays/workload-prd
   - ../../whoami/overlays/workload-prd
   - ../../yk-portfolio/overlays/workload-prd
   - ../../yk-update-checker/overlays/workload-prd
-  - ../../cloudflared/overlays/workload-prd
   - ../../homepage/overlays/workload-prd
-  - ../../cloudnative-pg/overlays/workload-prd
   - ../../immich/overlays/workload-prd
   - ../../opencloud/overlays/workload-prd

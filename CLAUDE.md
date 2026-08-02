@@ -110,14 +110,17 @@ HelmRepositories live next to each component (`base/helm-repository.yaml`, names
 | longhorn | longhorn | 1.12.0 | HA block storage (`longhorn` StorageClass) |
 | democratic-csi-nfs | democratic-csi | 0.15.1 | `truenas-nfs` StorageClass (RWX, TrueNAS) |
 | democratic-csi-iscsi | democratic-csi | 0.15.1 | `truenas-iscsi` StorageClass (RWO block, TrueNAS) |
+| cloudnative-pg | cloudnative-pg | 0.29.0 | CNPG operator (`cnpg-system`) — per-app Postgres clusters |
 | kubevirt / cdi | operator manifests | — | VMs on k8s + disk image import |
 | metrics-server | metrics-server | 3.x | HPA/VPA metrics |
 | flux-system | httproute | — | flux-operator UI at fluxcd.* |
 | kyverno-reporter | policy-reporter | 3.8.1 | Policy reporting UI |
 | vpa | vpa + goldilocks | — | Vertical pod autoscaler + recommendations |
 | yk-dns-manager | custom (OCIRepository) | — | DNS records on OPNsense |
+| cloudflared | deployment | — | Cloudflare Tunnel agent |
 | trivy | trivy-operator | 0.34.0 | Vulnerability scanning |
 | trivy-converter | trivy-operator-polr-adapter | 0.11.5 | Trivy reports → PolicyReports |
+| clean-pods | CronJob | — | Cluster-wide cleanup of Failed pods + stale completed pods |
 | forgejo | forgejo-helm (OCI) | 17.1.3 | Git server, `git.` hostname + SSH (port 22 via TCPRoute), CNPG `pg-cluster-forgejo`, `truenas-iscsi` PVC for repo data |
 
 Present in tree but **not wired into any overlay** (do not assume deployed): `core/local-path-provisioner`, `platform/harbor`, `platform/yk-talos-manager`.
@@ -143,14 +146,11 @@ PolicyExceptions for llm live in `kubernetes/llm/llama-cpp/base/policy-exception
 ### apps (workload-prd)
 | App | Namespace | Purpose |
 |-----|-----------|---------|
-| clean-pods | clean-pods | CronJob — cleans failed pods + completed jobs |
 | httpbin | httpbin | httpbingo echo service |
 | whoami | whoami | Identity echo service |
 | yk-portfolio | yk-portfolio | Personal portfolio (`portfolio.` hostname) |
 | yk-update-checker | yk-update-checker | Dependency update dashboard (`yk-updates.` hostname) |
-| cloudflared | cloudflared | Cloudflare Tunnel agent |
 | homepage | homepage | Dashboard landing page |
-| cloudnative-pg | cnpg-system | CNPG operator (chart 0.29.0) — per-app Postgres clusters |
 | immich | immich | Photos — server + ML (ROCm on 780M) + Valkey + CNPG `pg-cluster-immich` (VectorChord image) |
 | opencloud | opencloud | File cloud (OpenCloud/oCIS fork), single pod, `truenas-iscsi` PVC |
 
@@ -186,7 +186,7 @@ hostnames:
 - Split `kube-apiserver` and `remote-node`/`host` into separate egress rules, each allowing **both 6443 and 443** (in-cluster pods reach the API via `10.96.0.1:443`)
 - Common entities: `kube-apiserver`, `cluster`, `ingress`, `world`, `remote-node`, `host`
 - Ingress from the gateway = `fromEntities: [cluster, ingress]`
-- CNPG clusters additionally need: ingress 8000 from the operator (`cnpg-system`), and a matching `allow-egress-to-{app}` policy appended in `kubernetes/apps/cloudnative-pg/base/network-policy.yaml`
+- CNPG clusters additionally need: ingress 8000 from the operator (`cnpg-system`), and a matching `allow-egress-to-{app}` policy appended in `kubernetes/platform/cloudnative-pg/base/network-policy.yaml`
 
 ---
 

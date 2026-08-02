@@ -71,6 +71,6 @@ ESO picks it up and creates the `cloudflared-token` secret in the `cloudflared` 
    }
    ```
 2. Add an egress rule to the cloudflared CiliumNetworkPolicy
-   (`kubernetes/apps/cloudflared/base/network-policy.yaml`) allowing cloudflared
+   (`kubernetes/platform/cloudflared/base/network-policy.yaml`) allowing cloudflared
    to reach the app's pods on the Service's `targetPort`.
 3. Run `terraform apply`.
