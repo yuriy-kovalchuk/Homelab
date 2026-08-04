@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: yk-update-checker
-      version: "0.2.1"
+      version: "0.3.0-alpha"
       sourceRef:
         kind: HelmRepository
         name: yk-charts
@@ -47,3 +47,11 @@ spec:
         repos:
           - name: homelab
             repo: https://github.com/yuriy-kovalchuk/homelab
+
+    grafana:
+      dashboard:
+        enabled: true
+
+    metrics:
+      serviceMonitor:
+        enabled: true
