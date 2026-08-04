@@ -70,7 +70,6 @@ configMapGenerator:
     namespace: grafana
     files:
       - dashboards/longhorn.json
-      - dashboards/cloudnative-pg.json
     options:
       labels:
         grafana_dashboard: "1"
