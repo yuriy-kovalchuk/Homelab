@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: yk-update-checker
-      version: "0.3.0-alpha"
+      version: "0.3.0-dev"
       sourceRef:
         kind: HelmRepository
         name: yk-charts
@@ -27,7 +27,6 @@ spec:
 
     image:
       repository: ghcr.io/yuriy-kovalchuk/yk-update-checker
-      tag: "pr-20-713624f672a608f644f41812fb437285a5ac856e"
       pullPolicy: IfNotPresent
     resources:
       requests:
