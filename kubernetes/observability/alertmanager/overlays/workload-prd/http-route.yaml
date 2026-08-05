@@ -1,0 +1,20 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: alertmanager
+  namespace: alertmanager
+spec:
+  parentRefs:
+    - name: internal
+      namespace: kube-system
+      sectionName: https-alertmanager
+  hostnames:
+    - "alertmanager.yuriykovalchuk.dev"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: alertmanager
+          port: 9093

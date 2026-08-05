@@ -104,3 +104,14 @@ spec:
                 tags:
                   - key: service.name
                     value: job
+          - name: Alertmanager
+            type: alertmanager
+            uid: alertmanager
+            access: proxy
+            url: http://alertmanager.alertmanager.svc.cluster.local:9093
+            isDefault: false
+            version: 1
+            editable: true
+            jsonData:
+              implementation: prometheus
+              handleGrafanaManagedAlerts: true

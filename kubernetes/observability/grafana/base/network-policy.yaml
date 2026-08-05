@@ -84,6 +84,31 @@ spec:
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
+  name: grafana-egress-to-alertmanager
+  namespace: grafana
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: In
+        values:
+          - grafana
+          - grafana-sc-dashboard
+          - grafana-sc-datasources
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: alertmanager
+            app.kubernetes.io/instance: alertmanager
+            io.kubernetes.pod.namespace: alertmanager
+      toPorts:
+        - ports:
+            - port: "9093"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
   name: grafana-egress-to-kube-apiserver
   namespace: grafana
 spec:

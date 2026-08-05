@@ -1,0 +1,12 @@
+apiVersion: policies.kyverno.io/v1beta1
+kind: PolicyException
+metadata:
+  name: alertmanager
+  namespace: alertmanager
+spec:
+  matchConditions:
+    - name: exclude-alertmanager
+      expression: "object.metadata.namespace == 'alertmanager'"
+  policyRefs:
+    - kind: ValidatingPolicy
+      name: restrict-seccomp-strict

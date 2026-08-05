@@ -1,0 +1,42 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: alertmanager
+  namespace: alertmanager
+spec:
+  values:
+    replicaCount: 1
+
+    persistence:
+      enabled: true
+      storageClass: "longhorn"
+      size: 1Gi
+
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: [ALL]
+      readOnlyRootFilesystem: true
+
+    serviceMonitor:
+      enabled: true
+
+    # No real receiver wired up yet — this is a no-op stub. Alerts will
+    # dedupe/group/route correctly but nothing gets delivered anywhere
+    # until a real integration (Slack/email/webhook) is added here.
+    config:
+      receivers:
+        - name: default-receiver
+      route:
+        receiver: default-receiver
+        group_wait: 10s
+        group_interval: 5m
+        repeat_interval: 3h

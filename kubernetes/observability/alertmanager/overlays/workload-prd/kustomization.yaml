@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+  - policy-exception.yaml
+  - http-route.yaml
+patches:
+  - path: helm-release-patch.yaml
+    target:
+      kind: HelmRelease
+      name: alertmanager
+      namespace: alertmanager
