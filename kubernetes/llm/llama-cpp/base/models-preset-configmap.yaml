@@ -13,86 +13,8 @@ data:
 
     ; --- Add a section per model file (name = filename without .gguf) ---
 
-    [Qwen3.6-35B-A3B-UD-Q4_K_M]
-    c = 262144
-    cont-batching = true
-    parallel = 1
-    flash-attn = auto
-    cache-type-k = q8_0
-    cache-type-v = q8_0
-    ; MTP head is built into the model, no separate draft file needed
-    spec-type = draft-mtp
-    spec-draft-n-max = 3
-    load-on-startup = false
-    stop-timeout = 60
-    temp = 1.0
-    top-p = 0.95
-    top-k = 20
-    min-p = 0.00
-    presence-penalty = 1.5
-
-    [gemma-4-12b-it-Q4_K_M]
-    c = 32000
-    parallel = 1
-    flash-attn = auto
-    load-on-startup = false
-    temp = 1.0
-    top-p = 0.95
-    top-k = 64
-
-    [gemma-4-26B-A4B-it-UD-Q4_K_M]
-    c = 32000
-    parallel = 1
-    flash-attn = auto
-    load-on-startup = false
-    temp = 1.0
-    top-p = 0.95
-    top-k = 64
-
-    [gemma-4-12B-it-qat-UD-Q4_K_XL]
-    c = 16384
-    parallel = 1
-    flash-attn = auto
-    cache-type-k = q8_0
-    cache-type-v = q8_0
-    spec-type = draft-mtp
-    spec-draft-n-max = 4
-    model-draft = /models/mtp-gemma-4-12B-it.gguf
-    load-on-startup = false
-    temp = 1.0
-    top-p = 0.95
-    top-k = 64
-
-    [Bonsai-8B]
-    c = 32768
-    parallel = 1
-    flash-attn = auto
-    cache-type-k = q8_0
-    cache-type-v = q8_0
-    load-on-startup = false
-    temp = 0.8
-    top-p = 0.95
-    top-k = 40
 
     [Qwen3.6-27B-UD-Q6_K_XL]
-    c = 131072
-    cont-batching = true
-    parallel = 1
-    flash-attn = auto
-    cache-type-k = q8_0
-    cache-type-v = q8_0
-    ; MTP head built into the model
-    spec-type = draft-mtp
-    spec-draft-n-max = 3
-    load-on-startup = false
-    stop-timeout = 60
-    temp = 1.0
-    top-p = 0.95
-    top-k = 20
-    min-p = 0.00
-    presence-penalty = 1.5
-
-    [Qwen3.6-27B-Q4_K_M]
     c = 131072
     cont-batching = true
     parallel = 1

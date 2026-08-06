@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: model-download-gemma4-12b-qat
+  name: model-download
   namespace: llm
 spec:
   backoffLimit: 3
@@ -21,30 +21,45 @@ spec:
             - sh
             - -c
             - |
+              set -euo pipefail
+
               download() {
-                URL="$1"
-                FILE=$(basename "$URL")
-                DEST="/models/$FILE"
-                TMP="/models/$FILE.$$.tmp"
-                if [ -f "$DEST" ]; then
-                  echo "$FILE already present, skipping"
+                local url="$1"
+                local file dest tmp
+                file="$(basename "$url")"
+                dest="/models/$file"
+                tmp="/models/$file.tmp"
+
+                if [ -f "$dest" ]; then
+                  echo "[SKIP] $file already present"
                   return 0
                 fi
-                echo "downloading $FILE..."
-                wget -O "$TMP" "$URL" || { rm -f "$TMP"; return 1; }
-                if [ -f "$DEST" ]; then
-                  rm -f "$TMP"
-                  echo "$FILE was downloaded concurrently, skipping rename"
-                  return 0
+
+                echo "[DL] $file from $url"
+                local resume=""
+                [ -f "$tmp" ] && resume="-c"
+
+                if ! wget $resume -O "$tmp" "$url"; then
+                  echo "[FAIL] $file download failed — partial kept at $tmp, will resume next run"
+                  return 1
                 fi
-                mv "$TMP" "$DEST"
+
+                mv "$tmp" "$dest"
+                echo "[OK] $file"
               }
-              BASE="https://huggingface.co/unsloth/gemma-4-12B-it-qat-GGUF/resolve/main"
-              download "$BASE/gemma-4-12B-it-qat-UD-Q4_K_XL.gguf"
-              download "$BASE/mtp-gemma-4-12B-it.gguf"
+
+              while IFS= read -r url; do
+                case "$url" in
+                  ''|'#'*) continue ;;
+                esac
+                download "$url"
+              done < /config/models.txt
           volumeMounts:
             - name: models
               mountPath: /models
+            - name: model-list
+              mountPath: /config
+              readOnly: true
           resources:
             requests:
               cpu: 100m
@@ -65,3 +80,6 @@ spec:
         - name: models
           persistentVolumeClaim:
             claimName: llama-cpp-models
+        - name: model-list
+          configMap:
+            name: llama-cpp-model-list

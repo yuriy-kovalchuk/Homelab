@@ -229,15 +229,16 @@ hostnames:
 **llama.cpp** runs in router mode — no `--model` flag; serves all GGUF files on the models PVC (`--models-dir /models --models-preset /config/presets.ini --models-max 1`).
 
 **Key files:**
-- `kubernetes/llm/llama-cpp/base/deployment.yaml` — base Deployment (no GPU)
+- `kubernetes/llm/llama-cpp/base/deployment.yaml` — base Deployment (no GPU, image: `server-vulkan` floating tag)
 - `kubernetes/llm/llama-cpp/overlays/workload-prd/gpu-patch.yaml` — hardware patch (`ai-node: oculink`, toleration, privileged, `/dev/dri`, `/sys/bus/pci`)
 - `kubernetes/llm/llama-cpp/base/models-preset-configmap.yaml` — `presets.ini` (one `[section]` per model filename, global `[*]` defaults, `n-gpu-layers = -1`)
-- `kubernetes/llm/llama-cpp/base/model-download-*.yaml` — one download Job per model
+- `kubernetes/llm/llama-cpp/base/model-downloader-chart/values.yaml` — model URL list; HelmRelease generates one Job per entry (supports resume via `wget -c`)
 
 **Models** (section name = filename without `.gguf`; all `load-on-startup = false`):
-Qwen3.6-35B-A3B-UD-Q4_K_M · Qwen3.6-27B-UD-Q6_K_XL · Qwen3.6-27B-Q4_K_M (all with built-in MTP speculative decoding, `spec-type = draft-mtp`) · gemma-4-12b-it-Q4_K_M · gemma-4-12B-it-qat-UD-Q4_K_XL (MTP via separate draft file) · gemma-4-26B-A4B-it-UD-Q4_K_M · Bonsai-8B
+Qwen3.6-35B-A3B-UD-Q4_K_M · Qwen3.6-27B-UD-Q6_K_XL · Qwen3.6-27B-Q4_K_M (all with built-in MTP speculative decoding, `spec-type = draft-mtp`) · gemma-4-12b-it-Q4_K_M · gemma-4-12B-it-qat-UD-Q4_K_XL (MTP via separate draft file) · Bonsai-8B
+(gemma-4-26B-A4B-it-UD-Q4_K_M is in values.yaml as a commented-out entry)
 
-**Adding a new model:** copy a `model-download-*.yaml` Job (change URL + filename), add it to `base/kustomization.yaml`, add a `[ModelName]` section to the presets ConfigMap.
+**Adding a new model:** add a `- name: <slug>` entry with `urls:` to `model-downloader-chart/values.yaml`, then add a `[ModelName]` section to the presets ConfigMap.
 
 ---
 
