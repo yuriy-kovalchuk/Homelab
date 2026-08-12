@@ -5,6 +5,7 @@ resources:
   - httproute.yaml
   - policy-exception.yaml
   - storage-class-gpu.yaml
+  - storage-class-single-replica.yaml
 patches:
   - path: helm-release-patch.yaml
     target:

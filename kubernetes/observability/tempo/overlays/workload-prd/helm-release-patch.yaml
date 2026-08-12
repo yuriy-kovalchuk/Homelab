@@ -48,6 +48,7 @@ spec:
       persistence:
         enabled: true
         size: 5Gi
+        storageClass: longhorn-1r
 
     querier:
       replicas: 1

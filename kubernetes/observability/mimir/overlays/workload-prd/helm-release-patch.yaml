@@ -52,20 +52,6 @@ spec:
             bucket_name: "mimir-data"
             insecure: false
 
-        ruler_storage:
-          backend: s3
-          s3:
-            endpoint: "s3.yuriykovalchuk.dev:443"
-            region: "eu-south-1"
-            access_key_id: "${access_key_id}"
-            secret_access_key: "${secret_access_key}"
-            bucket_name: "mimir-ruler"
-            insecure: false
-
-        ruler:
-          alertmanager_url: "http://alertmanager.alertmanager.svc.cluster.local:9093"
-          enable_api: true
-
           tsdb:
             dir: /data/tsdb
             block_ranges_period: [1h]
@@ -79,6 +65,20 @@ spec:
           bucket_store:
             sync_interval: 5m
             ignore_blocks_within: 1h
+
+        ruler_storage:
+          backend: s3
+          s3:
+            endpoint: "s3.yuriykovalchuk.dev:443"
+            region: "eu-south-1"
+            access_key_id: "${access_key_id}"
+            secret_access_key: "${secret_access_key}"
+            bucket_name: "mimir-ruler"
+            insecure: false
+
+        ruler:
+          alertmanager_url: "http://alertmanager.alertmanager.svc.cluster.local:9093"
+          enable_api: true
 
         querier:
           query_store_after: 24h
@@ -118,7 +118,7 @@ spec:
         # sized for ~26h of homelab metrics; 3 Longhorn replicas land on
         # every control plane, so keep volumes small (cp-1/2 have ~93Gi free)
         size: 10Gi
-        storageClass: "longhorn"
+        storageClass: "longhorn-1r"
       replicas: 3
 
     querier:
@@ -134,7 +134,7 @@ spec:
       persistentVolume:
         enabled: true
         size: 2Gi
-        storageClass: "longhorn"
+        storageClass: "longhorn-1r"
       zoneAwareReplication:
         enabled: false
       replicas: 3
@@ -144,7 +144,7 @@ spec:
       persistentVolume:
         enabled: true
         size: 20Gi
-        storageClass: "longhorn"
+        storageClass: "longhorn-1r"
 
     kafka:
       enabled: false

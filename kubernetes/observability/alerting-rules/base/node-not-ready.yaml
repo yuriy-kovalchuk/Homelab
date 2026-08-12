@@ -9,9 +9,11 @@ spec:
       rules:
         - alert: NodeNotReady
           expr: kube_node_status_condition{condition="Ready", status="true"} == 0
-          for: 5m
+          for: 15m
+          keep_firing_for: 5m
           labels:
             severity: critical
+            component: node
           annotations:
             summary: "Node {{ $labels.node }} is not ready"
-            description: "Node {{ $labels.node }} has been NotReady for more than 5 minutes."
+            description: "Node {{ $labels.node }} has had condition Ready != True for more than 15 minutes. Likely causes: kubelet crash, network partition, or hardware failure."

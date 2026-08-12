@@ -14,7 +14,7 @@ spec:
 
     persistence:
       enabled: true
-      storageClass: "longhorn"
+      storageClass: "longhorn-1r"
       size: 1Gi
 
     resources:
@@ -42,6 +42,18 @@ spec:
           slack_configs:
             - channel: "#alerts"
               send_resolved: true
+              title: >-
+                {{ if eq .Status "firing" }}:fire:{{ else }}:white_check_mark:{{ end }}
+                [{{ .Status | toUpper }}] {{ .CommonLabels.alertname }} ({{ .Alerts | len }})
+              text: >-
+                {{ range .Alerts }}
+                *Severity:* {{ .Labels.severity }}
+                *Summary:* {{ .Annotations.summary }}
+                {{ if .Annotations.description }}*Description:* {{ .Annotations.description }}
+                {{ end }}{{ if .Labels.namespace }}*Namespace:* {{ .Labels.namespace }}
+                {{ end }}{{ if .Labels.node }}*Node:* {{ .Labels.node }}
+                {{ end }}
+                {{ end }}
       route:
         receiver: slack-alerts
         group_wait: 10s

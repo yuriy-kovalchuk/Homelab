@@ -68,6 +68,7 @@ spec:
         claims:
           - name: data
             size: 5Gi
+            storageClass: longhorn-1r
             accessModes:
               - ReadWriteOnce
 
