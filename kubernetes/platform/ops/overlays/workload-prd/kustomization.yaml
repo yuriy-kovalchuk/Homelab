@@ -1,14 +1,14 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ../../../gpu-tools/overlays/workload-prd
-  - ../../../hubble/overlays/workload-prd
-  - ../../../cilium-observability/overlays/workload-prd
-  - ../../../flux-system/overlays/workload-prd
-  - ../../../kyverno-reporter/overlays/workload-prd
-  - ../../../vpa/overlays/workload-prd
-  - ../../../yk-dns-manager/overlays/workload-prd
-  - ../../../cloudflared/overlays/workload-prd
-  - ../../../trivy/overlays/workload-prd
-  - ../../../trivy-converter/overlays/workload-prd
-  - ../../../clean-pods/overlays/workload-prd
+  - ../../gpu-tools/overlays/workload-prd
+  - ../../hubble/overlays/workload-prd
+  - ../../cilium-observability/overlays/workload-prd
+  - ../../flux-system/overlays/workload-prd
+  - ../../kyverno-reporter/overlays/workload-prd
+  - ../../vpa/overlays/workload-prd
+  - ../../yk-dns-manager/overlays/workload-prd
+  - ../../cloudflared/overlays/workload-prd
+  - ../../trivy/overlays/workload-prd
+  - ../../trivy-converter/overlays/workload-prd
+  - ../../clean-pods/overlays/workload-prd
