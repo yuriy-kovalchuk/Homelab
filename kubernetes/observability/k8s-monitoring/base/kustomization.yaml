@@ -6,3 +6,4 @@ resources:
   - helm-release.yaml
   - network-policy.yaml
   - policy-exception.yaml
+  - rbac-mimir-rules.yaml

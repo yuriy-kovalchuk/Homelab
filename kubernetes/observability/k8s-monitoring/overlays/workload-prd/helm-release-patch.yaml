@@ -64,6 +64,14 @@ spec:
             enabled: true
           extraArgs:
             - --disable-reporting
+        # Syncs PrometheusRule CRDs cluster-wide into Mimir's ruler — the
+        # GitOps path for alerting rules (see kubernetes/observability/alerting-rules).
+        # tenant_id matches the X-Scope-OrgID Grafana's Mimir datasource already sends.
+        extraConfig: |
+          mimir.rules.kubernetes "this" {
+            address   = "http://mimir-ruler.mimir.svc.cluster.local:8080"
+            tenant_id = "anonymous"
+          }
       alloy-receiver:
         controller:
           tolerations:

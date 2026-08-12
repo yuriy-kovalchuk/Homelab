@@ -52,6 +52,20 @@ spec:
             bucket_name: "mimir-data"
             insecure: false
 
+        ruler_storage:
+          backend: s3
+          s3:
+            endpoint: "s3.yuriykovalchuk.dev:443"
+            region: "eu-south-1"
+            access_key_id: "${access_key_id}"
+            secret_access_key: "${secret_access_key}"
+            bucket_name: "mimir-ruler"
+            insecure: false
+
+        ruler:
+          alertmanager_url: "http://alertmanager.alertmanager.svc.cluster.local:9093"
+          enable_api: true
+
           tsdb:
             dir: /data/tsdb
             block_ranges_period: [1h]
@@ -140,7 +154,8 @@ spec:
     gateway:
       enabledNonEnterprise: false
     ruler:
-      enabled: false
+      enabled: true
+      replicas: 1
     overrides_exporter:
       enabled: false
     alertmanager:
