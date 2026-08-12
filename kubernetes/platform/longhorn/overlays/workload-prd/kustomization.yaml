@@ -3,7 +3,6 @@ kind: Kustomization
 resources:
   - ../../base
   - httproute.yaml
-  - policy-exception.yaml
   - storage-class-gpu.yaml
   - storage-class-single-replica.yaml
 patches:

@@ -6,7 +6,6 @@ resources:
   - model-download-job.yaml
   - deployment.yaml
   - service.yaml
-  - network-policy.yaml
 configMapGenerator:
   - name: llama-cpp-model-list
     namespace: llm

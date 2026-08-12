@@ -4,6 +4,6 @@ resources:
   - allow-dns.yaml
   - allow-health-probes.yaml
   - allow-kube-system.yaml
-  - allow-gateway-frontend.yaml
   - allow-flux-system.yaml
   - allow-alloy-metrics-scraping.yaml
+  - allow-gateway-frontend.yaml

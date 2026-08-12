@@ -6,4 +6,3 @@ resources:
   - pvc.yaml
   - cnpg-cluster.yaml
   - helm-release.yaml
-  - network-policy.yaml

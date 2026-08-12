@@ -3,8 +3,6 @@ kind: Kustomization
 resources:
   - external-secret.yaml
   - helm-release.yaml
-  - policy-exception.yaml
-  - network-policy.yaml
 
 configMapGenerator:
   - name: grafana-dashboards-kubernetes

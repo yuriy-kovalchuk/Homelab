@@ -7,5 +7,3 @@ resources:
   - valkey.yaml
   - server.yaml
   - machine-learning.yaml
-  - network-policy.yaml
-  - policy-exception.yaml

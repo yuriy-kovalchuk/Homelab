@@ -4,6 +4,7 @@ resources:
   - gotk-sync.yaml
   - namespaces.yaml
   - core.yaml
+  - policies.yaml
   - platform.yaml
   - llm-policies.yaml
   - observability.yaml

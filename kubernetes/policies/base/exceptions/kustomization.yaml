@@ -1,0 +1,21 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - apps-immich.yaml
+  - apps-llama-cpp.yaml
+  - apps-open-webui.yaml
+  - apps-yk-update-checker.yaml
+  - kube-system.yaml
+  - observability-alertmanager.yaml
+  - observability-grafana.yaml
+  - observability-k8s-monitoring.yaml
+  - observability-loki.yaml
+  - observability-mimir.yaml
+  - observability-tempo.yaml
+  - platform-cdi.yaml
+  - platform-democratic-csi-iscsi.yaml
+  - platform-democratic-csi-nfs.yaml
+  - platform-kubevirt.yaml
+  - platform-longhorn.yaml
+  - platform-trivy.yaml
+  - vms-ubuntu-test.yaml

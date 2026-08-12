@@ -6,4 +6,3 @@ resources:
   - helm-release-policies.yaml
   - cluster-role.yaml
   - cluster-role-binding.yaml
-  - network-policy.yaml
