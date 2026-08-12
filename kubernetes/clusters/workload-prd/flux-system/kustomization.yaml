@@ -7,9 +7,6 @@ resources:
   - policies.yaml
   - platform-infra.yaml
   - platform-ops.yaml
-  - llm-policies.yaml
   - observability.yaml
-  - apps-system.yaml
   - apps.yaml
-  - llm.yaml
   - vms.yaml

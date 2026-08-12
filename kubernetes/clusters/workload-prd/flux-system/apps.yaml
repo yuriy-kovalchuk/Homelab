@@ -7,11 +7,12 @@ metadata:
 spec:
   interval: 2m
   dependsOn:
-    - name: apps-system
+    - name: policies
+    - name: platform-infra
   sourceRef:
     kind: GitRepository
     name: homelab
   path: ./kubernetes/apps/overlays/workload-prd
   prune: true
-  wait: true
+  wait: false
   timeout: 5m
