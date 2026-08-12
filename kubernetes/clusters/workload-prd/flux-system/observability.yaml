@@ -12,6 +12,6 @@ spec:
     kind: GitRepository
     name: homelab
   path: ./kubernetes/observability/overlays/workload-prd
-  prune: true
+  prune: false
   wait: true
   timeout: 15m
