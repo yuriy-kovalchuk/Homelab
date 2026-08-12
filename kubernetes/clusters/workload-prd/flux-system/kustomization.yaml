@@ -5,7 +5,8 @@ resources:
   - namespaces.yaml
   - core.yaml
   - policies.yaml
-  - platform.yaml
+  - platform-infra.yaml
+  - platform-ops.yaml
   - llm-policies.yaml
   - observability.yaml
   - apps-system.yaml

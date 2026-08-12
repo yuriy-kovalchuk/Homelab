@@ -2,16 +2,16 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: observability
+  name: platform-infra
   namespace: flux-system
 spec:
   interval: 2m
   dependsOn:
-    - name: platform-infra
+    - name: policies
   sourceRef:
     kind: GitRepository
     name: homelab
-  path: ./kubernetes/observability/overlays/workload-prd
+  path: ./kubernetes/platform/infra/overlays/workload-prd
   prune: true
   wait: true
   timeout: 15m
