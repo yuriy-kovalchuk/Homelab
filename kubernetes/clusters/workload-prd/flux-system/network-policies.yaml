@@ -2,17 +2,16 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: core
+  name: network-policies
   namespace: flux-system
 spec:
   interval: 2m
   dependsOn:
     - name: namespaces
-    - name: network-policies
   sourceRef:
     kind: GitRepository
     name: homelab
-  path: ./kubernetes/core/overlays/workload-prd
-  prune: false
+  path: ./kubernetes/network-policies/overlays/workload-prd
+  prune: true
   wait: true
-  timeout: 10m
+  timeout: 5m

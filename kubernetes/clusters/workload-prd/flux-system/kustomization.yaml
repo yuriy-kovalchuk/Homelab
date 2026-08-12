@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - gotk-sync.yaml
   - namespaces.yaml
+  - network-policies.yaml
   - core.yaml
   - policies.yaml
   - secrets.yaml
