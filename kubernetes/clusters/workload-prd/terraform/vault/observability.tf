@@ -41,3 +41,13 @@ resource "vault_kv_secret_v2" "grafana_admin" {
     password = var.grafana_admin_password
   })
 }
+
+resource "vault_kv_secret_v2" "alertmanager_slack" {
+  mount               = "kubernetes"
+  name                = "alertmanager/slack"
+  delete_all_versions = true
+
+  data_json = jsonencode({
+    webhook_url = var.alertmanager_slack_webhook_url
+  })
+}

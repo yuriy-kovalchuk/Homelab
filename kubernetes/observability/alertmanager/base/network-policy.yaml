@@ -29,3 +29,18 @@ spec:
         - ports:
             - port: "9093"
               protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: alertmanager-egress-to-slack
+  namespace: alertmanager
+spec:
+  endpointSelector: {}
+  egress:
+    - toFQDNs:
+        - matchName: "hooks.slack.com"
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

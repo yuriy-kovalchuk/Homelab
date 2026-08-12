@@ -4,6 +4,11 @@ metadata:
   name: alertmanager
   namespace: alertmanager
 spec:
+  valuesFrom:
+    - kind: Secret
+      name: alertmanager-slack-webhook
+      valuesKey: SLACK_API_URL
+      targetPath: config.global.slack_api_url
   values:
     replicaCount: 1
 
@@ -29,14 +34,16 @@ spec:
     serviceMonitor:
       enabled: true
 
-    # No real receiver wired up yet — this is a no-op stub. Alerts will
-    # dedupe/group/route correctly but nothing gets delivered anywhere
-    # until a real integration (Slack/email/webhook) is added here.
+    # slack_api_url is injected via valuesFrom (config.global.slack_api_url)
+    # from the alertmanager-slack-webhook Secret — see external-secret.yaml.
     config:
       receivers:
-        - name: default-receiver
+        - name: slack-alerts
+          slack_configs:
+            - channel: "#alerts"
+              send_resolved: true
       route:
-        receiver: default-receiver
+        receiver: slack-alerts
         group_wait: 10s
         group_interval: 5m
         repeat_interval: 3h

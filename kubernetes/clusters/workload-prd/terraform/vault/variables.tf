@@ -91,3 +91,9 @@ variable "opencloud_admin_password" {
   sensitive   = true
 }
 
+variable "alertmanager_slack_webhook_url" {
+  description = "Slack Incoming Webhook URL for Alertmanager notifications"
+  type        = string
+  sensitive   = true
+}
+
