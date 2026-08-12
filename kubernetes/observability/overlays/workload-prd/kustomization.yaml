@@ -7,4 +7,3 @@ resources:
   - ../../tempo/overlays/workload-prd
   - ../../k8s-monitoring/overlays/workload-prd
   - ../../grafana/overlays/workload-prd
-  - ../../alerting-rules/overlays/workload-prd

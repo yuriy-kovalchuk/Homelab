@@ -8,5 +8,6 @@ resources:
   - platform-infra.yaml
   - platform-ops.yaml
   - observability.yaml
+  - alerting-rules.yaml
   - apps.yaml
   - vms.yaml
