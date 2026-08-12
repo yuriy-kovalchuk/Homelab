@@ -1,0 +1,37 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - apps-forgejo.yaml
+  - apps-homepage.yaml
+  - apps-httpbin.yaml
+  - apps-immich.yaml
+  - apps-llama-cpp.yaml
+  - apps-open-webui.yaml
+  - apps-opencloud.yaml
+  - apps-whoami.yaml
+  - apps-yk-portfolio.yaml
+  - apps-yk-update-checker.yaml
+  - core-cert-manager.yaml
+  - core-external-secrets.yaml
+  - core-kyverno.yaml
+  - observability-alerting-rules.yaml
+  - observability-alertmanager.yaml
+  - observability-grafana.yaml
+  - observability-k8s-monitoring.yaml
+  - observability-loki.yaml
+  - observability-mimir.yaml
+  - observability-tempo.yaml
+  - platform-cdi.yaml
+  - platform-clean-pods.yaml
+  - platform-cloudflared.yaml
+  - platform-cloudnative-pg.yaml
+  - platform-democratic-csi-iscsi.yaml
+  - platform-democratic-csi-nfs.yaml
+  - platform-kubevirt.yaml
+  - platform-kyverno-reporter.yaml
+  - platform-longhorn.yaml
+  - platform-trivy-converter.yaml
+  - platform-trivy.yaml
+  - platform-vpa.yaml
+  - platform-yk-dns-manager.yaml
+  - vms-ubuntu-test.yaml

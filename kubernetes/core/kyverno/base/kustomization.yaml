@@ -1,10 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - namespace.yaml
   - helm-repository.yaml
   - helm-release.yaml
   - helm-release-policies.yaml
   - cluster-role.yaml
   - cluster-role-binding.yaml
-  - network-policy.yaml

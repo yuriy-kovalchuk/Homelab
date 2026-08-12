@@ -6,6 +6,8 @@ metadata:
   namespace: flux-system
 spec:
   interval: 2m
+  dependsOn:
+    - name: namespaces
   sourceRef:
     kind: GitRepository
     name: homelab

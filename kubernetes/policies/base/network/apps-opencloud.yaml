@@ -1,0 +1,37 @@
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: allow-gateway-ingress-from-opencloud
+spec:
+  description: "Allow the gateway to accept opencloud's own callback traffic on 443"
+  endpointSelector:
+    matchLabels:
+      "reserved:ingress": ""
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: opencloud
+            app: opencloud
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: opencloud
+  namespace: opencloud
+spec:
+  description: "Allow opencloud to receive traffic from the gateway and cluster"
+  endpointSelector:
+    matchLabels:
+      app: opencloud
+  ingress:
+    - fromEntities:
+        - cluster
+        - ingress
+      toPorts:
+        - ports:
+            - port: "9200"
+              protocol: TCP

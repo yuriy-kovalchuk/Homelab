@@ -4,6 +4,15 @@ metadata:
   name: grafana
   namespace: grafana
 spec:
+  dependsOn:
+    - name: loki
+      namespace: loki
+    - name: mimir
+      namespace: mimir
+    - name: tempo
+      namespace: tempo
+    - name: alertmanager
+      namespace: alertmanager
   values:
     admin:
       existingSecret: grafana-admin-secret

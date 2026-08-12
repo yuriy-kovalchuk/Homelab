@@ -8,3 +8,6 @@ resources:
   - ../../homepage/overlays/workload-prd
   - ../../immich/overlays/workload-prd
   - ../../opencloud/overlays/workload-prd
+  - ../../forgejo/overlays/workload-prd
+  - ../../../llm/llama-cpp/overlays/workload-prd
+  - ../../../llm/open-webui/overlays/workload-prd
