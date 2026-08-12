@@ -3,7 +3,6 @@ kind: Kustomization
 resources:
   - helm-repository.yaml
   - helm-release.yaml
-  - external-secret.yaml
 
 
 namespace: yk-dns-manager
