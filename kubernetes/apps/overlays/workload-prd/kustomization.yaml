@@ -10,4 +10,5 @@ resources:
   - ../../opencloud/overlays/workload-prd
   - ../../forgejo/overlays/workload-prd
   - ../../../llm/llama-cpp/overlays/workload-prd
+  - ../../../llm/llama-cpp-rocm/overlays/workload-prd
   - ../../../llm/open-webui/overlays/workload-prd

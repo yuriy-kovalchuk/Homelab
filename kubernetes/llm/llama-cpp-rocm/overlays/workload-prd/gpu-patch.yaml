@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llama-cpp-rocm
+  namespace: llm
+spec:
+  template:
+    spec:
+      nodeSelector:
+        ai-node: oculink
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
+      containers:
+        - name: llama-cpp
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          env:
+            # PLACEHOLDER index: verify with `rocminfo` on the pod and set the
+            # R9700's device index here (flip to "1" if inference lands on the 780M).
+            - name: HIP_VISIBLE_DEVICES
+              value: "0"
+          volumeMounts:
+            - name: dev-dri
+              mountPath: /dev/dri
+            - name: dev-kfd
+              mountPath: /dev/kfd
+      volumes:
+        - name: dev-dri
+          hostPath:
+            path: /dev/dri
+            type: Directory
+        - name: dev-kfd
+          hostPath:
+            path: /dev/kfd
+            type: CharDevice
