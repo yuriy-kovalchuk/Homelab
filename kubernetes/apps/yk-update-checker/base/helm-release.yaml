@@ -27,7 +27,7 @@ spec:
 
     image:
       repository: ghcr.io/yuriy-kovalchuk/yk-update-checker
-      pullPolicy: IfNotPresent
+      pullPolicy: Always
     resources:
       requests:
         cpu: 100m
@@ -52,10 +52,42 @@ spec:
           - name: homelab
             repo: https://github.com/yuriy-kovalchuk/homelab
 
+
+    # ── Prometheus / Alertmanager integration ──────────────────────────────────────
     grafana:
+    # Creates a ConfigMap with the pre-built Grafana dashboard JSON.
+    # When enabled, the label `grafana_dashboard: "1"` is added so that
+    # Grafana (or grafana-operator) auto-discovers and imports it.
       dashboard:
         enabled: true
+        # Sets the k8s-sidecar-target-directory annotation, which the Grafana
+        # sidecar uses to file the dashboard under this folder. Assumes the
+        # sidecar's watched base directory is its default, "/tmp/dashboards"
+        # (sidecarBaseDir below) — override if your Grafana release configured
+        # sidecar.dashboards.folder to something else.
+        folder: "Security"
 
     metrics:
+      # ServiceMonitor CRD — requires Prometheus Operator.
       serviceMonitor:
         enabled: true
+        additionalLabels: {}
+        interval: "5m"
+
+      # PrometheusRule CRD — generates alert rules routed to Alertmanager.
+      prometheusRule:
+        enabled: true
+        # Each entry becomes one rule.  Scope is matched against the metric label;
+        # severity is emitted as a label for Alertmanager routing.
+        # "unknown" covers non-semver-pinned dependencies (e.g. git SHAs) whose
+        # bump size can't be classified — treated as warning since it could be
+        # anything up to a major change.
+        rules:
+          - scope: major
+            severity: warning
+          - scope: minor
+            severity: info
+          - scope: patch
+            severity: info
+          - scope: unknown
+            severity: warning
