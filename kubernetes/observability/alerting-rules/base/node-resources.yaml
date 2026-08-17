@@ -34,3 +34,12 @@ spec:
           annotations:
             summary: "Node {{ $labels.instance }} root filesystem almost full"
             description: "Root filesystem on {{ $labels.instance }} has less than 10% space available."
+        - alert: NodeCPUUsageHigh
+          expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+          for: 15m
+          labels:
+            severity: warning
+            component: node
+          annotations:
+            summary: "Node {{ $labels.instance }} CPU usage is high"
+            description: "Node {{ $labels.instance }} has had CPU usage above 85% for more than 15 minutes. controlplane-2/controlplane-3 are only 4 vCPU — this can starve Longhorn's per-node instance-manager reservation."

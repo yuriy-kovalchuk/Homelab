@@ -30,6 +30,17 @@ spec:
         - ports:
             - port: "8080"
               protocol: TCP
+    # query-frontend doesn't serve the ruler's rules API — the "Mimir Ruler"
+    # datasource talks to mimir-ruler directly for Grafana's Alerting page.
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/component: ruler
+            app.kubernetes.io/instance: mimir
+            io.kubernetes.pod.namespace: mimir
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
 ---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy

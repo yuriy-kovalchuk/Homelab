@@ -82,6 +82,14 @@ spec:
         - ports:
             - port: "8080"
               protocol: TCP
+    # "Mimir Ruler" Grafana datasource — rules API for the Alerting page.
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: grafana
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
 ---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy

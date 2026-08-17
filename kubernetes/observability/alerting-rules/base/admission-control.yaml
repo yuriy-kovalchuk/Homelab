@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: admission-control
+  namespace: alerting-rules
+spec:
+  groups:
+    - name: admission-control
+      rules:
+        - alert: KyvernoWebhookDown
+          expr: kube_deployment_status_replicas_available{namespace="kyverno", deployment="kyverno-admission-controller"} == 0
+          for: 5m
+          labels:
+            severity: critical
+            component: admission-control
+          annotations:
+            summary: "Kyverno admission-controller has no available replicas"
+            description: "kyverno-admission-controller has had 0 available replicas for more than 5 minutes. Depending on failurePolicy, this can block resource creation cluster-wide."

@@ -60,6 +60,27 @@ spec:
             editable: true
             jsonData:
               httpHeaderName1: X-Scope-OrgID
+              # query-frontend doesn't serve the ruler's rules API (404) — rule
+              # definitions are exposed via the separate "Mimir Ruler" datasource.
+              manageAlerts: false
+            secureJsonData:
+              httpHeaderValue1: "anonymous"
+          # Points at mimir-ruler directly (not query-frontend/gateway, which
+          # isn't enabled) so Grafana's Alerting > Alert rules page can list the
+          # PrometheusRule-sourced rule groups from kubernetes/observability/alerting-rules.
+          # Only useful for rule/alert visibility — not a general query datasource.
+          - name: Mimir Ruler
+            type: prometheus
+            uid: mimir-ruler
+            access: proxy
+            url: http://mimir-ruler.mimir.svc.cluster.local:8080/prometheus
+            isDefault: false
+            version: 1
+            editable: true
+            jsonData:
+              httpHeaderName1: X-Scope-OrgID
+              manageAlerts: true
+              alertmanagerUid: alertmanager
             secureJsonData:
               httpHeaderValue1: "anonymous"
           - name: Loki

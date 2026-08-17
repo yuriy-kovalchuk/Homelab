@@ -8,3 +8,7 @@ resources:
   - certificates.yaml
   - database.yaml
   - gitops.yaml
+  - capacity.yaml
+  - cluster-core.yaml
+  - secrets.yaml
+  - admission-control.yaml

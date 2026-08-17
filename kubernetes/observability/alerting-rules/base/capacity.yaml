@@ -1,0 +1,27 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: capacity
+  namespace: alerting-rules
+spec:
+  groups:
+    - name: capacity
+      rules:
+        - alert: KubeCPUOvercommit
+          expr: sum(kube_pod_container_resource_requests{resource="cpu"}) / sum(kube_node_status_allocatable{resource="cpu"}) > 0.9
+          for: 30m
+          labels:
+            severity: warning
+            component: capacity
+          annotations:
+            summary: "Cluster CPU requests are close to total allocatable"
+            description: "Sum of all pod CPU requests has exceeded 90% of total cluster allocatable CPU for more than 30 minutes — new pods may fail to schedule."
+        - alert: KubeMemoryOvercommit
+          expr: sum(kube_pod_container_resource_requests{resource="memory"}) / sum(kube_node_status_allocatable{resource="memory"}) > 0.9
+          for: 30m
+          labels:
+            severity: warning
+            component: capacity
+          annotations:
+            summary: "Cluster memory requests are close to total allocatable"
+            description: "Sum of all pod memory requests has exceeded 90% of total cluster allocatable memory for more than 30 minutes — new pods may fail to schedule."

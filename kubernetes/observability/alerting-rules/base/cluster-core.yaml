@@ -1,0 +1,36 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: cluster-core
+  namespace: alerting-rules
+spec:
+  groups:
+    - name: cluster-core
+      rules:
+        - alert: CoreDNSDown
+          expr: up{job="integrations/kubernetes/kube-dns"} == 0
+          for: 5m
+          labels:
+            severity: critical
+            component: dns
+          annotations:
+            summary: "CoreDNS target {{ $labels.instance }} is down"
+            description: "CoreDNS instance {{ $labels.instance }} has been unreachable for more than 5 minutes — cluster-wide DNS resolution is at risk."
+        - alert: KubeAPIErrorsHigh
+          expr: sum(rate(apiserver_request_total{code=~"5..", verb!="CONNECT"}[5m])) / sum(rate(apiserver_request_total{verb!="CONNECT"}[5m])) > 0.05
+          for: 15m
+          labels:
+            severity: warning
+            component: control-plane
+          annotations:
+            summary: "kube-apiserver error rate is high"
+            description: "More than 5% of kube-apiserver requests have returned a 5xx error over the last 15 minutes."
+        - alert: KubeAPILatencyHigh
+          expr: histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{verb!~"WATCH|CONNECT"}[5m])) by (le)) > 1
+          for: 15m
+          labels:
+            severity: warning
+            component: control-plane
+          annotations:
+            summary: "kube-apiserver p99 latency is high"
+            description: "kube-apiserver p99 request latency has been above 1s for more than 15 minutes (excluding WATCH/CONNECT)."
