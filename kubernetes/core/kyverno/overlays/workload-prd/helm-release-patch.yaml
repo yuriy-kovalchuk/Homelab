@@ -56,6 +56,17 @@ spec:
             matchLabels:
               app.kubernetes.io/component: cleanup-controller
               app.kubernetes.io/instance: kyverno
+      rbac:
+        clusterRole:
+          extraResources:
+            - apiGroups:
+                - apps
+              resources:
+                - replicasets
+              verbs:
+                - delete
+                - list
+                - watch
     reportsController:
       replicas: 2
       podSecurityContext:

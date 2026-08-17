@@ -5,3 +5,4 @@ resources:
   - mutate-goldilocks-label.yaml
   - mutate-goldilocks-label-rbac.yaml
   - mutate-beyla-instrument-label.yaml
+  - cleanup-empty-replicasets.yaml
