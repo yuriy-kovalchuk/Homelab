@@ -52,6 +52,19 @@ Audit every `CiliumNetworkPolicy` / `CiliumClusterwideNetworkPolicy` in the clus
 - [ ] **Verify with Hubble, not by reading:** run each app through its real flows and check `hubble observe --verdict DROPPED` for both false-denies and rules that never match (candidates for removal)
 - [ ] **Document the verified end state** in CLAUDE.md conventions + a short `docs/NETWORK-POLICIES.md` inventory table (namespace → allowed ingress/egress → why)
 
+## 6. Split Alertmanager Slack notifications by component/channel
+
+Alert rules now exist (`kubernetes/observability/alerting-rules/base/`: `node-not-ready.yaml`, `node-resources.yaml`, `workload-health.yaml`, `storage.yaml`, `certificates.yaml`, `database.yaml`, `gitops.yaml`, `watchdog.yaml`) and every alert already carries a `component` label (`node`, `workload`, `storage`, `certificates`, `database`, `gitops`, `alerting`) plus `severity` (`critical`/`warning`/`none`). Alertmanager currently has a single catch-all route → one Slack receiver → `#alerts`, fed by one webhook URL (`alertmanager-slack-webhook` Vault secret → `config.global.slack_api_url` in `kubernetes/observability/alertmanager/overlays/workload-prd/helm-release-patch.yaml`).
+
+**Decision made:** route by `component` label, one Slack channel per component (7 channels), not a severity-based split and not logical groupings.
+
+**Blocker to resolve before implementing:** Alertmanager's built-in Slack receiver only POSTs to a single webhook-bound channel — Slack no longer honors a payload-level `channel` override for App-based Incoming Webhooks, so one webhook URL can't fan out to multiple channels. Two options were discussed, needs a decision to resume:
+
+- [ ] **Option A — native, 7 webhook URLs (recommended, no new infra):** Create 7 Slack Incoming Webhook URLs (same Slack App → "Incoming Webhooks" → "Add New Webhook to Workspace", once per channel). Store all 7 in Vault (extend `clusters/workload-prd/terraform/vault/` the same way the current single webhook is provisioned), expose via ExternalSecret, add 7 `slack_configs` receivers + 7 child `route` blocks matching `component` in `kubernetes/observability/alertmanager/overlays/workload-prd/helm-release-patch.yaml`.
+- [ ] **Option B — Slack bot token + relay service:** One bot token (`chat:write` scope, or `chat:write.public`) can post to any channel via `chat.postMessage`, but Alertmanager can't call that API natively — requires a new lightweight Deployment between Alertmanager (`webhook_configs`) and Slack's Web API to translate. More moving parts, one credential instead of seven.
+- [ ] Decide whether `Watchdog` (component: `alerting`, fires continuously, `repeat_interval: 3h`) gets its own channel or should be muted/routed elsewhere once the split lands — it's a heartbeat, not actionable.
+- [ ] Once the approach is chosen: wire receivers/routes, verify each component's alerts land in the right channel (test by temporarily lowering a `for:` duration or forcing a condition).
+
 ## 5. Cleanup follow-ups (small, do alongside)
 
 - [ ] Drop stale gateway listeners: `https-uptime-kuma` (app removed), `https-forgejo`/`ssh-forgejo` stay but only until step 1 lands

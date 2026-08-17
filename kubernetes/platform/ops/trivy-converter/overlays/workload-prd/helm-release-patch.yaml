@@ -17,11 +17,13 @@ spec:
     adapters:
       cisKubeBenchReports:
         enabled: false
-      # Per-pod vuln reports are extremely numerous (one per pod/replicaset).
-      # ClusterVulnerabilityReports (enabled below) already cover CVE data
-      # cluster-wide with far fewer objects, avoiding the startup cache timeout.
+      # Per-pod vuln reports are extremely numerous (one per pod/replicaset),
+      # which previously blew the adapter's default 2m startup cache-sync
+      # deadline. Raised timeout to give it enough time to finish the initial
+      # sync instead of leaving image CVEs unconverted.
       vulnerabilityReports:
-        enabled: false
+        enabled: true
+        timeout: 10
       # ConfigAuditReports are generated for every K8s resource in every namespace
       # (Deployments, Services, ConfigMaps, Roles…) making them the most numerous
       # type. With the rest of the controllers consuming the startup window, this
