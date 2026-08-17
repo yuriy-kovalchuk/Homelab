@@ -53,11 +53,15 @@ spec:
             summary: "Pod {{ $labels.namespace }}/{{ $labels.pod }} is stuck {{ $labels.phase }}"
             description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} has been in phase {{ $labels.phase }} for more than 15 minutes — likely a scheduling or volume-attach failure."
         - alert: KubeJobFailed
-          expr: kube_job_status_failed > 0
+          # kube_job_status_failed is a raw failed-pod-attempt counter that never
+          # resets, even after a later retry succeeds — without the `unless` guard
+          # this fires forever on any Job that ever had one transient pod failure,
+          # regardless of how old or how long since successfully completed.
+          expr: kube_job_status_failed > 0 unless kube_job_status_succeeded > 0
           for: 5m
           labels:
             severity: warning
             component: workload
           annotations:
             summary: "Job {{ $labels.namespace }}/{{ $labels.job_name }} failed"
-            description: "Job {{ $labels.namespace }}/{{ $labels.job_name }} has at least one failed pod and has not recovered for more than 5 minutes."
+            description: "Job {{ $labels.namespace }}/{{ $labels.job_name }} has at least one failed pod, never succeeded, and has not recovered for more than 5 minutes."
