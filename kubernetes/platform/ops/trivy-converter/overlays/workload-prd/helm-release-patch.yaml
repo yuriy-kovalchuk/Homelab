@@ -5,8 +5,6 @@ metadata:
   namespace: trivy-converter
 spec:
   values:
-    kubeClientQPS: 50
-    kubeClientBurst: 100
     # Switches the adapter's output (and RBAC) from wgpolicyk8s.io
     # PolicyReport/ClusterPolicyReport to openreports.io Report/ClusterReport —
     # an either/or switch in the chart, not additive. CRDs are already
@@ -37,18 +35,29 @@ spec:
       # one never gets its turn before the 2-minute manager deadline.
       configAuditReports:
         enabled: false
+      # All remaining enabled adapters start up serially and share the same
+      # startup window; the chart default timeout (2) is too tight once 6+
+      # controllers are competing for it. Same fix as vulnerabilityReports above —
+      # exposedSecretReports was the one observed actually crash-looping on
+      # "Could not wait for Cache to sync" before this was raised.
       complianceReports:
         enabled: true
+        timeout: 10
       rbacAssessmentReports:
         enabled: true
+        timeout: 10
       exposedSecretReports:
         enabled: true
+        timeout: 10
       infraAssessmentReports:
         enabled: true
+        timeout: 10
       clusterInfraAssessmentReports:
         enabled: true
+        timeout: 10
       clusterVulnerabilityReports:
         enabled: true
+        timeout: 10
     podSecurityContext:
       fsGroup: 12345
     securityContext:
