@@ -1,0 +1,36 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: workload-health
+  namespace: alerting-rules
+spec:
+  groups:
+    - name: workload-health
+      rules:
+        - alert: KubePodCrashLooping
+          expr: max_over_time(kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff"}[5m]) >= 1
+          for: 15m
+          labels:
+            severity: warning
+            component: workload
+          annotations:
+            summary: "Pod {{ $labels.namespace }}/{{ $labels.pod }} is crash looping"
+            description: "Container {{ $labels.container }} in pod {{ $labels.namespace }}/{{ $labels.pod }} has been in CrashLoopBackOff for more than 15 minutes."
+        - alert: KubeDeploymentReplicasMismatch
+          expr: (kube_deployment_spec_replicas - kube_deployment_status_replicas_available) > 0
+          for: 15m
+          labels:
+            severity: warning
+            component: workload
+          annotations:
+            summary: "Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has unavailable replicas"
+            description: "Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has not matched the desired number of available replicas for more than 15 minutes."
+        - alert: ContainerOOMKilled
+          expr: increase(container_oom_events_total[15m]) > 0
+          for: 0m
+          labels:
+            severity: warning
+            component: workload
+          annotations:
+            summary: "Container in {{ $labels.namespace }}/{{ $labels.pod }} was OOM killed"
+            description: "Container {{ $labels.container }} in pod {{ $labels.namespace }}/{{ $labels.pod }} was OOM killed in the last 15 minutes."

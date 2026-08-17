@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: database
+  namespace: alerting-rules
+spec:
+  groups:
+    - name: database
+      rules:
+        - alert: CNPGInstanceDown
+          expr: cnpg_collector_up == 0
+          for: 5m
+          labels:
+            severity: critical
+            component: database
+          annotations:
+            summary: "CloudNativePG instance {{ $labels.namespace }}/{{ $labels.pod }} is down"
+            description: "The CNPG exporter reports the PostgreSQL instance {{ $labels.namespace }}/{{ $labels.pod }} as unreachable for more than 5 minutes."

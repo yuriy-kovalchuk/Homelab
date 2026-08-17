@@ -1,0 +1,36 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: storage
+  namespace: alerting-rules
+spec:
+  groups:
+    - name: storage
+      rules:
+        - alert: LonghornVolumeDegraded
+          expr: longhorn_volume_robustness{robustness="degraded"} == 1
+          for: 10m
+          labels:
+            severity: warning
+            component: storage
+          annotations:
+            summary: "Longhorn volume {{ $labels.volume }} is degraded"
+            description: "Longhorn volume {{ $labels.volume }} has been in state degraded for more than 10 minutes — a replica is missing or rebuilding."
+        - alert: LonghornVolumeFaulted
+          expr: longhorn_volume_robustness{robustness="faulted"} == 1
+          for: 5m
+          labels:
+            severity: critical
+            component: storage
+          annotations:
+            summary: "Longhorn volume {{ $labels.volume }} is faulted"
+            description: "Longhorn volume {{ $labels.volume }} has been in state faulted for more than 5 minutes — all replicas are unavailable, data may be inaccessible."
+        - alert: KubePersistentVolumeFillingUp
+          expr: kubelet_volume_stats_available_bytes / kubelet_volume_stats_capacity_bytes < 0.10
+          for: 15m
+          labels:
+            severity: warning
+            component: storage
+          annotations:
+            summary: "PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} is almost full"
+            description: "PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} has less than 10% free space."

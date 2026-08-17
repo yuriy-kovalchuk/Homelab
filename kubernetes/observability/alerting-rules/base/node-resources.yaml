@@ -1,0 +1,36 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: node-resources
+  namespace: alerting-rules
+spec:
+  groups:
+    - name: node-resources
+      rules:
+        - alert: NodeMemoryPressure
+          expr: kube_node_status_condition{condition="MemoryPressure", status="true"} == 1
+          for: 15m
+          labels:
+            severity: critical
+            component: node
+          annotations:
+            summary: "Node {{ $labels.node }} has memory pressure"
+            description: "Node {{ $labels.node }} has had condition MemoryPressure == True for more than 15 minutes."
+        - alert: NodeDiskPressure
+          expr: kube_node_status_condition{condition="DiskPressure", status="true"} == 1
+          for: 15m
+          labels:
+            severity: critical
+            component: node
+          annotations:
+            summary: "Node {{ $labels.node }} has disk pressure"
+            description: "Node {{ $labels.node }} has had condition DiskPressure == True for more than 15 minutes."
+        - alert: NodeFilesystemAlmostOutOfSpace
+          expr: node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"} * 100 < 10
+          for: 15m
+          labels:
+            severity: warning
+            component: node
+          annotations:
+            summary: "Node {{ $labels.instance }} root filesystem almost full"
+            description: "Root filesystem on {{ $labels.instance }} has less than 10% space available."

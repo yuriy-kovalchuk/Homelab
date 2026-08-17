@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: watchdog
+  namespace: alerting-rules
+spec:
+  groups:
+    - name: watchdog
+      rules:
+        - alert: Watchdog
+          expr: vector(1)
+          for: 0m
+          labels:
+            severity: none
+            component: alerting
+          annotations:
+            summary: "Alerting pipeline heartbeat"
+            description: "This alert is always firing. It confirms the Mimir ruler -> Alertmanager -> Slack pipeline is alive. If it stops appearing, the alerting pipeline itself is broken."
