@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: yk-update-checker
-      version: "0.3.0-dev"
+      version: "0.3.0"
       sourceRef:
         kind: HelmRepository
         name: yk-charts
@@ -52,12 +52,11 @@ spec:
           - name: homelab
             repo: https://github.com/yuriy-kovalchuk/homelab
 
-
     # ── Prometheus / Alertmanager integration ──────────────────────────────────────
     grafana:
-    # Creates a ConfigMap with the pre-built Grafana dashboard JSON.
-    # When enabled, the label `grafana_dashboard: "1"` is added so that
-    # Grafana (or grafana-operator) auto-discovers and imports it.
+      # Creates a ConfigMap with the pre-built Grafana dashboard JSON.
+      # When enabled, the label `grafana_dashboard: "1"` is added so that
+      # Grafana (or grafana-operator) auto-discovers and imports it.
       dashboard:
         enabled: true
         # Sets the k8s-sidecar-target-directory annotation, which the Grafana
