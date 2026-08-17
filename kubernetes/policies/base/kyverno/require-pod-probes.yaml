@@ -1,0 +1,25 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: require-pod-probes
+  annotations:
+    policies.kyverno.io/title: Require Pod Probes
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: low
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Audits containers missing a readinessProbe or livenessProbe, which can let
+      traffic reach an unready or hung container. Audit mode: report only.
+spec:
+  validationActions:
+    - Audit
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  validations:
+    - expression: >-
+        object.spec.containers.all(c, has(c.readinessProbe) && has(c.livenessProbe))
+      message: "Containers should define both a readinessProbe and a livenessProbe."

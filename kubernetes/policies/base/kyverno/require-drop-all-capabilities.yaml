@@ -1,0 +1,32 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: require-drop-all-capabilities
+  annotations:
+    policies.kyverno.io/title: Require Drop All Capabilities
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Audits containers that don't explicitly drop the ALL capability set.
+      Distinct from the baseline disallow-capabilities policy (which blocks
+      specific *added* capabilities) — this checks whether a container drops
+      capabilities at all. Audit mode: report only.
+spec:
+  validationActions:
+    - Audit
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  validations:
+    - expression: >-
+        object.spec.containers.all(c,
+          has(c.securityContext) &&
+          has(c.securityContext.capabilities) &&
+          has(c.securityContext.capabilities.drop) &&
+          'ALL' in c.securityContext.capabilities.drop
+        )
+      message: "Containers should explicitly drop the ALL capability set."

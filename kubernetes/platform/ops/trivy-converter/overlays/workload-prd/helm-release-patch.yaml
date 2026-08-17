@@ -7,6 +7,13 @@ spec:
   values:
     kubeClientQPS: 50
     kubeClientBurst: 100
+    # Switches the adapter's output (and RBAC) from wgpolicyk8s.io
+    # PolicyReport/ClusterPolicyReport to openreports.io Report/ClusterReport —
+    # an either/or switch in the chart, not additive. CRDs are already
+    # installed via the kyverno chart (openreports.installCrds: true).
+    openreports:
+      enabled: true
+      install: false
     resources:
       limits:
         cpu: 500m

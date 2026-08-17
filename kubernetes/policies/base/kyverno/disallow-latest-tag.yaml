@@ -1,0 +1,34 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: disallow-latest-tag
+  annotations:
+    policies.kyverno.io/title: Disallow Latest Tag
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Using a mutable image tag (or no tag, which defaults to :latest) makes it
+      difficult to track which version of an image is running and to guarantee the
+      same image is deployed across replicas. This policy validates that the image
+      specifies a digest or a tag other than latest. Audit mode: report only.
+spec:
+  validationActions:
+    - Audit
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  validations:
+    - expression: >-
+        object.spec.containers.all(c,
+          c.image.contains('@sha256:') ||
+          (c.image.lastIndexOf(':') > c.image.lastIndexOf('/') && !c.image.endsWith(':latest'))
+        ) &&
+        (!has(object.spec.initContainers) || object.spec.initContainers.all(c,
+          c.image.contains('@sha256:') ||
+          (c.image.lastIndexOf(':') > c.image.lastIndexOf('/') && !c.image.endsWith(':latest'))
+        ))
+      message: "Images must specify a digest or an explicit tag other than 'latest'."

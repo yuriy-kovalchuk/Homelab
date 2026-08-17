@@ -21,6 +21,7 @@ metadata:
       ReplicaSets without a time delay. The schedule runs every minute, so very
       recent ReplicaSets should survive at least one cycle before deletion."
 spec:
+  deletionPropagationPolicy: Background
   matchConstraints:
     resourceRules:
       - apiGroups:

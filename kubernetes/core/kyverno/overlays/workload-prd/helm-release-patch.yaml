@@ -14,6 +14,14 @@ spec:
     reportsServer:
       enabled: false
 
+    config:
+      # ReplicaSets are excluded from all policy processing by default (chart's
+      # baseline resourceFilters), which silently no-ops the empty-ReplicaSet
+      # cleanup policy since the resource never reaches policy evaluation.
+      resourceFiltersExclude:
+        - '[ReplicaSet,*,*]'
+        - '[ReplicaSet/?*,*,*]'
+
 
     admissionController:
       replicas: 2
@@ -84,3 +92,11 @@ spec:
       policyExceptions:
         enabled: true
         namespace: "*"
+      # openreportsEnabled (chart default: true) already writes to
+      # openreports.io Report/ClusterReport. Disabling these stops the
+      # parallel write to legacy wgpolicyk8s.io PolicyReport/ClusterPolicyReport
+      # now that kyverno-reporter and trivy-converter both read openreports.io.
+      policyReports:
+        enabled: false
+      validatingAdmissionPolicyReports:
+        enabled: false

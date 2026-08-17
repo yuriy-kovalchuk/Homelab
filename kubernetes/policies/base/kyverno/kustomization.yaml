@@ -6,3 +6,12 @@ resources:
   - mutate-goldilocks-label-rbac.yaml
   - mutate-beyla-instrument-label.yaml
   - cleanup-empty-replicasets.yaml
+  - require-resource-set.yaml
+  - disallow-latest-tag.yaml
+  - restrict-image-registries.yaml
+  - require-pod-probes.yaml
+  - disallow-default-namespace.yaml
+  - restrict-wildcard-rbac.yaml
+  - disallow-default-serviceaccount.yaml
+  - restrict-node-port.yaml
+  - require-drop-all-capabilities.yaml

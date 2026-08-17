@@ -1,0 +1,26 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: restrict-node-port
+  annotations:
+    policies.kyverno.io/title: Restrict NodePort Services
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Service
+    policies.kyverno.io/description: >-
+      Audits Services of type NodePort. This cluster standardizes on the Cilium
+      Gateway + BGP-advertised LB pool (10.0.4.50-99) for external exposure; a
+      NodePort Service is likely an accidental bypass of that design. Audit
+      mode: report only.
+spec:
+  validationActions:
+    - Audit
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["services"]
+  validations:
+    - expression: "!has(object.spec.type) || object.spec.type != 'NodePort'"
+      message: "Service should not be of type NodePort — use the Gateway/LB pool instead."

@@ -1,0 +1,26 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: disallow-default-namespace
+  annotations:
+    policies.kyverno.io/title: Disallow Default Namespace
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: low
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Audits workloads deployed into the 'default' namespace. This cluster
+      centralizes every Namespace deliberately (kubernetes/namespaces/base/), so
+      anything landing in 'default' is likely a stray or ad-hoc deploy. Audit
+      mode: report only.
+spec:
+  validationActions:
+    - Audit
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  validations:
+    - expression: "object.metadata.namespace != 'default'"
+      message: "Workloads should not be deployed into the 'default' namespace."
