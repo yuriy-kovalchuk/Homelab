@@ -17,12 +17,14 @@ data:
     c = 131072
     cont-batching = true
     parallel = 1
-    flash-attn = auto
+    flash-attn = on
     cache-type-k = q8_0
     cache-type-v = q8_0
     ; MTP head built into the model
     spec-type = draft-mtp
-    spec-draft-n-max = 3
+    ; n-max=2 avoids an unconfirmed upstream report of output drift at n-max=3 on MTP models
+    spec-draft-n-max = 2
+    spec-draft-p-min = 0.8
     load-on-startup = false
     stop-timeout = 60
     temp = 1.0
