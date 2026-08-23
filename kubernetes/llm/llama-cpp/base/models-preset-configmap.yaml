@@ -14,7 +14,7 @@ data:
     ; --- Add a section per model file (name = filename without .gguf) ---
 
     [Qwen3.8-27B-UD-Q6_K_XL]
-    c = 131072
+    c = 180224
     cont-batching = true
     parallel = 1
     flash-attn = on
