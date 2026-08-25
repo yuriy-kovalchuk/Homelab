@@ -22,6 +22,35 @@ spec:
           maxKeepaliveTime: "24h"
           minKeepaliveTime: "5m"
           truncateFrequency: "2h"
+        # Cardinality control. These _bucket families are the bulk of their
+        # jobs' series and are queried by no Grafana dashboard and no
+        # PrometheusRule in this cluster (audited 2026-08-25 against every
+        # grafana_dashboard ConfigMap and every PrometheusRule).
+        # Only the _bucket series are dropped: _sum and _count survive, so
+        # averages and rates still work. What is lost is histogram_quantile()
+        # over these families — add a name back here if a panel ever needs it.
+        # Applied at remote_write, so one rule covers every scrape job.
+        metricProcessingRules: |
+          write_relabel_config {
+            source_labels = ["__name__"]
+            regex = "kyverno_(validating_policy_execution|admission_review)_duration_seconds_bucket"
+            action = "drop"
+          }
+          write_relabel_config {
+            source_labels = ["__name__"]
+            regex = "longhorn_rest_client_(rate_limiter_latency|request_latency)_seconds_bucket|longhorn_workqueue_(queue|work)_duration_seconds_bucket"
+            action = "drop"
+          }
+          write_relabel_config {
+            source_labels = ["__name__"]
+            regex = "workqueue_(queue|work)_duration_seconds_bucket|controller_runtime_reconcile_time_seconds_bucket"
+            action = "drop"
+          }
+          write_relabel_config {
+            source_labels = ["__name__"]
+            regex = "envoy_cluster_upstream_cx_(connect|length)_ms_bucket"
+            action = "drop"
+          }
       tempo:
         type: otlp
         url: http://tempo-distributor.tempo.svc.cluster.local:4317
@@ -192,9 +221,26 @@ spec:
             - container_file_descriptors
             - container_start_time_seconds
             - container_last_seen
-            - container_tasks_state
       controlPlane:
         enabled: true
+      # controlPlane above turns on the API Server scrape, which ships with no
+      # allow list — it keeps every series the endpoint exposes, and at ~297k
+      # series it is 64% of everything in Mimir. Each name below is a _bucket
+      # family used by no dashboard and no PrometheusRule (audited 2026-08-25).
+      # apiserver_request_duration_seconds_bucket is deliberately NOT here:
+      # k8s-api.json and the cluster-core alerting rules both query it.
+      apiServer:
+        metricsTuning:
+          excludeMetrics:
+            - etcd_request_duration_seconds_bucket
+            - apiserver_request_sli_duration_seconds_bucket
+            - apiserver_request_body_size_bytes_bucket
+            - apiserver_watch_list_duration_seconds_bucket
+            - apiserver_watch_cache_read_wait_seconds_bucket
+            - apiserver_response_sizes_bucket
+            - apiserver_watch_events_sizes_bucket
+            - apiserver_admission_controller_admission_duration_seconds_bucket
+            - apiserver_admission_webhook_admission_duration_seconds_bucket
       kubeControllerManager:
         enabled: true
       kubeDNS:
@@ -261,7 +307,19 @@ spec:
             enabled: true
 
     autoInstrumentation:
-      enabled: true
+      # Disabled: chart 4.4.0 cannot render a working Beyla config.
+      # charts/feature-auto-instrumentation/templates/_beyla-config.tpl forces
+      # BOTH internal_metrics.prometheus.port and prometheus_export.port to
+      # beyla.service.targetPort, and `merge $overrides $config` gives those
+      # overrides priority — so the ports below are discarded and Beyla is told
+      # to bind :9090 twice. The second listener fails with
+      # "bind: address already in use" and, with hostNetwork: true, the pod
+      # never recovers (2137 restarts, 1/4 ready). Setting service.targetPort
+      # does not help: it moves both ports to the same new number.
+      # The DaemonSet never going ready also stalls every `helm upgrade`.
+      # Re-enable once the chart lets the two ports differ. The config below is
+      # kept intact so that is a one-line change.
+      enabled: false
       collector: alloy-metrics
       destinations:
         - mimir
