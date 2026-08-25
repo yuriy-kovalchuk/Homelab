@@ -128,7 +128,13 @@ spec:
         # extraArgs replaces the chart default array — keep the fs-types-exclude entry
         extraArgs:
           - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|erofs|sysfs|tracefs|tmpfs|ramfs)$
-          - --collector.hwmon
+          # Temperature, fan and voltage readings now come from talos-monitoring
+          # (talos_sensor_*), read from the Talos API rather than /sys/class/hwmon.
+          # hwmon is enabled by default in node_exporter, so turning it off needs
+          # the explicit negative flag — dropping `--collector.hwmon` alone is a
+          # no-op. thermal_zone is also on by default; the flag below is likewise
+          # redundant but left in place as documentation of intent.
+          - --no-collector.hwmon
           - --collector.thermal_zone
         securityContext:
           seccompProfile:
@@ -258,11 +264,6 @@ spec:
         metricsTuning:
           useIntegrationAllowList: true
           includeMetrics:
-            - node_hwmon_temp_celsius
-            - node_hwmon_temp_max_celsius
-            - node_hwmon_temp_crit_celsius
-            - node_hwmon_fan_rpm
-            - node_hwmon_in_volts
             - node_thermal_zone_temp
 
     clusterEvents:
