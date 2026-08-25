@@ -16,3 +16,9 @@ spec:
       podMonitorEnabled: true
       grafanaDashboard:
         create: true
+        # Without this the k8s-sidecar drops the dashboard in the root of
+        # /tmp/dashboards, which Grafana renders outside any named folder.
+        # Every other dashboard ConfigMap in the cluster carries the same
+        # annotation; see kubernetes/observability/grafana/base/kustomization.yaml.
+        annotations:
+          k8s-sidecar-target-directory: /tmp/dashboards/Storage
