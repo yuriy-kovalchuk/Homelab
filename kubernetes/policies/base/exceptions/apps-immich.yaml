@@ -8,6 +8,7 @@ spec:
     - name: exclude-immich-gpu
       expression: >-
         object.metadata.namespace == 'immich' &&
+        has(object.metadata.labels) &&
         'app' in object.metadata.labels &&
         object.metadata.labels['app'] in ['immich-server', 'immich-machine-learning']
   policyRefs:

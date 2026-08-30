@@ -18,11 +18,17 @@ spec:
           securityContext:
             privileged: true
             runAsUser: 0
+            capabilities:
+              drop:
+                - ALL
           env:
-            # PLACEHOLDER index: verify with `rocminfo` on the pod and set the
-            # R9700's device index here (flip to "1" if inference lands on the 780M).
+            # Node has two AMD GPUs: R9700 (Navi 48, gfx1201) at PCI 03:00.0 =
+            # HIP device 0, and the 780M iGPU at PCI c7:00.0 = HIP device 1.
+            # Pin to the R9700 — the 780M (gfx110x) has no kernels in this image.
             - name: HIP_VISIBLE_DEVICES
               value: "0"
+            # ROCm 7.2.1 image (server-rocm) ships native gfx1201 kernels, so the
+            # R9700 needs NO HSA_OVERRIDE_GFX_VERSION spoof.
           volumeMounts:
             - name: dev-dri
               mountPath: /dev/dri

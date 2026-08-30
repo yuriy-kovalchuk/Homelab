@@ -20,6 +20,9 @@ spec:
           securityContext:
             privileged: true
             runAsUser: 0
+            capabilities:
+              drop:
+                - ALL
           volumeMounts:
             - name: dev-dri
               mountPath: /dev/dri
