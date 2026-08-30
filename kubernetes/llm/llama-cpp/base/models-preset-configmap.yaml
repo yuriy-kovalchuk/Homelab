@@ -33,38 +33,25 @@ data:
     min-p = 0.00
     presence-penalty = 0.0
 
-    [Qwen3.6-27B-UD-Q6_K_XL]
+    ; Ornith-1.5-35B-A3B: qwen35moe hybrid MoE (36B total, 3B active, 41 layers,
+    ; full-attention every 4th layer -> tiny KV cache). Fits the R9700 32 GB fully:
+    ; ~25.5 GB weights + ~2.7 GB KV (incl. MTP draft) + compute. Drop c to 65536 if
+    ; VRAM is tight. Built-in MTP head (imatrix MTP layers are Q4_0).
+    [Ornith-1.5-35B-A3B-Q5_K_M]
     c = 131072
     cont-batching = true
     parallel = 1
-    flash-attn = auto
+    flash-attn = on
     cache-type-k = q8_0
     cache-type-v = q8_0
-    ; MTP head built into the model
     spec-type = draft-mtp
-    spec-draft-n-max = 3
+    spec-draft-n-max = 2
+    spec-draft-p-min = 0.8
     load-on-startup = false
     stop-timeout = 60
-    temp = 1.0
-    top-p = 0.95
+    temp = 0.7
+    top-p = 0.8
     top-k = 20
     min-p = 0.00
-    presence-penalty = 1.5
+    presence-penalty = 1.0
 
-    [Qwen3.6-27B-Q-8_0]
-    c = 32000
-    cont-batching = true
-    parallel = 1
-    flash-attn = auto
-    cache-type-k = q8_0
-    cache-type-v = q8_0
-    ; MTP head built into the model
-    spec-type = draft-mtp
-    spec-draft-n-max = 3
-    load-on-startup = false
-    stop-timeout = 60
-    temp = 1.0
-    top-p = 0.95
-    top-k = 20
-    min-p = 0.00
-    presence-penalty = 1.5
