@@ -25,10 +25,22 @@ spec:
 
               download() {
                 local url="$1"
-                local file dest tmp
+                local file dir dest tmp
                 file="$(basename "$url")"
-                dest="/models/$file"
-                tmp="/models/$file.tmp"
+
+                # split GGUF (name-00001-of-00003.gguf) -> own subdir so the
+                # router loads the shards as one model; single files stay flat
+                case "$file" in
+                  *-[0-9][0-9][0-9][0-9][0-9]-of-[0-9][0-9][0-9][0-9][0-9].gguf)
+                    dir="/models/${file%-[0-9][0-9][0-9][0-9][0-9]-of-[0-9][0-9][0-9][0-9][0-9].gguf}"
+                    ;;
+                  *)
+                    dir="/models"
+                    ;;
+                esac
+                mkdir -p "$dir"
+                dest="$dir/$file"
+                tmp="$dir/$file.tmp"
 
                 if [ -f "$dest" ]; then
                   echo "[SKIP] $file already present"

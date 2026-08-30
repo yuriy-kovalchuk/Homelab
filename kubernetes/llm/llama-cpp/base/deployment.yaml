@@ -44,8 +44,10 @@ spec:
               cpu: "500m"
               memory: 1Gi
             limits:
-              cpu: "8"
-              memory: 32Gi
+              cpu: "14"
+              # headroom for CPU-MoE offload (Flash-Next Q2 keeps ~60 GB of
+              # experts in system RAM); normal models sit well under this
+              memory: 72Gi
           readinessProbe:
             httpGet:
               path: /health
