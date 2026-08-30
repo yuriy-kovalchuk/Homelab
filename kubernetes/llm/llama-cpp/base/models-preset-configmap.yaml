@@ -55,3 +55,40 @@ data:
     min-p = 0.00
     presence-penalty = 1.0
 
+    ; Qwen3.8-Flash-Next UD-Q2_K_XL (qwen4exp): 125B total / 6B active, hybrid
+    ; DeltaNet + QSA sparse attention + 512-expert MoE + 4B MTP head. ~79 GB split
+    ; GGUF -> lives in /models/Qwen3.8-Flash-Next-UD-Q2_K_XL/ .
+    ;
+    ; TEST config. Does NOT fit the R9700 32 GB alone -> n-cpu-moe pushes all
+    ; expert FFNs to system RAM (~60 GB), keeps attention/router/shared/MTP/KV on
+    ; the GPU. Needs ~58 GB RAM free -> stop other llm pods / move Immich first.
+    ;
+    ; KNOWN LIMIT: on the stock ROCm/Vulkan image the QSA top-k op is capped at
+    ; 1024 columns -> decode collapses once context > ~1024 tokens. c is kept low
+    ; here on purpose; raise it only on a hipCUB-enabled build (llama.cpp
+    ; -DGGML_CUDA_USE_CUB=ON) or once PR #27874 / #28005 land.
+    ;
+    ; Unsloth non-thinking (Instruct) sampling. Thinking mode: temp=1.0 top-p=0.95
+    ; presence-penalty=0.0 . reasoning depth via request chat-template-kwargs
+    ; {"reasoning_effort":"medium"} (xhigh|medium|low|none).
+    [Qwen3.8-Flash-Next-UD-Q2_K_XL]
+    c = 8192
+    n-gpu-layers = 99
+    n-cpu-moe = 48
+    cont-batching = true
+    parallel = 1
+    flash-attn = on
+    cache-type-k = q8_0
+    cache-type-v = q8_0
+    spec-type = draft-mtp
+    spec-draft-n-max = 2
+    spec-draft-p-min = 0.8
+    load-on-startup = false
+    stop-timeout = 120
+    temp = 0.7
+    top-p = 0.8
+    top-k = 20
+    min-p = 0.00
+    presence-penalty = 1.5
+    repeat-penalty = 1.0
+

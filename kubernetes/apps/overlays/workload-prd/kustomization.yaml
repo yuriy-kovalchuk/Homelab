@@ -10,5 +10,5 @@ resources:
   - ../../opencloud/overlays/workload-prd
   - ../../forgejo/overlays/workload-prd
   - ../../../llm/llama-cpp/overlays/workload-prd
-#  - ../../../llm/llama-cpp-rocm/overlays/workload-prd  # disabled — running Vulkan only for now
+  - ../../../llm/llama-cpp-rocm/overlays/workload-prd  # ROCm (gfx1201) — for Flash-Next; shares GPU + models PVC with the Vulkan pod, don't serve big models on both at once
   - ../../../llm/open-webui/overlays/workload-prd
