@@ -120,3 +120,13 @@ spec:
       # Kyverno's own ValidatingPolicy, and VAP generation is off.
       validatingAdmissionPolicyReports:
         enabled: false
+      backgroundScan:
+        # Every resource gets a full re-scan each interval, and v1.19 rebuilds the
+        # CEL env and recompiles every ValidatingPolicy per resource scanned (no
+        # compile cache — see scanner.go ScanResource). CPU therefore scales
+        # linearly with this: at 1h the leader sustained ~2 cores, ~95% of it CEL
+        # compilation plus the GC it generates. Background scan is the *only*
+        # source of reports for ValidatingPolicy (the admission path writes none),
+        # so the interval is the safe dial — coverage is unchanged, findings are
+        # just up to a day stale.
+        backgroundScanInterval: 24h
