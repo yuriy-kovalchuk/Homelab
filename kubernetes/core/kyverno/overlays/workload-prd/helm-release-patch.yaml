@@ -88,15 +88,35 @@ spec:
             matchLabels:
               app.kubernetes.io/component: reports-controller
               app.kubernetes.io/instance: kyverno
+      rbac:
+        clusterRole:
+          # The controller is otherwise bound to the built-in `view` role, which
+          # deliberately excludes RBAC resources. Without these, restrict-wildcard-rbac
+          # cannot start its Role/ClusterRole watchers and stays RBACPermissionsGranted=False.
+          extraResources:
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - roles
+                - clusterroles
+              verbs:
+                - get
+                - list
+                - watch
     features:
       policyExceptions:
         enabled: true
         namespace: "*"
-      # openreportsEnabled (chart default: true) already writes to
-      # openreports.io Report/ClusterReport. Disabling these stops the
-      # parallel write to legacy wgpolicyk8s.io PolicyReport/ClusterPolicyReport
-      # now that kyverno-reporter and trivy-converter both read openreports.io.
+      # Must stay true: it gates report *persistence*, not the report API
+      # flavour. With it false the background scan still evaluates every policy
+      # but drops the results instead of writing an EphemeralReport, so nothing
+      # ever reaches openreports.io and kyverno-reporter shows no policies.
+      # openreportsEnabled picks openreports.io *instead of* legacy
+      # wgpolicyk8s.io (either/or, not a parallel write), so no extra flag is
+      # needed to keep the legacy reports off.
       policyReports:
-        enabled: false
+        enabled: true
+      # Native Kubernetes ValidatingAdmissionPolicies only — unrelated to
+      # Kyverno's own ValidatingPolicy, and VAP generation is off.
       validatingAdmissionPolicyReports:
         enabled: false
