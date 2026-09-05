@@ -7,6 +7,7 @@ resources:
   - apps-httpbin.yaml
   - apps-immich.yaml
   - apps-llama-cpp.yaml
+  - apps-llama-cpp-igpu.yaml
   - apps-open-webui.yaml
   - apps-opencloud.yaml
   - apps-whoami.yaml

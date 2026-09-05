@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llama-cpp-igpu
+  namespace: llm
+spec:
+  template:
+    spec:
+      nodeSelector:
+        ai-node: oculink
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
+      containers:
+        - name: llama-cpp
+          securityContext:
+            privileged: true
+            runAsUser: 0
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: dev-dri
+              mountPath: /dev/dri
+            - name: sys-bus-pci
+              mountPath: /sys/bus/pci
+      volumes:
+        - name: dev-dri
+          hostPath:
+            path: /dev/dri
+            type: Directory
+        - name: sys-bus-pci
+          hostPath:
+            path: /sys/bus/pci
+            type: Directory

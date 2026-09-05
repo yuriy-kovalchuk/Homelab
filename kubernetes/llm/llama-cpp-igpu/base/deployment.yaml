@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llama-cpp-igpu
+  namespace: llm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: llama-cpp-igpu
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: llama-cpp-igpu
+    spec:
+      containers:
+        - name: llama-cpp
+          image: ghcr.io/ggml-org/llama.cpp:server-vulkan-b10689
+          args:
+            - --host
+            - "0.0.0.0"
+            - --port
+            - "8080"
+            - --models-dir
+            - /models
+            - --models-preset
+            - /config/presets.ini
+            - --models-max
+            - "1"
+            # Vulkan0 = Radeon 780M iGPU, Vulkan1 = R9700 (verified via
+            # `llama-server --list-devices` on the node). Router mode applies
+            # --device globally to every child process it spawns, so device
+            # pinning has to be per-Deployment, not per-model in presets.ini
+            # (upstream ggml-org/llama.cpp#20851).
+            - --device
+            - Vulkan0
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - name: models
+              mountPath: /models
+            - name: config
+              mountPath: /config
+              readOnly: true
+          resources:
+            requests:
+              cpu: "500m"
+              memory: 1Gi
+            limits:
+              cpu: "8"
+              # The 780M is UMA: weights land in system RAM via GTT rather than
+              # dedicated VRAM, so the model size counts against this limit.
+              # Ornith-1.5-35B-A3B Q5_K_M is ~23.7 GiB + ~2.7 GiB KV at c=131072.
+              memory: 32Gi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 3
+      volumes:
+        - name: models
+          persistentVolumeClaim:
+            claimName: llama-cpp-models
+        - name: config
+          configMap:
+            name: llama-cpp-models-preset

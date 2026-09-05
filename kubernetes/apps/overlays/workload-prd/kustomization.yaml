@@ -11,4 +11,5 @@ resources:
   - ../../forgejo/overlays/workload-prd
   - ../../../llm/llama-cpp/overlays/workload-prd
   - ../../../llm/llama-cpp-rocm/overlays/workload-prd  # ROCm (gfx1201) — for Flash-Next; shares GPU + models PVC with the Vulkan pod, don't serve big models on both at once
+  - ../../../llm/llama-cpp-igpu/overlays/workload-prd  # Vulkan on the 780M iGPU (Vulkan0) — serves a second model concurrently with the R9700 pod
   - ../../../llm/open-webui/overlays/workload-prd

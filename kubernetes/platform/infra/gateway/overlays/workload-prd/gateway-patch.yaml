@@ -280,6 +280,21 @@ spec:
           selector:
             matchLabels:
               kubernetes.io/metadata.name: "llm"
+    - name: https-vulkan-igpu
+      port: 443
+      protocol: HTTPS
+      hostname: "vulkan-igpu.yuriykovalchuk.dev"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: vulkan-igpu-gw-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: "llm"
     - name: https-yk-portfolio
       port: 443
       protocol: HTTPS
