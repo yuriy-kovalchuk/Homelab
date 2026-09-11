@@ -55,34 +55,47 @@ data:
     min-p = 0.00
     presence-penalty = 1.0
 
-    ; Qwen3.8-Flash-Next UD-Q2_K_XL (qwen4exp): 125B total / 6B active, hybrid
-    ; DeltaNet + QSA sparse attention + 512-expert MoE + 4B MTP head. ~79 GB split
-    ; GGUF -> lives in /models/Qwen3.8-Flash-Next-UD-Q2_K_XL/ .
+    ; Qwen3.8-Flash-Next UD-Q2_K_XL (qwen4exp): ~176B total (BF16 is 354 GB) /
+    ; ~5.5B active, 48 layers, 512 experts (10 used) + shared expert, hybrid
+    ; attention: Gated DeltaNet linear layers + QSA sparse full-attention every
+    ; 4th layer (full_attention_interval=4 -> only 12 layers grow a KV cache;
+    ; head_count_kv=2, key/value_length=256 -> ~13 KB/token at q8_0, so even
+    ; 262 k ctx is only ~3.4 GB of KV). Trained context_length = 262144.
+    ; QSA indexer top_k = 2048 (not 1024 - the old decode-collapse note was wrong,
+    ; verified coherent at 6 k ctx on this ROCm image). ~79 GB split GGUF in
+    ; /models/Qwen3.8-Flash-Next-UD-Q2_K_XL/ .
     ;
-    ; TEST config. Does NOT fit the R9700 32 GB alone -> n-cpu-moe pushes all
-    ; expert FFNs to system RAM (~60 GB), keeps attention/router/shared/MTP/KV on
-    ; the GPU. Needs ~58 GB RAM free -> stop other llm pods / move Immich first.
+    ; NO speculative decoding: the qwen4exp converter does not export an MTP /
+    ; NextN head, so the unsloth GGUF carries no MTP layers and `spec-type =
+    ; draft-mtp` aborts load with "model doesn't contain MTP layers". For MTP,
+    ; source an mtp-shards re-quant (e.g. unsloth UD-Q4_K_XL-mtp-shards).
     ;
-    ; KNOWN LIMIT: on the stock ROCm/Vulkan image the QSA top-k op is capped at
-    ; 1024 columns -> decode collapses once context > ~1024 tokens. c is kept low
-    ; here on purpose; raise it only on a hipCUB-enabled build (llama.cpp
-    ; -DGGML_CUDA_USE_CUB=ON) or once PR #27874 / #28005 land.
+    ; Does NOT fit the R9700 32 GB alone (~76 GB of Q2 weights) -> n-cpu-moe keeps
+    ; the expert FFNs of the first N layers in system RAM (~45-50 GB -> scale
+    ; Immich to 0 first), rest + attention + router + shared + KV on the GPU.
+    ; Measured on the R9700 (ROCm server-rocm-b10689), ~8.7 k-token prefill:
+    ;   ctx=8192   n-cpu-moe=22 -> 28 GiB  pp ~60/190  tg ~20
+    ;   ctx=8192   n-cpu-moe=24 -> 26 GiB  pp ~90/210  tg ~21
+    ;   ctx=150000 n-cpu-moe=22 -> 30.7 GiB (~1 GiB margin, risky)
+    ;   ctx=150000 n-cpu-moe=24 -> 28.9 GiB pp ~212 tg ~19   <- current
+    ;   ctx=262144 n-cpu-moe=22 -> FAILS (compute-buffer alloc)
+    ;   ctx=262144 n-cpu-moe=26 -> 29.7 GiB pp ~199 tg ~17
+    ;   ctx=262144 n-cpu-moe=28 -> 27.9 GiB pp ~186 tg ~17   (safe for full ctx)
+    ;   n-cpu-moe <=18 always OOMs (model buffer alone wants >32 GiB)
+    ; For the full 262 k context bump n-cpu-moe to 28.
     ;
     ; Unsloth non-thinking (Instruct) sampling. Thinking mode: temp=1.0 top-p=0.95
     ; presence-penalty=0.0 . reasoning depth via request chat-template-kwargs
     ; {"reasoning_effort":"medium"} (xhigh|medium|low|none).
     [Qwen3.8-Flash-Next-UD-Q2_K_XL]
-    c = 8192
+    c = 150000
     n-gpu-layers = 99
-    n-cpu-moe = 48
+    n-cpu-moe = 24
     cont-batching = true
     parallel = 1
     flash-attn = on
     cache-type-k = q8_0
     cache-type-v = q8_0
-    spec-type = draft-mtp
-    spec-draft-n-max = 2
-    spec-draft-p-min = 0.8
     load-on-startup = false
     stop-timeout = 120
     temp = 0.7

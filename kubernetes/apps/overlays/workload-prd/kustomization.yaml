@@ -9,6 +9,7 @@ resources:
   - ../../immich/overlays/workload-prd
   - ../../opencloud/overlays/workload-prd
   - ../../forgejo/overlays/workload-prd
+  - ../../forgejo-runner/overlays/workload-prd
   - ../../../llm/llama-cpp/overlays/workload-prd
   - ../../../llm/llama-cpp-rocm/overlays/workload-prd  # ROCm (gfx1201) — for Flash-Next; shares GPU + models PVC with the Vulkan pod, don't serve big models on both at once
   - ../../../llm/open-webui/overlays/workload-prd

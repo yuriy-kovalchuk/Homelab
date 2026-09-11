@@ -19,3 +19,14 @@ resource "vault_kv_secret_v2" "forgejo_db" {
     password = var.forgejo_db_password
   })
 }
+
+resource "vault_kv_secret_v2" "forgejo_runner" {
+  mount               = "kubernetes"
+  name                = "forgejo/runner"
+  delete_all_versions = true
+
+  data_json = jsonencode({
+    uuid  = var.forgejo_runner_uuid
+    token = var.forgejo_runner_token
+  })
+}

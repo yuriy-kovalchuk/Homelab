@@ -19,6 +19,18 @@ variable "forgejo_db_password" {
   sensitive   = true
 }
 
+variable "forgejo_runner_uuid" {
+  description = "UUID for the forgejo-runner Actions runner connection (from Forgejo admin UI: /admin/actions/runners)"
+  type        = string
+  sensitive   = true
+}
+
+variable "forgejo_runner_token" {
+  description = "Token for the forgejo-runner Actions runner connection (from Forgejo admin UI: /admin/actions/runners)"
+  type        = string
+  sensitive   = true
+}
+
 variable "cloudflare_api_token" {
   type      = string
   sensitive = true
