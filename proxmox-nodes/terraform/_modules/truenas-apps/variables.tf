@@ -56,3 +56,21 @@ variable "opencloud_admin_password" {
   type        = string
   sensitive   = true
 }
+
+variable "harbor_admin_password" {
+  description = "Initial password for the Harbor 'admin' user — only applied on first install"
+  type        = string
+  sensitive   = true
+}
+
+variable "harbor_db_password" {
+  description = "PostgreSQL password for Harbor's bundled database"
+  type        = string
+  sensitive   = true
+}
+
+variable "harbor_trivy_github_token" {
+  description = "GitHub PAT for Trivy vulnerability DB downloads — raises the anonymous 60 req/hr limit to 5000"
+  type        = string
+  sensitive   = true
+}

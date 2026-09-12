@@ -31,6 +31,7 @@ resources:
   - platform-kubevirt.yaml
   - platform-kyverno-reporter.yaml
   - platform-longhorn.yaml
+  - platform-talos-monitoring.yaml
   - platform-trivy-converter.yaml
   - platform-trivy.yaml
   - platform-vpa.yaml
