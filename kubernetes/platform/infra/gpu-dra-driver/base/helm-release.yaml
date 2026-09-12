@@ -1,0 +1,25 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: gpu-dra-driver
+  namespace: kube-amd-gpu
+spec:
+  interval: 5m
+  releaseName: gpu-dra-driver
+  chart:
+    spec:
+      chart: k8s-gpu-dra-driver
+      version: "v1.0.1"
+      sourceRef:
+        kind: HelmRepository
+        name: rocm-gpu-dra-driver
+        namespace: flux-system
+  timeout: 5m
+  install:
+    createNamespace: false
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+      remediateLastFailure: true

@@ -50,8 +50,9 @@ One bare-metal **Talos Linux** cluster (`workload-prd`) managed by FluxCD.
 - BGP: Cilium localASN **65002** ↔ OPNsense peerASN **65551** at `10.0.4.1`; LB pool `10.0.4.50–10.0.4.99` (`internal` Gateway is pinned to `10.0.4.50`)
 
 ### GPU nodes
-- The GPU node is labeled **`ai-node: oculink`** and tainted `workload=gpu:NoSchedule` — GPU workloads need both the nodeSelector and the toleration (see `kubernetes/llm/llama-cpp/overlays/workload-prd/gpu-patch.yaml`).
-- It has **two AMD GPUs**: an oculink-attached **AMD AI Pro R9700** (used by llama-cpp via Vulkan) and the **Radeon 780M iGPU** (reserved for Immich ML/transcoding via ROCm/VAAPI). Both appear under `/dev/dri` — pods must pin a device (`HIP_VISIBLE_DEVICES` for ROCm).
+- The GPU node is labeled **`ai-node: oculink`** and tainted `workload=gpu:NoSchedule`. GPU workloads need the toleration; they no longer need the nodeSelector, because the DRA claim (below) pins the pod to whichever node holds the requested card.
+- It has **two AMD GPUs**: an oculink-attached **AMD AI Pro R9700** (llama-cpp via Vulkan or ROCm) and the **Radeon 780M iGPU** (Immich ML/transcoding via ROCm/VAAPI). `controlplane-1` additionally has a **Radeon 680M** — currently unclaimed.
+- **GPUs are claimed via DRA, not hostPath.** `platform-infra/gpu-dra-driver` publishes one DRA device per GPU; a workload references a `ResourceClaimTemplate` whose CEL selector names the card by sysfs PCI device ID: `0x7551` R9700, `0x1900` Radeon 780M, `0x1681` Radeon 680M. Do **not** select on `productName` — amdgpu leaves `/sys/class/drm/card*/device/product_name` absent on these cards, so such a selector silently matches nothing. Claims are exclusive: two Deployments naming the same card means one runs and the other stays `Pending`. Every GPU Deployment must use `strategy: Recreate`, or a rollout deadlocks waiting for a device the outgoing pod still holds.
 - `llama-cpp-cuda` pins to `kubernetes.io/hostname: node-3` with a `nvidia` RuntimeClass (NVIDIA node, not listed in DEVICES.md). Currently **dormant/unwired** — see note below.
 
 ### VLAN map
@@ -88,6 +89,8 @@ GitRepository: homelab (branch: main)
 ```
 
 Each layer's `overlays/workload-prd/kustomization.yaml` is the ordered list of its components — register new components there.
+
+The `apps` Kustomization carries `spec.ignore` for `/spec/replicas` on Deployments in the `llm` namespace: Flux seeds the replica count on first apply and then leaves it alone, so GPU workloads can be parked at 0 with `kubectl scale` without Git reverting it. Every other field still reconciles.
 
 **Why `network-policies` and `secrets` are split out** (not just folded into `core`/`platform-infra`): a Kustomization that installs a CRD via HelmRelease can never also contain a raw manifest that's an *instance* of that CRD — `kustomize-controller` applies its whole build as one batch with zero visibility into `helm-controller`'s async CRD install, so on a cold reconcile it's a hard, non-self-healing race, not a soft one. `network-policies` is safe to run before `core` because Cilium's CRDs come from Terraform, not from anything Flux installs. `secrets` has to run after `core` because `ExternalSecret`/`ClusterSecretStore` are `external-secrets`' own CRDs. See **Kustomization conventions** below for the general rule.
 
@@ -140,6 +143,7 @@ Every `CiliumNetworkPolicy`/`CiliumClusterwideNetworkPolicy` in the cluster, fla
 | cloudnative-pg | cloudnative-pg | 0.29.0 | CNPG operator (`cnpg-system`) — per-app Postgres clusters |
 | kubevirt / cdi | operator manifests | — | VMs on k8s + disk image import |
 | metrics-server | metrics-server | 3.x | HPA/VPA metrics |
+| gpu-dra-driver | k8s-gpu-dra-driver | v1.0.1 | AMD GPU DRA driver (`kube-amd-gpu`) — publishes ResourceSlices + the `gpu.amd.com` DeviceClass |
 
 ### platform-ops
 | Component | Chart/Type | Version | Purpose |
@@ -182,7 +186,7 @@ Present in tree but **not wired into any overlay** (do not assume deployed): `co
 | immich | immich | Photos — server + ML (ROCm on 780M) + Valkey + CNPG `pg-cluster-immich` (VectorChord image) |
 | opencloud | opencloud | File cloud (OpenCloud/oCIS fork), single pod, `truenas-iscsi` PVC |
 | forgejo | forgejo | Git server, `git.` hostname + SSH (port 22 via TCPRoute), CNPG `pg-cluster-forgejo`, `truenas-iscsi` PVC for repo data. Physically lives at `kubernetes/platform/forgejo/` still — only its Flux wiring moved to `apps` |
-| llama-cpp | llm | `ghcr.io/ggml-org/llama.cpp:server-vulkan-*` router mode, R9700 via `ai-node: oculink`, models PVC `longhorn` 200Gi RWX. Plain Deployment, not a HelmRelease |
+| llama-cpp | llm | `ghcr.io/ggml-org/llama.cpp:server-vulkan-*` router mode, R9700 via DRA claim `llama-cpp-r9700`, models PVC `longhorn` 200Gi RWX. Plain Deployment, not a HelmRelease |
 | open-webui | open-webui | chart 15.2.0, `chat.` hostname, talks to llama-cpp `:8080` |
 
 Note: the gateway patch still carries a listener for `uptime-kuma`, which has been removed as a cluster app.
@@ -268,7 +272,8 @@ llama-cpp and open-webui are applied via the **`apps`** Kustomization (not a sta
 
 **Key files:**
 - `kubernetes/llm/llama-cpp/base/deployment.yaml` — base Deployment (no GPU, image: `server-vulkan` floating tag)
-- `kubernetes/llm/llama-cpp/overlays/workload-prd/gpu-patch.yaml` — hardware patch (`ai-node: oculink`, toleration, privileged, `/dev/dri`, `/sys/bus/pci`)
+- `kubernetes/llm/llama-cpp/overlays/workload-prd/gpu-patch.yaml` — hardware patch (toleration, `Recreate`, DRA `resourceClaims`; no privileged/hostPath)
+- `kubernetes/llm/*/base/resource-claim-template.yaml` — which physical GPU each Deployment claims
 - `kubernetes/llm/llama-cpp/base/models-preset-configmap.yaml` — `presets.ini` (one `[section]` per model filename, global `[*]` defaults, `n-gpu-layers = -1`)
 - `kubernetes/llm/llama-cpp/base/model-downloader-chart/values.yaml` — model URL list; HelmRelease generates one Job per entry (supports resume via `wget -c`)
 
@@ -334,7 +339,8 @@ spec:
 | `kubernetes/observability/k8s-monitoring/overlays/workload-prd/helm-release-patch.yaml` | Alloy collector config, destinations |
 | `kubernetes/observability/alerting-rules/base/` | Every PrometheusRule in the cluster |
 | `kubernetes/llm/llama-cpp/base/models-preset-configmap.yaml` | Per-model inference parameters |
-| `kubernetes/apps/immich/overlays/workload-prd/gpu-patch-*.yaml` | Immich GPU access (780M, ROCm/VAAPI, `HIP_VISIBLE_DEVICES`) |
+| `kubernetes/apps/immich/overlays/workload-prd/gpu-patch-*.yaml` | Immich GPU access (780M, ROCm/VAAPI, `HIP_VISIBLE_DEVICES`) — still hostPath-based, not yet migrated to DRA |
+| `kubernetes/platform/infra/gpu-dra-driver/` | AMD GPU DRA driver (device discovery + `gpu.amd.com` DeviceClass) |
 | `proxmox-nodes/terraform/_modules/truenas-apps/` | Docker apps on TrueNAS (Vault, Zot, RustFS, Forgejo, Dockhand, Traefik) |
 | `proxmox-nodes/terraform/_modules/truenas-setup/` | TrueNAS datasets (incl. democratic-csi parents) |
 | `docs/NETWORK.md` | VLAN layout, BGP, firewall rules |

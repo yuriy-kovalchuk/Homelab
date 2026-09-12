@@ -32,4 +32,7 @@ inputs = {
   rustfs_secret_key            = get_env("RUSTFS_SECRET_KEY")
   immich_db_password           = get_env("IMMICH_DB_PASSWORD")
   opencloud_admin_password     = get_env("OPENCLOUD_ADMIN_PASSWORD")
+  harbor_admin_password        = get_env("HARBOR_ADMIN_PASSWORD")
+  harbor_db_password           = get_env("HARBOR_DB_PASSWORD")
+  harbor_trivy_github_token    = get_env("HARBOR_TRIVY_GITHUB_TOKEN")
 }

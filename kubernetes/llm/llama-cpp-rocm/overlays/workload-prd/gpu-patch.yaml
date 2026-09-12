@@ -4,42 +4,34 @@ metadata:
   name: llama-cpp-rocm
   namespace: llm
 spec:
+  strategy:
+    type: Recreate
   template:
     spec:
-      nodeSelector:
-        ai-node: oculink
       tolerations:
         - key: workload
           operator: Equal
           value: gpu
           effect: NoSchedule
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      # Claims the R9700 (0x7551) — the same card as llama-cpp. Whichever pod
+      # is scheduled first holds it; the other stays Pending until that one is
+      # scaled to 0.
+      resourceClaims:
+        - name: gpu
+          resourceClaimTemplateName: llama-cpp-rocm-r9700
       containers:
         - name: llama-cpp
+          # HIP_VISIBLE_DEVICES is gone: the container is given exactly one GPU,
+          # so it is always HIP device 0. The ROCm 7.2.1 image ships native
+          # gfx1201 kernels, so no HSA_OVERRIDE_GFX_VERSION spoof either.
           securityContext:
-            privileged: true
-            runAsUser: 0
+            allowPrivilegeEscalation: false
             capabilities:
               drop:
                 - ALL
-          env:
-            # Node has two AMD GPUs: R9700 (Navi 48, gfx1201) at PCI 03:00.0 =
-            # HIP device 0, and the 780M iGPU at PCI c7:00.0 = HIP device 1.
-            # Pin to the R9700 — the 780M (gfx110x) has no kernels in this image.
-            - name: HIP_VISIBLE_DEVICES
-              value: "0"
-            # ROCm 7.2.1 image (server-rocm) ships native gfx1201 kernels, so the
-            # R9700 needs NO HSA_OVERRIDE_GFX_VERSION spoof.
-          volumeMounts:
-            - name: dev-dri
-              mountPath: /dev/dri
-            - name: dev-kfd
-              mountPath: /dev/kfd
-      volumes:
-        - name: dev-dri
-          hostPath:
-            path: /dev/dri
-            type: Directory
-        - name: dev-kfd
-          hostPath:
-            path: /dev/kfd
-            type: CharDevice
+          resources:
+            claims:
+              - name: gpu

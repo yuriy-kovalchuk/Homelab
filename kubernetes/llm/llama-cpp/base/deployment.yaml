@@ -27,8 +27,6 @@ spec:
             - /config/presets.ini
             - --models-max
             - "1"
-            - --device
-            - Vulkan1
           ports:
             - name: http
               containerPort: 8080
