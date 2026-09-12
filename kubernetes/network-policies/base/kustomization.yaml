@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - cluster-wide
   - apps-forgejo.yaml
+  - apps-forgejo-runner.yaml
   - apps-homepage.yaml
   - apps-httpbin.yaml
   - apps-immich.yaml

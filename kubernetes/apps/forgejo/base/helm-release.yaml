@@ -69,6 +69,8 @@ spec:
           HOST: pg-cluster-forgejo-rw:5432
           NAME: forgejo
           USER: forgejo
+        actions:
+          ENABLED: true
       additionalConfigFromEnvs:
         - name: FORGEJO__DATABASE__PASSWD
           valueFrom:

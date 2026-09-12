@@ -1,6 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
+  - apps-forgejo-runner.yaml
   - apps-immich.yaml
   - apps-llama-cpp.yaml
   - apps-open-webui.yaml
