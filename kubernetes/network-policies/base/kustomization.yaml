@@ -29,7 +29,6 @@ resources:
   - platform-cloudnative-pg.yaml
   - platform-democratic-csi-iscsi.yaml
   - platform-democratic-csi-nfs.yaml
-  - platform-gpu-tools.yaml
   - platform-kubevirt.yaml
   - platform-kyverno-reporter.yaml
   - platform-longhorn.yaml
