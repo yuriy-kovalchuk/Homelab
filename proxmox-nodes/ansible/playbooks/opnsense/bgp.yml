@@ -1,7 +1,7 @@
 ---
-# BGP peering with the Cilium BGP Control Plane on the management cluster.
+# BGP peering with the Cilium BGP Control Plane on the workload cluster.
 # OPNsense ASN: 65551, router-id: 10.0.2.1 (K8sMgmt VLAN gateway)
-# Peer: mgmt-1 at 10.0.2.2, ASN 65001
+# Peers: workload-prd nodes at 10.0.4.3-6, ASN 65002 (mgmt cluster peer decommissioned)
 - name: Configure FRR BGP peering
   hosts: opnsense
   gather_facts: false
@@ -43,18 +43,6 @@
         network_import_check: false
         reload: false
 
-    - name: Add mgmt-1 BGP neighbor
-      oxlorg.opnsense.frr_bgp_neighbor:
-        ip: "10.0.2.2"
-        as_number: 65001
-        description: mgmt-1
-        next_hop_self: true
-        multi_hop: false
-        keepalive: 30
-        hold_down: 90
-        connect_timer: 120
-        reload: false
-
     - name: Add workload cluster BGP neighbors
       oxlorg.opnsense.frr_bgp_neighbor:
         ip: "{{ item.ip }}"
@@ -67,6 +55,7 @@
         connect_timer: 120
         reload: "{{ item.last }}"
       loop:
-        - { ip: "10.0.4.2", name: node-1, last: false }
-        - { ip: "10.0.4.3", name: node-2, last: false }
-        - { ip: "10.0.4.4", name: node-3, last: true }
+        - { ip: "10.0.4.3", name: controlplane-1, last: false }
+        - { ip: "10.0.4.4", name: worker-1, last: false }
+        - { ip: "10.0.4.5", name: controlplane-2, last: false }
+        - { ip: "10.0.4.6", name: controlplane-3, last: true }
