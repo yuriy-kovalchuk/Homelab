@@ -6,23 +6,20 @@ metadata:
 spec:
   template:
     spec:
-      nodeSelector:
-        ai-node: oculink
-      tolerations:
-        - key: workload
-          operator: Equal
-          value: gpu
-          effect: NoSchedule
+      # Shares the single immich-gpu claim with immich-machine-learning, so
+      # both pods land on controlplane-1 and both see the 680M render node
+      # (VAAPI transcoding here, ROCm inference there).
+      resourceClaims:
+        - name: gpu
+          resourceClaimName: immich-gpu
       containers:
         - name: immich-server
           securityContext:
-            privileged: true
             runAsUser: 0
-          volumeMounts:
-            - name: dev-dri
-              mountPath: /dev/dri
-      volumes:
-        - name: dev-dri
-          hostPath:
-            path: /dev/dri
-            type: Directory
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            claims:
+              - name: gpu

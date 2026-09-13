@@ -4,25 +4,15 @@ metadata:
   name: immich-gpu
   namespace: immich
 spec:
+  # The Immich containers run as uid 0 so that files on the NFS uploads/cache
+  # PVCs keep their ownership. Everything else the baseline asks for is now
+  # satisfied by the Deployments themselves — the privileged/hostPath/volume
+  # exemptions went away when GPU access moved to a DRA ResourceClaim.
   matchConditions:
     - name: exclude-immich-gpu
-      expression: >-
-        object.metadata.namespace == 'immich' &&
-        has(object.metadata.labels) &&
-        'app' in object.metadata.labels &&
-        object.metadata.labels['app'] in ['immich-server', 'immich-machine-learning']
+      expression: "object.metadata.namespace == 'immich'"
   policyRefs:
-    - kind: ValidatingPolicy
-      name: disallow-host-path
-    - kind: ValidatingPolicy
-      name: disallow-privilege-escalation
-    - kind: ValidatingPolicy
-      name: disallow-privileged-containers
     - kind: ValidatingPolicy
       name: require-run-as-non-root-user
     - kind: ValidatingPolicy
       name: require-run-as-nonroot
-    - kind: ValidatingPolicy
-      name: restrict-seccomp-strict
-    - kind: ValidatingPolicy
-      name: restrict-volume-types

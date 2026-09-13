@@ -4,5 +4,6 @@ resources:
   - pvc.yaml
   - cnpg-cluster.yaml
   - valkey.yaml
+  - resource-claim.yaml
   - server.yaml
   - machine-learning.yaml

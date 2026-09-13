@@ -51,8 +51,8 @@ One bare-metal **Talos Linux** cluster (`workload-prd`) managed by FluxCD.
 
 ### GPU nodes
 - The GPU node is labeled **`ai-node: oculink`** and tainted `workload=gpu:NoSchedule`. GPU workloads need the toleration; they no longer need the nodeSelector, because the DRA claim (below) pins the pod to whichever node holds the requested card.
-- It has **two AMD GPUs**: an oculink-attached **AMD AI Pro R9700** (llama-cpp via Vulkan or ROCm) and the **Radeon 780M iGPU** (Immich ML/transcoding via ROCm/VAAPI). `controlplane-1` additionally has a **Radeon 680M** — currently unclaimed.
-- **GPUs are claimed via DRA, not hostPath.** `platform-infra/gpu-dra-driver` publishes one DRA device per GPU; a workload references a `ResourceClaimTemplate` whose CEL selector names the card by sysfs PCI device ID: `0x7551` R9700, `0x1900` Radeon 780M, `0x1681` Radeon 680M. Do **not** select on `productName` — amdgpu leaves `/sys/class/drm/card*/device/product_name` absent on these cards, so such a selector silently matches nothing. Claims are exclusive: two Deployments naming the same card means one runs and the other stays `Pending`. Every GPU Deployment must use `strategy: Recreate`, or a rollout deadlocks waiting for a device the outgoing pod still holds.
+- `worker-1` has **two AMD GPUs**: an oculink-attached **AMD AI Pro R9700** (llama-cpp via Vulkan or ROCm) and the **Radeon 780M iGPU** (`llama-cpp-igpu`). `controlplane-1` has a **Radeon 680M** (gfx1035), claimed by **Immich** — so the Immich pods run on controlplane-1, not worker-1. Their PVCs are RWX NFS, so nothing pins them to a node.
+- **GPUs are claimed via DRA, not hostPath.** `platform-infra/gpu-dra-driver` publishes one DRA device per GPU; a workload references a `ResourceClaimTemplate` whose CEL selector names the card by sysfs PCI device ID: `0x7551` R9700, `0x1900` Radeon 780M, `0x1681` Radeon 680M. Do **not** select on `productName` — amdgpu leaves `/sys/class/drm/card*/device/product_name` absent on these cards, so such a selector silently matches nothing. Claims are exclusive **cluster-wide** — devices are not partitioned by namespace, so two Deployments naming the same card means one runs and the other stays `Pending`, even across namespaces. Two pods share a card only by referencing the same `ResourceClaim` object by name (see Immich), which is namespaced — so cross-namespace sharing is not expressible. The AMD driver does not set `allowMultipleAllocations`, so consumable-capacity sharing is unavailable. Every GPU Deployment must use `strategy: Recreate`, or a rollout deadlocks waiting for a device the outgoing pod still holds.
 - `llama-cpp-cuda` pins to `kubernetes.io/hostname: node-3` with a `nvidia` RuntimeClass (NVIDIA node, not listed in DEVICES.md). Currently **dormant/unwired** — see note below.
 
 ### VLAN map
@@ -183,7 +183,7 @@ Present in tree but **not wired into any overlay** (do not assume deployed): `co
 | yk-portfolio | yk-portfolio | Personal portfolio (`portfolio.` hostname) |
 | yk-update-checker | yk-update-checker | Dependency update dashboard (`yk-updates.` hostname) |
 | homepage | homepage | Dashboard landing page |
-| immich | immich | Photos — server + ML (ROCm on 780M) + Valkey + CNPG `pg-cluster-immich` (VectorChord image) |
+| immich | immich | Photos — server + ML (ROCm on the 680M, controlplane-1) + Valkey + CNPG `pg-cluster-immich` (VectorChord image). Both pods share one `ResourceClaim` (`immich-gpu`) |
 | opencloud | opencloud | File cloud (OpenCloud/oCIS fork), single pod, `truenas-iscsi` PVC |
 | forgejo | forgejo | Git server, `git.` hostname + SSH (port 22 via TCPRoute), CNPG `pg-cluster-forgejo`, `truenas-iscsi` PVC for repo data. Physically lives at `kubernetes/platform/forgejo/` still — only its Flux wiring moved to `apps` |
 | llama-cpp | llm | `ghcr.io/ggml-org/llama.cpp:server-vulkan-*` router mode, R9700 via DRA claim `llama-cpp-r9700`, models PVC `longhorn` 200Gi RWX. Plain Deployment, not a HelmRelease |
@@ -339,7 +339,8 @@ spec:
 | `kubernetes/observability/k8s-monitoring/overlays/workload-prd/helm-release-patch.yaml` | Alloy collector config, destinations |
 | `kubernetes/observability/alerting-rules/base/` | Every PrometheusRule in the cluster |
 | `kubernetes/llm/llama-cpp/base/models-preset-configmap.yaml` | Per-model inference parameters |
-| `kubernetes/apps/immich/overlays/workload-prd/gpu-patch-*.yaml` | Immich GPU access (780M, ROCm/VAAPI, `HIP_VISIBLE_DEVICES`) — still hostPath-based, not yet migrated to DRA |
+| `kubernetes/apps/immich/overlays/workload-prd/gpu-patch-*.yaml` | Immich GPU access (680M via DRA; `HSA_OVERRIDE_GFX_VERSION=10.3.0` spoofs gfx1035→gfx1030 — this value tracks the card, change it if the claim is repointed) |
+| `kubernetes/apps/immich/base/resource-claim.yaml` | The shared claim both Immich pods reference |
 | `kubernetes/platform/infra/gpu-dra-driver/` | AMD GPU DRA driver (device discovery + `gpu.amd.com` DeviceClass) |
 | `proxmox-nodes/terraform/_modules/truenas-apps/` | Docker apps on TrueNAS (Vault, Zot, RustFS, Forgejo, Dockhand, Traefik) |
 | `proxmox-nodes/terraform/_modules/truenas-setup/` | TrueNAS datasets (incl. democratic-csi parents) |

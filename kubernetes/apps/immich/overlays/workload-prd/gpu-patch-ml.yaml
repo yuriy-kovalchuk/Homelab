@@ -6,33 +6,30 @@ metadata:
 spec:
   template:
     spec:
-      nodeSelector:
-        ai-node: oculink
-      tolerations:
-        - key: workload
-          operator: Equal
-          value: gpu
-          effect: NoSchedule
+      # No nodeSelector/toleration: the claim below resolves to the 680M, which
+      # lives on controlplane-1, so the scheduler places the pod there.
+      resourceClaims:
+        - name: gpu
+          resourceClaimName: immich-gpu
       containers:
         - name: immich-machine-learning
-          image: ghcr.io/immich-app/immich-machine-learning:release-rocm
           env:
-            # 780M is gfx1103 — not officially supported by ROCm, spoof gfx1100
+            # The 680M is gfx1035 (RDNA2, Rembrandt) — not an officially
+            # supported ROCm target, so spoof the nearest one that is, gfx1030.
+            # This was 11.0.0 while Immich ran on the gfx1103 780M; it must
+            # change with the card.
             - name: HSA_OVERRIDE_GFX_VERSION
-              value: "11.0.0"
-            # Node has two GPUs (R9700 + 780M iGPU) — restrict ROCm to the 780M only.
-            # PLACEHOLDER index: verify with `rocminfo` on the node and set the iGPU's
-            # device index here (flip to "1" if inference lands on the R9700).
-            - name: HIP_VISIBLE_DEVICES
-              value: "0"
+              value: "10.3.0"
+            # HIP_VISIBLE_DEVICES is gone: the container is handed exactly one
+            # GPU, so it is always HIP device 0.
           securityContext:
-            privileged: true
+            # Still uid 0 — Immich writes to the NFS uploads/cache PVCs and
+            # changing the runtime uid would change file ownership there.
             runAsUser: 0
-          volumeMounts:
-            - name: dev-dri
-              mountPath: /dev/dri
-      volumes:
-        - name: dev-dri
-          hostPath:
-            path: /dev/dri
-            type: Directory
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            claims:
+              - name: gpu
