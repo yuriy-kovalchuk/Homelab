@@ -16,3 +16,14 @@ spec:
   prune: false
   wait: false
   timeout: 5m
+  # Leave replica counts to whoever last ran `kubectl scale`. Flux seeds the
+  # value on first apply and then stops correcting drift on it, so the GPU
+  # workloads can be parked at 0 without Git fighting the change back to 1.
+  # Only spec/replicas is exempt — image, args and everything else still
+  # reconcile normally. Drop the `namespace` line to widen this to all apps.
+  ignore:
+    - paths:
+        - /spec/replicas
+      target:
+        kind: Deployment
+        namespace: llm

@@ -1,0 +1,30 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: gpu-dra-driver
+  namespace: kube-amd-gpu
+spec:
+  values:
+    # Creates the cluster-scoped DeviceClass `gpu.amd.com` that every
+    # ResourceClaimTemplate in this repo references.
+    deviceClass:
+      create: true
+    kubeletPlugin:
+      # Only the two AMD nodes carry the Talos amdgpu extension (worker-1,
+      # controlplane-1). Matching on key existence rather than the label's
+      # value keeps this correct across Talos upgrades, which bump the value.
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: extensions.talos.dev/amdgpu
+                    operator: Exists
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
+    # The admission webhook is only needed for partitioned Instinct GPUs.
+    webhook:
+      enabled: false

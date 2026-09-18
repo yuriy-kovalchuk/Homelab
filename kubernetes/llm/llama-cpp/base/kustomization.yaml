@@ -4,6 +4,7 @@ resources:
   - pvc.yaml
   - models-preset-configmap.yaml
   - model-download-job.yaml
+  - resource-claim-template.yaml
   - deployment.yaml
   - service.yaml
 configMapGenerator:

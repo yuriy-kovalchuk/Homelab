@@ -1,0 +1,23 @@
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: llama-cpp-r9700
+  namespace: llm
+spec:
+  spec:
+    devices:
+      requests:
+        - name: gpu
+          exactly:
+            deviceClassName: gpu.amd.com
+            allocationMode: ExactCount
+            count: 1
+            selectors:
+              - cel:
+                  # AMD AI Pro R9700 (gfx1201) @ 0000:03:00.0 on worker-1.
+                  # Selects on the sysfs PCI device ID, NOT productName: amdgpu
+                  # leaves /sys/class/drm/card*/device/product_name absent on
+                  # these cards, so a productName selector silently matches
+                  # nothing. Device IDs here: 0x7551 R9700, 0x1900 Radeon 780M,
+                  # 0x1681 Radeon 680M (controlplane-1).
+                  expression: 'device.attributes["gpu.amd.com"].deviceID == "0x7551"'

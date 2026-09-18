@@ -4,36 +4,34 @@ metadata:
   name: llama-cpp
   namespace: llm
 spec:
+  # Mandatory with DRA: a RollingUpdate would deadlock, because the incoming
+  # pod cannot be allocated the GPU until the outgoing pod releases it.
   strategy:
     type: Recreate
   template:
     spec:
-      nodeSelector:
-        ai-node: oculink
+      # The claim below pins the pod to whichever node holds the R9700, so no
+      # nodeSelector is needed — but worker-1's taint still has to be tolerated.
       tolerations:
         - key: workload
           operator: Equal
           value: gpu
           effect: NoSchedule
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      resourceClaims:
+        - name: gpu
+          resourceClaimTemplateName: llama-cpp-r9700
       containers:
         - name: llama-cpp
+          # No privileged/hostPath: the DRA driver injects /dev/kfd and this
+          # card's render node via CDI, and nothing else.
           securityContext:
-            privileged: true
-            runAsUser: 0
+            allowPrivilegeEscalation: false
             capabilities:
               drop:
                 - ALL
-          volumeMounts:
-            - name: dev-dri
-              mountPath: /dev/dri
-            - name: sys-bus-pci
-              mountPath: /sys/bus/pci
-      volumes:
-        - name: dev-dri
-          hostPath:
-            path: /dev/dri
-            type: Directory
-        - name: sys-bus-pci
-          hostPath:
-            path: /sys/bus/pci
-            type: Directory
+          resources:
+            claims:
+              - name: gpu
