@@ -11,3 +11,4 @@ resources:
   - ../../trivy/overlays/workload-prd
   - ../../trivy-converter/overlays/workload-prd
   - ../../clean-pods/overlays/workload-prd
+  - ../../talos-monitoring/overlays/workload-prd
