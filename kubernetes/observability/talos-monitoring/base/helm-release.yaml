@@ -5,12 +5,7 @@ metadata:
   namespace: talos-monitoring
 spec:
   interval: 5m
-  # Two prerequisites aren't done yet: no vX.Y.Z tag has been pushed in the
-  # talos-monitoring repo, so the 0.1.0 chart doesn't exist at the OCI ref
-  # above; and no node's machineconfig has kubernetesTalosAPIAccess enabled
-  # yet (see that repo's patch.yaml), so the pod would stay 0/1 Ready even
-  # once it exists. Flip this to false once both are done.
-  suspend: true
+  suspend: false
   chartRef:
     kind: OCIRepository
     name: talos-monitoring
@@ -25,11 +20,6 @@ spec:
       retries: 3
       remediateLastFailure: true
   values:
-    # os:admin, not the chart's os:reader default: this deployment is meant
-    # to replace node_exporter's hwmon/thermal_zone collectors (already
-    # turned off in observability/k8s-monitoring) with talos_sensor_*, which
-    # needs the Talos file-read RPC. patch.yaml in the app repo already
-    # requests os:admin to match.
     talos:
       roles:
         - os:admin
