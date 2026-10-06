@@ -9,4 +9,7 @@ spec:
   storageClassName: truenas-iscsi
   resources:
     requests:
-      storage: 20Gi
+      # The Strata ROCm image (git.yuriykovalchuk.dev/yuriy/Strata) builds on a
+      # ~30 GB rocm/dev -complete base: buildkit's copy plus the exported image
+      # need ~70 GB. Can only grow — a PVC request cannot be shrunk.
+      storage: 100Gi
