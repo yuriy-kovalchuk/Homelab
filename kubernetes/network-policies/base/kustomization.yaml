@@ -10,6 +10,7 @@ resources:
   - apps-llama-cpp.yaml
   - apps-llama-cpp-igpu.yaml
   - apps-open-webui.yaml
+  - apps-strata.yaml
   - apps-opencloud.yaml
   - apps-whoami.yaml
   - apps-yk-portfolio.yaml

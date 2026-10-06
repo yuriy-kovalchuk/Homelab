@@ -280,6 +280,21 @@ spec:
           selector:
             matchLabels:
               kubernetes.io/metadata.name: "llm"
+    - name: https-strata
+      port: 443
+      protocol: HTTPS
+      hostname: "strata.yuriykovalchuk.dev"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: strata-gw-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: "llm"
     - name: https-vulkan-igpu
       port: 443
       protocol: HTTPS

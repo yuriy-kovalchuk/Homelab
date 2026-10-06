@@ -5,6 +5,10 @@ metadata:
   namespace: forgejo-runner
 spec:
   replicas: 1
+  # dockerd's /var/lib/docker is an RWO iSCSI volume: a rolling update would
+  # leave the new pod waiting on an attach the old one still holds
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: forgejo-runner
@@ -13,6 +17,15 @@ spec:
       labels:
         app: forgejo-runner
     spec:
+      # Builds run on worker-1 (Zen 4, 16 threads, the GPU node), e.g. the Strata
+      # ROCm image. worker-1 is not always on: CI waits while it is down.
+      nodeSelector:
+        kubernetes.io/hostname: worker-1
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
       containers:
         - name: runner
           image: data.forgejo.org/forgejo/runner:13.1.0

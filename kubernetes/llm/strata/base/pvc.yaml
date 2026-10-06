@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: strata-data
+  namespace: llm
+spec:
+  # 1 replica, strict-local on worker-1: the data is useless without the R9700
+  # anyway, and reads stay on the node's NVMe (Strata reads its lookup table per token)
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn-gpu
+  resources:
+    requests:
+      storage: 200Gi

@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: strata
+  namespace: llm
+spec:
+  # Parked at 0 like the other R9700 Deployments (the apps Kustomization ignores
+  # /spec/replicas in llm): scale llama-cpp / llama-cpp-rocm to 0, then this to 1.
+  replicas: 0
+  selector:
+    matchLabels:
+      app: strata
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: strata
+    spec:
+      # Grace for the server to stop the engine and unpin ~35 GB of RAM.
+      terminationGracePeriodSeconds: 120
+      containers:
+        - name: strata
+          # Built by git.yuriykovalchuk.dev/yuriy/Strata CI (Strata 82f46a8, gfx1201, ROCm 7.2.4)
+          image: harbor.yuriykovalchuk.dev/homelab/strata:82f46a8-gfx1201-rocm7.2.4
+          env:
+            # Read by the image's entrypoint.sh on the first start only (the result
+            # is saved in /data/config); REINSTALL=1 re-runs setup with new values.
+            - name: MODEL
+              value: IQ2_XS
+            - name: CONTEXT
+              value: "131072"
+            # Without an API key Strata only answers Host names it knows (DNS
+            # rebinding guard); the gateway and in-cluster names have to be listed.
+            - name: STRATA_ALLOWED_HOSTS
+              value: strata.yuriykovalchuk.dev,strata,strata.llm,strata.llm.svc,strata.llm.svc.cluster.local
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          resources:
+            requests:
+              cpu: "4"
+              # IQ2_XS keeps its 35.5 GB of experts in RAM (pageable on ROCm,
+              # STRATA_RESIDENT_PIN=0) plus the engine and int8 KV past 64K
+              memory: 44Gi
+            limits:
+              cpu: "15"
+              # worker-1 has ~60 GiB allocatable; leave room for the node's own pods
+              memory: 56Gi
+          # The first start downloads ~76 GB and packs the model before the port
+          # opens (hours on a slow link); later starts load in a few minutes.
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            periodSeconds: 30
+            failureThreshold: 480
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            periodSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            periodSeconds: 30
+            failureThreshold: 5
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: strata-data
