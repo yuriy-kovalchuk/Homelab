@@ -1,0 +1,94 @@
+# Downloads a GSQ-RCO size onto strata-data so the engine pod (which has no
+# internet egress, see network-policies/base/apps-strata.yaml) can set it up
+# offline. Plain HTTPS, so a plain image: Strata itself is not needed here, and
+# its setup could not run here anyway — it requires the GPU, which only the
+# engine pod can claim (the amdgpu driver hides cards a pod has no access to).
+#
+# Writes the files exactly where Strata's setup looks, each with the `.done`
+# marker setup treats as "already downloaded":
+#   /data/models/<MODEL>/Qwen3.8-Flash-Next-GSQ-RCO-<MODEL>-0000{1,2}-of-00002.gguf
+# Shard 2 (the 29 GB lookup table) is the same file for every size: skipped when
+# another size already has it, setup hardlinks that copy. The MTP draft layer is
+# not fetched here — it is already on the volume (/data/mtp) and shared.
+#
+# Switching models: set MODEL here, push (force: Flux recreates this immutable
+# Job), wait for it to complete, then set MODEL in deployment.yaml — the engine
+# then packs the model offline (a few minutes) and serves it.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: strata-download
+  namespace: llm
+  annotations:
+    kustomize.toolkit.fluxcd.io/force: enabled
+spec:
+  backoffLimit: 6
+  template:
+    metadata:
+      labels:
+        app: strata-download
+    spec:
+      restartPolicy: OnFailure
+      # strata-data is a strict-local longhorn-gpu volume: its only replica is on
+      # worker-1. ReadWriteOnce is per node, so this runs beside the engine pod.
+      nodeSelector:
+        kubernetes.io/hostname: worker-1
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: download
+          image: alpine:3.21
+          env:
+            # IQ3_XXS: 43 GB experts, 99.4% of BF16 on ISTA's tasks (shard 1 is 47 GB)
+            - name: MODEL
+              value: IQ3_XXS
+            # the revision Strata's setup.py pins for this repo (HF_REVISIONS)
+            - name: HF_BASE
+              value: https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF/resolve/ed59f92082b1e93c0e96d60a8b11aab089b52f09
+          command:
+            - sh
+            - -c
+            - |
+              set -eu
+              dir="/data/models/$MODEL"
+              mkdir -p "$dir"
+              for i in 1 2; do
+                f="Qwen3.8-Flash-Next-GSQ-RCO-$MODEL-0000$i-of-00002.gguf"
+                if [ -f "$dir/$f.done" ]; then
+                  echo "[SKIP] $f already downloaded"; continue
+                fi
+                if [ "$i" = 2 ] && ls /data/models/*/Qwen3.8-Flash-Next-GSQ-RCO-*-00002-of-00002.gguf.done >/dev/null 2>&1; then
+                  echo "[SKIP] $f: another size has shard 2, Strata's setup hardlinks it"; continue
+                fi
+                echo "[DL] $f"
+                wget -c -O "$dir/$f.part" "$HF_BASE/$MODEL/$f"
+                mv -f "$dir/$f.part" "$dir/$f"
+                date '+%Y-%m-%d %H:%M' > "$dir/$f.done"
+                echo "[OK] $f"
+              done
+              echo "$MODEL downloaded; set MODEL=$MODEL in deployment.yaml to switch the engine."
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: "1"
+              memory: 256Mi
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: strata-data

@@ -25,13 +25,15 @@ spec:
           # ROCm 7.2.4, repo 2583165)
           image: harbor.yuriykovalchuk.dev/homelab/strata:82f46a8-gfx1201-rocm7.2.4-2583165
           env:
-            # Serve only: never downloads (this pod has no internet egress). Models
-            # are prepared by setup-job.yaml; until the config of MODEL exists on
-            # /data the entrypoint waits for it.
+            # auto: if MODEL has no config yet, run Strata's setup first, then serve.
+            # This pod has no internet egress, so setup runs offline on the files
+            # strata-download put on /data (it skips shards with a .done marker and
+            # reuses the MTP layer): it only packs the model and writes the config.
+            # Setup must run here, not in the download Job: it needs the GPU.
             - name: STRATA_MODE
-              value: serve
-            # Which prepared model to serve. Switch only after strata-setup has
-            # finished preparing it (setup-job.yaml).
+              value: auto
+            # Which model to serve. Switch only after strata-download has completed
+            # for it (download-job.yaml) — setup cannot download from this pod.
             - name: MODEL
               value: IQ2_XS
             # Without an API key Strata only answers Host names it knows (DNS
@@ -55,8 +57,8 @@ spec:
               cpu: "15"
               # worker-1 has ~60 GiB allocatable; leave room for the node's own pods
               memory: 56Gi
-          # Loading takes a few minutes; on a fresh volume the pod also waits here
-          # for strata-setup to download and pack the model (hours on a slow link).
+          # Loading takes a few minutes; the first start of a newly switched model
+          # also packs it (minutes, offline) before the port opens.
           startupProbe:
             httpGet:
               path: /health
