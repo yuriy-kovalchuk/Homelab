@@ -81,10 +81,24 @@ spec:
           command:
             - sh
             - -c
+            # Prunes by size, not age: `until=` judges an image by its build date,
+            # so it deleted weeks-old bases like rocm/dev the day after every pull,
+            # and the CI build cache (driver: docker) is what makes rebuilds fast.
             - |
               while true; do
                 sleep 86400
-                docker system prune -af --volumes --filter "until=72h"
+                # leftovers of finished jobs
+                docker container prune -f --filter "until=24h"
+                docker network prune -f --filter "until=24h"
+                docker volume prune -af
+                # build cache: keep the most recently used 60 GB
+                docker builder prune -af --max-used-space 60gb
+                # unused images only once the volume is 80% full
+                set -- $(df -P /docker-lib | tail -1)
+                used=${5%\%}
+                if [ "$used" -ge 80 ]; then
+                  docker image prune -af
+                fi
               done
           env:
             - name: DOCKER_HOST
@@ -99,6 +113,11 @@ spec:
             runAsGroup: 1000
             seccompProfile:
               type: RuntimeDefault
+          # read-only, only for df
+          volumeMounts:
+            - name: docker-lib
+              mountPath: /docker-lib
+              readOnly: true
       volumes:
         - name: config
           secret:
