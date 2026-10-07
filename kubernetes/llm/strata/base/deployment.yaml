@@ -54,9 +54,13 @@ spec:
               mountPath: /data
       containers:
         - name: strata
-          # Built by git.yuriykovalchuk.dev/yuriy/Strata CI (Strata 82f46a8, gfx1201,
-          # ROCm 7.2.4, repo 2583165)
-          image: harbor.yuriykovalchuk.dev/homelab/strata:82f46a8-gfx1201-rocm7.2.4-2583165
+          # Built by git.yuriykovalchuk.dev/yuriy/Strata CI (Strata e8ca9af, gfx1201,
+          # ROCm 7.2.4, repo 3687328) -- 242 commits ahead of the previous pin
+          # (82f46a8), off the multi-stage Dockerfile: 7.58 GB -> 4.20 GB (the
+          # first two multi-stage builds, 0659674/7f2dd2e, were missing
+          # hipblaslt/hipblas and then their ldconfig cache -- both confirmed
+          # fixed via `ldd` against this exact tag before pointing it here).
+          image: harbor.yuriykovalchuk.dev/homelab/strata:e8ca9af-gfx1201-rocm7.2.4-3687328
           env:
             # auto: if MODEL has no config yet, run Strata's setup first, then serve.
             # This pod has no internet egress, so setup runs offline on the files
