@@ -19,6 +19,39 @@ spec:
     spec:
       # Grace for the server to stop the engine and unpin ~35 GB of RAM.
       terminationGracePeriodSeconds: 120
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        # Seeds our --max-context override onto the PVC as a normal writable
+        # file instead of mounting the ConfigMap there directly: the engine's
+        # auto wrapper does cfg_path.touch() on it every launch (a "most
+        # recently used" marker), which fails outright on a read-only
+        # ConfigMap subPath mount (ConfigMap volumes can never be writable,
+        # no matter how they're mounted). Copying overwrites it fresh on
+        # every pod start, so it's still self-healing/declarative -- just one
+        # step removed from a live mount.
+        - name: seed-model-configs
+          image: alpine:3.21
+          command:
+            - sh
+            - -c
+            - |
+              set -eu
+              cp /configs/strata-iq2_xs.json /data/config/strata-iq2_xs.json
+              cp /configs/strata-iq3_xxs.json /data/config/strata-iq3_xxs.json
+              cp /configs/strata-iq3_s.json /data/config/strata-iq3_s.json
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: model-configs
+              mountPath: /configs
+              readOnly: true
+            - name: data
+              mountPath: /data
       containers:
         - name: strata
           # Built by git.yuriykovalchuk.dev/yuriy/Strata CI (Strata 82f46a8, gfx1201,
@@ -40,16 +73,6 @@ spec:
             # rebinding guard); the gateway and in-cluster names have to be listed.
             - name: STRATA_ALLOWED_HOSTS
               value: strata.yuriykovalchuk.dev,strata,strata.llm,strata.llm.svc,strata.llm.svc.cluster.local
-            # UNVERIFIED: best-effort override of --max-context (default is
-            # VRAM-tiered auto-detect, 131072 on a 32 GB card) for a model that
-            # has no config yet — mirrors the --max-context flag setup.sh takes.
-            # Strata's auto wrapper isn't documented to read this; if the engine
-            # log still shows "context 131072 tokens" after rollout, this is a
-            # no-op and the only confirmed fallback is hand-editing the generated
-            # /data/config/strata-iq3_s.json's "--max-context" value once it
-            # exists, then restarting the pod to pick it up.
-            - name: STRATA_MAX_CONTEXT
-              value: "180224"
           ports:
             - name: http
               containerPort: 8080
@@ -95,3 +118,6 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: strata-data
+        - name: model-configs
+          configMap:
+            name: strata-model-configs

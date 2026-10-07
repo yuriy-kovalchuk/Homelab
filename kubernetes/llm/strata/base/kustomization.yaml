@@ -6,3 +6,4 @@ resources:
   - download-job.yaml
   - deployment.yaml
   - service.yaml
+  - configmap-model-configs.yaml

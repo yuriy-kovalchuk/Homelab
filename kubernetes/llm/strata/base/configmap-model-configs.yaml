@@ -1,0 +1,153 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: strata-model-configs
+  namespace: llm
+data:
+  # One key per quant size we've downloaded, each identical to what
+  # `STRATA_MODE=auto` setup generated on its own at
+  # /data/config/strata-<model>.json except "--max-context" bumped from
+  # setup.sh's VRAM-tier default (131072 on this 32 GB card) to 180224
+  # (trained ceiling is 262144; KV cost there is still small -- ~2.3 GiB
+  # combined K+V for the 12 full-attention layers at 180224, see
+  # deployment.yaml's volumeMounts for how each gets layered onto the PVC).
+  # Re-copy a model's block from its real generated file if upstream
+  # setup.sh's other defaults for it ever change and this drifts.
+  #
+  # IQ2_XS is the only one of the three with "--kv-resident 32768": setup
+  # found enough RAM headroom at its ~33 GB of resident experts to stream
+  # KV beyond that threshold from RAM instead of keeping it all VRAM-resident.
+  # IQ3_XXS and IQ3_S have no such flag -- KV stays fully VRAM-resident for
+  # both, competing with the expert cache for the same budget; a bigger
+  # context here shrinks that cache further on both, more so on IQ3_S.
+  strata-iq2_xs.json: |
+    {
+     "exe": "/opt/strata/engine/strata",
+     "args": [
+      "--pack",
+      "/data/packs/iq2_xs",
+      "--native",
+      "/data/models/IQ2_XS/Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00001-of-00002.gguf",
+      "--ple-gguf",
+      "/data/models/IQ2_XS/Qwen3.8-Flash-Next-GSQ-RCO-IQ2_XS-00002-of-00002.gguf",
+      "--expert-profile",
+      "/opt/strata/data/expert-profile.bin",
+      "--expert-cache",
+      "auto",
+      "--prefill",
+      "auto",
+      "--spec",
+      "4",
+      "--spec-min-p",
+      "0.5",
+      "--mtp",
+      "/data/mtp/rt",
+      "--max-context",
+      "180224",
+      "--kv",
+      "int8",
+      "--kv-resident",
+      "32768"
+     ],
+     "cwd": "/opt/strata",
+     "tokenizer": "/data/packs/iq2_xs/tokenizer",
+     "model_name": "qwen3.8-flash-next-iq2_xs",
+     "log": "/opt/strata/strata-iq2_xs.log",
+     "lib_dirs": [
+      "/opt/rocm/lib"
+     ],
+     "port": 8080,
+     "backend": "hip",
+     "env": {
+      "STRATA_HIPBLASLT_TUNING": "/opt/strata/tools/hip/gfx1201-hipblaslt-100202.txt"
+     },
+     "gpu": 0,
+     "gpus_asked": true,
+     "host": "0.0.0.0"
+    }
+  strata-iq3_xxs.json: |
+    {
+     "exe": "/opt/strata/engine/strata",
+     "args": [
+      "--pack",
+      "/data/packs/iq3_xxs",
+      "--native",
+      "/data/models/IQ3_XXS/Qwen3.8-Flash-Next-GSQ-RCO-IQ3_XXS-00001-of-00002.gguf",
+      "--ple-gguf",
+      "/data/models/IQ3_XXS/Qwen3.8-Flash-Next-GSQ-RCO-IQ3_XXS-00002-of-00002.gguf",
+      "--expert-profile",
+      "/opt/strata/data/expert-profile.bin",
+      "--expert-cache",
+      "auto",
+      "--prefill",
+      "auto",
+      "--spec",
+      "4",
+      "--spec-min-p",
+      "0.5",
+      "--mtp",
+      "/data/mtp/rt",
+      "--max-context",
+      "180224",
+      "--kv",
+      "int8"
+     ],
+     "cwd": "/opt/strata",
+     "tokenizer": "/data/packs/iq3_xxs/tokenizer",
+     "model_name": "qwen3.8-flash-next-iq3_xxs",
+     "log": "/opt/strata/strata-iq3_xxs.log",
+     "lib_dirs": [
+      "/opt/rocm/lib"
+     ],
+     "port": 8080,
+     "backend": "hip",
+     "env": {
+      "STRATA_HIPBLASLT_TUNING": "/opt/strata/tools/hip/gfx1201-hipblaslt-100202.txt"
+     },
+     "gpu": 0,
+     "gpus_asked": true,
+     "host": "0.0.0.0"
+    }
+  strata-iq3_s.json: |
+    {
+     "exe": "/opt/strata/engine/strata",
+     "args": [
+      "--pack",
+      "/data/packs/iq3_s",
+      "--native",
+      "/data/models/IQ3_S/Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00001-of-00002.gguf",
+      "--ple-gguf",
+      "/data/models/IQ3_S/Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00002-of-00002.gguf",
+      "--expert-profile",
+      "/opt/strata/data/expert-profile.bin",
+      "--expert-cache",
+      "auto",
+      "--prefill",
+      "auto",
+      "--spec",
+      "4",
+      "--spec-min-p",
+      "0.5",
+      "--mtp",
+      "/data/mtp/rt",
+      "--max-context",
+      "180224",
+      "--kv",
+      "int8"
+     ],
+     "cwd": "/opt/strata",
+     "tokenizer": "/data/packs/iq3_s/tokenizer",
+     "model_name": "qwen3.8-flash-next-iq3_s",
+     "log": "/opt/strata/strata-iq3_s.log",
+     "lib_dirs": [
+      "/opt/rocm/lib"
+     ],
+     "port": 8080,
+     "backend": "hip",
+     "env": {
+      "STRATA_HIPBLASLT_TUNING": "/opt/strata/tools/hip/gfx1201-hipblaslt-100202.txt"
+     },
+     "gpu": 0,
+     "gpus_asked": true,
+     "host": "0.0.0.0"
+    }
