@@ -45,9 +45,11 @@ spec:
         - name: download
           image: alpine:3.21
           env:
-            # IQ3_XXS: 43 GB experts, 99.4% of BF16 on ISTA's tasks (shard 1 is 47 GB)
+            # IQ3_S: the biggest/recommended size in this repo — matches the base
+            # model on AIME25 (100.00), exceeds it on GPQA-Diamond (92.93 vs 91.92)
+            # (shard 1 is 54.8 GB)
             - name: MODEL
-              value: IQ3_XXS
+              value: IQ3_S
             # the revision Strata's setup.py pins for this repo (HF_REVISIONS)
             - name: HF_BASE
               value: https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF/resolve/ed59f92082b1e93c0e96d60a8b11aab089b52f09

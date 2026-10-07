@@ -11,4 +11,10 @@ spec:
   storageClassName: longhorn-gpu
   resources:
     requests:
-      storage: 200Gi
+      # Bumped from 200Gi: three Qwen3.8-Flash-Next sizes side by side (IQ2_XS,
+      # IQ3_XXS, IQ3_S) plus the shared ~29 GB shard-2 hardlink and mtp/packs
+      # filled it to 86% (167.6G/195.8G) and left too little headroom for a
+      # new size's setup-time disk-space precheck (it wants ~31 GB free even
+      # though the shard-2 copy ends up hardlinked, not duplicated). worker-1's
+      # longhorn-gpu disk has ~437 GiB available, so this is well within room.
+      storage: 300Gi

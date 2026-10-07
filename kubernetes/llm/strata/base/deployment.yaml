@@ -35,11 +35,21 @@ spec:
             # Which model to serve. Switch only after strata-download has completed
             # for it (download-job.yaml) — setup cannot download from this pod.
             - name: MODEL
-              value: IQ2_XS
+              value: IQ3_S
             # Without an API key Strata only answers Host names it knows (DNS
             # rebinding guard); the gateway and in-cluster names have to be listed.
             - name: STRATA_ALLOWED_HOSTS
               value: strata.yuriykovalchuk.dev,strata,strata.llm,strata.llm.svc,strata.llm.svc.cluster.local
+            # UNVERIFIED: best-effort override of --max-context (default is
+            # VRAM-tiered auto-detect, 131072 on a 32 GB card) for a model that
+            # has no config yet — mirrors the --max-context flag setup.sh takes.
+            # Strata's auto wrapper isn't documented to read this; if the engine
+            # log still shows "context 131072 tokens" after rollout, this is a
+            # no-op and the only confirmed fallback is hand-editing the generated
+            # /data/config/strata-iq3_s.json's "--max-context" value once it
+            # exists, then restarting the pod to pick it up.
+            - name: STRATA_MAX_CONTEXT
+              value: "180224"
           ports:
             - name: http
               containerPort: 8080
@@ -50,13 +60,17 @@ spec:
           resources:
             requests:
               cpu: "4"
-              # IQ2_XS keeps its 35.5 GB of experts in RAM (pageable on ROCm,
-              # STRATA_RESIDENT_PIN=0) plus the engine and int8 KV past 64K
-              memory: 44Gi
+              # IQ3_S's shard 1 is 54.8 GB (vs IQ3_XXS's 47 GB) -> resident
+              # experts in RAM (pageable on ROCm, STRATA_RESIDENT_PIN=0) scale
+              # with it, est. ~46-47 GB, plus the engine and int8 KV past the
+              # resident threshold -- bigger again at 180224 ctx than at 131072.
+              memory: 52Gi
             limits:
               cpu: "15"
-              # worker-1 has ~60 GiB allocatable; leave room for the node's own pods
-              memory: 56Gi
+              # worker-1 has ~60 GiB allocatable total (confirmed via `kubectl
+              # describe node`) -- this is already most of it; leave ~2 GiB for
+              # the node's own pods, not much slack beyond the request estimate.
+              memory: 58Gi
           # Loading takes a few minutes; the first start of a newly switched model
           # also packs it (minutes, offline) before the port opens.
           startupProbe:
