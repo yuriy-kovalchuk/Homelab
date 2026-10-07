@@ -12,5 +12,10 @@ configMapGenerator:
     namespace: llm
     files:
       - models.txt
+  # Chat templates a preset can point at with chat-template-file = /templates/<file>
+  - name: llama-cpp-chat-templates
+    namespace: llm
+    files:
+      - chat-templates/qwen3.8-27b-unsloth.jinja
 generatorOptions:
   disableNameSuffixHash: true

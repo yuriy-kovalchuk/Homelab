@@ -1,4 +1,6 @@
 https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/resolve/main/Qwen3.8-27B-UD-Q6_K_XL.gguf
+# ISTA-DASLab GSQ-RCO IQ3_S (3.5 bpw, "task-lossless") with the MTP head, ~12.1 GB
+https://huggingface.co/ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF/resolve/main/Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp.gguf
 https://huggingface.co/bartowski/Ornith-1.5-35B-A3B-GGUF/resolve/main/Ornith-1.5-35B-A3B-Q5_K_M.gguf
 
 # Qwen3.8-Flash-Next UD-Q2_K_XL — 3-part split (~79 GB). Split GGUFs land in

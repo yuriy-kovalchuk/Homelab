@@ -37,6 +37,9 @@ spec:
             - name: config
               mountPath: /config
               readOnly: true
+            - name: chat-templates
+              mountPath: /templates
+              readOnly: true
           resources:
             requests:
               cpu: "500m"
@@ -67,3 +70,6 @@ spec:
         - name: config
           configMap:
             name: llama-cpp-models-preset
+        - name: chat-templates
+          configMap:
+            name: llama-cpp-chat-templates

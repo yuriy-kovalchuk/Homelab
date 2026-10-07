@@ -33,6 +33,36 @@ data:
     min-p = 0.00
     presence-penalty = 0.0
 
+    ; Qwen3.8-27B GSQ-RCO IQ3_S (ISTA-DASLab): 3.5 bpw, half the size of the
+    ; UD-Q6_K_XL above (12.1 GB with the MTP head). Learned rounding (GSQ) +
+    ; loss-optimised per-tensor formats (RCO). Their eval vs BF16: AIME25, LCB v6
+    ; identical, GPQA-D -0.5, perplexity +0.3% (wiki2) / +2.5-2.7% (c4, fineweb).
+    ; Half the bytes per token -> faster decode than Q6 on the same card, and the
+    ; native 262k context fits: ~12 GB weights + KV + compute well under 32 GB.
+    ; Same sampling as the Q6 (Qwen's thinking-mode defaults).
+    ; chat-template-file: ISTA ships the stock Qwen template, which rejects the
+    ; `developer` role and reasoning_effort "high"; Unsloth's fixed one keeps it
+    ; behaving exactly like the Q6 for every client.
+    [Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp]
+    c = 262144
+    cont-batching = true
+    parallel = 1
+    flash-attn = on
+    cache-type-k = q8_0
+    cache-type-v = q8_0
+    chat-template-file = /templates/qwen3.8-27b-unsloth.jinja
+    ; MTP head shipped in the -mtp file
+    spec-type = draft-mtp
+    spec-draft-n-max = 2
+    spec-draft-p-min = 0.8
+    load-on-startup = false
+    stop-timeout = 60
+    temp = 1.0
+    top-p = 0.95
+    top-k = 20
+    min-p = 0.00
+    presence-penalty = 0.0
+
     ; Ornith-1.5-35B-A3B: qwen35moe hybrid MoE (36B total, 3B active, 41 layers,
     ; full-attention every 4th layer -> tiny KV cache). Fits the R9700 32 GB fully:
     ; ~25.5 GB weights + ~2.7 GB KV (incl. MTP draft) + compute. Drop c to 65536 if
