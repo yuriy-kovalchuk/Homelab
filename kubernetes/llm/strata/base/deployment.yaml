@@ -21,15 +21,19 @@ spec:
       terminationGracePeriodSeconds: 120
       containers:
         - name: strata
-          # Built by git.yuriykovalchuk.dev/yuriy/Strata CI (Strata 82f46a8, gfx1201, ROCm 7.2.4)
-          image: harbor.yuriykovalchuk.dev/homelab/strata:82f46a8-gfx1201-rocm7.2.4
+          # Built by git.yuriykovalchuk.dev/yuriy/Strata CI (Strata 82f46a8, gfx1201,
+          # ROCm 7.2.4, repo 2583165)
+          image: harbor.yuriykovalchuk.dev/homelab/strata:82f46a8-gfx1201-rocm7.2.4-2583165
           env:
-            # Read by the image's entrypoint.sh on the first start only (the result
-            # is saved in /data/config); REINSTALL=1 re-runs setup with new values.
+            # Serve only: never downloads (this pod has no internet egress). Models
+            # are prepared by setup-job.yaml; until the config of MODEL exists on
+            # /data the entrypoint waits for it.
+            - name: STRATA_MODE
+              value: serve
+            # Which prepared model to serve. Switch only after strata-setup has
+            # finished preparing it (setup-job.yaml).
             - name: MODEL
               value: IQ2_XS
-            - name: CONTEXT
-              value: "131072"
             # Without an API key Strata only answers Host names it knows (DNS
             # rebinding guard); the gateway and in-cluster names have to be listed.
             - name: STRATA_ALLOWED_HOSTS
@@ -51,8 +55,8 @@ spec:
               cpu: "15"
               # worker-1 has ~60 GiB allocatable; leave room for the node's own pods
               memory: 56Gi
-          # The first start downloads ~76 GB and packs the model before the port
-          # opens (hours on a slow link); later starts load in a few minutes.
+          # Loading takes a few minutes; on a fresh volume the pod also waits here
+          # for strata-setup to download and pack the model (hours on a slow link).
           startupProbe:
             httpGet:
               path: /health

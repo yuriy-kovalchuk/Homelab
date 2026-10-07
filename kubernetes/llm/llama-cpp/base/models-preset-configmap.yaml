@@ -51,6 +51,8 @@ data:
     cache-type-k = q8_0
     cache-type-v = q8_0
     chat-template-file = /templates/qwen3.8-27b-unsloth.jinja
+    ; image input: the base model's BF16 vision encoder (~1 GB more VRAM)
+    mmproj = /models/mmproj-Qwen3.8-27B-BF16.gguf
     ; MTP head shipped in the -mtp file
     spec-type = draft-mtp
     spec-draft-n-max = 2

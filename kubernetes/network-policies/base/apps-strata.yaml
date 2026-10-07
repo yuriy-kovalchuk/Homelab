@@ -21,8 +21,20 @@ spec:
         - ports:
             - port: "8080"
               protocol: TCP
-  # Hugging Face (model shards + MTP layer) and GitHub (setup.py's llama.cpp /
-  # update checks) on first start
+  # No egress block: the engine never leaves the cluster (cluster-wide allow-dns
+  # already puts every pod in egress default-deny). Downloads happen in the
+  # strata-setup Job below.
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: strata-setup
+  namespace: llm
+spec:
+  endpointSelector:
+    matchLabels:
+      app: strata-setup
+  # Hugging Face: the GSQ-RCO shards and the MTP layer (Qwen's repo + its CDN)
   egress:
     - toEntities:
         - world
