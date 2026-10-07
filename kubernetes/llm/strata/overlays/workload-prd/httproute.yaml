@@ -11,6 +11,23 @@ spec:
   hostnames:
     - "strata.yuriykovalchuk.dev"
   rules:
+    # llama-server also serves the OpenAI routes without the /v1 prefix, and
+    # clients built for it rely on that: pi-llama-cpp registers the bare server
+    # URL as the provider's base URL, so chat goes to /chat/completions. Strata
+    # only serves /v1/chat/completions (404 otherwise), so map the bare path.
+    - matches:
+        - path:
+            type: Exact
+            value: /chat/completions
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplaceFullPath
+              replaceFullPath: /v1/chat/completions
+      backendRefs:
+        - name: strata
+          port: 8080
     - matches:
         - path:
             type: PathPrefix
