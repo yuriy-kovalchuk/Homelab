@@ -14,4 +14,5 @@ resources:
   - ../../../llm/llama-cpp-rocm/overlays/workload-prd  # ROCm (gfx1201) — for Flash-Next; shares GPU + models PVC with the Vulkan pod, don't serve big models on both at once
   - ../../../llm/llama-cpp-igpu/overlays/workload-prd  # Vulkan on the 780M iGPU (Vulkan0) — serves a second model concurrently with the R9700 pod
   - ../../../llm/strata/overlays/workload-prd  # Strata (HIP, gfx1201) — Flash-Next with expert caching + MTP; R9700 on worker-1
+  - ../../../llm/sd-server/overlays/workload-prd  # stable-diffusion.cpp (Vulkan) — Qwen-Image-2.1; R9700, parked at 0 (one R9700 workload at a time)
   - ../../../llm/open-webui/overlays/workload-prd

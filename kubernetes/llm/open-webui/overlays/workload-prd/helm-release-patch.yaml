@@ -14,3 +14,35 @@ spec:
         value: "1"
       - name: OFFLINE_MODE
         value: "true"
+      # Image generation via sd-server's AUTOMATIC1111-compatible API (llm/sd-server).
+      # These are persistent config: they seed the DB on first start, and once
+      # the admin Images page is saved the DB values win over these.
+      - name: ENABLE_IMAGE_GENERATION
+        value: "true"
+      - name: IMAGE_GENERATION_ENGINE
+        value: automatic1111
+      - name: AUTOMATIC1111_BASE_URL
+        value: http://sd-server.llm.svc.cluster.local:1234
+      # Qwen-Image-2.1 wants dimensions divisible by 32; 20 steps is sd.cpp's default
+      # (Open WebUI would otherwise ask for 50).
+      - name: IMAGE_SIZE
+        value: 1024x1024
+      - name: IMAGE_STEPS
+        value: "20"
+      - name: AUTOMATIC1111_PARAMS
+        value: '{"cfg_scale": 6.0, "sampler_name": "euler"}'
+      # Image editing: Open WebUI has no A1111 edit engine, so this goes through
+      # sd-server's OpenAI-compatible /v1/images/edits (Qwen-Image-2.1 edit mode;
+      # the int8 Qwen3-VL text encoder already carries the vision tower).
+      - name: ENABLE_IMAGE_EDIT
+        value: "true"
+      - name: IMAGE_EDIT_ENGINE
+        value: openai
+      - name: IMAGES_EDIT_OPENAI_API_BASE_URL
+        value: http://sd-server.llm.svc.cluster.local:1234/v1
+      # sd-server has no auth; set explicitly so Open WebUI never falls back to
+      # sending OPENAI_API_KEY there.
+      - name: IMAGES_EDIT_OPENAI_API_KEY
+        value: none
+      - name: IMAGE_EDIT_MODEL
+        value: sd-cpp-local

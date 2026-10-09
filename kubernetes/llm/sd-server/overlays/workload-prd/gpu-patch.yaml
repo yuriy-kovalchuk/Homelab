@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sd-server
+  namespace: llm
+spec:
+  template:
+    spec:
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      # Claims the R9700 (0x7551), which pins the pod to worker-1.
+      resourceClaims:
+        - name: gpu
+          resourceClaimTemplateName: sd-server-r9700
+      containers:
+        - name: sd-server
+          # No privileged/hostPath: the DRA driver injects this card's render
+          # node via CDI, which is all Vulkan (RADV) needs.
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            claims:
+              - name: gpu

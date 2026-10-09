@@ -295,6 +295,21 @@ spec:
           selector:
             matchLabels:
               kubernetes.io/metadata.name: "llm"
+    - name: https-sd
+      port: 443
+      protocol: HTTPS
+      hostname: "sd.yuriykovalchuk.dev"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: sd-server-gw-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: "llm"
     - name: https-vulkan-igpu
       port: 443
       protocol: HTTPS

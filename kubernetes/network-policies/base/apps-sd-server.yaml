@@ -1,0 +1,44 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: sd-server
+  namespace: llm
+spec:
+  endpointSelector:
+    matchLabels:
+      app: sd-server
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: open-webui
+      toPorts:
+        - ports:
+            - port: "1234"
+              protocol: TCP
+    - fromEntities:
+        - ingress
+      toPorts:
+        - ports:
+            - port: "1234"
+              protocol: TCP
+  # No egress block: the server never leaves the cluster (cluster-wide allow-dns
+  # already puts every pod in egress default-deny). Downloads happen in the
+  # sd-server-download Job below.
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: sd-server-download
+  namespace: llm
+spec:
+  endpointSelector:
+    matchLabels:
+      app: sd-server-download
+  # Hugging Face: the Qwen-Image-2.1 weights (huggingface.co + its CDN)
+  egress:
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

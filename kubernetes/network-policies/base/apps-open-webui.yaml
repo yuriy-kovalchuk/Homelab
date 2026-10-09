@@ -24,6 +24,15 @@ spec:
         - ports:
             - port: "8080"
               protocol: TCP
+    # Image generation (AUTOMATIC1111-compatible API of stable-diffusion.cpp)
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: llm
+            app: sd-server
+      toPorts:
+        - ports:
+            - port: "1234"
+              protocol: TCP
     - toEntities:
         - kube-apiserver
       toPorts:

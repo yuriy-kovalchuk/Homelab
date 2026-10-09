@@ -1,0 +1,94 @@
+# Downloads the Qwen-Image-2.1 weights onto sd-server-models so the server pod
+# (which has no internet egress, see network-policies/base/apps-sd-server.yaml)
+# only ever reads them from the volume. Plain HTTPS, so a plain image.
+#
+# Each file is checked against its Hugging Face LFS SHA-256 (the same values
+# the repo's SHA256SUMS lists) and gets a `.done` marker; a rerun skips files
+# that already have one. Files land where deployment.yaml's args expect them:
+#   /models/diffusion_models/qwen-image-2.1-UC-Q8_0.gguf
+#   /models/text_encoders/qwen3vl_8b_int8_convrot.safetensors
+#   /models/vae/qwen_image_2.1_vae_bf16.safetensors
+#
+# Switching quant: add its line to FILES (path + sha256 from the HF tree API at
+# HF_REVISION), push (force: Flux recreates this immutable Job), wait for it to
+# complete, then point --diffusion-model at it in deployment.yaml.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sd-server-download
+  namespace: llm
+  annotations:
+    kustomize.toolkit.fluxcd.io/force: enabled
+spec:
+  backoffLimit: 6
+  template:
+    metadata:
+      labels:
+        app: sd-server-download
+    spec:
+      restartPolicy: OnFailure
+      # sd-server-models is a strict-local longhorn-gpu volume: its only replica
+      # is on worker-1. ReadWriteOnce is per node, so this runs beside the server.
+      nodeSelector:
+        kubernetes.io/hostname: worker-1
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: download
+          image: alpine:3.21
+          env:
+            # abenzerps/Qwen-Image-2.1-Uncensored-GGUF, pinned to the revision
+            # whose hashes are listed in FILES.
+            - name: HF_BASE
+              value: https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-GGUF/resolve/6b34e59458d3eb7ba6a6f86a116aed5253dc02c3
+            # <repo path> <sha256> <directory under /models>
+            - name: FILES
+              value: |
+                qwen-image-2.1-UC-Q8_0.gguf cde456c72ea3ecebfc1be783300e972711d875e0c5f1bed33d42b66b156affa8 diffusion_models
+                text_encoders/qwen3vl_8b_int8_convrot.safetensors 8bfd0f6e12abf2d2d697ecc888e5e90b0d6741d6708f05799f53afa560452e8f text_encoders
+                vae/qwen_image_2.1_vae_bf16.safetensors bb21f7473051e1ac368515dd3f2e15cd44d7a11748ee8823e1ddca3e4876b7c9 vae
+          command:
+            - sh
+            - -c
+            - |
+              set -eu
+              echo "$FILES" | while read -r src sha dir; do
+                [ -n "$src" ] || continue
+                f="/models/$dir/$(basename "$src")"
+                mkdir -p "/models/$dir"
+                if [ -f "$f.done" ]; then
+                  echo "[SKIP] $f already downloaded"; continue
+                fi
+                echo "[DL] $src"
+                wget -c -O "$f.part" "$HF_BASE/$src"
+                echo "$sha  $f.part" | sha256sum -c -
+                mv -f "$f.part" "$f"
+                date '+%Y-%m-%d %H:%M' > "$f.done"
+                echo "[OK] $f"
+              done
+              echo "all files present"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: "1"
+              memory: 256Mi
+          volumeMounts:
+            - name: models
+              mountPath: /models
+      volumes:
+        - name: models
+          persistentVolumeClaim:
+            claimName: sd-server-models

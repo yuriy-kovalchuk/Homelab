@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sd-server-models
+  namespace: llm
+spec:
+  # 1 replica, strict-local on worker-1 like strata-data: the weights are only
+  # useful next to the R9700, and loads stay on the node's NVMe.
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn-gpu
+  resources:
+    requests:
+      # Q8_0 transformer (7.6 GB) + int8 Qwen3-VL-8B text encoder (9.4 GB) + VAE
+      # (0.7 GB) = 17.7 GB; room for a second quant or a few LoRAs beside it.
+      storage: 50Gi
