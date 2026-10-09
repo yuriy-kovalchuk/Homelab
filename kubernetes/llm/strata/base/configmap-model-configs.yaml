@@ -20,6 +20,11 @@ data:
   # IQ3_XXS and IQ3_S have no such flag -- KV stays fully VRAM-resident for
   # both, competing with the expert cache for the same budget; a bigger
   # context here shrinks that cache further on both, more so on IQ3_S.
+  #
+  # "fit_max_tokens": true (also ours, not setup's) clamps a request's
+  # max_tokens to the context left after its prompt instead of 400ing.
+  # Clients like pi send a fixed max_tokens near the full context, which
+  # otherwise fails as soon as the prompt + that exceeds --max-context.
   strata-iq2_xs.json: |
     {
      "exe": "/opt/strata/engine/strata",
@@ -63,7 +68,8 @@ data:
      },
      "gpu": 0,
      "gpus_asked": true,
-     "host": "0.0.0.0"
+     "host": "0.0.0.0",
+     "fit_max_tokens": true
     }
   strata-iq3_xxs.json: |
     {
@@ -106,7 +112,8 @@ data:
      },
      "gpu": 0,
      "gpus_asked": true,
-     "host": "0.0.0.0"
+     "host": "0.0.0.0",
+     "fit_max_tokens": true
     }
   strata-iq3_s.json: |
     {
@@ -149,5 +156,6 @@ data:
      },
      "gpu": 0,
      "gpus_asked": true,
-     "host": "0.0.0.0"
+     "host": "0.0.0.0",
+     "fit_max_tokens": true
     }
