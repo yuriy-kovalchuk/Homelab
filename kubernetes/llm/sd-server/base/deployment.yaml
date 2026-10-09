@@ -37,8 +37,16 @@ spec:
             # Files written by sd-server-download (download-job.yaml).
             - --diffusion-model
             - /models/diffusion_models/qwen-image-2.1-UC-Q8_0.gguf
+            # Qwen's own Q8_0 GGUF of Qwen3-VL-8B-Instruct, not the int8_convrot
+            # safetensors: ggml-vulkan crashes (SIGBUS at libggml-vulkan.so+0x6239f)
+            # running int8_convrot on RADV. The int8 file stays on the PVC as a
+            # fallback: --llm it with --backend diffusion=Vulkan0,te=CPU,vae=Vulkan0.
             - --llm
-            - /models/text_encoders/qwen3vl_8b_int8_convrot.safetensors
+            - /models/text_encoders/Qwen3VL-8B-Instruct-Q8_0.gguf
+            # Vision tower for image edits (reference images); the GGUF text
+            # encoder doesn't carry it.
+            - --llm_vision
+            - /models/text_encoders/mmproj-Qwen3VL-8B-Instruct-F16.gguf
             - --vae
             - /models/vae/qwen_image_2.1_vae_bf16.safetensors
             - --diffusion-fa
@@ -63,8 +71,9 @@ spec:
               memory: 4Gi
             limits:
               cpu: "8"
-              # ~17.7 GB of weights pass through RAM on their way into the
-              # R9700's 32 GB (and stay there if --auto-fit ever spills).
+              # ~18 GB of weights pass through RAM on their way into the R9700's
+              # 32 GB (all of it fits there: 16.7 GB measured). On the 780M
+              # (UMA) the weights would count against this limit instead.
               memory: 24Gi
           # No /health route: /v1/models is the cheapest endpoint that answers
           # once the server is listening (it starts after the model context).

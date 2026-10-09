@@ -1,0 +1,19 @@
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: sd-server-radeon780m
+  namespace: llm
+spec:
+  spec:
+    devices:
+      requests:
+        - name: gpu
+          exactly:
+            deviceClassName: gpu.amd.com
+            allocationMode: ExactCount
+            count: 1
+            selectors:
+              - cel:
+                  # Radeon 780M iGPU (gfx1103) on worker-1 -- same card as
+                  # llama-cpp-igpu: only one of the two can hold it.
+                  expression: 'device.attributes["gpu.amd.com"].deviceID == "0x1900"'
