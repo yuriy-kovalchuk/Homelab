@@ -7,7 +7,7 @@ Configures OPNsense after the VM is running. Uses the OPNsense HTTP API via the 
 ```
 playbooks/opnsense/
 ├── site.yml               # runs all playbooks in order
-├── vlans.yml              # VLAN sub-interfaces (vtnet1.2–vtnet1.7)
+├── vlans.yml              # VLAN sub-interfaces (vtnet1.3–vtnet1.5)
 ├── interfaces.yml         # prints manual checklist (no API available)
 ├── dhcp.yml               # DHCP server per VLAN
 ├── reservations.yml       # static DHCP reservations for all nodes
@@ -15,13 +15,12 @@ playbooks/opnsense/
 ├── firewall.yml           # firewall rules (see NETWORK.md)
 ├── dns.yml                # Unbound DoT + per-VLAN port-53 redirect
 ├── proxmox.yml            # Proxmox management access + WAN block
-├── bgp.yml                # FRR BGP peering with Cilium (management cluster)
-└── temp_ap_setup.yml      # temporary: phys-workload → guest-wifi for AP setup
+└── bgp.yml                # FRR BGP peering with Cilium (workload cluster)
 ```
 
 > **interfaces.yml requires one manual step** before it can run: after `vlans.yml`
 > creates the VLAN devices, go to OPNsense GUI → Interfaces → Assignments and add
-> vtnet1.2 through vtnet1.7 in order. OPNsense assigns them as opt1–opt6.
+> vtnet1.3 through vtnet1.5 in order. OPNsense assigns them as opt2–opt4.
 
 ## Prerequisites
 
@@ -68,14 +67,11 @@ ansible-playbook -i inventories/prd/gateway playbooks/opnsense/vlans.yml
 
    | Device    | Description  |
    |-----------|--------------|
-   | vtnet1.2  | K8sMgmt      |
    | vtnet1.3  | Storage      |
    | vtnet1.4  | K8sWorkload  |
    | vtnet1.5  | PhysWorkload |
-   | vtnet1.6  | PrivateWifi  |
-   | vtnet1.7  | GuestWifi    |
 
-3. Click **Save** — OPNsense assigns them as `opt1` through `opt6`
+3. Click **Save** — OPNsense assigns them as `opt2` through `opt4`
 
 *2b. Clear the IP from the LAN trunk:*
 1. Go to **Interfaces → [LAN]**
@@ -85,12 +81,9 @@ ansible-playbook -i inventories/prd/gateway playbooks/opnsense/vlans.yml
 
 | Interface      | IPv4 Address |
 |----------------|--------------|
-| [K8sMgmt]      | 10.0.2.1/24  |
 | [Storage]      | 10.0.3.1/24  |
 | [K8sWorkload]  | 10.0.4.1/24  |
 | [PhysWorkload] | 10.0.5.1/24  |
-| [PrivateWifi]  | 10.0.6.1/24  |
-| [GuestWifi]    | 10.0.7.1/24  |
 
 Print this checklist in the terminal:
 ```bash
@@ -107,11 +100,13 @@ ansible-playbook -i inventories/prd/gateway playbooks/opnsense/dhcp.yml
 ansible-playbook -i inventories/prd/gateway playbooks/opnsense/reservations.yml
 ```
 
-| Hostname | IP       | MAC               |
-|----------|----------|-------------------|
-| mgmt-1   | 10.0.2.2 | fc:3f:db:0f:8e:18 |
-| truenas  | 10.0.3.3 | bc:24:11:19:5c:66 |
-| node-1   | 10.0.4.2 | 00:e0:4c:68:10:09 |
+| Hostname        | IP       | MAC               |
+|-----------------|----------|-------------------|
+| truenas         | 10.0.3.3 | bc:24:11:19:5c:66 |
+| controlplane-1  | 10.0.4.3 | 78:55:36:03:b1:e0 |
+| worker-1        | 10.0.4.4 | 38:05:25:32:8e:dc |
+| valefor         | 10.0.4.5 | fc:3f:db:0f:8e:18 |
+| ifrit           | 10.0.4.6 | 00:e0:4c:68:10:09 |
 
 **Step 5 — NAT (one GUI step first):**
 
@@ -145,25 +140,17 @@ ansible-playbook -i inventories/prd/gateway playbooks/opnsense/proxmox.yml
 ansible-playbook -i inventories/prd/gateway playbooks/opnsense/bgp.yml
 ```
 
-| Side     | ASN   | IP       |
-|----------|-------|----------|
-| OPNsense | 65551 | 10.0.2.1 |
-| mgmt-1   | 65001 | 10.0.2.2 |
+| Side           | ASN   | IP       |
+|----------------|-------|----------|
+| OPNsense       | 65551 | 10.0.4.1 |
+| controlplane-1 | 65002 | 10.0.4.3 |
+| worker-1       | 65002 | 10.0.4.4 |
+| valefor        | 65002 | 10.0.4.5 |
+| ifrit          | 65002 | 10.0.4.6 |
 
 **Or run everything at once:**
 ```bash
 ansible-playbook -i inventories/prd/gateway playbooks/opnsense/site.yml
-```
-
-## One-off tasks
-
-**Temporary phys-workload → guest-wifi access (AP setup):**
-```bash
-# Open
-ansible-playbook -i inventories/prd/gateway playbooks/opnsense/temp_ap_setup.yml
-
-# Close when done
-ansible-playbook -i inventories/prd/gateway playbooks/opnsense/temp_ap_setup.yml -e "state=absent"
 ```
 
 ## Network Design

@@ -5,7 +5,7 @@
 #
 # Verify the mode is correct: Firewall → NAT → Outbound → Mode = Automatic
 #
-# If VLANs have IPs configured (opt1-opt6) and automatic mode is on,
+# If VLANs have IPs configured (opt2-opt4) and automatic mode is on,
 # OPNsense generates NAT rules for all VLAN subnets automatically.
 # No manual rules are required here.
 #

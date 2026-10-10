@@ -18,12 +18,9 @@
 
           2. Set gateway IPs on each VLAN interface:
 
-             Interfaces → [K8sMgmt]     → enable → IPv4: Static → 10.0.2.1/24 → Save
              Interfaces → [Storage]     → enable → IPv4: Static → 10.0.3.1/24 → Save
              Interfaces → [K8sWorkload] → enable → IPv4: Static → 10.0.4.1/24 → Save
              Interfaces → [PhysWorkload]→ enable → IPv4: Static → 10.0.5.1/24 → Save
-             Interfaces → [PrivateWifi] → enable → IPv4: Static → 10.0.6.1/24 → Save
-             Interfaces → [GuestWifi]   → enable → IPv4: Static → 10.0.7.1/24 → Save
 
           3. Click Apply changes after all interfaces are saved.
 

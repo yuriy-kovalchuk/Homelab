@@ -1,0 +1,99 @@
+---
+# Kubernetes API virtual IP: HAProxy on OPNsense listens on 10.0.4.10:6443
+# (IP alias on the k8s-workload VLAN) and passes TCP through to the
+# control-plane nodes. TCP mode, not TLS termination — kubectl authenticates
+# with client certificates end to end.
+#
+# The API server cert must list 10.0.4.10 (Talos cluster.apiServer.certSANs),
+# otherwise clients reject it.
+#
+- name: Kubernetes API load balancer
+  hosts: opnsense
+  gather_facts: false
+  module_defaults:
+    group/oxlorg.opnsense.all:
+      firewall: "{{ opnsense_host }}"
+      api_key: "{{ opnsense_api_key }}"
+      api_secret: "{{ opnsense_api_secret }}"
+      ssl_verify: "{{ opnsense_ssl_verify }}"
+  vars:
+    k8s_api_vip: "10.0.4.10"
+    control_plane_nodes:
+      - { name: valefor, ip: "10.0.4.5" }
+      - { name: ifrit, ip: "10.0.4.6" }
+      - { name: shiva, ip: "10.0.4.7" }
+
+  tasks:
+    - name: Install os-haproxy plugin
+      oxlorg.opnsense.package:
+        name: os-haproxy
+        action: install
+
+    - name: Virtual IP for the Kubernetes API
+      oxlorg.opnsense.interface_vip:
+        address: "{{ k8s_api_vip }}/32"
+        interface: opt3
+        mode: ipalias
+        description: "k8s-api-vip"
+        reload: false
+
+    - name: Apply virtual IP
+      oxlorg.opnsense.reload:
+        target: interface_vip
+
+    # oxlorg.opnsense 26.1.11 haproxy_healthcheck reports "changed" but never
+    # saves, so create it through the raw API. Without a named check the
+    # generated server lines carry no "check" and dead nodes keep getting traffic.
+    - name: Look up existing health checks
+      oxlorg.opnsense.raw:
+        url: "haproxy/settings/search_healthchecks"
+        action: get
+      register: existing_healthchecks
+      changed_when: false
+
+    - name: Health check (TCP connect)
+      oxlorg.opnsense.raw:
+        url: "haproxy/settings/add_healthcheck"
+        action: post
+        data:
+          healthcheck:
+            name: k8s-api-tcp
+            description: "TCP connect to kube-apiserver"
+            type: tcp
+            interval: "2s"
+      when: existing_healthchecks.response.rows | selectattr('name', 'equalto', 'k8s-api-tcp') | list | length == 0
+
+    - name: Control-plane servers
+      oxlorg.opnsense.haproxy_server:
+        name: "k8s-api-{{ item.name }}"
+        address: "{{ item.ip }}"
+        port: 6443
+        reload: false
+      loop: "{{ control_plane_nodes }}"
+
+    - name: Backend pool
+      oxlorg.opnsense.haproxy_backend:
+        name: k8s-api
+        mode: tcp
+        algorithm: roundrobin
+        linked_servers: "{{ control_plane_nodes | map(attribute='name') | map('regex_replace', '^', 'k8s-api-') | list }}"
+        health_check_enabled: true
+        health_check: k8s-api-tcp
+        reload: false
+
+    - name: Frontend on the VIP
+      oxlorg.opnsense.haproxy_frontend:
+        name: k8s-api
+        bind: ["{{ k8s_api_vip }}:6443"]
+        mode: tcp
+        default_backend: k8s-api
+        reload: false
+
+    - name: Enable HAProxy
+      oxlorg.opnsense.haproxy_general_settings:
+        enabled: true
+        reload: false
+
+    - name: Apply HAProxy config
+      oxlorg.opnsense.reload:
+        target: haproxy

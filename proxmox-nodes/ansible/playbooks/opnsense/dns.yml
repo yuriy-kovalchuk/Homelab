@@ -32,18 +32,12 @@
 
   vars:
     vlan_interfaces:
-      - interface: opt1
-        description: "dns-redirect opt1 k8s-mgmt port 53 to unbound"
       - interface: opt2
         description: "dns-redirect opt2 storage port 53 to unbound"
       - interface: opt3
         description: "dns-redirect opt3 k8s-workload port 53 to unbound"
       - interface: opt4
         description: "dns-redirect opt4 phys-workload port 53 to unbound"
-      - interface: opt5
-        description: "dns-redirect opt5 private-wifi port 53 to unbound"
-      - interface: opt6
-        description: "dns-redirect opt6 guest-wifi port 53 to unbound"
 
   tasks:
     # -------------------------------------------------------------------------

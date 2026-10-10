@@ -1,11 +1,10 @@
 ---
-# Interface name mapping (OPNsense assigns opt1-opt6 in assignment order):
-#   opt1 = VLAN 2 — k8s-mgmt      (10.0.2.0/24)
+# Interface name mapping (opt-labels are assigned per-interface and stay
+# stable even after other VLANs are unassigned — opt2/opt3/opt4 kept their
+# labels when opt1/opt5/opt6 (VLAN 2/6/7) were removed):
 #   opt2 = VLAN 3 — storage        (10.0.3.0/24)
 #   opt3 = VLAN 4 — k8s-workload   (10.0.4.0/24)
 #   opt4 = VLAN 5 — phys-workload  (10.0.5.0/24)
-#   opt5 = VLAN 6 — private-wifi   (10.0.6.0/24)
-#   opt6 = VLAN 7 — guest-wifi     (10.0.7.0/24)
 #
 # All aliases and rules are created with reload: false.
 # A single reload at the end applies everything atomically — this avoids
@@ -39,10 +38,6 @@
           type: network
           content: ["10.0.0.0/16"]
           description: "All homelab subnets"
-        - name: VLAN2_NET
-          type: network
-          content: ["10.0.2.0/24"]
-          description: "k8s-mgmt"
         - name: VLAN3_NET
           type: network
           content: ["10.0.3.0/24"]
@@ -55,14 +50,6 @@
           type: network
           content: ["10.0.5.0/24"]
           description: "phys-workload"
-        - name: VLAN6_NET
-          type: network
-          content: ["10.0.6.0/24"]
-          description: "private-wifi"
-        - name: VLAN7_NET
-          type: network
-          content: ["10.0.7.0/24"]
-          description: "guest-wifi"
         - name: WEB_PORTS
           type: port
           content: ["80", "443"]
@@ -71,18 +58,6 @@
           type: port
           content: ["2049"]
           description: "NFS"
-        - name: NAS_PORTS
-          type: port
-          content: ["445", "2049"]
-          description: "NAS — SMB (445) + NFS (2049)"
-        - name: VAULT_HARBOR_PORTS
-          type: port
-          content: ["443", "8200"]
-          description: "Harbor (443) and Vault (8200)"
-        - name: TALOS_K8S_PORTS
-          type: port
-          content: ["6443", "50000"]
-          description: "Kubernetes API (6443) and Talos API (50000)"
 
     # -------------------------------------------------------------------------
     # Rules — WAN management access
@@ -101,106 +76,6 @@
         destination_net: "192.168.0.110/32"
         destination_port: "443"
         description: "wan-01 management access from home network"
-        reload: false
-        match_fields: ["description"]
-
-    # -------------------------------------------------------------------------
-    # Rules — opt1 (VLAN 2 — k8s-mgmt)
-    # OUT: storage (full), gateway DNS + NTP + HTTPS API + BGP, internet
-    # -------------------------------------------------------------------------
-
-    - name: "opt1 | k8s-mgmt → gateway (DNS)"
-      oxlorg.opnsense.rule:
-        sequence: 5
-        interface: ["opt1"]
-        direction: in
-        action: pass
-        protocol: "TCP/UDP"
-        source_net: VLAN2_NET
-        destination_net: "10.0.2.1/32"
-        destination_port: "53"
-        description: "opt1-05 k8s-mgmt to gateway dns"
-        reload: false
-        match_fields: ["description"]
-
-    - name: "opt1 | k8s-mgmt → gateway (NTP)"
-      oxlorg.opnsense.rule:
-        sequence: 6
-        interface: ["opt1"]
-        direction: in
-        action: pass
-        protocol: UDP
-        source_net: VLAN2_NET
-        destination_net: "10.0.2.1/32"
-        destination_port: "123"
-        description: "opt1-06 k8s-mgmt to gateway ntp"
-        reload: false
-        match_fields: ["description"]
-
-    - name: "opt1 | k8s-mgmt → gateway (HTTPS API)"
-      oxlorg.opnsense.rule:
-        sequence: 7
-        interface: ["opt1"]
-        direction: in
-        action: pass
-        protocol: TCP
-        source_net: VLAN2_NET
-        destination_net: "10.0.2.1/32"
-        destination_port: "443"
-        description: "opt1-07 k8s-mgmt to gateway https api"
-        reload: false
-        match_fields: ["description"]
-
-    - name: "opt1 | k8s-mgmt → gateway (BGP)"
-      oxlorg.opnsense.rule:
-        sequence: 8
-        interface: ["opt1"]
-        direction: in
-        action: pass
-        protocol: TCP
-        source_net: VLAN2_NET
-        destination_net: "10.0.2.1/32"
-        destination_port: "179"
-        description: "opt1-08 k8s-mgmt to gateway bgp"
-        reload: false
-        match_fields: ["description"]
-
-    - name: "opt1 | k8s-mgmt → storage (full)"
-      oxlorg.opnsense.rule:
-        sequence: 10
-        interface: ["opt1"]
-        direction: in
-        action: pass
-        source_net: VLAN2_NET
-        destination_net: VLAN3_NET
-        description: "opt1-10 k8s-mgmt to storage"
-        reload: false
-        match_fields: ["description"]
-
-    - name: "opt1 | k8s-mgmt → k8s-workload (Talos + K8s API)"
-      oxlorg.opnsense.rule:
-        sequence: 15
-        interface: ["opt1"]
-        direction: in
-        action: pass
-        protocol: TCP
-        source_net: VLAN2_NET
-        destination_net: VLAN4_NET
-        destination_port: TALOS_K8S_PORTS
-        description: "opt1-15 k8s-mgmt to k8s-workload talos and k8s api"
-        reload: false
-        match_fields: ["description"]
-
-    - name: "opt1 | k8s-mgmt → internet"
-      oxlorg.opnsense.rule:
-        sequence: 20
-        interface: ["opt1"]
-        direction: in
-        action: pass
-        source_net: VLAN2_NET
-        destination_invert: true
-        destination_net: HOMELAB_ALL
-        description: "opt1-20 k8s-mgmt to internet"
         reload: false
         match_fields: ["description"]
 
@@ -269,7 +144,7 @@
 
     # -------------------------------------------------------------------------
     # Rules — opt3 (VLAN 4 — k8s-workload)
-    # OUT: gateway DNS + NTP + HTTPS API + BGP, storage (full), k8s-mgmt (Vault+Harbor ports), internet
+    # OUT: gateway DNS + NTP + HTTPS API + BGP, storage (full), internet
     # -------------------------------------------------------------------------
 
     - name: "opt3 | k8s-workload → gateway (DNS)"
@@ -328,6 +203,20 @@
         reload: false
         match_fields: ["description"]
 
+    - name: "opt3 | k8s-workload → k8s API VIP (HAProxy)"
+      oxlorg.opnsense.rule:
+        sequence: 9
+        interface: ["opt3"]
+        direction: in
+        action: pass
+        protocol: TCP
+        source_net: VLAN4_NET
+        destination_net: "10.0.4.10/32"
+        destination_port: "6443"
+        description: "opt3-09 k8s-workload to k8s api vip"
+        reload: false
+        match_fields: ["description"]
+
     - name: "opt3 | k8s-workload → storage (full)"
       oxlorg.opnsense.rule:
         sequence: 10
@@ -337,20 +226,6 @@
         source_net: VLAN4_NET
         destination_net: VLAN3_NET
         description: "opt3-10 k8s-workload to storage"
-        reload: false
-        match_fields: ["description"]
-
-    - name: "opt3 | k8s-workload → k8s-mgmt (Vault + Harbor)"
-      oxlorg.opnsense.rule:
-        sequence: 20
-        interface: ["opt3"]
-        direction: in
-        action: pass
-        protocol: TCP
-        source_net: VLAN4_NET
-        destination_net: VLAN2_NET
-        destination_port: VAULT_HARBOR_PORTS
-        description: "opt3-20 k8s-workload to k8s-mgmt vault harbor"
         reload: false
         match_fields: ["description"]
 
@@ -369,22 +244,10 @@
 
     # -------------------------------------------------------------------------
     # Rules — opt4 (VLAN 5 — phys-workload)
-    # OUT: all homelab except guest (VLAN 7), internet
+    # OUT: all homelab, internet
     # -------------------------------------------------------------------------
 
-    - name: "opt4 | phys-workload → guest (block)"
-      oxlorg.opnsense.rule:
-        sequence: 5
-        interface: ["opt4"]
-        direction: in
-        action: block
-        source_net: VLAN5_NET
-        destination_net: VLAN7_NET
-        description: "opt4-05 phys-workload block to guest"
-        reload: false
-        match_fields: ["description"]
-
-    - name: "opt4 | phys-workload → homelab (all VLANs except guest)"
+    - name: "opt4 | phys-workload → homelab (all VLANs)"
       oxlorg.opnsense.rule:
         sequence: 10
         interface: ["opt4"]
@@ -406,68 +269,6 @@
         destination_invert: true
         destination_net: HOMELAB_ALL
         description: "opt4-20 phys-workload to internet"
-        reload: false
-        match_fields: ["description"]
-
-    # -------------------------------------------------------------------------
-    # Rules — opt5 (VLAN 6 — private-wifi)
-    # OUT: k8s-mgmt (shared services), storage (NFS), internet
-    # -------------------------------------------------------------------------
-
-    - name: "opt5 | private-wifi → k8s-mgmt (shared services)"
-      oxlorg.opnsense.rule:
-        sequence: 10
-        interface: ["opt5"]
-        direction: in
-        action: pass
-        source_net: VLAN6_NET
-        destination_net: VLAN2_NET
-        description: "opt5-10 private-wifi to k8s-mgmt"
-        reload: false
-        match_fields: ["description"]
-
-    - name: "opt5 | private-wifi → storage (NAS)"
-      oxlorg.opnsense.rule:
-        sequence: 20
-        interface: ["opt5"]
-        direction: in
-        action: pass
-        protocol: "TCP/UDP"
-        source_net: VLAN6_NET
-        destination_net: VLAN3_NET
-        destination_port: NAS_PORTS
-        description: "opt5-20 private-wifi to storage nas"
-        reload: false
-        match_fields: ["description"]
-
-    - name: "opt5 | private-wifi → internet"
-      oxlorg.opnsense.rule:
-        sequence: 30
-        interface: ["opt5"]
-        direction: in
-        action: pass
-        source_net: VLAN6_NET
-        destination_invert: true
-        destination_net: HOMELAB_ALL
-        description: "opt5-30 private-wifi to internet"
-        reload: false
-        match_fields: ["description"]
-
-    # -------------------------------------------------------------------------
-    # Rules — opt6 (VLAN 7 — guest-wifi)
-    # OUT: internet only — hard isolated
-    # -------------------------------------------------------------------------
-
-    - name: "opt6 | guest-wifi → internet only"
-      oxlorg.opnsense.rule:
-        sequence: 10
-        interface: ["opt6"]
-        direction: in
-        action: pass
-        source_net: VLAN7_NET
-        destination_invert: true
-        destination_net: HOMELAB_ALL
-        description: "opt6-10 guest to internet only"
         reload: false
         match_fields: ["description"]
 

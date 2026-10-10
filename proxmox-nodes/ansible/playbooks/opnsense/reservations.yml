@@ -9,6 +9,8 @@
       api_secret: "{{ opnsense_api_secret }}"
       ssl_verify: "{{ opnsense_ssl_verify }}"
   vars:
+    # 10.0.4.0/24 plan: .2–.9 control-plane nodes, .10 k8s API VIP,
+    # .11+ workers, .50–.99 Cilium LB pool, .100–.200 DHCP pool.
     reservations:
       - subnet: "10.0.3.0/24"
         ip: "10.0.3.3"
@@ -18,23 +20,18 @@
       - subnet: "10.0.4.0/24"
         ip: "10.0.4.6"
         mac: "00:e0:4c:68:10:09"
-        hostname: "controlplane-3"
-        description: "controlplane-3 workload control-plane"
-      - subnet: "10.0.4.0/24"
-        ip: "10.0.4.3"
-        mac: "78:55:36:03:b1:e0"
-        hostname: "controlplane-1"
-        description: "controlplane-1 workload control-plane"
-      - subnet: "10.0.4.0/24"
-        ip: "10.0.4.4"
-        mac: "38:05:25:32:8e:dc"
-        hostname: "worker-1"
-        description: "worker-1 workload worker"
+        hostname: "ifrit"
+        description: "ifrit workload control-plane"
       - subnet: "10.0.4.0/24"
         ip: "10.0.4.5"
         mac: "fc:3f:db:0f:8e:18"
-        hostname: "controlplane-2"
-        description: "controlplane-2 workload control-plane"
+        hostname: "valefor"
+        description: "valefor workload control-plane"
+      - subnet: "10.0.4.0/24"
+        ip: "10.0.4.7"
+        mac: "10:62:e5:17:93:cf"
+        hostname: "shiva"
+        description: "shiva workload control-plane"
   tasks:
     - name: Reserve node IPs
       oxlorg.opnsense.dhcp_reservation:
@@ -44,4 +41,9 @@
         hostname: "{{ item.hostname }}"
         description: "{{ item.description }}"
         state: present
+        reload: false
       loop: "{{ reservations }}"
+
+    - name: Reload DHCP config
+      oxlorg.opnsense.reload:
+        target: dhcp

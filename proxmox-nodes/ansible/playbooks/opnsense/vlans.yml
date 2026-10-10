@@ -10,12 +10,9 @@
       ssl_verify: "{{ opnsense_ssl_verify }}"
   vars:
     vlans:
-      - { id: 2, description: "k8s-mgmt" }
       - { id: 3, description: "storage" }
       - { id: 4, description: "k8s-workload" }
       - { id: 5, description: "phys-workload" }
-      - { id: 6, description: "private-wifi" }
-      - { id: 7, description: "guest-wifi" }
   tasks:
     - name: Create VLAN sub-interfaces on vtnet1
       oxlorg.opnsense.interface_vlan:
