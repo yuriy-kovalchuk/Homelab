@@ -2,7 +2,24 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - rbac.yaml
-  - configmap.yaml
   - service.yaml
   - deployment.yaml
   - httproute.yaml
+# Hash-suffixed name: any config edit changes the ConfigMap name in the
+# Deployment, so the pod rolls and the new one re-renders the page (see the
+# startupProbe in deployment.yaml). Every file Homepage looks for is listed,
+# because it tries to copy a default into the (read-only) config dir for any
+# that is missing.
+configMapGenerator:
+  - name: homepage
+    namespace: homepage
+    files:
+      - config/settings.yaml
+      - config/services.yaml
+      - config/widgets.yaml
+      - config/kubernetes.yaml
+      - config/bookmarks.yaml
+      - config/docker.yaml
+      - config/proxmox.yaml
+      - config/custom.css
+      - config/custom.js

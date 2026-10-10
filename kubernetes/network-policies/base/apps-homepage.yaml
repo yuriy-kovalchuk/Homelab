@@ -32,9 +32,15 @@ spec:
               protocol: TCP
             - port: "443"
               protocol: TCP
+    # siteMonitor status checks for everything outside the cluster: TrueNAS +
+    # its Traefik apps and OPNsense on 443, TrueNAS UI on 8443, Proxmox on 8006.
     - toEntities:
         - world
       toPorts:
         - ports:
             - port: "443"
+              protocol: TCP
+            - port: "8443"
+              protocol: TCP
+            - port: "8006"
               protocol: TCP

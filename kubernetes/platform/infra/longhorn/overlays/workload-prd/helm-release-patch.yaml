@@ -16,13 +16,16 @@ spec:
     defaultSettings:
       defaultReplicaCount: 3
       taintToleration: workload=gpu:NoSchedule
+      replicaAutoBalance: best-effort
     persistence:
       defaultClassReplicaCount: 3
-      # Replicas of the default class only on nodes tagged "always-on"
-      # (control planes) so data survives worker-1 shutdowns
+      # Replicas of the default class only on Longhorn nodes tagged "system"
+      # (control planes) so data survives worker shutdowns. The tag is set by
+      # the node.longhorn.io/default-node-tags annotation in each control
+      # plane's Talos config.
       defaultNodeSelector:
         enable: true
-        selector: "always-on"
+        selector: "system"
     csi:
       attacher:
         replicaCount: 2

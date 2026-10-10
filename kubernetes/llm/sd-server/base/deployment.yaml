@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sd-server
+  namespace: llm
+spec:
+  # Parked at 0 like the other R9700 Deployments (the apps Kustomization ignores
+  # /spec/replicas in llm): scale strata / llama-cpp / llama-cpp-rocm to 0, then
+  # this to 1.
+  replicas: 0
+  selector:
+    matchLabels:
+      app: sd-server
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: sd-server
+    spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: sd-server
+          # stable-diffusion.cpp master @ f2f168f (2026-10-09), Vulkan build -- has
+          # Qwen-Image-2.1 (added 2026-09-20). Upstream only publishes floating
+          # master-* tags, so this pins the index digest.
+          image: ghcr.io/leejet/stable-diffusion.cpp:master-vulkan@sha256:e0762b8ae0d01a07845b48d6454aa52aa3f6d242ce5f387d803163089c26d9e6
+          command:
+            - /sd-server
+          args:
+            - --listen-ip
+            - "0.0.0.0"
+            - --listen-port
+            - "1234"
+            # Files written by sd-server-download (download-job.yaml).
+            - --diffusion-model
+            - /models/diffusion_models/qwen-image-2.1-UC-Q8_0.gguf
+            # Qwen's own Q8_0 GGUF of Qwen3-VL-8B-Instruct, not the int8_convrot
+            # safetensors: ggml-vulkan crashes (SIGBUS at libggml-vulkan.so+0x6239f)
+            # running int8_convrot on RADV. The int8 file stays on the PVC as a
+            # fallback: --llm it with --backend diffusion=Vulkan0,te=CPU,vae=Vulkan0.
+            - --llm
+            - /models/text_encoders/Qwen3VL-8B-Instruct-Q8_0.gguf
+            # Vision tower for image edits (reference images); the GGUF text
+            # encoder doesn't carry it.
+            - --llm_vision
+            - /models/text_encoders/mmproj-Qwen3VL-8B-Instruct-F16.gguf
+            - --vae
+            - /models/vae/qwen_image_2.1_vae_bf16.safetensors
+            - --diffusion-fa
+            # Defaults for requests that don't set their own (upstream's
+            # docs/qwen_image_2.1.md example: cfg 6.0, euler; 20 steps is the
+            # engine default).
+            - --cfg-scale
+            - "6.0"
+            - --sampling-method
+            - euler
+          ports:
+            - name: http
+              containerPort: 1234
+              protocol: TCP
+          volumeMounts:
+            - name: models
+              mountPath: /models
+              readOnly: true
+          resources:
+            requests:
+              cpu: "1"
+              memory: 4Gi
+            limits:
+              cpu: "8"
+              # ~18 GB of weights pass through RAM on their way into the R9700's
+              # 32 GB (all of it fits there: 16.7 GB measured). On the 780M
+              # (UMA) the weights would count against this limit instead.
+              memory: 24Gi
+          # No /health route: /v1/models is the cheapest endpoint that answers
+          # once the server is listening (it starts after the model context).
+          startupProbe:
+            httpGet:
+              path: /v1/models
+              port: 1234
+            periodSeconds: 10
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /v1/models
+              port: 1234
+            periodSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /v1/models
+              port: 1234
+            periodSeconds: 30
+            # A generation can keep the server busy; give it room before a restart.
+            timeoutSeconds: 10
+            failureThreshold: 10
+      volumes:
+        - name: models
+          persistentVolumeClaim:
+            claimName: sd-server-models

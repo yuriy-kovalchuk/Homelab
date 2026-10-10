@@ -8,6 +8,10 @@ spec:
   revisionHistoryLimit: 3
   strategy:
     type: RollingUpdate
+    rollingUpdate:
+      # Keep the old pod serving until the new one has re-rendered the page.
+      maxUnavailable: 0
+      maxSurge: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: homepage
@@ -17,6 +21,7 @@ spec:
         app.kubernetes.io/name: homepage
     spec:
       serviceAccountName: homepage
+      # Needed: the kubernetes widget and the per-service pod status read the API.
       automountServiceAccountToken: true
       securityContext:
         runAsNonRoot: true
@@ -27,65 +32,75 @@ spec:
           type: RuntimeDefault
       containers:
         - name: homepage
-          image: ghcr.io/gethomepage/homepage:v1.13.1
+          image: ghcr.io/gethomepage/homepage:v2.4.0@sha256:643bd0be730d40f69d58028a55d1a896739333e8815786df42bc97f109ecbe61
           imagePullPolicy: IfNotPresent
           env:
             - name: HOMEPAGE_ALLOWED_HOSTS
               value: homepage.yuriykovalchuk.dev
+            # Logs to stdout only, so nothing writes into the read-only config dir.
+            - name: LOG_TARGETS
+              value: stdout
           ports:
             - name: http
               containerPort: 3000
               protocol: TCP
           securityContext:
             allowPrivilegeEscalation: false
+            # Must stay writable: re-rendering the page (below) writes the new
+            # HTML into /app/.next, which ships in the image.
             readOnlyRootFilesystem: false
             capabilities:
               drop:
                 - ALL
-            runAsNonRoot: true
-            runAsUser: 1000
-            seccompProfile:
-              type: RuntimeDefault
+          # The index page is pre-rendered when the image is built, from the
+          # default skeleton config. Until something calls /api/revalidate,
+          # every visitor first gets that default page and then the real
+          # services swap in client-side. The re-render only lives in the
+          # container's filesystem, so it's lost on every restart. Calling
+          # /api/revalidate as the startup probe re-renders the page from our
+          # config before the pod is ever marked Ready.
+          # Host header: Homepage rejects Hosts not in HOMEPAGE_ALLOWED_HOSTS
+          # (localhost:3000 is always allowed); kubelet would send the pod IP.
+          startupProbe:
+            httpGet:
+              path: /api/revalidate
+              port: http
+              httpHeaders:
+                - name: Host
+                  value: localhost:3000
+            periodSeconds: 5
+            timeoutSeconds: 10
+            failureThreshold: 24
+          readinessProbe:
+            httpGet:
+              path: /api/healthcheck
+              port: http
+              httpHeaders:
+                - name: Host
+                  value: localhost:3000
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/healthcheck
+              port: http
+              httpHeaders:
+                - name: Host
+                  value: localhost:3000
+            periodSeconds: 30
+            failureThreshold: 3
           resources:
             requests:
               cpu: 50m
               memory: 128Mi
             limits:
-              cpu: 200m
-              memory: 256Mi
+              cpu: 500m
+              memory: 384Mi
           volumeMounts:
+            # Whole directory, read-only, instead of per-file subPath mounts.
             - name: config
-              mountPath: /app/config/settings.yaml
-              subPath: settings.yaml
-            - name: config
-              mountPath: /app/config/services.yaml
-              subPath: services.yaml
-            - name: config
-              mountPath: /app/config/widgets.yaml
-              subPath: widgets.yaml
-            - name: config
-              mountPath: /app/config/kubernetes.yaml
-              subPath: kubernetes.yaml
-            - name: config
-              mountPath: /app/config/bookmarks.yaml
-              subPath: bookmarks.yaml
-            - name: config
-              mountPath: /app/config/docker.yaml
-              subPath: docker.yaml
-            - name: config
-              mountPath: /app/config/proxmox.yaml
-              subPath: proxmox.yaml
-            - name: config
-              mountPath: /app/config/custom.css
-              subPath: custom.css
-            - name: config
-              mountPath: /app/config/custom.js
-              subPath: custom.js
-            - name: logs
-              mountPath: /app/config/logs
+              mountPath: /app/config
+              readOnly: true
       volumes:
         - name: config
           configMap:
             name: homepage
-        - name: logs
-          emptyDir: {}

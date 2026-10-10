@@ -2,6 +2,10 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: longhorn-1r
+  annotations:
+    # StorageClass parameters are immutable; let Flux recreate it on change
+    # instead of failing the whole platform-infra apply.
+    kustomize.toolkit.fluxcd.io/force: enabled
 provisioner: driver.longhorn.io
 allowVolumeExpansion: true
 reclaimPolicy: Delete
@@ -11,5 +15,5 @@ parameters:
   staleReplicaTimeout: "30"
   fsType: ext4
   # Same placement restriction as the default class — control planes only,
-  # so the single copy doesn't land on worker-1, which isn't always-on.
-  nodeSelector: "always-on"
+  # so the single copy doesn't land on a worker that may be powered off.
+  nodeSelector: "system"

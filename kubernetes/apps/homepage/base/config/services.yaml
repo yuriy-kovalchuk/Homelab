@@ -1,0 +1,208 @@
+# Status sources:
+# - Kubernetes services use namespace + app/podSelector: pod state, CPU and
+#   memory straight from the API server (no request through the gateway).
+#   Workloads parked at replicas 0 (the R9700 ones) show as not running.
+# - Everything outside the cluster uses siteMonitor (homepage's egress policy
+#   allows world:443/8443/8006 for these).
+
+- AI:
+    - Open WebUI:
+        icon: open-webui.svg
+        href: https://chat.yuriykovalchuk.dev
+        description: Chat with the local models
+        namespace: open-webui
+        app: open-webui
+    - Strata:
+        icon: mdi-layers-triple
+        href: https://strata.yuriykovalchuk.dev
+        description: Qwen3.8 Flash-Next — R9700
+        namespace: llm
+        app: strata
+        podSelector: app=strata
+    - Image generation:
+        icon: mdi-palette
+        href: https://sd.yuriykovalchuk.dev
+        description: Qwen-Image-2.1 (sd.cpp) — R9700
+        namespace: llm
+        app: sd-server
+        podSelector: app=sd-server
+    - llama.cpp Vulkan:
+        icon: mdi-robot-outline
+        href: https://llama.yuriykovalchuk.dev
+        description: llama-server — R9700
+        namespace: llm
+        app: llama-cpp
+        podSelector: app=llama-cpp
+    - llama.cpp ROCm:
+        icon: mdi-robot-outline
+        href: https://rocm.yuriykovalchuk.dev
+        description: llama-server — R9700
+        namespace: llm
+        app: llama-cpp-rocm
+        podSelector: app=llama-cpp-rocm
+    - llama.cpp iGPU:
+        icon: mdi-robot-outline
+        href: https://vulkan-igpu.yuriykovalchuk.dev
+        description: llama-server — Radeon 780M
+        namespace: llm
+        app: llama-cpp-igpu
+        podSelector: app=llama-cpp-igpu
+
+- Apps:
+    - Immich:
+        icon: immich.svg
+        href: https://immich.yuriykovalchuk.dev
+        description: Photos
+        namespace: immich
+        app: immich
+        podSelector: app in (immich-server, immich-machine-learning)
+    - OpenCloud:
+        icon: owncloud.svg
+        href: https://opencloud.yuriykovalchuk.dev
+        description: Files
+        namespace: opencloud
+        app: opencloud
+        podSelector: app=opencloud
+    - Forgejo:
+        icon: forgejo.svg
+        href: https://git.yuriykovalchuk.dev
+        description: Git server
+        namespace: forgejo
+        app: forgejo
+    - Portfolio:
+        icon: mdi-briefcase-account
+        href: https://portfolio.yuriykovalchuk.dev
+        description: Personal portfolio
+        namespace: yk-portfolio
+        app: yk-portfolio
+        podSelector: app=yk-portfolio
+    - Update checker:
+        icon: mdi-update
+        href: https://yk-updates.yuriykovalchuk.dev
+        description: Dependency updates
+        namespace: yk-update-checker
+        app: yk-update-checker
+
+- Observability:
+    - Grafana:
+        icon: grafana.svg
+        href: https://grafana.yuriykovalchuk.dev
+        description: Dashboards — Mimir, Loki, Tempo
+        namespace: grafana
+        app: grafana
+    - Alertmanager:
+        icon: alertmanager.svg
+        href: https://alertmanager.yuriykovalchuk.dev
+        description: Alert routing to Slack
+        namespace: alertmanager
+        app: alertmanager
+    - Alloy:
+        icon: alloy.svg
+        href: https://alloy.yuriykovalchuk.dev
+        description: Telemetry collectors
+        namespace: k8s-monitoring
+        app: alloy-metrics
+    - Hubble:
+        icon: cilium.svg
+        href: https://hubble.yuriykovalchuk.dev
+        description: Cilium network flows
+        namespace: kube-system
+        app: hubble-ui
+    - Talos monitoring:
+        icon: talos.svg
+        href: https://talos-monitoring.yuriykovalchuk.dev
+        description: Talos node health
+        namespace: talos-monitoring
+        app: talos-monitoring
+
+- Platform:
+    - Flux:
+        icon: flux-cd.svg
+        href: https://fluxcd.yuriykovalchuk.dev
+        description: GitOps — workload-prd
+        namespace: flux-system
+        app: flux-operator
+    - Longhorn:
+        icon: longhorn.svg
+        href: https://longhorn.yuriykovalchuk.dev
+        description: Block storage
+        namespace: longhorn-system
+        app: longhorn
+    - Kyverno reporter:
+        icon: mdi-shield-check
+        href: https://kyverno-reporter.yuriykovalchuk.dev
+        description: Policy and vulnerability reports
+        namespace: kyverno-reporter
+        app: policy-reporter-ui
+    - Goldilocks:
+        icon: mdi-scale-balance
+        href: https://goldilocks.yuriykovalchuk.dev
+        description: VPA right-sizing
+        namespace: vpa
+        app: goldilocks
+        podSelector: app.kubernetes.io/name=goldilocks,app.kubernetes.io/component=dashboard
+
+# TrueNAS VM on the Proxmox storage node; the apps sit behind its Traefik.
+- Storage node:
+    - TrueNAS:
+        icon: truenas-scale.svg
+        href: https://10.0.3.3:8443/ui/
+        description: NAS — NFS, SMB, iSCSI
+        siteMonitor: https://10.0.3.3:8443/ui/
+    - Traefik:
+        icon: traefik.svg
+        href: https://traefik.yuriykovalchuk.dev
+        description: Reverse proxy for the apps below
+        siteMonitor: https://traefik.yuriykovalchuk.dev
+    - Vault:
+        icon: hashicorp-vault.svg
+        href: https://vault.yuriykovalchuk.dev
+        description: Secrets — synced by External Secrets
+        siteMonitor: https://vault.yuriykovalchuk.dev
+    - Harbor:
+        icon: harbor.svg
+        href: https://harbor.yuriykovalchuk.dev
+        description: Container registry
+        siteMonitor: https://harbor.yuriykovalchuk.dev
+    - RustFS:
+        icon: minio.svg
+        href: https://rustfs.yuriykovalchuk.dev
+        description: S3 console — API at s3.yuriykovalchuk.dev
+        siteMonitor: https://rustfs.yuriykovalchuk.dev
+    - Dockhand:
+        icon: docker.svg
+        href: https://dockhand.yuriykovalchuk.dev
+        description: Docker apps on TrueNAS
+        siteMonitor: https://dockhand.yuriykovalchuk.dev
+
+- Infrastructure:
+    - OPNsense:
+        icon: opnsense.svg
+        href: https://10.0.4.1
+        description: Firewall, VLANs, BGP
+        siteMonitor: https://10.0.4.1
+    - Proxmox gateway:
+        icon: proxmox.svg
+        href: https://192.168.0.254:8006
+        description: Hypervisor — OPNsense VM
+        siteMonitor: https://192.168.0.254:8006
+    - Proxmox storage:
+        icon: proxmox.svg
+        href: https://10.0.3.2:8006
+        description: Hypervisor — TrueNAS VM
+        siteMonitor: https://10.0.3.2:8006
+
+- Dev tools:
+    - HTTPBin:
+        icon: mdi-web
+        href: https://httpbin.yuriykovalchuk.dev
+        description: HTTP request testing
+        namespace: httpbin
+        app: httpbingo
+    - Whoami:
+        icon: mdi-account-question
+        href: https://whoami.yuriykovalchuk.dev
+        description: Request echo
+        namespace: whoami
+        app: whoami
+        podSelector: app=whoami

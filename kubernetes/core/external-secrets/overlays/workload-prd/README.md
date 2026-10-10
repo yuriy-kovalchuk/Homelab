@@ -53,7 +53,7 @@ CA=$(kubectl --kubeconfig ~/.kube/workload config view --minify --raw \
   -o jsonpath='{.clusters[0].cluster.certificate-authority-data}' | base64 -d)
 
 vault write auth/kubernetes/config \
-  kubernetes_host="https://10.0.4.3:6443" \
+  kubernetes_host="https://10.0.4.10:6443" \
   kubernetes_ca_cert="$CA" \
   token_reviewer_jwt="<token-from-step-1>"
 ```
