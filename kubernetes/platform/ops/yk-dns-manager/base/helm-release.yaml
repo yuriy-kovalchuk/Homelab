@@ -24,7 +24,7 @@ spec:
       provider: opnsense
       upsert: false
       settings:
-        base_url: "https://10.0.2.1/api"
+        base_url: "https://10.0.4.1/api"
         skip_tls_verify: "true"
         default_ttl: "300"
       existingSecret: "dns-manager-provider-credentials"

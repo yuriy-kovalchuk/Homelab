@@ -44,6 +44,22 @@ spec:
       replicas: 3
       zoneAwareReplication:
         enabled: false
+      # Chart default is only *preferred* anti-affinity plus a spread on a zone
+      # label these nodes don't have; require one ingester per node instead.
+      affinity: |
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  {{- include "tempo.selectorLabels" (dict "ctx" . "component" "ingester") | nindent 18 }}
+              topologyKey: kubernetes.io/hostname
+      topologySpreadConstraints: |
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              {{- include "tempo.selectorLabels" (dict "ctx" . "component" "ingester") | nindent 14 }}
       # WAL survives pod restarts; blocks flush to S3 continuously
       persistence:
         enabled: true

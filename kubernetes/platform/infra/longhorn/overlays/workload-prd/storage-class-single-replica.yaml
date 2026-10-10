@@ -12,6 +12,9 @@ reclaimPolicy: Delete
 volumeBindingMode: Immediate
 parameters:
   numberOfReplicas: "1"
+  # Keep the replica on the node running the pod: with one replica, a remote
+  # copy means a drain of *either* node breaks the volume.
+  dataLocality: "best-effort"
   staleReplicaTimeout: "30"
   fsType: ext4
   # Same placement restriction as the default class — control planes only,

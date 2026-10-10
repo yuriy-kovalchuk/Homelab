@@ -105,8 +105,15 @@ spec:
             kvstore:
               store: memberlist
 
+    # Hard one-per-node spread (chart default is ScheduleAnyway, which let the
+    # scheduler stack replicas): a node drain/upgrade then only ever takes out
+    # one replica of each component.
     distributor:
       replicas: 2
+      topologySpreadConstraints:
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
       extraArgs:
         auth.multitenancy-enabled: false
 
@@ -120,15 +127,31 @@ spec:
         size: 10Gi
         storageClass: "longhorn-1r"
       replicas: 3
+      topologySpreadConstraints:
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
 
     querier:
       replicas: 2
+      topologySpreadConstraints:
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
 
     query_frontend:
       replicas: 2
+      topologySpreadConstraints:
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
 
     query_scheduler:
       replicas: 2
+      topologySpreadConstraints:
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
 
     store_gateway:
       persistentVolume:
@@ -138,6 +161,10 @@ spec:
       zoneAwareReplication:
         enabled: false
       replicas: 3
+      topologySpreadConstraints:
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
 
     compactor:
       replicas: 1
