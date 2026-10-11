@@ -58,6 +58,10 @@ spec:
         memory: 1536Mi
 
     worker:
+      # The wait-for-backend init container polls the API server with kubectl;
+      # NetBox has no API access (network policy), and rqworker retries on its own.
+      waitForBackend:
+        enabled: false
       resources:
         requests:
           cpu: 50m
