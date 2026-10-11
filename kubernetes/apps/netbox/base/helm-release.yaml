@@ -25,8 +25,6 @@ spec:
       existingSecret: netbox-superuser
 
     timeZone: Europe/Rome
-    # Every page and API call requires a login
-    loginRequired: true
 
     # Bundled Bitnami subcharts off: Postgres is a CNPG cluster, Valkey is
     # deployed next to the release (valkey.yaml).

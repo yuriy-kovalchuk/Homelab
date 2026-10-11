@@ -1,0 +1,232 @@
+# Homelab inventory, loaded into NetBox by sync.py.
+# Same facts as docs/DEVICES.md and docs/NETWORK.md — change both together.
+
+site:
+  name: Homelab
+  slug: homelab
+
+tags:
+  - { name: talos, color: "2196f3", description: Talos Linux node }
+  - { name: not-always-on, color: "ff9800", description: Powered off at times; nothing critical runs here }
+  - { name: longhorn-system, color: "4caf50", description: "Longhorn node tag 'system' (default storage classes)" }
+  - { name: longhorn-gpu, color: "9c27b0", description: "Longhorn node tag 'gpu' (longhorn-gpu class)" }
+  - { name: gpu-only, color: "f44336", description: "Tainted workload=gpu:NoSchedule" }
+
+manufacturers: [Ubiquiti, MERCUSYS, TP-Link, Topton, Beelink, HP, Minisforum, AMD, Generic]
+
+device_roles:
+  - { name: Router, slug: router, color: "795548" }
+  - { name: Switch, slug: switch, color: "3f51b5" }
+  - { name: Access point, slug: access-point, color: "00bcd4" }
+  - { name: Hypervisor, slug: hypervisor, color: "607d8b" }
+  - { name: K8s control plane, slug: k8s-control-plane, color: "2196f3" }
+  - { name: K8s worker, slug: k8s-worker, color: "8bc34a" }
+
+platforms:
+  - { name: Proxmox VE, slug: proxmox-ve }
+  - { name: Talos Linux v1.14.2, slug: talos-1-14-2 }
+  - { name: OPNsense, slug: opnsense }
+  - { name: TrueNAS SCALE, slug: truenas-scale }
+
+device_types:
+  - { manufacturer: Generic, model: ISP router, slug: generic-isp-router }
+  - { manufacturer: Ubiquiti, model: USW-Flex-2.5G-8, slug: usw-flex-2-5g-8 }
+  - { manufacturer: MERCUSYS, model: MS105GS-M2, slug: ms105gs-m2 }
+  - { manufacturer: TP-Link, model: TL-WA1201, slug: tl-wa1201 }
+  - { manufacturer: Topton, model: N150 mini-PC, slug: topton-n150 }
+  - { manufacturer: Beelink, model: ME Mini NAS, slug: beelink-me-mini }
+  - { manufacturer: Beelink, model: SER5 Max, slug: beelink-ser5-max }
+  - { manufacturer: HP, model: EliteDesk 800 G2 DM 65W, slug: hp-elitedesk-800-g2-dm }
+  - { manufacturer: HP, model: ProDesk 600 G3 DM, slug: hp-prodesk-600-g3-dm }
+  - { manufacturer: HP, model: EliteDesk 800 G3 DM 65W, slug: hp-elitedesk-800-g3-dm }
+  - { manufacturer: Minisforum, model: AI series (Ryzen 7 255), slug: minisforum-ai-r7-255 }
+
+vlans:
+  - { vid: 3, name: storage, description: "Storage node and TrueNAS. UniFi 'Storage', OPNsense opt2" }
+  - { vid: 4, name: k8s-workload, description: "Talos nodes, API VIP, Cilium LB pool. UniFi 'Talos PRD', OPNsense opt3" }
+  - { vid: 5, name: trusted, description: "Trusted PCs, WiFi, switch management. UniFi 'Trusted', OPNsense opt4 (PhysWorkload)" }
+
+prefixes:
+  - { prefix: 10.0.0.0/16, status: container, description: "Homelab supernet (HOMELAB_ALL)" }
+  - { prefix: 10.0.3.0/24, vlan: 3, description: storage }
+  - { prefix: 10.0.4.0/24, vlan: 4, description: k8s-workload }
+  - { prefix: 10.0.5.0/24, vlan: 5, description: trusted }
+  - { prefix: 192.168.0.0/24, description: "Home LAN behind the ISP router (not managed here)" }
+
+ip_ranges:
+  - { start: 10.0.3.100/24, end: 10.0.3.200/24, description: Kea DHCP pool }
+  - { start: 10.0.4.2/24, end: 10.0.4.9/24, status: reserved, description: Control planes only }
+  - { start: 10.0.4.50/24, end: 10.0.4.99/24, description: "Cilium LoadBalancer pool (BGP, ASN 65002)" }
+  - { start: 10.0.4.100/24, end: 10.0.4.200/24, description: Kea DHCP pool }
+  - { start: 10.0.5.100/24, end: 10.0.5.200/24, description: "Kea DHCP pool (admin PC, WiFi clients)" }
+
+# Addresses that belong to no single interface
+standalone_ips:
+  - { address: 10.0.4.50/24, dns_name: "*.yuriykovalchuk.dev", description: "Cilium Gateway 'internal' — every HTTPS hostname" }
+
+devices:
+  - name: isp-router
+    type: generic-isp-router
+    role: router
+    description: ISP router, internet gateway (not managed here)
+    interfaces:
+      - { name: lan, type: other, ips: [192.168.0.1/24] }
+
+  - name: usw-flex
+    type: usw-flex-2-5g-8
+    role: switch
+    platform: null
+    description: Managed switch, UniFi controller; Device Management Network = trusted
+    interfaces:
+      - { name: Port 1, type: 2.5gbase-t, description: "Trunk — native None, tagged 3/4/5", mode: tagged, tagged_vlans: [3, 4, 5] }
+      - { name: Port 2, type: 2.5gbase-t, description: Storage, mode: access, untagged_vlan: 3 }
+      - { name: Port 3, type: 2.5gbase-t, description: Trusted, mode: access, untagged_vlan: 5 }
+      - { name: Port 4, type: 2.5gbase-t, description: Talos PRD, mode: access, untagged_vlan: 4 }
+      - { name: Port 5, type: 2.5gbase-t, description: Talos PRD workers, mode: access, untagged_vlan: 4 }
+      - { name: Port 6, type: 2.5gbase-t, description: Talos PRD workers, mode: access, untagged_vlan: 4 }
+      - { name: Port 7, type: 2.5gbase-t, description: "Unused, native Default", enabled: false }
+      - { name: Port 8, type: 2.5gbase-t, description: "Unused, native Default", enabled: false }
+      - { name: Port 9, type: 10gbase-t, description: "Management — admin PC (MAC d0:11:e5:81:14:af), native trusted", mode: access, untagged_vlan: 5 }
+      - { name: Port 10, type: 10gbase-x-sfpp, description: "SFP, unused, native Default", enabled: false }
+      - { name: mgmt, type: virtual, description: Switch management, ips: [10.0.5.5/24], primary: true }
+
+  - name: ms105gs
+    type: ms105gs-m2
+    role: switch
+    description: Unmanaged 2.5G switch for the control planes, behind usw-flex Port 4
+    interfaces:
+      - { name: Port 1, type: 2.5gbase-t }
+      - { name: Port 2, type: 2.5gbase-t }
+      - { name: Port 3, type: 2.5gbase-t }
+      - { name: Port 4, type: 2.5gbase-t }
+      - { name: Port 5, type: 2.5gbase-t, enabled: false }
+
+  - name: tl-wa1201
+    type: tl-wa1201
+    role: access-point
+    description: WiFi AP, single SSID on the trusted network; static IP set on the AP
+    interfaces:
+      - { name: eth0, type: 1000base-t, mac: "b0:19:21:de:28:ee", ips: [10.0.5.2/24], primary: true }
+
+  - name: gateway
+    type: topton-n150
+    role: hypervisor
+    platform: proxmox-ve
+    description: Proxmox host running the OPNsense VM
+    comments: "Intel N150, 16 GB DDR5, 128 GB NVMe"
+    interfaces:
+      - { name: eth0, type: other, description: "To ISP router (WAN)" }
+      - { name: eth3, type: 2.5gbase-t, description: "Trunk to usw-flex Port 1 (nic3 in Terraform)" }
+      - { name: vmbr0, type: bridge, description: WAN bridge, bridge_members: [eth0], ips: [192.168.0.254/24], primary: true }
+      - { name: vmbr1, type: bridge, description: VLAN-aware trunk bridge, bridge_members: [eth3] }
+
+  - name: storage
+    type: beelink-me-mini
+    role: hypervisor
+    platform: proxmox-ve
+    description: Proxmox host running the TrueNAS VM (storage controller passed through)
+    comments: "Intel N150 (Twin Lake), 16 GB LPDDR5-4800"
+    interfaces:
+      - { name: nic0, type: 2.5gbase-t, description: "Uplink to usw-flex Port 2 (OS interface name not recorded)" }
+      - { name: vmbr0, type: bridge, bridge_members: [nic0], ips: [10.0.3.2/24], primary: true }
+
+  - name: valefor
+    type: hp-elitedesk-800-g2-dm
+    role: k8s-control-plane
+    platform: talos-1-14-2
+    cluster: workload-prd
+    tags: [talos, longhorn-system]
+    comments: "Intel i5-6400T 4C/4T, 16 GB DDR4-2133, Kingston SV300 120 GB SATA. Schematic 613e1592…"
+    interfaces:
+      - { name: eno1, type: 1000base-t, description: Intel I219-LM, mac: "fc:3f:db:0f:8e:18", ips: [10.0.4.5/24], primary: true }
+
+  - name: ifrit
+    type: hp-prodesk-600-g3-dm
+    role: k8s-control-plane
+    platform: talos-1-14-2
+    cluster: workload-prd
+    tags: [talos, longhorn-system]
+    comments: "Intel i5-6500T 4C/4T, 32 GB DDR4-2133, Essencore 256 GB SATA. Schematic 613e1592…"
+    interfaces:
+      - { name: enp1s0, type: 2.5gbase-t, description: Realtek RTL8125, mac: "00:e0:4c:68:10:09", ips: [10.0.4.6/24], primary: true }
+      - { name: eno1, type: 1000base-t, description: "Onboard Intel I219-LM, unused", mac: "ac:e2:d3:04:3c:fb", enabled: false }
+
+  - name: shiva
+    type: hp-elitedesk-800-g3-dm
+    role: k8s-control-plane
+    platform: talos-1-14-2
+    cluster: workload-prd
+    tags: [talos, longhorn-system]
+    comments: "Intel i5-6500 4C/4T, 16 GB DDR4-2133, MicroFrom 256 GB SATA. Schematic 613e1592…"
+    interfaces:
+      - { name: eno1, type: 1000base-t, description: Intel I219-LM, mac: "10:62:e5:17:93:cf", ips: [10.0.4.7/24], primary: true }
+
+  - name: ixion
+    type: beelink-ser5-max
+    role: k8s-worker
+    platform: talos-1-14-2
+    cluster: workload-prd
+    status: offline
+    tags: [talos, not-always-on]
+    comments: "AMD Ryzen 7 6800H 8C/16T, 32 GB. No disk: the 128 GB OSC NVMe (SM2263XT) failed, replacement pending. Schematic 65cf8364…"
+    interfaces:
+      - { name: eno1, type: other, mac: "78:55:36:03:b1:e0", ips: [10.0.4.11/24], primary: true }
+    inventory:
+      - { name: Radeon 680M, manufacturer: AMD, part_id: "0x1681", description: "iGPU, Rembrandt gfx1035 — Immich via DRA" }
+
+  - name: bahamut
+    type: minisforum-ai-r7-255
+    role: k8s-worker
+    platform: talos-1-14-2
+    cluster: workload-prd
+    tags: [talos, not-always-on, longhorn-gpu, gpu-only]
+    comments: "AMD Ryzen 7 255 8C/16T, 64 GB DDR5-5600, Crucial P310 1 TB NVMe. Label ai-node=oculink. Schematic 65cf8364…"
+    interfaces:
+      - { name: enp4s0, type: 2.5gbase-t, description: Realtek RTL8125, mac: "38:05:25:32:8e:dc", ips: [10.0.4.12/24], primary: true }
+    inventory:
+      - { name: Radeon AI PRO R9700, manufacturer: AMD, part_id: "0x7551", description: "Navi 48 gfx1201 on OCuLink — llama-cpp, strata, sd-server" }
+      - { name: Radeon 780M, manufacturer: AMD, part_id: "0x1900", description: "iGPU, HawkPoint gfx1103 — llama-cpp-igpu" }
+
+cables:
+  - [gateway/eth0, isp-router/lan]
+  - [gateway/eth3, usw-flex/Port 1]
+  - [storage/nic0, usw-flex/Port 2]
+  - [tl-wa1201/eth0, usw-flex/Port 3]
+  - [ms105gs/Port 1, usw-flex/Port 4]
+  - [valefor/eno1, ms105gs/Port 2]
+  - [ifrit/enp1s0, ms105gs/Port 3]
+  - [shiva/eno1, ms105gs/Port 4]
+  - [ixion/eno1, usw-flex/Port 5]
+  - [bahamut/enp4s0, usw-flex/Port 6]
+
+clusters:
+  - { name: gateway, type: Proxmox VE, device: gateway }
+  - { name: storage, type: Proxmox VE, device: storage }
+  - { name: workload-prd, type: Kubernetes, description: "Talos v1.14.2, Kubernetes v1.37.1, Cilium 1.20.1, Flux" }
+
+virtual_machines:
+  - name: opnsense
+    cluster: gateway
+    role: router
+    platform: opnsense
+    vcpus: 2
+    memory: 8196     # MB
+    disk: 32         # GB
+    description: "Router/firewall: Unbound, Kea, FRR BGP (ASN 65551), HAProxy API VIP. VM ID 1001"
+    interfaces:
+      - { name: vtnet0, description: "WAN on vmbr0", ips: [192.168.0.110/24], primary: true }
+      - { name: vtnet1, description: "VLAN trunk on vmbr1", mac: "bc:24:11:a3:2a:24", mode: tagged, tagged_vlans: [3, 4, 5] }
+      - { name: vtnet1.3, parent: vtnet1, description: opt2 Storage, mode: access, untagged_vlan: 3, ips: [10.0.3.1/24] }
+      - { name: vtnet1.4, parent: vtnet1, description: opt3 K8sWorkload, mode: access, untagged_vlan: 4,
+          ips: [10.0.4.1/24, { address: 10.0.4.10/24, role: vip, description: "Kubernetes API VIP — HAProxy → control planes :6443" }] }
+      - { name: vtnet1.5, parent: vtnet1, description: opt4 PhysWorkload (trusted), mode: access, untagged_vlan: 5, ips: [10.0.5.1/24] }
+
+  - name: truenas
+    cluster: storage
+    platform: truenas-scale
+    vcpus: 3
+    memory: 12000
+    disk: 32
+    description: "NFS/iSCSI/SMB; apps: Vault, Harbor, RustFS (S3), Traefik, Dockhand. VM ID 1000"
+    interfaces:
+      - { name: net0, description: "On vmbr0 (OS interface name not recorded)", mac: "bc:24:11:19:5c:66", ips: [10.0.3.3/24], primary: true }

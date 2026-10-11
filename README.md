@@ -70,6 +70,7 @@ Homelab/
 ├── proxmox-nodes/
 │   ├── terraform/            Terragrunt: OPNsense VM, TrueNAS VM, TrueNAS datasets and apps, Proxmox ACME
 │   └── ansible/              OPNsense configuration (VLANs, DHCP, firewall, DNS, BGP, HAProxy) and the Docker VM
+├── netbox/                homelab.yaml (devices, cabling, VLANs, IPs, VMs) + sync.py that loads it into NetBox
 ├── docs/
 ├── devbox.json               Pinned CLI tooling
 └── devbox_scripts/
