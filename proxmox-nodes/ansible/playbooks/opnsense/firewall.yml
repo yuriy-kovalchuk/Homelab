@@ -291,7 +291,7 @@
     # OUT: gateway DNS + NTP, every homelab VLAN (full admin from the tailnet —
     #      the tailnet policy decides who), internet only for Tailscale + apt.
     # IN:  nothing; only trusted (opt4-10) can reach the VM, for management.
-    # Proxmox (WAN side) access is in proxmox.yml.
+    # The gateway Proxmox host is on the trusted VLAN (10.0.5.3), so opt1-10 covers it.
     # -------------------------------------------------------------------------
     - name: "opt1 | remote-access → gateway (DNS)"
       oxlorg.opnsense.rule:
@@ -334,8 +334,7 @@
         match_fields: ["description"]
 
     # The internet rules below match "not HOMELAB_ALL", which would include
-    # the home LAN (ISP router admin page, other home devices). Proxmox on the
-    # home LAN is allowed earlier (opt1-15, proxmox.yml).
+    # the home LAN (ISP router admin page, other home devices).
     - name: "opt1 | remote-access → home LAN (block)"
       oxlorg.opnsense.rule:
         sequence: 18

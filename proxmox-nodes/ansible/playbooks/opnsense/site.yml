@@ -6,4 +6,3 @@
 - import_playbook: nat.yml
 - import_playbook: firewall.yml
 - import_playbook: dns.yml
-- import_playbook: proxmox.yml

@@ -96,6 +96,12 @@ One broken CEL expression denies every workload that shares those policyRefs; gu
 - `unbound/service/dnsbl` re-downloads every blocklist (~1 min of no DNS) and needs `timeout: 180`. The HaGeZi VPN-bypass list blocks Tailscale; the allowlist in `dns.yml` must stay.
 - To see why traffic is blocked, read `diagnostics/firewall/log` (newest first) instead of guessing.
 
+## Gateway host (Proxmox) management
+
+- Management is `10.0.5.3` on `vmbr1.5` (trusted VLAN); `vmbr0` carries no host address (OPNsense WAN only). Break-glass: `nic1`/`vmbr9` at `172.30.0.1/24`, direct laptop cable. All in `proxmox-nodes/terraform/prd/gateway/network` (`lockdown` true = normal, false = rebuild via `192.168.0.254`).
+- Flipping `lockdown` removes the address Terraform may be talking to: set `GATEWAY_PROXMOX_ENDPOINT` to the address that survives the change first, and run from trusted or break-glass.
+- The cluster cannot reach the trusted VLAN by design, so nothing in Kubernetes (e.g. Homepage siteMonitor) may depend on reaching `10.0.5.3`.
+
 ## Tailscale (remote access)
 
 - Subnet router VM `tailscale` (10.0.6.10, VLAN 6, gateway host). Remote clients are SNATed to it, so Cilium policies that allow outside clients (`allow-gateway-frontend`, `allow-kube-system`) list `10.0.6.10/32`.

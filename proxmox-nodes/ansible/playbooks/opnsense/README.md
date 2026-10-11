@@ -14,7 +14,6 @@ playbooks/opnsense/
 ├── nat.yml                # outbound NAT masquerade  ⚠️ requires manual step
 ├── firewall.yml           # firewall rules (see NETWORK.md)
 ├── dns.yml                # Unbound DoT + per-VLAN port-53 redirect
-├── proxmox.yml            # Proxmox management access + WAN block
 └── bgp.yml                # FRR BGP peering with Cilium (workload cluster)
 ```
 
@@ -131,12 +130,7 @@ ansible-playbook -i inventories/prd/gateway playbooks/opnsense/dns.yml
 
 Configures Cloudflare DoT upstreams (`1.1.1.1`/`1.0.0.1` over TLS 853), per-VLAN transparent DNS redirect (port 53 → Unbound), and WAN egress block on port 53.
 
-**Step 8 — Proxmox access:**
-```bash
-ansible-playbook -i inventories/prd/gateway playbooks/opnsense/proxmox.yml
-```
-
-**Step 9 — BGP (Cilium peering):**
+**Step 8 — BGP (Cilium peering):**
 ```bash
 ansible-playbook -i inventories/prd/gateway playbooks/opnsense/bgp.yml
 ```

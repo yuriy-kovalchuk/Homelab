@@ -57,6 +57,7 @@ prefixes:
   - { prefix: 10.0.6.0/24, vlan: 6, description: remote-access }
   - { prefix: 100.64.0.0/10, description: "Tailnet (addresses assigned by Tailscale)" }
   - { prefix: 192.168.0.0/24, description: "Home LAN behind the ISP router (not managed here)" }
+  - { prefix: 172.30.0.0/24, description: "Break-glass: gateway host nic1, direct cable only, not routed" }
 
 ip_ranges:
   - { start: 10.0.3.100/24, end: 10.0.3.200/24, description: Kea DHCP pool }
@@ -120,10 +121,14 @@ devices:
     description: Proxmox host running the OPNsense and Tailscale VMs
     comments: "Intel N150, 16 GB DDR5, 128 GB NVMe"
     interfaces:
-      - { name: eth0, type: other, description: "To ISP router (WAN)" }
-      - { name: eth3, type: 2.5gbase-t, description: "Trunk to usw-flex Port 1 (nic3 in Terraform)" }
-      - { name: vmbr0, type: bridge, description: WAN bridge, bridge_members: [eth0], ips: [192.168.0.254/24], primary: true }
-      - { name: vmbr1, type: bridge, description: VLAN-aware trunk bridge, bridge_members: [eth3] }
+      - { name: nic0, type: other, description: "To ISP router (WAN)" }
+      - { name: nic1, type: other, description: "Break-glass port: direct laptop cable only", mac: "00:d0:b4:04:8c:a2" }
+      - { name: nic2, type: other, description: Spare, enabled: false }
+      - { name: nic3, type: 2.5gbase-t, description: "Trunk to usw-flex Port 1" }
+      - { name: vmbr0, type: bridge, description: "WAN bridge for OPNsense; no host address after lockdown", bridge_members: [nic0] }
+      - { name: vmbr1, type: bridge, description: VLAN-aware trunk bridge, bridge_members: [nic3] }
+      - { name: vmbr1.5, type: virtual, description: "Host management on the trusted VLAN", mode: access, untagged_vlan: 5, ips: [10.0.5.3/24], primary: true }
+      - { name: vmbr9, type: bridge, description: "Break-glass bridge, no gateway", bridge_members: [nic1], ips: [172.30.0.1/24] }
 
   - name: storage
     type: beelink-me-mini
@@ -193,8 +198,8 @@ devices:
       - { name: Radeon 780M, manufacturer: AMD, part_id: "0x1900", description: "iGPU, HawkPoint gfx1103 — llama-cpp-igpu" }
 
 cables:
-  - [gateway/eth0, isp-router/lan]
-  - [gateway/eth3, usw-flex/Port 1]
+  - [gateway/nic0, isp-router/lan]
+  - [gateway/nic3, usw-flex/Port 1]
   - [storage/nic0, usw-flex/Port 2]
   - [tl-wa1201/eth0, usw-flex/Port 3]
   - [ms105gs/Port 1, usw-flex/Port 4]
@@ -244,7 +249,7 @@ virtual_machines:
     vcpus: 1
     memory: 1024
     disk: 8
-    description: "Tailscale subnet router (homelab-router, tag:homelab-router). VM ID 1010. Advertises 10.0.3.0/24, 10.0.4.0/24, 10.0.5.0/24, 10.0.6.1/32, 192.168.0.254/32"
+    description: "Tailscale subnet router (homelab-router, tag:homelab-router). VM ID 1010. Advertises 10.0.3.0/24, 10.0.4.0/24, 10.0.5.0/24, 10.0.6.1/32"
     interfaces:
       - { name: eth0, description: "On vmbr1, tag 6", mac: "bc:24:11:e3:11:6a", mode: access, untagged_vlan: 6, ips: [10.0.6.10/24], primary: true }
       - { name: tailscale0, description: Tailnet interface, ips: [100.67.182.63/32] }

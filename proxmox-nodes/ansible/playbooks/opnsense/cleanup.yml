@@ -2,7 +2,6 @@
 # Removes all Ansible-managed aliases, firewall rules, d_nat rules, and DNS config:
 #   firewall.yml  — aliases and filter rules
 #   dns.yml       — DoT upstreams, d_nat redirect rules, WAN port-53 block
-#   proxmox.yml   — PROXMOX/PROXMOX_PORTS aliases, opt4 and WAN rules
 #
 - name: Remove Ansible-managed firewall rules, aliases, and DNS config
   hosts: opnsense

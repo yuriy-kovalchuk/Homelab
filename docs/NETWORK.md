@@ -15,10 +15,13 @@ flowchart TB
 
     subgraph gw["gateway — Proxmox on Topton N150"]
         direction TB
-        eth0["eth0"]
-        eth3["eth3 (nic3)"]
-        vmbr0["vmbr0<br/>WAN bridge"]
+        eth0["nic0"]
+        eth3["nic3"]
+        nic1["nic1<br/>break-glass"]
+        vmbr0["vmbr0<br/>WAN bridge, no host IP"]
         vmbr1["vmbr1<br/>VLAN-aware trunk"]
+        mgmt["vmbr1.5<br/>host management<br/>(trusted VLAN)"]
+        vmbr9["vmbr9<br/>break-glass, no gateway"]
         subgraph opn["OPNsense VM"]
             wan["vtnet0 — WAN"]
             lan["vtnet1 — VLAN trunk<br/>VLAN 3 / 4 / 5 / 6 gateways"]
@@ -30,7 +33,10 @@ flowchart TB
         eth0 --- vmbr0 --- wan
         eth3 --- vmbr1 --- lan
         ts ---|"tag 6"| vmbr1
+        vmbr1 --- mgmt
+        nic1 --- vmbr9
     end
+    laptop["laptop<br/>(emergency only)"] -.->|direct cable| nic1
 
     subgraph sw["UniFi USW-Flex-2.5G-8"]
         p1["1 Trunk"]
@@ -86,8 +92,10 @@ flowchart TB
 - **VLAN 6 exists only inside the gateway host.** The Tailscale VM and
   OPNsense's `vtnet1` share `vmbr1`, so remote-access traffic never touches the
   switch, and always passes OPNsense's firewall.
-- **The Proxmox gateway host's own management** is on the home LAN, not a
-  VLAN. Home-LAN devices reach it without passing OPNsense.
+- **The gateway host's management is on the trusted VLAN** (`vmbr1.5`), not
+  on the home LAN. Home-LAN devices cannot reach it; trusted PCs reach it at
+  L2, so it works even with OPNsense down. A spare NIC (`nic1`) is a
+  break-glass port for a direct laptop cable.
 
 ## VLANs
 
@@ -151,7 +159,6 @@ sequence order per interface.
 | Interface | Rule | Action |
 |-----------|------|--------|
 | WAN | wan-01 | home LAN → OPNsense web/API (443) — **targets the old WAN address `.110`, see DEVICES.md** |
-| WAN | wan-02 | **block** any → gateway Proxmox SSH/web UI (22, 8006) |
 | WAN | dns | **block** port 53 leaving through WAN (DNS only leaves over DoT) |
 | storage (opt2) | opt2-05 | → OPNsense DNS |
 | storage (opt2) | opt2-08 / 10 | → internet: DNS, HTTP/HTTPS only |
@@ -161,30 +168,51 @@ sequence order per interface.
 | k8s-workload (opt3) | opt3-10 | → storage, all ports |
 | k8s-workload (opt3) | opt3-30 | → internet |
 | trusted (opt4) | opt4-10 | → every homelab VLAN, incl. remote-access (SSH to the Tailscale VM) |
-| trusted (opt4) | opt4-20 | → internet; also how trusted reaches the gateway Proxmox on the home LAN |
+| trusted (opt4) | opt4-20 | → internet |
 | remote-access (opt1) | opt1-05 / 06 | → OPNsense DNS, NTP |
-| remote-access (opt1) | opt1-10 | → every homelab VLAN, all ports (full admin; the tailnet policy decides who) |
-| remote-access (opt1) | opt1-15 | → gateway Proxmox SSH/web UI (22, 8006) — in `proxmox.yml` |
+| remote-access (opt1) | opt1-10 | → every homelab VLAN, all ports, incl. the gateway Proxmox on trusted (full admin; the tailnet policy decides who) |
 | remote-access (opt1) | opt1-18 | **block** → rest of the home LAN (`192.168.0.0/16`, `172.16.0.0/12`) |
 | remote-access (opt1) | opt1-20 | → internet TCP 80/443 (Tailscale control, DERP relays, apt) |
 | remote-access (opt1) | opt1-21 | → internet UDP 41641/3478 (Tailscale direct WireGuard, STUN) |
 
 In short: **trusted** can reach everything; **remote-access** reaches the
-whole lab and the gateway Proxmox, but not the rest of the home LAN, and the
+whole lab (incl. both Proxmox hosts), but not the home LAN, and the
 internet only for Tailscale and updates; **k8s-workload** reaches storage, the
 internet and the gateway services it needs; **storage** only answers, except
 for internet updates and Vault calling the Kubernetes API. Nothing may open
 connections into remote-access except trusted.
 
-**Host-type aliases (`PROXMOX`) are only filled by an alias reconfigure.** A
-rule reload alone leaves their table empty, and every rule using them then
-silently matches nothing. `firewall.yml` and `proxmox.yml` reconfigure aliases
-before reloading rules.
+**Host-type aliases are only filled by an alias reconfigure.** A rule reload
+alone leaves their table empty, and every rule using them then silently
+matches nothing. `firewall.yml` reconfigures aliases before reloading rules.
+
+**Gap still open:** k8s-workload's internet rule (`opt3-30`, "not homelab")
+also matches the home LAN, so pods can reach the ISP router and other home
+devices. The same block as `opt1-18` would close it.
 
 Inside Kubernetes, Cilium only lets clients from outside the cluster reach
 the `internal` Gateway (80/443) from the trusted VLAN and from the Tailscale
 VM's address (`allow-gateway-frontend`, `allow-kube-system`). App policies
 trust the Gateway, so they don't need changes for new client networks.
+
+## Gateway host management
+
+The gateway Proxmox host runs OPNsense, so its own management must not depend
+on the network it hosts more than necessary.
+
+| Path | Address | Works when |
+|------|---------|-----------|
+| Trusted VLAN (normal) | `https://10.0.5.3:8006` | Switch and trunk up; OPNsense not needed (same L2 as trusted PCs) |
+| Tailscale | same address, via the subnet router | OPNsense up |
+| Break-glass | `https://172.30.0.1:8006`, laptop `172.30.0.2/24` on a cable into `nic1` | Host up — nothing else needed |
+| Physical console | keyboard and monitor | Always |
+
+Managed by `proxmox-nodes/terraform/prd/gateway/network` with a `lockdown`
+switch: `false` puts the management address back on the home LAN
+(`192.168.0.254`, gateway the ISP router) for a rebuild, `true` is normal
+operation (no host address on `vmbr0`, default route via OPNsense). Switch it
+only from a path that survives the change (trusted or break-glass), and point
+`GATEWAY_PROXMOX_ENDPOINT` at the address that will still exist afterwards.
 
 ## Remote access (Tailscale)
 
@@ -202,8 +230,9 @@ traversal works, otherwise through a DERP relay (nearest: Frankfurt).
 2. **OPNsense rules on opt1** (table above). The VM SNATs remote traffic, so
    the lab sees every remote client as the VM's address.
 
-**Advertised routes:** storage, k8s-workload and trusted subnets, OPNsense's
-VLAN 6 address (the split-DNS resolver) and the gateway Proxmox. Split DNS
+**Advertised routes:** storage, k8s-workload and trusted subnets (the trusted
+one includes the gateway Proxmox) and OPNsense's VLAN 6 address (the
+split-DNS resolver). Split DNS
 sends `yuriykovalchuk.dev` to Unbound on VLAN 6, so app hostnames resolve to
 the Gateway exactly as at home.
 
@@ -228,7 +257,7 @@ hardware would remove that risk.
 | Tailnet policy, split DNS, settings, router auth key | `proxmox-nodes/terraform/prd/tailscale` (module `_modules/tailscale-tailnet`), OAuth client credentials in `.env` |
 | The OAuth client itself | `proxmox-nodes/terraform/prd/tailscale-bootstrap` — applied only with a short-lived `TAILSCALE_API_KEY` |
 | VM configuration (Tailscale, forwarding, updates, NTP) | `proxmox-nodes/ansible/playbooks/tailscale.yml`, inventory `inventories/prd/remote-access` |
-| OPNsense rules | `firewall.yml` (opt1-*), `proxmox.yml` (opt1-15), `dns.yml` (redirect) |
+| OPNsense rules | `firewall.yml` (opt1-*), `dns.yml` (redirect) |
 
 ## DNS
 
@@ -296,8 +325,6 @@ Mostly Ansible (`proxmox-nodes/ansible/playbooks/opnsense/`, run against
 4. `nat.yml` — checks outbound NAT is Automatic.
 5. `firewall.yml` — aliases and rules.
 6. `dns.yml` — Unbound DoT, DNSBL allowlist, DNS redirect, WAN port-53 block.
-7. `proxmox.yml` — Proxmox management access.
-
 Run separately: `reservations.yml` (static leases), `bgp.yml` (FRR),
 `k8s_api_lb.yml` (HAProxy VIP). The Tailscale VM itself is configured by
 `playbooks/tailscale.yml` against `inventories/prd/remote-access`.

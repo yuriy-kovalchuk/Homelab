@@ -19,7 +19,7 @@ reservation changes; static leases are defined in
 
 | Host | Hardware | Role |
 |------|----------|------|
-| gateway | Topton mini-PC, Intel N150, 16 GB DDR5, 128 GB NVMe | Runs the OPNsense and Tailscale VMs. `eth0` → ISP router (`vmbr0`, WAN); `eth3` → switch port 1 (`vmbr1`, VLAN trunk, `nic3` in Terraform) |
+| gateway | Topton mini-PC, Intel N150, 16 GB DDR5, 128 GB NVMe, 4 NICs | Runs the OPNsense and Tailscale VMs. `nic0` → ISP router (`vmbr0`, OPNsense WAN, no host address); `nic3` → switch port 1 (`vmbr1`, VLAN trunk); `nic1` = break-glass port (`vmbr9`); `nic2` spare. Management on `vmbr1.5` (trusted VLAN). Host networking: `proxmox-nodes/terraform/prd/gateway/network` |
 | storage | Beelink ME Mini NAS, Intel N150 (Twin Lake), 16 GB LPDDR5-4800 | Runs the TrueNAS VM with its storage controller passed through. Switch port 2 |
 
 ### Virtual machines
@@ -76,7 +76,7 @@ Node labels and taints:
 |----|--------|-------|
 | 192.168.0.1 | ISP router | Internet gateway |
 | 192.168.0.253 | OPNsense WAN (vtnet0) | Read from OPNsense on 2026-10-11 (earlier docs said `.110`; firewall rule `wan-01` still targets `.110`) |
-| 192.168.0.254 | gateway Proxmox | Web UI on 8006; reachable from trusted and remote-access |
+| — | gateway Proxmox | **No address on the home LAN** since the lockdown (2026-10-11). `192.168.0.254` is only used during a rebuild (`lockdown = false`) |
 
 ### VLAN 3 — storage — `10.0.3.0/24`
 
@@ -115,6 +115,7 @@ addresses: `.2–.4`, `.8`, `.9`.
 |----|--------|-------|
 | 10.0.5.1 | OPNsense (opt4) | Gateway, DNS, NTP; the address Ansible uses for the OPNsense API. vtnet1 MAC bc:24:11:a3:2a:24 (seen on switch port 1) |
 | 10.0.5.5 | UniFi USW-Flex-2.5G-8 | Switch management (static) |
+| 10.0.5.3 | gateway Proxmox (`vmbr1.5`) | Management: web UI `https://10.0.5.3:8006`, SSH. Static on the host; default route via `10.0.5.1`. Reached from trusted at L2 (works with OPNsense down) and from remote-access |
 | 10.0.5.2 | TP-Link TL-WA1201 | Static, set on the AP itself (no Kea reservation); web UI at http://10.0.5.2/ |
 | 10.0.5.100–200 | DHCP pool | Admin PC (MAC d0:11:e5:81:14:af, switch port 9), WiFi clients |
 
@@ -132,9 +133,19 @@ switch, no DHCP.
 
 | Name | Tailnet IP | Notes |
 |------|-----------|-------|
-| homelab-router | 100.67.182.63 | Subnet router; advertises `10.0.3.0/24`, `10.0.4.0/24`, `10.0.5.0/24`, `10.0.6.1/32`, `192.168.0.254/32` (auto-approved by the policy) |
+| homelab-router | 100.67.182.63 | Subnet router; advertises `10.0.3.0/24`, `10.0.4.0/24`, `10.0.5.0/24`, `10.0.6.1/32` (auto-approved by the policy) |
 
 Your own devices join with your Apple ID and need approval under Machines in
 the Tailscale console. Tailscale addresses are assigned by Tailscale from
 `100.64.0.0/10`.
+
+### Break-glass — `172.30.0.0/24` (gateway host only)
+
+A direct-cable emergency path into the gateway Proxmox host that works with
+OPNsense, the switch or the VLANs down. Not routed anywhere, no gateway.
+
+| IP | Device | Notes |
+|----|--------|-------|
+| 172.30.0.1 | gateway Proxmox, port `nic1` (`vmbr9`, MAC 00:d0:b4:04:8c:a2) | Web UI `https://172.30.0.1:8006` |
+| 172.30.0.2 | your laptop, set manually | Cable straight into `nic1`; subnet `255.255.255.0`, no router |
 

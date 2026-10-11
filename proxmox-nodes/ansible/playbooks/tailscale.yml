@@ -30,9 +30,8 @@
     tailscale_routes:
       - 10.0.3.0/24       # storage
       - 10.0.4.0/24       # k8s-workload
-      - 10.0.5.0/24       # trusted (OPNsense UI, switch, AP)
+      - 10.0.5.0/24       # trusted (OPNsense UI, gateway Proxmox, switch, AP)
       - 10.0.6.1/32       # OPNsense on remote-access: split-DNS resolver
-      - 192.168.0.254/32  # gateway Proxmox UI
   tasks:
     - name: Unattended security upgrades
       ansible.builtin.apt:

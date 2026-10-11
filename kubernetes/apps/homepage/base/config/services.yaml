@@ -183,9 +183,10 @@
         siteMonitor: https://10.0.4.1
     - Proxmox gateway:
         icon: proxmox.svg
-        href: https://192.168.0.254:8006
-        description: Hypervisor — OPNsense VM
-        siteMonitor: https://192.168.0.254:8006
+        # Management is on the trusted VLAN, which the cluster cannot reach by
+        # design — so no siteMonitor (it would always show down).
+        href: https://10.0.5.3:8006
+        description: Hypervisor — OPNsense and Tailscale VMs
     - Proxmox storage:
         icon: proxmox.svg
         href: https://10.0.3.2:8006

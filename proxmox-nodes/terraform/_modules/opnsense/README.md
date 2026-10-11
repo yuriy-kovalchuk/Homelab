@@ -22,7 +22,7 @@ Then upload via Proxmox web UI: **local → ISO Images → Upload**.
 ## 2. Configure
 
 Fill in the values in `terraform/prd/.env.example` → `.env` at repo root:
-- `GATEWAY_PROXMOX_ENDPOINT` — Proxmox API URL (e.g. `https://192.168.0.254:8006/`)
+- `GATEWAY_PROXMOX_ENDPOINT` — Proxmox API URL (e.g. `https://10.0.5.3:8006/`; `https://192.168.0.254:8006/` before lockdown)
 - `GATEWAY_PROXMOX_PASSWORD` — Proxmox root password
 - `GATEWAY_LAN_BRIDGE_PORT` — physical NIC to attach to `vmbr1` (run `ip link show` on Proxmox to find it)
 
