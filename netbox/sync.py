@@ -36,7 +36,7 @@ def _norm(v):
     if isinstance(v, dict):
         return v.get("id", v.get("value", v))
     if isinstance(v, list):
-        return sorted(_norm(x) for x in v)
+        return sorted((_norm(x) for x in v), key=lambda x: (x is None, str(x)))  # None: not created yet (dry run)
     return v
 
 

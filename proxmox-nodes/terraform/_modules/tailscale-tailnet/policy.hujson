@@ -1,5 +1,5 @@
-// Tailnet policy — paste into the Tailscale admin console (Access controls).
-// Kept here so it is reviewed and versioned with the rest of the lab.
+// Tailnet policy, applied by Terraform (tailscale_acl in main.tf).
+// Edit here, not in the admin console: the next apply overwrites console edits.
 {
   // Only tailnet admins may assign the router tag
   "tagOwners": {

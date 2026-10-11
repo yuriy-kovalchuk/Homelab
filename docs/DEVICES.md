@@ -19,7 +19,7 @@ reservation changes; static leases are defined in
 
 | Host | Hardware | Role |
 |------|----------|------|
-| gateway | Topton mini-PC, Intel N150, 16 GB DDR5, 128 GB NVMe | Runs the OPNsense VM. `eth0` → ISP router (`vmbr0`, WAN); `eth3` → switch port 1 (`vmbr1`, VLAN trunk, `nic3` in Terraform) |
+| gateway | Topton mini-PC, Intel N150, 16 GB DDR5, 128 GB NVMe | Runs the OPNsense and Tailscale VMs. `eth0` → ISP router (`vmbr0`, WAN); `eth3` → switch port 1 (`vmbr1`, VLAN trunk, `nic3` in Terraform) |
 | storage | Beelink ME Mini NAS, Intel N150 (Twin Lake), 16 GB LPDDR5-4800 | Runs the TrueNAS VM with its storage controller passed through. Switch port 2 |
 
 ### Virtual machines
@@ -28,6 +28,7 @@ reservation changes; static leases are defined in
 |----|------|-------|-----------|------------|
 | opnsense | gateway | 1001 | 2 vCPU, 8 GB RAM, 32 GB disk; vtnet0 on `vmbr0`, vtnet1 on `vmbr1` | `proxmox-nodes/terraform/prd/gateway` |
 | truenas | storage | 1000 | 3 vCPU, 12 GB RAM, 32 GB boot disk, PCIe storage controller passthrough; on `vmbr0` | `proxmox-nodes/terraform/prd/storage/truenas-install` |
+| tailscale | gateway | 1010 | 1 vCPU, 1 GB RAM, 8 GB disk, Ubuntu 24.04; `eth0` on `vmbr1` tag 6 (VLAN 6 only); no guest agent, no passthrough | `proxmox-nodes/terraform/prd/gateway/tailscale` (OS config: `playbooks/tailscale.yml`) |
 
 TrueNAS apps (`proxmox-nodes/terraform/_modules/truenas-apps`): Vault,
 Harbor, RustFS (S3), Traefik, Dockhand.
@@ -74,8 +75,8 @@ Node labels and taints:
 | IP | Device | Notes |
 |----|--------|-------|
 | 192.168.0.1 | ISP router | Internet gateway |
-| 192.168.0.110 | OPNsense WAN (vtnet0) | Web UI/API reachable from the home LAN on 443 |
-| 192.168.0.254 | gateway Proxmox | Web UI on 8006 |
+| 192.168.0.253 | OPNsense WAN (vtnet0) | Read from OPNsense on 2026-10-11 (earlier docs said `.110`; firewall rule `wan-01` still targets `.110`) |
+| 192.168.0.254 | gateway Proxmox | Web UI on 8006; reachable from trusted and remote-access |
 
 ### VLAN 3 — storage — `10.0.3.0/24`
 
@@ -116,3 +117,24 @@ addresses: `.2–.4`, `.8`, `.9`.
 | 10.0.5.5 | UniFi USW-Flex-2.5G-8 | Switch management (static) |
 | 10.0.5.2 | TP-Link TL-WA1201 | Static, set on the AP itself (no Kea reservation); web UI at http://10.0.5.2/ |
 | 10.0.5.100–200 | DHCP pool | Admin PC (MAC d0:11:e5:81:14:af, switch port 9), WiFi clients |
+
+### VLAN 6 — remote-access — `10.0.6.0/24`
+
+Exists only inside the gateway Proxmox host (`vmbr1`, tag 6); not on the
+switch, no DHCP.
+
+| IP | Device | MAC | Notes |
+|----|--------|-----|-------|
+| 10.0.6.1 | OPNsense (opt1, GUI name "Tailscale") | — | Gateway, DNS (split-DNS resolver for the tailnet), NTP |
+| 10.0.6.10 | tailscale VM | bc:24:11:e3:11:6a | Static via cloud-init. Tailnet name `homelab-router`, tag `tag:homelab-router`, tailnet IP `100.67.182.63` |
+
+### Tailnet
+
+| Name | Tailnet IP | Notes |
+|------|-----------|-------|
+| homelab-router | 100.67.182.63 | Subnet router; advertises `10.0.3.0/24`, `10.0.4.0/24`, `10.0.5.0/24`, `10.0.6.1/32`, `192.168.0.254/32` (auto-approved by the policy) |
+
+Your own devices join with your Apple ID and need approval under Machines in
+the Tailscale console. Tailscale addresses are assigned by Tailscale from
+`100.64.0.0/10`.
+

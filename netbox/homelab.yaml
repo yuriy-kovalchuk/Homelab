@@ -21,12 +21,14 @@ device_roles:
   - { name: Hypervisor, slug: hypervisor, color: "607d8b" }
   - { name: K8s control plane, slug: k8s-control-plane, color: "2196f3" }
   - { name: K8s worker, slug: k8s-worker, color: "8bc34a" }
+  - { name: Remote access, slug: remote-access, color: "ff5722" }
 
 platforms:
   - { name: Proxmox VE, slug: proxmox-ve }
   - { name: Talos Linux v1.14.2, slug: talos-1-14-2 }
   - { name: OPNsense, slug: opnsense }
   - { name: TrueNAS SCALE, slug: truenas-scale }
+  - { name: Ubuntu 24.04, slug: ubuntu-24-04 }
 
 device_types:
   - { manufacturer: Generic, model: ISP router, slug: generic-isp-router }
@@ -45,12 +47,15 @@ vlans:
   - { vid: 3, name: storage, description: "Storage node and TrueNAS. UniFi 'Storage', OPNsense opt2" }
   - { vid: 4, name: k8s-workload, description: "Talos nodes, API VIP, Cilium LB pool. UniFi 'Talos PRD', OPNsense opt3" }
   - { vid: 5, name: trusted, description: "Trusted PCs, WiFi, switch management. UniFi 'Trusted', OPNsense opt4 (PhysWorkload)" }
+  - { vid: 6, name: remote-access, description: "Tailscale subnet router VM only; exists only inside the gateway Proxmox host. OPNsense opt1 (Tailscale)" }
 
 prefixes:
   - { prefix: 10.0.0.0/16, status: container, description: "Homelab supernet (HOMELAB_ALL)" }
   - { prefix: 10.0.3.0/24, vlan: 3, description: storage }
   - { prefix: 10.0.4.0/24, vlan: 4, description: k8s-workload }
   - { prefix: 10.0.5.0/24, vlan: 5, description: trusted }
+  - { prefix: 10.0.6.0/24, vlan: 6, description: remote-access }
+  - { prefix: 100.64.0.0/10, description: "Tailnet (addresses assigned by Tailscale)" }
   - { prefix: 192.168.0.0/24, description: "Home LAN behind the ISP router (not managed here)" }
 
 ip_ranges:
@@ -112,7 +117,7 @@ devices:
     type: topton-n150
     role: hypervisor
     platform: proxmox-ve
-    description: Proxmox host running the OPNsense VM
+    description: Proxmox host running the OPNsense and Tailscale VMs
     comments: "Intel N150, 16 GB DDR5, 128 GB NVMe"
     interfaces:
       - { name: eth0, type: other, description: "To ISP router (WAN)" }
@@ -214,12 +219,13 @@ virtual_machines:
     disk: 32         # GB
     description: "Router/firewall: Unbound, Kea, FRR BGP (ASN 65551), HAProxy API VIP. VM ID 1001"
     interfaces:
-      - { name: vtnet0, description: "WAN on vmbr0", ips: [192.168.0.110/24], primary: true }
-      - { name: vtnet1, description: "VLAN trunk on vmbr1", mac: "bc:24:11:a3:2a:24", mode: tagged, tagged_vlans: [3, 4, 5] }
+      - { name: vtnet0, description: "WAN on vmbr0", ips: [192.168.0.253/24], primary: true }
+      - { name: vtnet1, description: "VLAN trunk on vmbr1", mac: "bc:24:11:a3:2a:24", mode: tagged, tagged_vlans: [3, 4, 5, 6] }
       - { name: vtnet1.3, parent: vtnet1, description: opt2 Storage, mode: access, untagged_vlan: 3, ips: [10.0.3.1/24] }
       - { name: vtnet1.4, parent: vtnet1, description: opt3 K8sWorkload, mode: access, untagged_vlan: 4,
           ips: [10.0.4.1/24, { address: 10.0.4.10/24, role: vip, description: "Kubernetes API VIP — HAProxy → control planes :6443" }] }
       - { name: vtnet1.5, parent: vtnet1, description: opt4 PhysWorkload (trusted), mode: access, untagged_vlan: 5, ips: [10.0.5.1/24] }
+      - { name: vtnet1.6, parent: vtnet1, description: opt1 Tailscale (remote-access), mode: access, untagged_vlan: 6, ips: [10.0.6.1/24] }
 
   - name: truenas
     cluster: storage
@@ -230,3 +236,16 @@ virtual_machines:
     description: "NFS/iSCSI/SMB; apps: Vault, Harbor, RustFS (S3), Traefik, Dockhand. VM ID 1000"
     interfaces:
       - { name: net0, description: "On vmbr0 (OS interface name not recorded)", mac: "bc:24:11:19:5c:66", ips: [10.0.3.3/24], primary: true }
+
+  - name: tailscale
+    cluster: gateway
+    role: remote-access
+    platform: ubuntu-24-04
+    vcpus: 1
+    memory: 1024
+    disk: 8
+    description: "Tailscale subnet router (homelab-router, tag:homelab-router). VM ID 1010. Advertises 10.0.3.0/24, 10.0.4.0/24, 10.0.5.0/24, 10.0.6.1/32, 192.168.0.254/32"
+    interfaces:
+      - { name: eth0, description: "On vmbr1, tag 6", mac: "bc:24:11:e3:11:6a", mode: access, untagged_vlan: 6, ips: [10.0.6.10/24], primary: true }
+      - { name: tailscale0, description: Tailnet interface, ips: [100.67.182.63/32] }
+

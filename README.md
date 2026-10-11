@@ -10,7 +10,8 @@ they belong to.
 |---|---|
 | Kubernetes | Talos v1.14.2, Kubernetes v1.37.1, Cilium 1.20.1, Flux 2.9.4 |
 | Nodes | 3 control planes (valefor, ifrit, shiva) + 2 workers (ixion, bahamut) |
-| Network | OPNsense: VLANs 3 storage / 4 k8s-workload / 5 trusted, BGP to Cilium, HAProxy API VIP |
+| Network | OPNsense: VLANs 3 storage / 4 k8s-workload / 5 trusted / 6 remote-access, BGP to Cilium, HAProxy API VIP |
+| Remote access | Tailscale subnet router VM on VLAN 6 (no port forwards), tailnet managed by Terraform |
 | Storage | Longhorn on the nodes, TrueNAS over NFS and iSCSI, RustFS S3 for object storage |
 | Domain | `yuriykovalchuk.dev` (Cloudflare DNS, Let's Encrypt, Cloudflare Tunnel) |
 
@@ -32,6 +33,8 @@ flowchart LR
     sw --- cp["valefor · ifrit · shiva<br/>control planes"]
     sw --- wk["ixion · bahamut<br/>workers, not always on"]
     sw --- trusted["trusted PCs + WiFi"]
+    opn --- ts["Tailscale VM<br/>VLAN 6, subnet router"]
+    ts -.->|outbound only| tailnet(("your devices<br/>anywhere"))
 ```
 
 - **Control planes** are small HP mini-PCs. They run etcd, the platform and
@@ -41,6 +44,9 @@ flowchart LR
   PRO R9700 over OCuLink plus a Radeon 780M and runs the local LLM stack;
   it is tainted `workload=gpu:NoSchedule`. **ixion** has a Radeon 680M used
   by Immich.
+- **Remote access:** a Tailscale subnet router VM on its own VLAN, inside
+  the gateway host. OPNsense filters everything it forwards; the tailnet
+  policy limits who may use it.
 - **TrueNAS** serves NFS/iSCSI volumes to the cluster and runs Vault, Harbor,
   RustFS (S3), Traefik and Dockhand as TrueNAS apps.
 
@@ -68,8 +74,8 @@ Homelab/
 │   ├── llm/                  llama.cpp, Strata, stable-diffusion, Open WebUI (wired in through apps)
 │   └── vms/                  KubeVirt VMs
 ├── proxmox-nodes/
-│   ├── terraform/            Terragrunt: OPNsense VM, TrueNAS VM, TrueNAS datasets and apps, Proxmox ACME
-│   └── ansible/              OPNsense configuration (VLANs, DHCP, firewall, DNS, BGP, HAProxy) and the Docker VM
+│   ├── terraform/            Terragrunt: OPNsense, TrueNAS and Tailscale VMs, TrueNAS datasets and apps, Proxmox ACME, tailnet (policy, DNS, keys)
+│   └── ansible/              OPNsense configuration (VLANs, DHCP, firewall, DNS, BGP, HAProxy), the Tailscale VM, the Docker VM
 ├── netbox/                homelab.yaml (devices, cabling, VLANs, IPs, VMs) + sync.py that loads it into NetBox
 ├── docs/
 ├── devbox.json               Pinned CLI tooling

@@ -92,6 +92,15 @@ One broken CEL expression denies every workload that shares those policyRefs; gu
 - Removing an item from a loop does not delete it in OPNsense; delete it explicitly.
 - BGP neighbors match on IP only (`match_fields: ["ip"]`); renaming a description otherwise creates a duplicate.
 - Interface assignment and interface IPs are GUI-only.
+- Host-type aliases (e.g. `PROXMOX`) are filled only by `firewall/alias/reconfigure`; a rule reload leaves them empty and every rule using them matches nothing. Check with `firewall/alias_util/list/<alias>`.
+- `unbound/service/dnsbl` re-downloads every blocklist (~1 min of no DNS) and needs `timeout: 180`. The HaGeZi VPN-bypass list blocks Tailscale; the allowlist in `dns.yml` must stay.
+- To see why traffic is blocked, read `diagnostics/firewall/log` (newest first) instead of guessing.
+
+## Tailscale (remote access)
+
+- Subnet router VM `tailscale` (10.0.6.10, VLAN 6, gateway host). Remote clients are SNATed to it, so Cilium policies that allow outside clients (`allow-gateway-frontend`, `allow-kube-system`) list `10.0.6.10/32`.
+- Tailnet config is Terraform: `prd/tailscale` (policy, split DNS, settings, router key) runs with the OAuth client in `.env`. Never put the OAuth client in that unit — it can't read itself and would be recreated. It lives in `prd/tailscale-bootstrap`, applied only with a short-lived `TAILSCALE_API_KEY` (and the OAuth vars unset; the provider rejects both at once).
+- The policy file is authoritative: console edits are overwritten on the next apply.
 
 ## Secrets and Vault
 

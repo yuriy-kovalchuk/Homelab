@@ -2,14 +2,15 @@
 # Tailscale subnet router on the remote-access VLAN (VM 1010 on the gateway
 # Proxmox host, see proxmox-nodes/terraform/prd/gateway/tailscale).
 #
-# Requires TAILSCALE_AUTHKEY in the environment (.env): a pre-approved,
-# non-ephemeral key tagged tag:homelab-router, created in the Tailscale admin
-# console. The key is only used on first login; re-runs don't re-authenticate.
+# Requires TAILSCALE_AUTHKEY: a pre-approved, tagged one-time key created by
+# Terraform (proxmox-nodes/terraform/prd/tailscale). Only used on first login;
+# re-runs don't re-authenticate.
 #
 # What remote clients may reach is decided twice: by the tailnet policy
-# (proxmox-nodes/tailscale/policy.hujson) and by the OPNsense rules on the
-# remote-access interface (firewall.yml).
+# (terraform/_modules/tailscale-tailnet/policy.hujson) and by the OPNsense
+# rules on the remote-access interface (firewall.yml).
 #
+#   export TAILSCALE_AUTHKEY=$(cd ../terraform/prd/tailscale && terragrunt output -raw router_auth_key)
 #   ansible-playbook -i inventories/prd/remote-access playbooks/tailscale.yml
 #
 - name: System update
@@ -45,6 +46,29 @@
           APT::Periodic::Update-Package-Lists "1";
           APT::Periodic::Unattended-Upgrade "1";
         mode: "0644"
+
+    # VLAN 6 only allows NTP to OPNsense, not to ntp.ubuntu.com
+    - name: timesyncd drop-in directory
+      ansible.builtin.file:
+        path: /etc/systemd/timesyncd.conf.d
+        state: directory
+        mode: "0755"
+
+    - name: Time sync from OPNsense
+      ansible.builtin.copy:
+        dest: /etc/systemd/timesyncd.conf.d/opnsense.conf
+        content: |
+          [Time]
+          NTP=10.0.6.1
+          FallbackNTP=
+        mode: "0644"
+      register: timesyncd
+
+    - name: Restart timesyncd
+      ansible.builtin.systemd:
+        name: systemd-timesyncd
+        state: restarted
+      when: timesyncd.changed
 
     - name: Enable IP forwarding (subnet router)
       ansible.posix.sysctl:

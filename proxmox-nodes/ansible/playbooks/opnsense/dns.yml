@@ -38,6 +38,8 @@
         description: "dns-redirect opt3 k8s-workload port 53 to unbound"
       - interface: opt4
         description: "dns-redirect opt4 phys-workload port 53 to unbound"
+      - interface: opt1
+        description: "dns-redirect opt1 remote-access port 53 to unbound"
 
   tasks:
     # -------------------------------------------------------------------------
@@ -63,6 +65,36 @@
     - name: Reload Unbound
       oxlorg.opnsense.reload:
         target: unbound
+
+    # -------------------------------------------------------------------------
+    # DNSBL allowlist
+    # The blocklists themselves are chosen in the GUI (Unbound → Blocklist).
+    # HaGeZi "DoH/VPN/TOR/Proxy Bypass" blocks Tailscale, which the remote-access
+    # router needs (control plane, DERP relays, pkgs, logs). Entries are regexes.
+    # -------------------------------------------------------------------------
+    - name: Look up the DNSBL entry
+      oxlorg.opnsense.raw:
+        url: "unbound/settings/search_dnsbl"
+        action: get
+      register: dnsbl
+      changed_when: false
+
+    - name: Allowlist Tailscale domains
+      oxlorg.opnsense.raw:
+        url: "unbound/settings/set_dnsbl/{{ dnsbl.response.rows[0].uuid }}"
+        action: post
+        data:
+          blocklist:
+            allowlists: 'tailscale.com,.*\.tailscale\.com,tailscale.io,.*\.tailscale\.io'
+      when: dnsbl.response.rows | length > 0
+
+    # Re-downloads every blocklist; Unbound answers nothing for ~30–60 s
+    - name: Apply DNSBL
+      oxlorg.opnsense.raw:
+        url: "unbound/service/dnsbl"
+        action: post
+        timeout: 180  # downloads every list; the default API timeout is too short
+      when: dnsbl.response.rows | length > 0
 
     # -------------------------------------------------------------------------
     # WAN egress block

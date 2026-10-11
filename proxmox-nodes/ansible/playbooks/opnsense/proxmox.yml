@@ -1,11 +1,12 @@
 ---
 # Configures access to the Proxmox host (192.168.0.254).
 #
-#   - opt4 (phys-workload) → Proxmox on TCP 22 + 8006
+#   - opt1 (remote-access) → Proxmox on TCP 22 + 8006 (trusted/opt4 reaches it
+#     through its internet rule)
 #   - WAN inbound block for the same ports — prevents internet-routed access
 #     and documents that Proxmox should not be reachable from the WAN direction.
 #
-# NOTE: Proxmox (192.168.0.254) and OPNsense WAN (192.168.0.110) share the
+# NOTE: Proxmox (192.168.0.254) and OPNsense WAN (192.168.0.253) share the
 # same L2 home network. Traffic from a home-network device directly to Proxmox
 # does NOT pass through OPNsense and cannot be blocked here. Full isolation
 # requires moving Proxmox's management interface to a VLAN.
@@ -53,6 +54,30 @@
         description: "wan-02 block proxmox from wan"
         reload: false
         match_fields: ["description"]
+
+    # The trusted VLAN reaches Proxmox through its internet rule (opt4-20);
+    # remote-access only has Tailscale-specific internet access, so it needs this.
+    - name: "opt1 | remote-access → Proxmox management"
+      oxlorg.opnsense.rule:
+        sequence: 15
+        interface: ["opt1"]
+        direction: in
+        action: pass
+        protocol: TCP
+        source_net: "10.0.6.0/24"
+        destination_net: PROXMOX
+        destination_port: PROXMOX_PORTS
+        description: "opt1-15 remote-access to proxmox"
+        reload: false
+        match_fields: ["description"]
+
+    # Host-type aliases are filled by OPNsense's alias updater, which only runs
+    # on an alias reconfigure — a rule reload leaves them empty (and every rule
+    # using them silently matches nothing).
+    - name: Reconfigure aliases
+      oxlorg.opnsense.raw:
+        url: "firewall/alias/reconfigure"
+        action: post
 
     - name: Reload firewall rules
       oxlorg.opnsense.reload:

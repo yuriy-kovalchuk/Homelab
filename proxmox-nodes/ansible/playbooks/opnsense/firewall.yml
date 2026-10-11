@@ -5,6 +5,8 @@
 #   opt2 = VLAN 3 — storage        (10.0.3.0/24)
 #   opt3 = VLAN 4 — k8s-workload   (10.0.4.0/24)
 #   opt4 = VLAN 5 — phys-workload  (10.0.5.0/24)
+#   opt1 = VLAN 6 — remote-access  (10.0.6.0/24, Tailscale subnet router VM;
+#          GUI description "Tailscale")
 #
 # All aliases and rules are created with reload: false.
 # A single reload at the end applies everything atomically — this avoids
@@ -50,6 +52,18 @@
           type: network
           content: ["10.0.5.0/24"]
           description: "phys-workload"
+        - name: VLAN6_NET
+          type: network
+          content: ["10.0.6.0/24"]
+          description: "remote-access"
+        - name: TAILSCALE_UDP
+          type: port
+          content: ["41641", "3478"]
+          description: "Tailscale direct WireGuard + STUN"
+        - name: PRIVATE_NON_LAB
+          type: network
+          content: ["192.168.0.0/16", "172.16.0.0/12"]
+          description: "Private ranges outside the homelab (home LAN behind the ISP router)"
         - name: WEB_PORTS
           type: port
           content: ["80", "443"]
@@ -273,10 +287,110 @@
         match_fields: ["description"]
 
     # -------------------------------------------------------------------------
+    # Rules — opt1 (VLAN 6 — remote-access, Tailscale subnet router)
+    # OUT: gateway DNS + NTP, every homelab VLAN (full admin from the tailnet —
+    #      the tailnet policy decides who), internet only for Tailscale + apt.
+    # IN:  nothing; only trusted (opt4-10) can reach the VM, for management.
+    # Proxmox (WAN side) access is in proxmox.yml.
+    # -------------------------------------------------------------------------
+    - name: "opt1 | remote-access → gateway (DNS)"
+      oxlorg.opnsense.rule:
+        sequence: 5
+        interface: ["opt1"]
+        direction: in
+        action: pass
+        protocol: "TCP/UDP"
+        source_net: VLAN6_NET
+        destination_net: "10.0.6.1/32"
+        destination_port: "53"
+        description: "opt1-05 remote-access to gateway dns"
+        reload: false
+        match_fields: ["description"]
+
+    - name: "opt1 | remote-access → gateway (NTP)"
+      oxlorg.opnsense.rule:
+        sequence: 6
+        interface: ["opt1"]
+        direction: in
+        action: pass
+        protocol: UDP
+        source_net: VLAN6_NET
+        destination_net: "10.0.6.1/32"
+        destination_port: "123"
+        description: "opt1-06 remote-access to gateway ntp"
+        reload: false
+        match_fields: ["description"]
+
+    - name: "opt1 | remote-access → homelab (all VLANs)"
+      oxlorg.opnsense.rule:
+        sequence: 10
+        interface: ["opt1"]
+        direction: in
+        action: pass
+        source_net: VLAN6_NET
+        destination_net: HOMELAB_ALL
+        description: "opt1-10 remote-access to homelab"
+        reload: false
+        match_fields: ["description"]
+
+    # The internet rules below match "not HOMELAB_ALL", which would include
+    # the home LAN (ISP router admin page, other home devices). Proxmox on the
+    # home LAN is allowed earlier (opt1-15, proxmox.yml).
+    - name: "opt1 | remote-access → home LAN (block)"
+      oxlorg.opnsense.rule:
+        sequence: 18
+        interface: ["opt1"]
+        direction: in
+        action: block
+        source_net: VLAN6_NET
+        destination_net: PRIVATE_NON_LAB
+        description: "opt1-18 remote-access block home lan"
+        reload: false
+        match_fields: ["description"]
+
+    - name: "opt1 | remote-access → internet (HTTP/HTTPS: Tailscale control, DERP, apt)"
+      oxlorg.opnsense.rule:
+        sequence: 20
+        interface: ["opt1"]
+        direction: in
+        action: pass
+        protocol: TCP
+        source_net: VLAN6_NET
+        destination_invert: true
+        destination_net: HOMELAB_ALL
+        destination_port: WEB_PORTS
+        description: "opt1-20 remote-access to internet web"
+        reload: false
+        match_fields: ["description"]
+
+    - name: "opt1 | remote-access → internet (Tailscale direct connections)"
+      oxlorg.opnsense.rule:
+        sequence: 21
+        interface: ["opt1"]
+        direction: in
+        action: pass
+        protocol: UDP
+        source_net: VLAN6_NET
+        destination_invert: true
+        destination_net: HOMELAB_ALL
+        destination_port: TAILSCALE_UDP
+        description: "opt1-21 remote-access to internet tailscale udp"
+        reload: false
+        match_fields: ["description"]
+
+    # -------------------------------------------------------------------------
     # Single reload — applies aliases and rules atomically.
     # Rule reload regenerates the full pf ruleset including alias tables,
     # so a separate alias reload is not needed here.
     # -------------------------------------------------------------------------
+
+    # Host-type aliases are filled by OPNsense's alias updater, which only runs
+    # on an alias reconfigure — a rule reload leaves them empty (and every rule
+    # using them silently matches nothing).
+    - name: Reconfigure aliases
+      oxlorg.opnsense.raw:
+        url: "firewall/alias/reconfigure"
+        action: post
 
     - name: Reload firewall rules
       oxlorg.opnsense.reload:
