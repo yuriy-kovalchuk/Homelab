@@ -13,7 +13,6 @@ This file holds the rules and pitfalls that are not obvious from the code.
 - **Goal of the cluster:** drains and upgrades with no data loss and no downtime. Prefer changes that keep that true (spread constraints, PDBs, replicas ≥ 2 for stateless services).
 - **Workers are not always on**, bahamut especially. Anything that must stay up runs on the control planes, and its Longhorn data stays on `system`-tagged nodes.
 - **bahamut is for GPU workloads only** (taint `workload=gpu:NoSchedule`). forgejo-runner is the one deliberate exception.
-- `yk-dns-manager` is suspended in its overlay **on purpose** (the user is working on it). Don't unsuspend it.
 - `docs/` must stay in sync: a new device, address, VLAN or rule goes into DEVICES.md / NETWORK.md in the same change.
 
 ## Kubernetes conventions

@@ -48,12 +48,14 @@ spec:
       host: netbox-valkey
       database: 1
 
+    # Granian starts one worker per CPU (4 on these nodes), each a full
+    # Django process; together they need ~1.1 GiB once serving.
     resources:
       requests:
         cpu: 100m
-        memory: 512Mi
-      limits:
         memory: 1Gi
+      limits:
+        memory: 1536Mi
 
     worker:
       resources:

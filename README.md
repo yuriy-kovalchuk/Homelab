@@ -147,7 +147,7 @@ Chart versions as deployed.
 | Trivy operator + PolicyReport adapter | 0.36.0 / 0.11.5 | Vulnerability scanning |
 | policy-reporter | 3.10.0 | Kyverno report UI |
 | cloudflared | — | Cloudflare Tunnel for public access |
-| yk-dns-manager | 0.1.1-dev | Writes internal DNS records into OPNsense (currently suspended) |
+| yk-dns-manager | 0.1.1-dev | Writes internal DNS records into OPNsense |
 | hubble, cilium-observability, flux-system | — | Hubble UI, Envoy stats, Flux UI routes |
 | clean-pods | — | CronJob removing failed and stale pods |
 
