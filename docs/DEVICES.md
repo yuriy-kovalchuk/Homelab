@@ -1,56 +1,118 @@
-# Network Devices
+# Devices
 
-All static/reserved devices on the homelab network. Update this file whenever a new device is added.
+Every device in the homelab: hardware, addresses and MACs. Topology and VLAN
+policy are in [NETWORK.md](NETWORK.md). Update this file whenever a device or
+reservation changes; static leases are defined in
+`proxmox-nodes/ansible/playbooks/opnsense/reservations.yml`.
 
-## Home Network (192.168.0.0/24) — WAN side, unmanaged
+## Hardware
 
-| IP              | Hostname          | Device              | Notes                        |
-|-----------------|-------------------|---------------------|------------------------------|
-| 192.168.0.1     | —                 | Home router         | ISP gateway                  |
-| 192.168.0.110   | opnsense          | OPNsense VM         | WAN IP, firewall/router      |
-| 192.168.0.254   | gateway-pve       | Proxmox (gateway)   | Homelab hypervisor — gateway |
+### Network
 
-## VLAN 2 — deprecated (10.0.2.0/24, opt1)
+| Device | Model | Notes |
+|--------|-------|-------|
+| Managed switch | UniFi USW-Flex-2.5G-8 | 8 × 2.5 GbE; managed from the UniFi controller |
+| Control-plane switch | MERCUSYS MS105GS-M2 | Unmanaged, 5 × 2.5 GbE; behind switch port 4 |
+| Access point | TP-Link TL-WA1201 | AC1200 dual-band; one SSID on the trusted network. MAC b0:19:21:de:28:ee |
 
-No active devices. Pending removal from switch and OPNsense config.
+### Proxmox hosts
 
-| IP              | Hostname | Device            | Notes                              |
-|-----------------|----------|-------------------|------------------------------------|
-| 10.0.2.1        | —        | OPNsense opt1     | VLAN gateway                       |
+| Host | Hardware | Role |
+|------|----------|------|
+| gateway | Topton mini-PC, Intel N150, 16 GB DDR5, 128 GB NVMe | Runs the OPNsense VM. `eth0` → ISP router (`vmbr0`, WAN); `eth3` → switch port 1 (`vmbr1`, VLAN trunk, `nic3` in Terraform) |
+| storage | Beelink ME Mini NAS, Intel N150 (Twin Lake), 16 GB LPDDR5-4800 | Runs the TrueNAS VM with its storage controller passed through. Switch port 2 |
 
-## VLAN 3 — storage (10.0.3.0/24, opt2)
+### Virtual machines
 
-| IP         | Hostname     | Device              | Notes                                         |
-|------------|--------------|---------------------|-----------------------------------------------|
-| 10.0.3.1   | —            | OPNsense opt2       | VLAN gateway                                  |
-| 10.0.3.2   | storage      | Proxmox (storage)   | Storage node hypervisor                       |
-| 10.0.3.3   | truenas      | TrueNAS SCALE VM    | NAS — NFS/SMB, Vault, Zot, RustFS, apps      |
+| VM | Host | VM ID | Resources | Defined in |
+|----|------|-------|-----------|------------|
+| opnsense | gateway | 1001 | 2 vCPU, 8 GB RAM, 32 GB disk; vtnet0 on `vmbr0`, vtnet1 on `vmbr1` | `proxmox-nodes/terraform/prd/gateway` |
+| truenas | storage | 1000 | 3 vCPU, 12 GB RAM, 32 GB boot disk, PCIe storage controller passthrough; on `vmbr0` | `proxmox-nodes/terraform/prd/storage/truenas-install` |
 
-## VLAN 4 — k8s-workload (10.0.4.0/24, opt3)
+TrueNAS apps (`proxmox-nodes/terraform/_modules/truenas-apps`): Vault,
+Harbor, RustFS (S3), Traefik, Dockhand.
 
-| IP         | Hostname        | Device        | Notes                                          |
-|------------|-----------------|---------------|------------------------------------------------|
-| 10.0.4.1   | —               | OPNsense opt3 | VLAN gateway                                   |
-| 10.0.4.6   | controlplane-3  | Talos node    | Workload control-plane (offline, coming back)  |
-| 10.0.4.3   | controlplane-1  | Talos node    | Workload control-plane                         |
-| 10.0.4.4   | worker-1        | Talos node    | Workload worker — AMD 780M GPU                 |
-| 10.0.4.5   | controlplane-2  | Talos node    | Workload control-plane                         |
-| 10.0.4.50–.99 | —            | LB pool       | Cilium BGP LoadBalancer IP pool                |
+### Kubernetes nodes (Talos, cluster `workload-prd`)
 
-## VLAN 5 — phys-workload (10.0.5.0/24, opt4)
+All run Talos v1.14.2 with Kubernetes v1.37.1.
 
-| IP         | Hostname     | Device              | Notes                        |
-|------------|--------------|---------------------|------------------------------|
-| 10.0.5.1   | —            | OPNsense opt4       | VLAN gateway                 |
+| Node | Role | Hardware | CPU | RAM | Disk | NIC |
+|------|------|----------|-----|-----|------|-----|
+| valefor | control plane | HP EliteDesk 800 G2 DM 65W | Intel i5-6400T, 4C/4T | 16 GB DDR4-2133 | Kingston SV300 120 GB SATA | Intel I219-LM 1 GbE (`eno1`) |
+| ifrit | control plane | HP ProDesk 600 G3 DM | Intel i5-6500T, 4C/4T | 32 GB DDR4-2133 | Essencore 256 GB SATA | Realtek RTL8125 2.5 GbE (`enp1s0`); onboard I219-LM unused |
+| shiva | control plane | HP EliteDesk 800 G3 DM 65W | Intel i5-6500, 4C/4T | 16 GB DDR4-2133 | MicroFrom 256 GB SATA | Intel I219-LM 1 GbE (`eno1`) |
+| ixion | worker | Beelink SER5 Max | AMD Ryzen 7 6800H, 8C/16T | 32 GB | **None** — the 128 GB OSC NVMe (SM2263XT) failed; replacement pending | `eno1` |
+| bahamut | worker | Minisforum AI series mini-PC (firmware vendor "Micro Computer (HK) Tech Limited") | AMD Ryzen 7 255, 8C/16T | 64 GB DDR5-5600 | Crucial P310 1 TB NVMe | Realtek RTL8125 2.5 GbE (`enp4s0`); MediaTek MT7925 WiFi unused |
 
-## VLAN 6 — private-wifi (10.0.6.0/24, opt5)
+GPUs (claimed through Kubernetes DRA by PCI device ID):
 
-| IP         | Hostname     | Device              | Notes                        |
-|------------|--------------|---------------------|------------------------------|
-| 10.0.6.1   | —            | OPNsense opt5       | VLAN gateway                 |
+| Node | GPU | PCI ID | Used by |
+|------|-----|--------|---------|
+| bahamut | AMD Radeon AI PRO R9700 (Navi 48, gfx1201), on OCuLink | `0x7551` | llama-cpp, llama-cpp-rocm, strata, sd-server |
+| bahamut | Radeon 780M iGPU (HawkPoint, gfx1103) | `0x1900` | llama-cpp-igpu |
+| ixion | Radeon 680M iGPU (Rembrandt, gfx1035) | `0x1681` | Immich (server + machine learning) |
 
-## VLAN 7 — guest-wifi (10.0.7.0/24, opt6)
+Talos image schematics (factory.talos.dev):
 
-| IP         | Hostname     | Device              | Notes                        |
-|------------|--------------|---------------------|------------------------------|
-| 10.0.7.1   | —            | OPNsense opt6       | VLAN gateway                 |
+| Nodes | Schematic | Extensions |
+|-------|-----------|------------|
+| valefor, ifrit, shiva | `613e1592…` | iscsi-tools, util-linux-tools |
+| bahamut, ixion | `65cf8364…` | amd-ucode, amdgpu, iscsi-tools, util-linux-tools |
+
+Node labels and taints:
+
+- Control planes carry the Longhorn node tag `system`. Data that must stay
+  available lives only on them, since the workers are not always powered on.
+- bahamut: label `ai-node: oculink`, taint `workload=gpu:NoSchedule`, Longhorn
+  tag `gpu`. Only GPU workloads (and forgejo-runner, which builds there)
+  tolerate it.
+
+## Addresses
+
+### Home LAN — `192.168.0.0/24` (ISP side, not managed here)
+
+| IP | Device | Notes |
+|----|--------|-------|
+| 192.168.0.1 | ISP router | Internet gateway |
+| 192.168.0.110 | OPNsense WAN (vtnet0) | Web UI/API reachable from the home LAN on 443 |
+| 192.168.0.254 | gateway Proxmox | Web UI on 8006 |
+
+### VLAN 3 — storage — `10.0.3.0/24`
+
+| IP | Device | MAC | Notes |
+|----|--------|-----|-------|
+| 10.0.3.1 | OPNsense (opt2) | — | Gateway, DNS, NTP |
+| 10.0.3.2 | storage Proxmox | — | Static on the host; web UI on 8006 |
+| 10.0.3.3 | truenas | bc:24:11:19:5c:66 | Kea reservation; must stay static (democratic-csi and Vault depend on it) |
+| 10.0.3.100–200 | DHCP pool | | |
+
+### VLAN 4 — k8s-workload — `10.0.4.0/24`
+
+Address plan: `.1` gateway · `.2–.9` control planes only · `.10` Kubernetes
+API VIP · `.11+` workers · `.50–.99` Cilium LoadBalancer pool · `.100–.200`
+DHCP pool.
+
+| IP | Device | MAC | Notes |
+|----|--------|-----|-------|
+| 10.0.4.1 | OPNsense (opt3) | — | Gateway, DNS, NTP, BGP (ASN 65551, router ID) |
+| 10.0.4.5 | valefor | fc:3f:db:0f:8e:18 | Control plane |
+| 10.0.4.6 | ifrit | 00:e0:4c:68:10:09 | Control plane |
+| 10.0.4.7 | shiva | 10:62:e5:17:93:cf | Control plane |
+| 10.0.4.10 | Kubernetes API VIP | — | IP alias on OPNsense; HAProxy → control planes :6443 |
+| 10.0.4.11 | ixion | 78:55:36:03:b1:e0 | Worker; offline until its disk is replaced |
+| 10.0.4.12 | bahamut | 38:05:25:32:8e:dc | Worker; not always powered on. Static IP in its Talos config as well |
+| 10.0.4.50 | `internal` Gateway | — | Cilium Gateway for every HTTPS hostname |
+| 10.0.4.50–99 | Cilium LB pool | | Advertised over BGP (ASN 65002) |
+| 10.0.4.100–200 | DHCP pool | | |
+
+All five nodes are BGP neighbors of OPNsense (`bgp.yml`). Free control-plane
+addresses: `.2–.4`, `.8`, `.9`.
+
+### VLAN 5 — trusted — `10.0.5.0/24`
+
+| IP | Device | Notes |
+|----|--------|-------|
+| 10.0.5.1 | OPNsense (opt4) | Gateway, DNS, NTP; the address Ansible uses for the OPNsense API. vtnet1 MAC bc:24:11:a3:2a:24 (seen on switch port 1) |
+| 10.0.5.5 | UniFi USW-Flex-2.5G-8 | Switch management (static) |
+| 10.0.5.2 | TP-Link TL-WA1201 | Static, set on the AP itself (no Kea reservation); web UI at http://10.0.5.2/ |
+| 10.0.5.100–200 | DHCP pool | Admin PC (MAC d0:11:e5:81:14:af, switch port 9), WiFi clients |

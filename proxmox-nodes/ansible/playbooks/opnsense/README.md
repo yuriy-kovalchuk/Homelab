@@ -103,10 +103,11 @@ ansible-playbook -i inventories/prd/gateway playbooks/opnsense/reservations.yml
 | Hostname        | IP       | MAC               |
 |-----------------|----------|-------------------|
 | truenas         | 10.0.3.3 | bc:24:11:19:5c:66 |
-| controlplane-1  | 10.0.4.3 | 78:55:36:03:b1:e0 |
-| worker-1        | 10.0.4.4 | 38:05:25:32:8e:dc |
 | valefor         | 10.0.4.5 | fc:3f:db:0f:8e:18 |
 | ifrit           | 10.0.4.6 | 00:e0:4c:68:10:09 |
+| shiva           | 10.0.4.7 | 10:62:e5:17:93:cf |
+| ixion           | 10.0.4.11 | 78:55:36:03:b1:e0 |
+| bahamut         | 10.0.4.12 | 38:05:25:32:8e:dc |
 
 **Step 5 — NAT (one GUI step first):**
 
@@ -143,10 +144,11 @@ ansible-playbook -i inventories/prd/gateway playbooks/opnsense/bgp.yml
 | Side           | ASN   | IP       |
 |----------------|-------|----------|
 | OPNsense       | 65551 | 10.0.4.1 |
-| controlplane-1 | 65002 | 10.0.4.3 |
-| worker-1       | 65002 | 10.0.4.4 |
 | valefor        | 65002 | 10.0.4.5 |
 | ifrit          | 65002 | 10.0.4.6 |
+| shiva          | 65002 | 10.0.4.7 |
+| ixion          | 65002 | 10.0.4.11 |
+| bahamut        | 65002 | 10.0.4.12 |
 
 **Or run everything at once:**
 ```bash

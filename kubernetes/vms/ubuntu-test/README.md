@@ -1,6 +1,6 @@
 # ubuntu-test VM
 
-Ubuntu 24.04 (Noble) test VM running on KubeVirt in the `kubevirt-ubuntu-test` namespace on `worker-1`.
+Ubuntu 24.04 (Noble) test VM running on KubeVirt in the `kubevirt-ubuntu-test` namespace on `bahamut`.
 
 ## Specs
 

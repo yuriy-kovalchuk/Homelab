@@ -1,289 +1,118 @@
-# Workload Cluster — `workload-prd`
+# Cluster `workload-prd`
 
-Bare-metal Talos Linux cluster running on VLAN 4 (`10.0.4.0/24`). Hosts user-facing
-workloads. Consumes shared infrastructure services (Vault, Harbor) from the
-`management-prd` cluster on VLAN 2. Managed entirely by FluxCD after bootstrap.
+Bare-metal Talos Linux cluster on the k8s-workload VLAN. Three control planes
+(valefor, ifrit, shiva) and two workers that are not always on (ixion,
+bahamut). After bootstrap, Flux manages everything from this repo.
 
-## Nodes
+Hardware, IPs and MACs: [docs/DEVICES.md](../../../docs/DEVICES.md).
+Network, API VIP and BGP: [docs/NETWORK.md](../../../docs/NETWORK.md).
+Layers and components: [README.md](../../../README.md).
 
-| Hostname        | IP       | Role          | Interface | Disk          |
-|-----------------|----------|---------------|-----------|---------------|
-| controlplane-1  | 10.0.4.3 | control-plane | enp1s0    | /dev/nvme0n1  |
-| workload-1      | 10.0.4.4 | worker        | enp2s0    | /dev/nvme0n1  |
+## This folder
 
-## FluxCD layer order
+| Path | Contents |
+|------|----------|
+| `flux-system/` | `gotk-sync.yaml` (GitRepository `homelab` on `main`) and one Flux Kustomization per layer, ordered by `dependsOn` |
+| `terraform/cni/` | Cilium install (Helm) |
+| `terraform/fluxcd/` | flux-operator + `FluxInstance` |
+| `terraform/vault/` | Writes every app secret into Vault (KV v2 mount `kubernetes`), one `.tf` per app |
+| `terraform/cloudflare/` | Cloudflare DNS records |
 
-Layers are enabled one at a time in `flux-system/kustomization.yaml`. Verify each
-layer is healthy before uncommenting the next.
+Terraform runs inside `devbox shell`, which loads `.env` and provides
+`tf_init` / `tf_plan` / `tf_apply`. Kubeconfig path: `~/.kube/workload`
+(see the `terraform.tfvars` files).
 
-```
-core → platform → observability
-              ↘ apps
-              ↘ llm
-```
+## Bootstrap from scratch
 
----
+### 1. Network
 
-## Prerequisites
+On OPNsense (Ansible in `proxmox-nodes/ansible/playbooks/opnsense/`):
 
-- Devbox shell active (`devbox shell` at repo root)
-- Kubeconfig for this cluster at `~/.kube/workload`
-- Management cluster running and healthy (Vault + Harbor reachable)
-- Vault root token available (`VAULT_ADDR=https://vault.mgmt.yuriy-lab.cloud`)
+- `reservations.yml` — a Kea reservation for every node.
+- `k8s_api_lb.yml` — Kubernetes API VIP (HAProxy). The VIP must exist before
+  the nodes are configured, because their config points at it.
+- `bgp.yml` — a BGP neighbor for every node.
 
----
+### 2. Talos nodes
 
-## 1. Reserve static IPs in Kea
+Node configs are kept out of Git (`.playground/talos/`, `~/.talos/`).
+Generate them with `talosctl gen config`, with these settings for every node:
 
-Add DHCP reservations in OPNsense so nodes always receive their assigned IPs:
+- `cluster.controlPlane.endpoint`: the API VIP, `https://<vip>:6443`.
+- `cluster.apiServer.certSANs`: the VIP.
+- A `HostnameConfig` document with the lowercase node name.
+- `machine.install.image`: the node's factory installer, with the schematic
+  from DEVICES.md (iscsi-tools and util-linux-tools everywhere, plus amdgpu
+  and amd-ucode on AMD GPU nodes).
+- `machine.nodeAnnotations`: `node.longhorn.io/default-node-tags`:
+  `'["system"]'` on control planes, `'["gpu"]'` on bahamut.
+- Workers: labels and taints (bahamut: `ai-node: oculink`,
+  `workload=gpu:NoSchedule`). Talos cannot add taints to a worker after it
+  has registered, so set them with `kubectl` if the node already exists.
 
-**OPNsense → Services → Kea DHCP → DHCPv4 → Reservations**
-
-| Hostname       | MAC              | IP       | Description              |
-|----------------|------------------|----------|--------------------------|
-| controlplane-1 | `<mac>`          | 10.0.4.3 | workload-prd control-plane |
-| workload-1     | `<mac>`          | 10.0.4.4 | workload-prd worker        |
-
-Find the MAC address from OPNsense DHCP leases after first network boot, or from
-the BIOS/UEFI network settings.
-
----
-
-## 2. Provision Talos nodes
-
-Node imaging is handled by `yk-talos-manager` running on the management cluster.
-Apply the TalosCluster and TalosNode CRs from the management cluster:
+Boot each node into maintenance mode, then:
 
 ```bash
-kubectl --kubeconfig ~/.kube/mgmt apply \
-  -f kubernetes/platform/yk-talos-manager-prd-workload/overlays/management-prd/
+talosctl apply-config --insecure -n <node-ip> -f <node>.yaml
+talosctl -e <first-cp> -n <first-cp> bootstrap          # first control plane only
+talosctl -e <first-cp> -n <first-cp> kubeconfig ~/.kube/workload
 ```
 
-Wait for yk-talos-manager to complete provisioning before proceeding.
+Nodes stay `NotReady` until Cilium is installed.
 
-Verify nodes are reachable:
+### 3. Cilium
 
 ```bash
-kubectl --kubeconfig ~/.kube/workload get nodes
+cd kubernetes/clusters/workload-prd/terraform/cni && tf_init && tf_apply
 ```
 
-Nodes will show `NotReady` until Cilium is installed.
+### 4. Vault secrets
 
----
-
-## 3. Install Cilium CNI
+Vault runs on TrueNAS. Write the app secrets (values come from `TF_VAR_*` in
+`.env`):
 
 ```bash
-cd kubernetes/clusters/workload-prd/terraform/cni
-tf_init && tf_apply
+cd kubernetes/clusters/workload-prd/terraform/vault && tf_init && tf_apply
 ```
 
-Verify:
+### 5. Flux
 
 ```bash
-kubectl --kubeconfig ~/.kube/workload get nodes
-kubectl --kubeconfig ~/.kube/workload -n kube-system get pods -l app.kubernetes.io/name=cilium
-```
-
-All nodes should reach `Ready`.
-
----
-
-## 4. Install FluxCD
-
-```bash
-cd kubernetes/clusters/workload-prd/terraform/fluxcd
-tf_init && tf_apply
-```
-
-Verify controllers are running:
-
-```bash
-kubectl --kubeconfig ~/.kube/workload -n flux-system get pods
-```
-
----
-
-## 5. Bootstrap GitOps sync
-
-```bash
-kubectl --kubeconfig ~/.kube/workload \
-  apply -k kubernetes/clusters/workload-prd/flux-system/
-```
-
-This creates:
-- `GitRepository/homelab` — watches the `main` branch
-- `Kustomization/flux-system` — self-manages the flux-system directory
-- `Kustomization/core` — first layer (only active layer at bootstrap)
-
-Watch reconciliation:
-
-```bash
+cd kubernetes/clusters/workload-prd/terraform/fluxcd && tf_init && tf_apply
+kubectl --kubeconfig ~/.kube/workload apply -k kubernetes/clusters/workload-prd/flux-system/
 flux --kubeconfig ~/.kube/workload get kustomizations -w
 ```
 
----
+All layers are listed in `flux-system/kustomization.yaml`; `dependsOn`
+brings them up in order. Nothing needs enabling by hand.
 
-## 6. Layer: core
+### 6. Vault Kubernetes auth (one time)
 
-**What deploys:** `gateway-api-crds`, `prometheus-operator-crds`, `cert-manager`,
-`external-secrets`, `external-secrets-config` (ClusterSecretStore), `kyverno`,
-`cilium-policies`.
+Once `external-secrets` is running, configure Vault to trust its
+ServiceAccount tokens, with `kubernetes_host` set to the API VIP:
+[`core/external-secrets/overlays/workload-prd/README.md`](../../core/external-secrets/overlays/workload-prd/README.md).
+Until then the `secrets` layer, and everything after it, waits.
 
-### 6a. Configure Vault Kubernetes auth (one-time)
-
-After `external-secrets` is running, set up Vault authentication so the
-`ClusterSecretStore` can resolve secrets.
-
-→ See [`core/external-secrets/overlays/workload-prd/README.md`](../../../core/external-secrets/overlays/workload-prd/README.md)
-
-### 6b. Verify core is healthy
+### 7. Cloudflare DNS
 
 ```bash
-# All HelmReleases ready
-kubectl --kubeconfig ~/.kube/workload get helmrelease -A
-
-# ClusterSecretStore connected to Vault
-kubectl --kubeconfig ~/.kube/workload get clustersecretstore default-store
-
-# Kyverno generate policy created per-namespace policies
-kubectl --kubeconfig ~/.kube/workload get ciliumnetworkpolicies -A
+cd kubernetes/clusters/workload-prd/terraform/cloudflare && tf_init && tf_apply
 ```
 
-Expected:
-
-```
-NAME            AGE   STATUS   READY
-default-store   Xm    Valid    True
-```
-
----
-
-## 7. Layer: platform
-
-**What deploys:** `gateway`, `cluster-issuer`, `bgp`, `hubble`, `cilium-observability`,
-`longhorn`, `metrics-server`, `forgejo`, `flux-system` (HelmRepo), `kyverno-reporter`,
-`vpa`, `yk-dns-manager`, `trivy`, `trivy-converter`.
-
-### 7a. Pre-create secrets
-
-These are not managed by ExternalSecrets — create them before enabling the layer:
-
-```bash
-# cert-manager — Cloudflare API token for DNS-01 challenges
-kubectl --kubeconfig ~/.kube/workload create namespace cert-manager
-kubectl --kubeconfig ~/.kube/workload create secret generic cloudflare-api-token-secret \
-  --namespace cert-manager \
-  --from-literal=api-token=<cloudflare-api-token>
-```
-
-Token permissions required: `Zone:Read`, `DNS:Edit`.
-Create at **Cloudflare Dashboard → My Profile → API Tokens → Create Token**.
-
-```bash
-# yk-dns-manager — OPNsense API credentials
-kubectl --kubeconfig ~/.kube/workload create namespace yk-dns-manager
-kubectl --kubeconfig ~/.kube/workload create secret generic dns-provider-credentials \
-  --namespace yk-dns-manager \
-  --from-literal=OPNSENSE_API_KEY=<api-key> \
-  --from-literal=OPNSENSE_API_SECRET=<api-secret>
-```
-
-Generate the OPNsense key at **System → Access → Users → root → API Keys → Add**.
-
-### 7b. Enable platform layer
-
-Uncomment `platform.yaml` in `flux-system/kustomization.yaml`, commit and push.
-
-### 7c. Verify platform is healthy
-
-```bash
-flux --kubeconfig ~/.kube/workload get kustomization platform
-kubectl --kubeconfig ~/.kube/workload get helmrelease -A
-kubectl --kubeconfig ~/.kube/workload get clusterissuer
-```
-
----
-
-## 8. Layer: observability
-
-**What deploys:** `loki`, `mimir`, `tempo`, `k8s-monitoring`, `grafana`.
-
-### 8a. Populate Vault with S3 credentials
-
-Observability components pull S3 credentials via ExternalSecrets. Populate Vault
-using the workload-prd Vault terraform:
-
-```bash
-cd kubernetes/clusters/workload-prd/terraform/vault
-tf_init && tf_apply
-```
-
-Verify the ExternalSecrets resolve after the layer deploys:
-
-```bash
-kubectl --kubeconfig ~/.kube/workload get externalsecrets -A
-```
-
-### 8b. Enable observability layer
-
-Uncomment `observability.yaml` in `flux-system/kustomization.yaml`, commit and push.
-
-### 8c. Verify
-
-```bash
-flux --kubeconfig ~/.kube/workload get kustomization observability
-kubectl --kubeconfig ~/.kube/workload get helmrelease -n loki
-kubectl --kubeconfig ~/.kube/workload get helmrelease -n mimir
-kubectl --kubeconfig ~/.kube/workload get helmrelease -n tempo
-```
-
----
-
-## 9. Layers: apps + llm
-
-### 9a. Enable apps and llm
-
-Uncomment `apps.yaml` and `llm.yaml` in `flux-system/kustomization.yaml`, commit and push.
-
-### 9b. Verify
+### 8. Check
 
 ```bash
 flux --kubeconfig ~/.kube/workload get kustomizations
-kubectl --kubeconfig ~/.kube/workload get helmrelease -A
+kubectl --kubeconfig ~/.kube/workload get clustersecretstore default-store
+kubectl --kubeconfig ~/.kube/workload get externalsecrets -A
+kubectl --kubeconfig ~/.kube/workload get helmreleases -A
+kubectl --kubeconfig ~/.kube/workload -n longhorn-system get lease longhorn-global-manager
 ```
 
----
+## Secrets
 
-## Cloudflare DNS records
-
-DNS records for all exposed services are managed via Terraform. Apply at any point
-after FluxCD is running — records must exist before cert-manager issues certificates:
-
-```bash
-cd kubernetes/clusters/workload-prd/terraform/cloudflare
-tf_init && tf_apply
-```
-
----
-
-## Secrets reference
-
-| Secret | Namespace | How created | When needed |
-|--------|-----------|-------------|-------------|
-| `cloudflare-api-token-secret` | `cert-manager` | Manual (step 7a) | Before platform |
-| `dns-provider-credentials` | `yk-dns-manager` | Manual (step 7a) | Before platform |
-| `loki-s3-secret` | `loki` | ExternalSecret → Vault | Before observability |
-| `mimir-credentials` | `mimir` | ExternalSecret → Vault | Before observability |
-| `tempo-s3-secret` | `tempo` | ExternalSecret → Vault | Before observability |
-
----
-
-## Network
-
-| Host           | IP       | VLAN               |
-|----------------|----------|--------------------|
-| controlplane-1 | 10.0.4.3 | k8s-workload (VLAN 4) |
-| workload-1     | 10.0.4.4 | k8s-workload (VLAN 4) |
-
-See [`docs/NETWORK.md`](../../../docs/NETWORK.md) for the full VLAN layout and firewall rules.
+Every secret comes from Vault through an ExternalSecret in
+`kubernetes/secrets/base/`: cert-manager (Cloudflare token), democratic-csi
+(nfs, iscsi), cloudflared, yk-dns-manager (OPNsense API key), Loki, Mimir,
+Tempo, Grafana, Alertmanager, Immich, OpenCloud, Forgejo, forgejo-runner,
+and the ubuntu-test VM. Nothing is created by hand in the cluster.

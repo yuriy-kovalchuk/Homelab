@@ -117,7 +117,7 @@ ssh root@10.0.3.3 "
   docker cp /tmp/reviewer-jwt.txt ix-vault-vault-1:/tmp/reviewer-jwt.txt
   docker exec -e VAULT_ADDR=http://127.0.0.1:8200 -e VAULT_TOKEN=<root-token> ix-vault-vault-1 \
     sh -c 'vault write auth/kubernetes/config \
-      kubernetes_host=https://10.0.4.3:6443 \
+      kubernetes_host=https://10.0.4.10:6443 \
       kubernetes_ca_cert=@/tmp/k8s-ca.crt \
       token_reviewer_jwt=\$(cat /tmp/reviewer-jwt.txt) \
       disable_iss_validation=true'
