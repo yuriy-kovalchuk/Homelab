@@ -5,7 +5,7 @@ metadata:
   namespace: longhorn-system
 spec:
   values:
-    # Tolerate the worker-1 GPU taint: Longhorn must still run there to
+    # Tolerate the bahamut GPU taint: Longhorn must still run there to
     # serve worker-local volumes (longhorn-gpu StorageClass)
     global:
       tolerations:

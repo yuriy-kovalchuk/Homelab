@@ -10,7 +10,7 @@ parameters:
   numberOfReplicas: "1"
   staleReplicaTimeout: "30"
   fsType: ext4
-  # Data stays on worker-1 (gpu tag) next to the pods that use it —
+  # Data stays on bahamut (gpu tag) next to the pods that use it —
   # this class is for volumes that are useless without the GPU node anyway
   nodeSelector: "gpu"
   dataLocality: "strict-local"

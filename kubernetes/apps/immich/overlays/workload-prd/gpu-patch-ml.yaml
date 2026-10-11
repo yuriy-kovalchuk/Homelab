@@ -7,7 +7,7 @@ spec:
   template:
     spec:
       # No nodeSelector/toleration: the claim below resolves to the 680M, which
-      # lives on controlplane-1, so the scheduler places the pod there.
+      # lives on ixion, so the scheduler places the pod there.
       resourceClaims:
         - name: gpu
           resourceClaimName: immich-gpu

@@ -10,8 +10,8 @@ spec:
     deviceClass:
       create: true
     kubeletPlugin:
-      # Only the two AMD nodes carry the Talos amdgpu extension (worker-1,
-      # controlplane-1). Matching on key existence rather than the label's
+      # Only the two AMD nodes carry the Talos amdgpu extension (bahamut,
+      # ixion). Matching on key existence rather than the label's
       # value keeps this correct across Talos upgrades, which bump the value.
       affinity:
         nodeAffinity:

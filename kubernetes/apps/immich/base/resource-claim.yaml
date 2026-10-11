@@ -14,7 +14,7 @@ spec:
           selectors:
             - cel:
                 # Radeon 680M (gfx1035, Rembrandt) @ 0000:04:00.0 on
-                # controlplane-1. Selects on the sysfs PCI device ID, not
+                # ixion. Selects on the sysfs PCI device ID, not
                 # productName — amdgpu leaves product_name absent on these
                 # cards, so a productName selector matches nothing.
                 expression: 'device.attributes["gpu.amd.com"].deviceID == "0x1681"'

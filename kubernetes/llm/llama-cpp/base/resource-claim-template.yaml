@@ -19,5 +19,5 @@ spec:
                   # leaves /sys/class/drm/card*/device/product_name absent on
                   # these cards, so a productName selector silently matches
                   # nothing. Device IDs here: 0x7551 R9700, 0x1900 Radeon 780M,
-                  # 0x1681 Radeon 680M (controlplane-1).
+                  # 0x1681 Radeon 680M (ixion).
                   expression: 'device.attributes["gpu.amd.com"].deviceID == "0x7551"'

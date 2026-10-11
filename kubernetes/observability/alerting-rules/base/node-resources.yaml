@@ -42,4 +42,4 @@ spec:
             component: node
           annotations:
             summary: "Node {{ $labels.instance }} CPU usage is high"
-            description: "Node {{ $labels.instance }} has had CPU usage above 85% for more than 15 minutes. controlplane-2/controlplane-3 are only 4 vCPU — this can starve Longhorn's per-node instance-manager reservation."
+            description: "Node {{ $labels.instance }} has had CPU usage above 85% for more than 15 minutes. valefor, ifrit and shiva have only 4 cores — this can starve Longhorn's per-node instance-manager reservation."

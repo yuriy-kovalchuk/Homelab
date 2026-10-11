@@ -7,7 +7,7 @@ spec:
   template:
     spec:
       # Shares the single immich-gpu claim with immich-machine-learning, so
-      # both pods land on controlplane-1 and both see the 680M render node
+      # both pods land on ixion and both see the 680M render node
       # (VAAPI transcoding here, ROCm inference there).
       resourceClaims:
         - name: gpu
