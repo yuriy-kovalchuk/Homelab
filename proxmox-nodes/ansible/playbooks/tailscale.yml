@@ -1,0 +1,112 @@
+---
+# Tailscale subnet router on the remote-access VLAN (VM 1010 on the gateway
+# Proxmox host, see proxmox-nodes/terraform/prd/gateway/tailscale).
+#
+# Requires TAILSCALE_AUTHKEY in the environment (.env): a pre-approved,
+# non-ephemeral key tagged tag:homelab-router, created in the Tailscale admin
+# console. The key is only used on first login; re-runs don't re-authenticate.
+#
+# What remote clients may reach is decided twice: by the tailnet policy
+# (proxmox-nodes/tailscale/policy.hujson) and by the OPNsense rules on the
+# remote-access interface (firewall.yml).
+#
+#   ansible-playbook -i inventories/prd/remote-access playbooks/tailscale.yml
+#
+- name: System update
+  hosts: tailscale
+  become: true
+  gather_facts: false
+  roles:
+    - system_update
+
+- name: Tailscale subnet router
+  hosts: tailscale
+  become: true
+  gather_facts: true
+  vars:
+    tailscale_hostname: homelab-router
+    tailscale_tags: "tag:homelab-router"
+    tailscale_routes:
+      - 10.0.3.0/24       # storage
+      - 10.0.4.0/24       # k8s-workload
+      - 10.0.5.0/24       # trusted (OPNsense UI, switch, AP)
+      - 10.0.6.1/32       # OPNsense on remote-access: split-DNS resolver
+      - 192.168.0.254/32  # gateway Proxmox UI
+  tasks:
+    - name: Unattended security upgrades
+      ansible.builtin.apt:
+        name: unattended-upgrades
+        state: present
+
+    - name: Enable unattended upgrades
+      ansible.builtin.copy:
+        dest: /etc/apt/apt.conf.d/20auto-upgrades
+        content: |
+          APT::Periodic::Update-Package-Lists "1";
+          APT::Periodic::Unattended-Upgrade "1";
+        mode: "0644"
+
+    - name: Enable IP forwarding (subnet router)
+      ansible.posix.sysctl:
+        name: "{{ item }}"
+        value: "1"
+        sysctl_file: /etc/sysctl.d/99-tailscale.conf
+        reload: true
+      loop:
+        - net.ipv4.ip_forward
+        - net.ipv6.conf.all.forwarding
+
+    - name: Tailscale apt signing key
+      ansible.builtin.get_url:
+        url: "https://pkgs.tailscale.com/stable/ubuntu/{{ ansible_distribution_release }}.noarmor.gpg"
+        dest: /usr/share/keyrings/tailscale-archive-keyring.gpg
+        mode: "0644"
+
+    - name: Tailscale apt repository
+      ansible.builtin.copy:
+        dest: /etc/apt/sources.list.d/tailscale.list
+        content: >
+          deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg]
+          https://pkgs.tailscale.com/stable/ubuntu {{ ansible_distribution_release }} main
+        mode: "0644"
+
+    - name: Install Tailscale
+      ansible.builtin.apt:
+        name: tailscale
+        state: present
+        update_cache: true
+
+    - name: Start tailscaled
+      ansible.builtin.systemd:
+        name: tailscaled
+        enabled: true
+        state: started
+
+    - name: Current Tailscale state
+      ansible.builtin.command: tailscale status --json
+      register: ts_status
+      changed_when: false
+      failed_when: false
+
+    - name: Log in and advertise routes (first run only)
+      ansible.builtin.command: >
+        tailscale up
+        --auth-key={{ lookup('env', 'TAILSCALE_AUTHKEY') }}
+        --hostname={{ tailscale_hostname }}
+        --advertise-tags={{ tailscale_tags }}
+        --advertise-routes={{ tailscale_routes | join(',') }}
+        --accept-routes=false
+        --accept-dns=false
+        --ssh=false
+      no_log: true
+      when: (ts_status.stdout | default('{}') | from_json).BackendState | default('') != 'Running'
+
+    - name: Keep routes and settings in sync (every run)
+      ansible.builtin.command: >
+        tailscale set
+        --advertise-routes={{ tailscale_routes | join(',') }}
+        --accept-routes=false
+        --accept-dns=false
+        --ssh=false
+        --auto-update
+      changed_when: false

@@ -1,0 +1,40 @@
+// Tailnet policy — paste into the Tailscale admin console (Access controls).
+// Kept here so it is reviewed and versioned with the rest of the lab.
+{
+  // Only tailnet admins may assign the router tag
+  "tagOwners": {
+    "tag:homelab-router": ["autogroup:admin"],
+  },
+
+  // Routes from the router are approved automatically, but only these exact
+  // ones: a compromised router cannot widen what it advertises.
+  "autoApprovers": {
+    "routes": {
+      "10.0.3.0/24":      ["tag:homelab-router"],
+      "10.0.4.0/24":      ["tag:homelab-router"],
+      "10.0.5.0/24":      ["tag:homelab-router"],
+      "10.0.6.1/32":      ["tag:homelab-router"],
+      "192.168.0.254/32": ["tag:homelab-router"],
+    },
+  },
+
+  "grants": [
+    // Admins (you) reach the whole lab through the router
+    {
+      "src": ["autogroup:admin"],
+      "dst": ["10.0.3.0/24", "10.0.4.0/24", "10.0.5.0/24", "10.0.6.1/32", "192.168.0.254/32"],
+      "ip":  ["*"],
+    },
+    // Your own devices can reach each other
+    {
+      "src": ["autogroup:member"],
+      "dst": ["autogroup:self"],
+      "ip":  ["*"],
+    },
+    // Deliberately nothing with tag:homelab-router as src: the router cannot
+    // open connections to any device on the tailnet.
+  ],
+
+  // No Tailscale SSH anywhere
+  "ssh": [],
+}

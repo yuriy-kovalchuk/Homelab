@@ -13,6 +13,7 @@
       - { id: 3, description: "storage" }
       - { id: 4, description: "k8s-workload" }
       - { id: 5, description: "phys-workload" }
+      - { id: 6, description: "remote-access" }   # Tailscale subnet router VM, lives only inside the gateway Proxmox host
   tasks:
     - name: Create VLAN sub-interfaces on vtnet1
       oxlorg.opnsense.interface_vlan:
