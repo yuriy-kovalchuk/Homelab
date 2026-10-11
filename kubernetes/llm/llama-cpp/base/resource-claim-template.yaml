@@ -14,7 +14,7 @@ spec:
             count: 1
             selectors:
               - cel:
-                  # AMD AI Pro R9700 (gfx1201) @ 0000:03:00.0 on worker-1.
+                  # AMD AI Pro R9700 (gfx1201) @ 0000:03:00.0 on bahamut.
                   # Selects on the sysfs PCI device ID, NOT productName: amdgpu
                   # leaves /sys/class/drm/card*/device/product_name absent on
                   # these cards, so a productName selector silently matches

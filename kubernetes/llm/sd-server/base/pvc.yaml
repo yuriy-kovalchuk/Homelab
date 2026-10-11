@@ -4,7 +4,7 @@ metadata:
   name: sd-server-models
   namespace: llm
 spec:
-  # 1 replica, strict-local on worker-1 like strata-data: the weights are only
+  # 1 replica, strict-local on bahamut like strata-data: the weights are only
   # useful next to the R9700, and loads stay on the node's NVMe.
   accessModes:
     - ReadWriteOnce

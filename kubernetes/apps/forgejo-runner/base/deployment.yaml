@@ -17,10 +17,10 @@ spec:
       labels:
         app: forgejo-runner
     spec:
-      # Builds run on worker-1 (Zen 4, 16 threads, the GPU node), e.g. the Strata
-      # ROCm image. worker-1 is not always on: CI waits while it is down.
+      # Builds run on bahamut (Zen 4, 16 threads, the GPU node), e.g. the Strata
+      # ROCm image. bahamut is not always on: CI waits while it is down.
       nodeSelector:
-        kubernetes.io/hostname: worker-1
+        kubernetes.io/hostname: bahamut
       tolerations:
         - key: workload
           operator: Equal

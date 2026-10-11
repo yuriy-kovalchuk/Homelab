@@ -32,6 +32,16 @@
         mac: "10:62:e5:17:93:cf"
         hostname: "shiva"
         description: "shiva workload control-plane"
+      - subnet: "10.0.4.0/24"
+        ip: "10.0.4.11"
+        mac: "78:55:36:03:b1:e0"
+        hostname: "ixion"
+        description: "ixion workload worker"
+      - subnet: "10.0.4.0/24"
+        ip: "10.0.4.12"
+        mac: "38:05:25:32:8e:dc"
+        hostname: "bahamut"
+        description: "bahamut workload worker (oculink GPU)"
   tasks:
     - name: Reserve node IPs
       oxlorg.opnsense.dhcp_reservation:

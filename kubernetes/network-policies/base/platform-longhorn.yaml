@@ -53,6 +53,34 @@ spec:
             - port: "443"
               protocol: TCP
 ---
+# Added in Longhorn 1.13. It holds the longhorn-global-manager lease; without
+# API access its caches never sync, nobody holds the lease, and Longhorn pauses
+# remount-triggered pod deletion cluster-wide (a volume that faults and comes
+# back then leaves its pod on a dead, read-only mount).
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: longhorn-global-manager
+  namespace: longhorn-system
+spec:
+  endpointSelector:
+    matchLabels:
+      app: longhorn-global-manager
+  egress:
+    - toEntities:
+        - cluster
+    - toEntities:
+        - kube-apiserver
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
+---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:

@@ -58,4 +58,6 @@
       loop:
         - { ip: "10.0.4.5", name: valefor, last: false }
         - { ip: "10.0.4.6", name: ifrit, last: false }
-        - { ip: "10.0.4.7", name: shiva, last: true }
+        - { ip: "10.0.4.7", name: shiva, last: false }
+        - { ip: "10.0.4.11", name: ixion, last: false }
+        - { ip: "10.0.4.12", name: bahamut, last: true }

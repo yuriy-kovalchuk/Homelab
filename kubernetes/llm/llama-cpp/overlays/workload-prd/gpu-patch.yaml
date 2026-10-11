@@ -11,7 +11,7 @@ spec:
   template:
     spec:
       # The claim below pins the pod to whichever node holds the R9700, so no
-      # nodeSelector is needed — but worker-1's taint still has to be tolerated.
+      # nodeSelector is needed — but bahamut's taint still has to be tolerated.
       tolerations:
         - key: workload
           operator: Equal

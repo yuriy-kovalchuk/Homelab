@@ -14,7 +14,7 @@ spec:
       securityContext:
         seccompProfile:
           type: RuntimeDefault
-      # Claims the R9700 (0x7551), which pins the pod to worker-1.
+      # Claims the R9700 (0x7551), which pins the pod to bahamut.
       resourceClaims:
         - name: gpu
           resourceClaimTemplateName: strata-r9700

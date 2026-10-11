@@ -94,7 +94,7 @@ spec:
               memory: 52Gi
             limits:
               cpu: "15"
-              # worker-1 has ~60 GiB allocatable total (confirmed via `kubectl
+              # bahamut has ~60 GiB allocatable total (confirmed via `kubectl
               # describe node`) -- this is already most of it; leave ~2 GiB for
               # the node's own pods, not much slack beyond the request estimate.
               memory: 58Gi

@@ -14,6 +14,6 @@ spec:
             count: 1
             selectors:
               - cel:
-                  # Radeon 780M iGPU (gfx1103) on worker-1 -- same card as
+                  # Radeon 780M iGPU (gfx1103) on bahamut -- same card as
                   # llama-cpp-igpu: only one of the two can hold it.
                   expression: 'device.attributes["gpu.amd.com"].deviceID == "0x1900"'

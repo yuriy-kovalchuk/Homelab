@@ -51,17 +51,41 @@
       register: existing_healthchecks
       changed_when: false
 
-    - name: Health check (TCP connect)
+    # A TCP-connect check is not enough: a memory-starved kube-apiserver still
+    # completes the TCP handshake (the kernel does that) but never answers TLS,
+    # so it stays UP and gets its share of connections, which then hang. This
+    # check does a real HTTPS GET /readyz. Talos disables anonymous auth, so a
+    # healthy apiserver answers 401; that still proves TLS and HTTP are served.
+    - name: Health check (HTTPS /readyz)
       oxlorg.opnsense.raw:
         url: "haproxy/settings/add_healthcheck"
         action: post
         data:
           healthcheck:
-            name: k8s-api-tcp
-            description: "TCP connect to kube-apiserver"
-            type: tcp
+            name: k8s-api-readyz
+            description: "HTTPS GET /readyz on kube-apiserver"
+            type: http
             interval: "2s"
-      when: existing_healthchecks.response.rows | selectattr('name', 'equalto', 'k8s-api-tcp') | list | length == 0
+            ssl: ssl
+            http_method: get
+            http_uri: /readyz
+            http_version: http10
+            http_expressionEnabled: "1"
+            http_expression: rstatus
+            http_value: "^(200|401)$"
+      when: existing_healthchecks.response.rows | selectattr('name', 'equalto', 'k8s-api-readyz') | list | length == 0
+
+    # The check talks TLS to the apiservers' self-signed certs; there is no CA
+    # to verify against, and the traffic itself is TCP passthrough anyway.
+    - name: Do not verify backend certificates in health checks
+      oxlorg.opnsense.raw:
+        url: "haproxy/settings/set"
+        action: post
+        data:
+          haproxy:
+            general:
+              tuning:
+                sslServerVerify: none
 
     - name: Control-plane servers
       oxlorg.opnsense.haproxy_server:
@@ -78,7 +102,7 @@
         algorithm: roundrobin
         linked_servers: "{{ control_plane_nodes | map(attribute='name') | map('regex_replace', '^', 'k8s-api-') | list }}"
         health_check_enabled: true
-        health_check: k8s-api-tcp
+        health_check: k8s-api-readyz
         reload: false
 
     - name: Frontend on the VIP
@@ -93,6 +117,14 @@
       oxlorg.opnsense.haproxy_general_settings:
         enabled: true
         reload: false
+
+    - name: Test HAProxy config before applying it
+      oxlorg.opnsense.raw:
+        url: "haproxy/service/configtest"
+        action: get
+      register: haproxy_configtest
+      changed_when: false
+      failed_when: "'ALERT' in (haproxy_configtest.response.result | default(''))"
 
     - name: Apply HAProxy config
       oxlorg.opnsense.reload:

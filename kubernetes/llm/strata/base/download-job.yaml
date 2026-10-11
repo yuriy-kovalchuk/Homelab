@@ -30,9 +30,9 @@ spec:
     spec:
       restartPolicy: OnFailure
       # strata-data is a strict-local longhorn-gpu volume: its only replica is on
-      # worker-1. ReadWriteOnce is per node, so this runs beside the engine pod.
+      # bahamut. ReadWriteOnce is per node, so this runs beside the engine pod.
       nodeSelector:
-        kubernetes.io/hostname: worker-1
+        kubernetes.io/hostname: bahamut
       tolerations:
         - key: workload
           operator: Equal

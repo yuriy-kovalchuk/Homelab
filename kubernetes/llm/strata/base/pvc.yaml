@@ -4,7 +4,7 @@ metadata:
   name: strata-data
   namespace: llm
 spec:
-  # 1 replica, strict-local on worker-1: the data is useless without the R9700
+  # 1 replica, strict-local on bahamut: the data is useless without the R9700
   # anyway, and reads stay on the node's NVMe (Strata reads its lookup table per token)
   accessModes:
     - ReadWriteOnce
@@ -15,6 +15,6 @@ spec:
       # IQ3_XXS, IQ3_S) plus the shared ~29 GB shard-2 hardlink and mtp/packs
       # filled it to 86% (167.6G/195.8G) and left too little headroom for a
       # new size's setup-time disk-space precheck (it wants ~31 GB free even
-      # though the shard-2 copy ends up hardlinked, not duplicated). worker-1's
+      # though the shard-2 copy ends up hardlinked, not duplicated). bahamut's
       # longhorn-gpu disk has ~437 GiB available, so this is well within room.
       storage: 300Gi
