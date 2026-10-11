@@ -90,7 +90,7 @@ spec:
               # IQ3_S's shard 1 is 54.8 GB (vs IQ3_XXS's 47 GB) -> resident
               # experts in RAM (pageable on ROCm, STRATA_RESIDENT_PIN=0) scale
               # with it, est. ~46-47 GB, plus the engine and int8 KV past the
-              # resident threshold -- bigger again at 180224 ctx than at 131072.
+              # resident threshold -- bigger again at 256000 ctx than at 131072.
               memory: 52Gi
             limits:
               cpu: "15"

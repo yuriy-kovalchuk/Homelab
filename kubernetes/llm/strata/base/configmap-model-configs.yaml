@@ -7,10 +7,11 @@ data:
   # One key per quant size we've downloaded, each identical to what
   # `STRATA_MODE=auto` setup generated on its own at
   # /data/config/strata-<model>.json except "--max-context" bumped from
-  # setup.sh's VRAM-tier default (131072 on this 32 GB card) to 180224
-  # (trained ceiling is 262144; KV cost there is still small -- ~2.3 GiB
-  # combined K+V for the 12 full-attention layers at 180224, see
-  # deployment.yaml's volumeMounts for how each gets layered onto the PVC).
+  # setup.sh's VRAM-tier default (131072 on this 32 GB card) to 180224, and
+  # to 256000 (250k) on IQ3_S (trained ceiling is 262144; KV cost there is
+  # still small -- ~2.3 GiB combined K+V for the 12 full-attention layers at
+  # 180224, ~3.3 GiB at 256000, see deployment.yaml's initContainer for how
+  # each gets seeded onto the PVC).
   # Re-copy a model's block from its real generated file if upstream
   # setup.sh's other defaults for it ever change and this drifts.
   #
@@ -138,7 +139,7 @@ data:
       "--mtp",
       "/data/mtp/rt",
       "--max-context",
-      "180224",
+      "256000",
       "--kv",
       "int8"
      ],
