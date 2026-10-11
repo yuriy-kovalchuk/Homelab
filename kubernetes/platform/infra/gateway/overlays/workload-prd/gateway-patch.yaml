@@ -85,6 +85,21 @@ spec:
           selector:
             matchLabels:
               kubernetes.io/metadata.name: "forgejo"
+    - name: https-netbox
+      port: 443
+      protocol: HTTPS
+      hostname: "netbox.yuriykovalchuk.dev"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: netbox-gw-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: "netbox"
     - name: https-homepage
       port: 443
       protocol: HTTPS

@@ -1,0 +1,65 @@
+# Task queue (db 0) and cache (db 1) for NetBox. Deployed directly instead of
+# the chart's Bitnami subchart (Bitnami moved its free images to a legacy
+# registry). No persistence: queued jobs and cache are disposable.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: netbox-valkey
+  namespace: netbox
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: netbox-valkey
+  template:
+    metadata:
+      labels:
+        app: netbox-valkey
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: valkey
+          image: docker.io/valkey/valkey:8.1.10
+          args: ["--save", "", "--appendonly", "no"]
+          ports:
+            - name: valkey
+              containerPort: 6379
+          readinessProbe:
+            tcpSocket:
+              port: valkey
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: netbox-valkey
+  namespace: netbox
+spec:
+  selector:
+    app: netbox-valkey
+  ports:
+    - name: valkey
+      port: 6379
+      targetPort: valkey

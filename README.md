@@ -174,6 +174,7 @@ ingesters are spread one per node; Loki's are not yet.
 | opencloud | File cloud |
 | forgejo + forgejo-runner | Git server (CNPG Postgres) and Actions runner (builds on bahamut) |
 | homepage | Dashboard |
+| netbox | Inventory and IPAM for the lab (experiment; CNPG Postgres, Valkey) |
 | yk-portfolio, yk-update-checker | Personal site, dependency update dashboard |
 | httpbin, whoami | Test services |
 | llama-cpp, llama-cpp-rocm, llama-cpp-igpu | llama.cpp servers on the R9700 (Vulkan, ROCm) and the 780M |

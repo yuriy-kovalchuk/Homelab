@@ -109,3 +109,44 @@ variable "alertmanager_slack_webhook_url" {
   sensitive   = true
 }
 
+
+variable "netbox_secret_key" {
+  description = "NetBox SECRET_KEY (50+ random characters)"
+  type        = string
+  sensitive   = true
+}
+
+variable "netbox_api_token_pepper" {
+  description = "NetBox API token pepper (50+ random characters)"
+  type        = string
+  sensitive   = true
+}
+
+variable "netbox_superuser_username" {
+  description = "NetBox superuser name"
+  type        = string
+  default     = "admin"
+}
+
+variable "netbox_superuser_password" {
+  description = "NetBox superuser password"
+  type        = string
+  sensitive   = true
+}
+
+variable "netbox_superuser_email" {
+  description = "NetBox superuser email"
+  type        = string
+}
+
+variable "netbox_superuser_api_token" {
+  description = "NetBox superuser API token (40 hex characters)"
+  type        = string
+  sensitive   = true
+}
+
+variable "netbox_db_password" {
+  description = "Password for the netbox CNPG database user"
+  type        = string
+  sensitive   = true
+}

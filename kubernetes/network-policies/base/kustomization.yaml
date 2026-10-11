@@ -9,6 +9,7 @@ resources:
   - apps-immich.yaml
   - apps-llama-cpp.yaml
   - apps-llama-cpp-igpu.yaml
+  - apps-netbox.yaml
   - apps-open-webui.yaml
   - apps-sd-server.yaml
   - apps-strata.yaml

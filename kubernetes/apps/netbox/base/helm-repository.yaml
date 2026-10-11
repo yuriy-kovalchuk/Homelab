@@ -1,0 +1,10 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: netbox
+  namespace: netbox
+spec:
+  interval: 12h
+  url: oci://ghcr.io/netbox-community/netbox-chart/netbox
+  ref:
+    tag: "8.3.91"

@@ -1,0 +1,81 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: netbox
+  namespace: netbox
+spec:
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: netbox
+    namespace: netbox
+  timeout: 10m
+  install:
+    createNamespace: false
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+      remediateLastFailure: true
+  values:
+    # secret_key, api_token_peppers, email_password — from Vault (ExternalSecret)
+    existingSecret: netbox-config
+    superuser:
+      existingSecret: netbox-superuser
+
+    timeZone: Europe/Rome
+    # Every page and API call requires a login
+    loginRequired: true
+
+    # Bundled Bitnami subcharts off: Postgres is a CNPG cluster, Valkey is
+    # deployed next to the release (valkey.yaml).
+    postgresql:
+      enabled: false
+    valkey:
+      enabled: false
+    externalDatabase:
+      host: pg-cluster-netbox-rw
+      port: 5432
+      database: netbox
+      username: netbox
+      existingSecretName: netbox-db
+      existingSecretKey: password
+    tasksDatabase:
+      host: netbox-valkey
+      database: 0
+    cachingDatabase:
+      host: netbox-valkey
+      database: 1
+
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+      limits:
+        memory: 1Gi
+
+    worker:
+      resources:
+        requests:
+          cpu: 50m
+          memory: 256Mi
+        limits:
+          memory: 512Mi
+
+    housekeeping:
+      enabled: true
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          memory: 512Mi
+
+    # Shared by the web pod, the worker and housekeeping, which can land on
+    # different nodes, so it must be ReadWriteMany.
+    persistence:
+      enabled: true
+      storageClass: truenas-nfs
+      accessMode: ReadWriteMany
+      size: 1Gi
