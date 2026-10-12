@@ -54,13 +54,15 @@ spec:
               mountPath: /data
       containers:
         - name: strata
-          # Built by git.yuriykovalchuk.dev/yuriy/Strata CI (Strata e8ca9af, gfx1201,
-          # ROCm 7.2.4, repo 3687328) -- 242 commits ahead of the previous pin
-          # (82f46a8), off the multi-stage Dockerfile: 7.58 GB -> 4.20 GB (the
-          # first two multi-stage builds, 0659674/7f2dd2e, were missing
-          # hipblaslt/hipblas and then their ldconfig cache -- both confirmed
-          # fixed via `ldd` against this exact tag before pointing it here).
-          image: harbor.yuriykovalchuk.dev/homelab/strata:e8ca9af-gfx1201-rocm7.2.4-3687328
+          # Built by git.yuriykovalchuk.dev/yuriy/Strata CI (Strata 7695859 = v0.1.43,
+          # gfx1201, ROCm 7.2.4, repo 3c52d49) -- 458 commits ahead of the previous
+          # pin (e8ca9af, v0.1.40.2). v0.1.43 turns on RDNA4 defaults that apply here
+          # with no config change: fused int8 prompt experts for IQ3_S/IQ3_XXS
+          # (R9700 prefill +15-20%), 16K chunks for a bare `--prefill auto`, the
+          # measured PCIe share (fits the OCuLink x4 link) and the route tail skip.
+          # Each has an opt-out env var if it misbehaves: STRATA_PF_FUSED=0,
+          # STRATA_GFX12_CHUNK=0, STRATA_PCIE_FRAC_DEFAULT=old, STRATA_ROUTE_TAIL_SKIP=0.
+          image: harbor.yuriykovalchuk.dev/homelab/strata:7695859-gfx1201-rocm7.2.4-3c52d49
           env:
             # auto: if MODEL has no config yet, run Strata's setup first, then serve.
             # This pod has no internet egress, so setup runs offline on the files
