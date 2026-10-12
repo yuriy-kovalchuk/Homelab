@@ -7,4 +7,4 @@ spec:
   interval: 1h
   url: oci://ghcr.io/yuriy-kovalchuk/charts/talos-monitoring
   ref:
-    tag: "0.1.0"
+    tag: "0.1.1"
