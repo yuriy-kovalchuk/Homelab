@@ -62,7 +62,7 @@ spec:
           # measured PCIe share (fits the OCuLink x4 link) and the route tail skip.
           # Each has an opt-out env var if it misbehaves: STRATA_PF_FUSED=0,
           # STRATA_GFX12_CHUNK=0, STRATA_PCIE_FRAC_DEFAULT=old, STRATA_ROUTE_TAIL_SKIP=0.
-          image: harbor.yuriykovalchuk.dev/homelab/strata:7695859-gfx1201-rocm7.2.4-3c52d49
+          image: harbor.yuriykovalchuk.dev/homelab/strata:477ac13-gfx1201-rocm7.2.4-c40a550
           env:
             # auto: if MODEL has no config yet, run Strata's setup first, then serve.
             # This pod has no internet egress, so setup runs offline on the files
