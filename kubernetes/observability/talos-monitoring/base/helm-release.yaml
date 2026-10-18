@@ -21,8 +21,12 @@ spec:
       remediateLastFailure: true
   values:
     talos:
+      # Omni (which manages the Talos configs) refuses os:admin for in-cluster
+      # Talos API access, so the nodes only allow os:reader. Every COSI /
+      # machine-API collector works with it; the file-based ones (sensors,
+      # hwmon, DMI), which need the admin-only Read RPC, switch themselves off.
       roles:
-        - os:admin
+        - os:reader
     serviceMonitor:
       enabled: true
     grafana:
