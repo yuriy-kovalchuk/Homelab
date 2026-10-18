@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - vm.yaml
   - rdp-service.yaml
+  - ssh-service.yaml

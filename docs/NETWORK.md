@@ -45,6 +45,7 @@ flowchart TB
         p4["4 Talos PRD"]
         p5["5 Talos PRD workers"]
         p6["6 Talos PRD workers"]
+        p7["7 Talos PRD workers<br/>(planned for ixion)"]
         p9["9 Management"]
     end
 
@@ -64,6 +65,7 @@ flowchart TB
         shiva["shiva<br/>control plane"]
         ixion["ixion<br/>worker · Radeon 680M"]
         bahamut["bahamut<br/>worker · R9700 via OCuLink"]
+        yojimbo["yojimbo<br/>worker · GTX 1070 (VMs)"]
     end
 
     internet --- isp --- eth0
@@ -75,8 +77,9 @@ flowchart TB
     mercusys --- valefor
     mercusys --- ifrit
     mercusys --- shiva
-    p5 --- ixion
+    p5 --- yojimbo
     p6 --- bahamut
+    p7 -.- ixion
 
     remote -.->|"WireGuard, outbound only"| tsctl
     ts -.->|"outbound only, no port forward"| tsctl
@@ -137,14 +140,14 @@ network (7, 8 or 10).
 | 2 | Storage | storage Proxmox host (TrueNAS VM behind it) | 2.5 GbE | Storage (3) | Block All |
 | 3 | Trusted | TP-Link TL-WA1201 access point | 1 GbE | Trusted (5) | Block All |
 | 4 | Talos PRD | MERCUSYS MS105GS → valefor, ifrit, shiva | 2.5 GbE | Talos PRD (4) | Block All |
-| 5 | Talos PRD workers | ixion | — (offline) | Talos PRD (4) | Block All |
+| 5 | Talos PRD workers | yojimbo | 1 GbE | Talos PRD (4) | Block All |
 | 6 | Talos PRD workers | bahamut | 2.5 GbE | Talos PRD (4) | Block All |
-| 7 | Port 7 | — | — | Default | — |
+| 7 | Port 7 | ixion when it is back (offline); still to be set to Talos PRD (4) in UniFi | — | Default | — |
 | 8 | Port 8 | — | — | Default | — |
 | 9 | Management | admin PC | — | Trusted (5) | Block All |
 | 10 | Port 10 (SFP) | — | — | Default | — |
 
-Ports 7, 8 and 10 are untouched factory defaults: untagged `Default`
+Ports 8 and 10 (and 7 until ixion moves there) are untouched factory defaults: untagged `Default`
 network, which OPNsense does not serve. The AP does no VLAN tagging; its
 single SSID is the trusted network. valefor and shiva have 1 GbE NICs, so
 only ifrit runs at 2.5 GbE behind the MERCUSYS switch. VLAN 6 is not on the
@@ -311,8 +314,8 @@ installs them as routes to the node holding each service.
   internal DNS record. Reachable from trusted, from k8s-workload, and from
   tailnet devices through the Tailscale VM.
 - **Non-HTTP services** get their own LoadBalancer IP from the pool instead of
-  the Gateway, plus a CiliumNetworkPolicy limiting the clients. Today: RDP to
-  the `ubuntu-test` VM on `10.0.4.51:3389` (`externalTrafficPolicy: Local`, so
+  the Gateway, plus a CiliumNetworkPolicy limiting the clients. Today: RDP and SSH to
+  the `ubuntu-test` VM on `10.0.4.51` (3389, 22; two Services sharing the IP) (`externalTrafficPolicy: Local`, so
   only bahamut advertises it), from trusted and the Tailscale VM only.
 - **Public:** `cloudflared` runs a Cloudflare Tunnel from the cluster. Nothing
   needs to be port-forwarded for it.

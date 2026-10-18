@@ -12,7 +12,7 @@ tags:
   - { name: longhorn-gpu, color: "9c27b0", description: "Longhorn node tag 'gpu' (longhorn-gpu class)" }
   - { name: gpu-only, color: "f44336", description: "Tainted workload=gpu:NoSchedule" }
 
-manufacturers: [Ubiquiti, MERCUSYS, TP-Link, Topton, Beelink, HP, Minisforum, AMD, Generic]
+manufacturers: [Ubiquiti, MERCUSYS, TP-Link, Topton, Beelink, HP, Minisforum, AMD, NVIDIA, Generic]
 
 device_roles:
   - { name: Router, slug: router, color: "795548" }
@@ -26,6 +26,7 @@ device_roles:
 platforms:
   - { name: Proxmox VE, slug: proxmox-ve }
   - { name: Talos Linux v1.14.2, slug: talos-1-14-2 }
+  - { name: Talos Linux v1.14.4, slug: talos-1-14-4 }
   - { name: OPNsense, slug: opnsense }
   - { name: TrueNAS SCALE, slug: truenas-scale }
   - { name: Ubuntu 24.04, slug: ubuntu-24-04 }
@@ -42,6 +43,7 @@ device_types:
   - { manufacturer: HP, model: ProDesk 600 G3 DM, slug: hp-prodesk-600-g3-dm }
   - { manufacturer: HP, model: EliteDesk 800 G3 DM 65W, slug: hp-elitedesk-800-g3-dm }
   - { manufacturer: Minisforum, model: AI series (Ryzen 7 255), slug: minisforum-ai-r7-255 }
+  - { manufacturer: Generic, model: Desktop (Pegatron board, i7-7700K), slug: desktop-pegatron-i7-7700k }
 
 vlans:
   - { vid: 3, name: storage, description: "Storage node and TrueNAS. UniFi 'Storage', OPNsense opt2" }
@@ -69,7 +71,7 @@ ip_ranges:
 # Addresses that belong to no single interface
 standalone_ips:
   - { address: 10.0.4.50/24, dns_name: "*.yuriykovalchuk.dev", description: "Cilium Gateway 'internal' — every HTTPS hostname" }
-  - { address: 10.0.4.51/24, description: "ubuntu-test-rdp — RDP (TCP 3389) to the ubuntu-test VM on bahamut" }
+  - { address: 10.0.4.51/24, description: "ubuntu-test-rdp / ubuntu-test-ssh — RDP (3389) and SSH (22) to the ubuntu-test VM on bahamut" }
 
 devices:
   - name: isp-router
@@ -144,7 +146,7 @@ devices:
   - name: valefor
     type: hp-elitedesk-800-g2-dm
     role: k8s-control-plane
-    platform: talos-1-14-2
+    platform: talos-1-14-4
     cluster: workload-prd
     tags: [talos, longhorn-system]
     comments: "Intel i5-6400T 4C/4T, 16 GB DDR4-2133, Kingston SV300 120 GB SATA. Schematic 613e1592…"
@@ -154,7 +156,7 @@ devices:
   - name: ifrit
     type: hp-prodesk-600-g3-dm
     role: k8s-control-plane
-    platform: talos-1-14-2
+    platform: talos-1-14-4
     cluster: workload-prd
     tags: [talos, longhorn-system]
     comments: "Intel i5-6500T 4C/4T, 32 GB DDR4-2133, Essencore 256 GB SATA. Schematic 613e1592…"
@@ -165,7 +167,7 @@ devices:
   - name: shiva
     type: hp-elitedesk-800-g3-dm
     role: k8s-control-plane
-    platform: talos-1-14-2
+    platform: talos-1-14-4
     cluster: workload-prd
     tags: [talos, longhorn-system]
     comments: "Intel i5-6500 4C/4T, 16 GB DDR4-2133, MicroFrom 256 GB SATA. Schematic 613e1592…"
@@ -175,7 +177,7 @@ devices:
   - name: ixion
     type: beelink-ser5-max
     role: k8s-worker
-    platform: talos-1-14-2
+    platform: talos-1-14-4
     cluster: workload-prd
     status: offline
     tags: [talos, not-always-on]
@@ -188,7 +190,7 @@ devices:
   - name: bahamut
     type: minisforum-ai-r7-255
     role: k8s-worker
-    platform: talos-1-14-2
+    platform: talos-1-14-4
     cluster: workload-prd
     tags: [talos, not-always-on, longhorn-gpu, gpu-only]
     comments: "AMD Ryzen 7 255 8C/16T, 64 GB DDR5-5600, Crucial P310 1 TB NVMe. Label ai-node=oculink. Schematic 65cf8364…"
@@ -197,6 +199,18 @@ devices:
     inventory:
       - { name: Radeon AI PRO R9700, manufacturer: AMD, part_id: "0x7551", description: "Navi 48 gfx1201 on OCuLink — llama-cpp, strata, sd-server" }
       - { name: Radeon 780M, manufacturer: AMD, part_id: "0x1900", description: "iGPU, HawkPoint gfx1103 — llama-cpp-igpu" }
+
+  - name: yojimbo
+    type: desktop-pegatron-i7-7700k
+    role: k8s-worker
+    platform: talos-1-14-4
+    cluster: workload-prd
+    tags: [talos, gpu-only]
+    comments: "Intel i7-7700K 4C/8T, 16 GB, Samsung MZ7LN256 256 GB SATA. Managed by Omni. Taint workload=gpu:NoSchedule, Longhorn tag vms. Schematic c9d4b52a… (NVIDIA 580 LTS)"
+    interfaces:
+      - { name: enp4s0, type: 1000base-t, description: Realtek RTL8111/8168, mac: "10:05:01:43:06:f7", ips: [10.0.4.13/24], primary: true }
+    inventory:
+      - { name: GeForce GTX 1070, manufacturer: NVIDIA, part_id: "0x1b81", description: "Pascal GP104 — VMs via VFIO passthrough (NVIDIA DRA driver, planned)" }
 
 cables:
   - [gateway/nic0, isp-router/lan]
@@ -207,13 +221,13 @@ cables:
   - [valefor/eno1, ms105gs/Port 2]
   - [ifrit/enp1s0, ms105gs/Port 3]
   - [shiva/eno1, ms105gs/Port 4]
-  - [ixion/eno1, usw-flex/Port 5]
+  - [yojimbo/enp4s0, usw-flex/Port 5]
   - [bahamut/enp4s0, usw-flex/Port 6]
 
 clusters:
   - { name: gateway, type: Proxmox VE, device: gateway }
   - { name: storage, type: Proxmox VE, device: storage }
-  - { name: workload-prd, type: Kubernetes, description: "Talos v1.14.2, Kubernetes v1.37.1, Cilium 1.20.1, Flux" }
+  - { name: workload-prd, type: Kubernetes, description: "Talos v1.14.4 (Omni), Kubernetes v1.37.1, Cilium 1.20.3, Flux" }
 
 virtual_machines:
   - name: opnsense

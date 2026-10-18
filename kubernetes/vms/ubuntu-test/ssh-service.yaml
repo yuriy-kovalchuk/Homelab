@@ -1,0 +1,24 @@
+# SSH straight to the VM on the same LoadBalancer IP as RDP (10.0.4.51, shared
+# through the lbipam sharing-key), advertised over BGP by bahamut only; no
+# kube-apiserver / virtctl in the path. externalTrafficPolicy Local keeps the
+# client address for the ingress policy.
+apiVersion: v1
+kind: Service
+metadata:
+  name: ubuntu-test-ssh
+  namespace: kubevirt-ubuntu-test
+  annotations:
+    lbipam.cilium.io/ips: "10.0.4.51"
+    lbipam.cilium.io/sharing-key: ubuntu-test
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  # Cilium serves the LB IP itself; no NodePort on every node.
+  allocateLoadBalancerNodePorts: false
+  selector:
+    kubevirt.io/vm: ubuntu-test
+  ports:
+    - name: ssh
+      port: 22
+      targetPort: 22
+      protocol: TCP

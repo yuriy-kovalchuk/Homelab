@@ -8,7 +8,7 @@ Ubuntu 24.04 (Noble) test VM running on KubeVirt in the `kubevirt-ubuntu-test` n
 - 50 GB Longhorn PVC (RWO — no live migration)
 - Networking: KubeVirt bridge mode (VM shares pod IP, no iptables/passt required)
 - Desktop: XFCE4 + LightDM
-- Remote desktop: xrdp on `10.0.4.51:3389` (see Access)
+- Remote desktop: xrdp on `10.0.4.51:3389`; SSH on `10.0.4.51:22` (see Access)
 
 **Flux is suspended for this component** (`suspend: true` in
 `kubernetes/clusters/workload-prd/flux-system/vms.yaml`): changes here are applied from the
@@ -46,7 +46,7 @@ kill $(lsof -ti:5901)
 
 `rdp-service.yaml` exposes TCP 3389 of the VM on **`10.0.4.51`** (Cilium LB pool, advertised over BGP
 by bahamut only, `externalTrafficPolicy: Local`, no NodePort). Nothing goes through the kube-apiserver.
-The `ubuntu-test-rdp-ingress` CiliumNetworkPolicy (`kubernetes/network-policies/base/vms-ubuntu-test.yaml`)
+The `ubuntu-test-remote-ingress` CiliumNetworkPolicy (`kubernetes/network-policies/base/vms-ubuntu-test.yaml`)
 allows it only from the trusted VLAN (`10.0.5.0/24`) and the Tailscale subnet router (`10.0.6.10`).
 
 **1. Install xrdp inside the VM** (one-time, via the console or SSH, as the desktop user):
@@ -63,6 +63,19 @@ over xrdp at the same time.
 
 **2. Connect** with Microsoft "Windows App" (free, Mac App Store; macOS has no built-in RDP client)
 to `10.0.4.51`, with the VM user's credentials.
+
+### SSH
+
+`ssh-service.yaml` puts SSH on the same IP (`ubuntu-test-ssh`, `10.0.4.51:22`, the two Services share
+it through `lbipam.cilium.io/sharing-key: ubuntu-test`), allowed by the same policy.
+
+```bash
+ssh-copy-id -i ~/.ssh/homelab_ed25519.pub <vm-user>@10.0.4.51   # once, with the VM password
+ssh -i ~/.ssh/homelab_ed25519 <vm-user>@10.0.4.51
+```
+
+The cloud-init enables password logins (`ssh_pwauth: true`). Once your key works, turn them off in the
+guest (`PasswordAuthentication no` in `/etc/ssh/sshd_config.d/`, then `sudo systemctl reload ssh`).
 
 ## Console access
 

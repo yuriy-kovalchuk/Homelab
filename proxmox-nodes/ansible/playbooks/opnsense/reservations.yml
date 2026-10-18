@@ -42,6 +42,11 @@
         mac: "38:05:25:32:8e:dc"
         hostname: "bahamut"
         description: "bahamut workload worker (oculink GPU)"
+      - subnet: "10.0.4.0/24"
+        ip: "10.0.4.13"
+        mac: "10:05:01:43:06:f7"
+        hostname: "yojimbo"
+        description: "yojimbo workload worker (GTX 1070)"
   tasks:
     - name: Reserve node IPs
       oxlorg.opnsense.dhcp_reservation:

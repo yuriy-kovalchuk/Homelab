@@ -192,6 +192,13 @@
         href: https://10.0.3.2:8006
         description: Hypervisor — TrueNAS VM
         siteMonitor: https://10.0.3.2:8006
+    - NetBox:
+        icon: netbox.svg
+        href: https://netbox.yuriykovalchuk.dev
+        description: Source of truth — devices, IPs, cables
+        namespace: netbox
+        app: netbox
+        podSelector: app.kubernetes.io/name=netbox
 
 - Dev tools:
     - HTTPBin:

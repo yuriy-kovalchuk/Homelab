@@ -35,7 +35,7 @@ Harbor, RustFS (S3), Traefik, Dockhand.
 
 ### Kubernetes nodes (Talos, cluster `workload-prd`)
 
-All run Talos v1.14.2 with Kubernetes v1.37.1.
+All run Talos v1.14.4 with Kubernetes v1.37.1.
 
 | Node | Role | Hardware | CPU | RAM | Disk | NIC |
 |------|------|----------|-----|-----|------|-----|
@@ -44,6 +44,7 @@ All run Talos v1.14.2 with Kubernetes v1.37.1.
 | shiva | control plane | HP EliteDesk 800 G3 DM 65W | Intel i5-6500, 4C/4T | 16 GB DDR4-2133 | MicroFrom 256 GB SATA | Intel I219-LM 1 GbE (`eno1`) |
 | ixion | worker | Beelink SER5 Max | AMD Ryzen 7 6800H, 8C/16T | 32 GB | **None** — the 128 GB OSC NVMe (SM2263XT) failed; replacement pending | `eno1` |
 | bahamut | worker | Minisforum AI series mini-PC (firmware vendor "Micro Computer (HK) Tech Limited") | AMD Ryzen 7 255, 8C/16T | 64 GB DDR5-5600 | Crucial P310 1 TB NVMe | Realtek RTL8125 2.5 GbE (`enp4s0`); MediaTek MT7925 WiFi unused |
+| yojimbo | worker | Desktop, Pegatron mainboard | Intel i7-7700K, 4C/8T | 16 GB (2 × 8 GB Micron) | Samsung MZ7LN256 256 GB SATA (`wwid naa.5002538d41a3f834`) | Realtek RTL8111/8168 1 GbE (`enp4s0`); Intel AC 3168 WiFi unused |
 
 GPUs (claimed through Kubernetes DRA by PCI device ID):
 
@@ -52,6 +53,7 @@ GPUs (claimed through Kubernetes DRA by PCI device ID):
 | bahamut | AMD Radeon AI PRO R9700 (Navi 48, gfx1201), on OCuLink | `0x7551` | llama-cpp, llama-cpp-rocm, strata, sd-server |
 | bahamut | Radeon 780M iGPU (HawkPoint, gfx1103) | `0x1900` | llama-cpp-igpu |
 | ixion | Radeon 680M iGPU (Rembrandt, gfx1035) | `0x1681` | Immich (server + machine learning) |
+| yojimbo | NVIDIA GeForce GTX 1070 (Pascal GP104), HDMI audio `0x10f0` | `0x1b81` | VMs via VFIO passthrough (NVIDIA DRA driver, planned) |
 
 Talos image schematics (factory.talos.dev):
 
@@ -59,6 +61,7 @@ Talos image schematics (factory.talos.dev):
 |-------|-----------|------------|
 | valefor, ifrit, shiva | `613e1592…` | iscsi-tools, util-linux-tools |
 | bahamut, ixion | `65cf8364…` | amd-ucode, amdgpu, iscsi-tools, util-linux-tools |
+| yojimbo | `c9d4b52a…` | intel-ucode, nonfree-kmod-nvidia-lts (580, the last branch with Pascal), nvidia-container-toolkit-lts, iscsi-tools, util-linux-tools; kernel args `intel_iommu=on iommu=pt` |
 
 Node labels and taints:
 
@@ -67,6 +70,11 @@ Node labels and taints:
 - bahamut: label `ai-node: oculink`, taint `workload=gpu:NoSchedule`, Longhorn
   tag `gpu`. Only GPU workloads (and forgejo-runner, which builds there)
   tolerate it.
+- yojimbo: labels `machineSize: medium`, `gpu-vendor: nvidia`, taint
+  `workload=gpu:NoSchedule` (set with kubectl: Talos cannot taint a worker),
+  Longhorn node and disk tag `vms` (10 GiB reserved): only the `longhorn-vms`
+  StorageClass places volumes there. Managed by Omni (config patch
+  `10-bee448ac-…`), joined 2026-10-18.
 
 ## Addresses
 
@@ -100,10 +108,11 @@ DHCP pool.
 | 10.0.4.6 | ifrit | 00:e0:4c:68:10:09 | Control plane |
 | 10.0.4.7 | shiva | 10:62:e5:17:93:cf | Control plane |
 | 10.0.4.10 | Kubernetes API VIP | — | IP alias on OPNsense; HAProxy → control planes :6443 |
-| 10.0.4.11 | ixion | 78:55:36:03:b1:e0 | Worker; offline until its disk is replaced |
+| 10.0.4.11 | ixion | 78:55:36:03:b1:e0 | Worker; offline until its disk is replaced (moves to switch port 7) |
 | 10.0.4.12 | bahamut | 38:05:25:32:8e:dc | Worker; not always powered on. Static IP in its Talos config as well |
+| 10.0.4.13 | yojimbo | 10:05:01:43:06:f7 | Worker, GTX 1070 for VMs. Kea reservation and static IP in its Talos config |
 | 10.0.4.50 | `internal` Gateway | — | Cilium Gateway for every HTTPS hostname |
-| 10.0.4.51 | `ubuntu-test-rdp` | — | RDP (TCP 3389) to the ubuntu-test VM on bahamut; trusted VLAN and Tailscale only |
+| 10.0.4.51 | `ubuntu-test-rdp` / `ubuntu-test-ssh` | — | RDP (TCP 3389) and SSH (TCP 22) to the ubuntu-test VM on bahamut (shared LB IP); trusted VLAN and Tailscale only |
 | 10.0.4.50–99 | Cilium LB pool | | Advertised over BGP (ASN 65002) |
 | 10.0.4.100–200 | DHCP pool | | |
 
