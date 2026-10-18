@@ -1,0 +1,16 @@
+apiVersion: policies.kyverno.io/v1beta1
+kind: PolicyException
+metadata:
+  name: node-feature-discovery
+  namespace: node-feature-discovery
+spec:
+  matchConditions:
+    - name: exclude-node-feature-discovery
+      expression: "object.metadata.namespace == 'node-feature-discovery'"
+  # nfd-worker's read-only hostPath mounts only; seccomp, non-root and
+  # dropped capabilities are already satisfied by the chart and our values.
+  policyRefs:
+    - kind: ValidatingPolicy
+      name: disallow-host-path
+    - kind: ValidatingPolicy
+      name: restrict-volume-types
