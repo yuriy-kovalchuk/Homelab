@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../llama-cpp/overlays/workload-prd
+  - ../../llama-cpp-rocm/overlays/workload-prd  # ROCm (gfx1201) — for Flash-Next; shares GPU + models PVC with the Vulkan pod, don't serve big models on both at once
+  - ../../llama-cpp-igpu/overlays/workload-prd  # Vulkan on the 780M iGPU (Vulkan0) — serves a second model concurrently with the R9700 pod
+  - ../../llama-cpp-cuda/overlays/workload-prd  # CUDA on the GTX 1070 (yojimbo), NVIDIA DRA claim; Gemma 4 and Qwen3.6-35B-A3B from Hugging Face
+  - ../../strata/overlays/workload-prd  # Strata (HIP, gfx1201) — Flash-Next with expert caching + MTP; R9700 on bahamut
+  - ../../sd-server/overlays/workload-prd  # stable-diffusion.cpp (Vulkan) — Qwen-Image-2.1; R9700, parked at 0 (one R9700 workload at a time)
+  - ../../open-webui/overlays/workload-prd

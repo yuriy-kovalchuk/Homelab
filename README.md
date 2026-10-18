@@ -71,7 +71,7 @@ Homelab/
 │   ├── observability/        Loki, Mimir, Tempo, Alloy, Grafana, Alertmanager, talos-monitoring
 │   │   └── alerting-rules/   PrometheusRules
 │   ├── apps/                 User-facing apps
-│   ├── llm/                  llama.cpp, Strata, stable-diffusion, Open WebUI (wired in through apps)
+│   ├── llm/                  llama.cpp, Strata, stable-diffusion, Open WebUI (its own llm layer)
 │   └── vms/                  KubeVirt VMs
 ├── proxmox-nodes/
 │   ├── terraform/            Terragrunt: OPNsense, TrueNAS and Tailscale VMs, TrueNAS datasets and apps, Proxmox ACME, tailnet (policy, DNS, keys)
@@ -104,6 +104,7 @@ namespaces
                 ├── observability
                 │   └── alerting-rules
                 ├── apps                (also depends on policies)
+                ├── llm                 (also depends on policies)
                 └── vm-ubuntu-test
 ```
 
@@ -115,8 +116,10 @@ Why it is split this way:
   policies, secrets and policies are separate layers after `core`.
 - `platform-infra` holds only what other layers need to work; a broken tool
   in `platform-ops` cannot block anything else.
-- The `apps` Kustomization ignores `/spec/replicas` for Deployments in the
+- The `llm` Kustomization ignores `/spec/replicas` for Deployments in the
   `llm` namespace, so GPU workloads can be parked at 0 with `kubectl scale`.
+  It prunes (removing a model server from Git deletes it and its volumes);
+  `apps` does not.
 
 ## Components
 
@@ -179,12 +182,18 @@ ingesters are spread one per node; Loki's are not yet.
 |-----|---------|
 | immich | Photos; Radeon 680M on ixion via a shared DRA claim; CNPG Postgres |
 | opencloud | File cloud |
-| forgejo + forgejo-runner | Git server (CNPG Postgres) and Actions runner (builds on bahamut) |
+| forgejo + forgejo-runner | Git server (CNPG Postgres) and Actions runner (builds on any worker) |
 | homepage | Dashboard |
 | netbox | Inventory and IPAM for the lab (experiment; CNPG Postgres, Valkey) |
 | yk-portfolio, yk-update-checker | Personal site, dependency update dashboard |
 | httpbin, whoami | Test services |
+
+**llm**
+
+| App | Purpose |
+|-----|---------|
 | llama-cpp, llama-cpp-rocm, llama-cpp-igpu | llama.cpp servers on the R9700 (Vulkan, ROCm) and the 780M |
+| llama-cpp-cuda | llama.cpp (CUDA 12) on the GTX 1070 (yojimbo): Gemma 4, Qwen3.6-35B-A3B |
 | strata | Expert-caching inference engine on the R9700 |
 | sd-server | stable-diffusion.cpp on the R9700 (parked at 0 by default) |
 | open-webui | Chat UI for the llama.cpp servers |
@@ -192,7 +201,7 @@ ingesters are spread one per node; Loki's are not yet.
 Only one R9700 workload can run at a time: GPU claims are exclusive.
 
 **In the tree but not deployed:** `core/local-path-provisioner`,
-`platform/yk-talos-manager`, `llm/llama-cpp-cuda`.
+`platform/yk-talos-manager`.
 
 ## Storage classes
 

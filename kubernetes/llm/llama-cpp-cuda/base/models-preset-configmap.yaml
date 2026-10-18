@@ -38,3 +38,25 @@ data:
     [gemma-4-E2B-it-Q8_0]
     c = 131072
     mmproj = /models/mmproj-gemma-4-E2B-it-F16.gguf
+
+    ; Qwen3.6-35B-A3B UD-IQ3_XXS (13.2 GB, MoE, 3B active): the settings measured
+    ; on a GTX 1070 Ti in https://unbiasedbob.com/8gb-coding/ (~25 tok/s, ~400 tok/s
+    ; prompt, ~10 GB of RAM; 80.6% on its 86-task coding bench vs 77.5% for IQ2_M).
+    ; n-cpu-moe 25: the routed experts of 25 of the 40 layers stay in RAM and run
+    ; on the CPU, everything else is on the GPU (23 if the card also drove a
+    ; display; yojimbo is headless). If it runs out of VRAM, drop c to 65536 first.
+    [Qwen3.6-35B-A3B-UD-IQ3_XXS]
+    c = 131072
+    n-cpu-moe = 25
+    batch-size = 2048
+    ubatch-size = 2048
+    cache-type-k = q4_0
+    cache-type-v = q4_0
+    reasoning-budget = 8192
+    n-predict = 32768
+    temp = 0.7
+    top-k = 20
+    top-p = 0.8
+    min-p = 0.0
+    presence-penalty = 0.0
+    repeat-penalty = 1.0

@@ -1,0 +1,32 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: llm
+  namespace: flux-system
+spec:
+  interval: 2m
+  dependsOn:
+    - name: policies
+    - name: platform-infra
+  sourceRef:
+    kind: GitRepository
+    name: homelab
+  path: ./kubernetes/llm/overlays/workload-prd
+  # Unlike apps, removing a model server from Git deletes it, its PVCs included:
+  # the model volumes (llama-cpp-models, strata-data, ...) hold only downloads.
+  # open-webui's PVC holds chats: never rename or remove it without a backup.
+  prune: true
+  wait: false
+  timeout: 5m
+  # Leave replica counts to whoever last ran `kubectl scale`. Flux seeds the
+  # value on first apply and then stops correcting drift on it, so the GPU
+  # workloads can be parked at 0 without Git fighting the change back to 1.
+  # Only spec/replicas is exempt — image, args and everything else still
+  # reconcile normally.
+  ignore:
+    - paths:
+        - /spec/replicas
+      target:
+        kind: Deployment
+        namespace: llm

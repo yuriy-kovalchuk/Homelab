@@ -12,4 +12,5 @@ resources:
   - observability.yaml
   - alerting-rules.yaml
   - apps.yaml
+  - llm.yaml
   - vms.yaml

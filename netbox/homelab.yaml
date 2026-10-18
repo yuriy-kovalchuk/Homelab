@@ -210,7 +210,7 @@ devices:
     interfaces:
       - { name: enp4s0, type: 1000base-t, description: Realtek RTL8111/8168, mac: "10:05:01:43:06:f7", ips: [10.0.4.13/24], primary: true }
     inventory:
-      - { name: GeForce GTX 1070, manufacturer: NVIDIA, part_id: "0x1b81", description: "Pascal GP104 — VMs via VFIO passthrough (NVIDIA DRA driver, planned)" }
+      - { name: GeForce GTX 1070, manufacturer: NVIDIA, part_id: "0x1b81", description: "Pascal GP104 — llama-cpp-cuda (NVIDIA DRA); VMs via VFIO planned" }
 
 cables:
   - [gateway/nic0, isp-router/lan]
