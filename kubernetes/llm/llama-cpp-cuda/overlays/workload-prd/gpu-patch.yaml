@@ -30,3 +30,12 @@ spec:
           resources:
             claims:
               - name: gpu
+        - name: gpu-exporter
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            claims:
+              - name: gpu

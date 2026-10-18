@@ -70,3 +70,13 @@ configMapGenerator:
         grafana_dashboard: "1"
       annotations:
         k8s-sidecar-target-directory: /tmp/dashboards/Storage
+
+  - name: grafana-dashboards-energy
+    namespace: grafana
+    files:
+      - dashboards/energy.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+      annotations:
+        k8s-sidecar-target-directory: /tmp/dashboards/Energy

@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: llama-cpp-cuda-gpu
+  namespace: llm
+spec:
+  selector:
+    matchLabels:
+      app: llama-cpp-cuda
+  podMetricsEndpoints:
+    - port: gpu-metrics
+      path: /metrics
+      interval: 30s
+      relabelings:
+        - replacement: nvidia-gpu
+          targetLabel: job
+        - sourceLabels: [__meta_kubernetes_pod_node_name]
+          targetLabel: node

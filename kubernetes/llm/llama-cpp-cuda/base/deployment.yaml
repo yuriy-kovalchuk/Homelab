@@ -64,6 +64,31 @@ spec:
             initialDelaySeconds: 30
             periodSeconds: 30
             failureThreshold: 3
+        # GPU power, utilisation, memory and temperature (nvidia_smi_*) for the
+        # Energy dashboard. It shares the pod's GPU claim (overlay), which is the
+        # only way to reach the card: DRA claims are exclusive, and CDI injects
+        # nvidia-smi and the driver libraries into every container that uses it.
+        # It stops with the pod, so the GTX 1070 is only measured while this runs.
+        - name: gpu-exporter
+          image: utkuozdemir/nvidia_gpu_exporter:1.15.1
+          ports:
+            - name: gpu-metrics
+              containerPort: 9835
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 64Mi
+          securityContext:
+            readOnlyRootFilesystem: true
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 9835
+            periodSeconds: 30
       volumes:
         - name: models
           persistentVolumeClaim:

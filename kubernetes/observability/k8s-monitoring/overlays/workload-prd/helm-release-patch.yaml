@@ -128,13 +128,11 @@ spec:
         # extraArgs replaces the chart default array — keep the fs-types-exclude entry
         extraArgs:
           - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|erofs|sysfs|tracefs|tmpfs|ramfs)$
-          # Temperature, fan and voltage readings now come from talos-monitoring
-          # (talos_sensor_*), read from the Talos API rather than /sys/class/hwmon.
-          # hwmon is enabled by default in node_exporter, so turning it off needs
-          # the explicit negative flag — dropping `--collector.hwmon` alone is a
-          # no-op. thermal_zone is also on by default; the flag below is likewise
-          # redundant but left in place as documentation of intent.
-          - --no-collector.hwmon
+          # hwmon is on again (node_exporter's default) for the GPUs' power:
+          # talos-monitoring's sensor collectors need the admin-only Talos Read
+          # RPC, and under Omni it only gets os:reader, so talos_sensor_* is gone.
+          # Only the power series are kept (linuxHosts includeMetrics below).
+          # thermal_zone is on by default; the flag is documentation of intent.
           - --collector.thermal_zone
         securityContext:
           seccompProfile:
@@ -277,6 +275,9 @@ spec:
           useIntegrationAllowList: true
           includeMetrics:
             - node_thermal_zone_temp
+            # GPU power (amdgpu: PPT on the R9700 / 780M) for the Energy dashboard
+            - node_hwmon_power_.*
+            - node_hwmon_chip_names
       energyMetrics:
         enabled: true
 

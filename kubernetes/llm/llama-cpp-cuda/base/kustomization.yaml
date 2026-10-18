@@ -7,3 +7,4 @@ resources:
   - resource-claim-template.yaml
   - deployment.yaml
   - service.yaml
+  - pod-monitor.yaml
