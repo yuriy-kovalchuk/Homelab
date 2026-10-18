@@ -53,3 +53,25 @@ spec:
               protocol: TCP
             - port: "443"
               protocol: TCP
+---
+# RDP (xrdp in the guest) on the ubuntu-test-rdp LoadBalancer (10.0.4.51:3389),
+# from the trusted VLAN and the Tailscale subnet router only.
+# externalTrafficPolicy Local keeps the client address, so these CIDRs match
+# the real clients.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: ubuntu-test-rdp-ingress
+  namespace: kubevirt-ubuntu-test
+spec:
+  endpointSelector:
+    matchLabels:
+      kubevirt.io/vm: ubuntu-test
+  ingress:
+    - fromCIDR:
+        - 10.0.5.0/24
+        - 10.0.6.10/32
+      toPorts:
+        - ports:
+            - port: "3389"
+              protocol: TCP

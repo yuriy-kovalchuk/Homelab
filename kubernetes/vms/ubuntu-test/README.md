@@ -8,6 +8,12 @@ Ubuntu 24.04 (Noble) test VM running on KubeVirt in the `kubevirt-ubuntu-test` n
 - 50 GB Longhorn PVC (RWO — no live migration)
 - Networking: KubeVirt bridge mode (VM shares pod IP, no iptables/passt required)
 - Desktop: XFCE4 + LightDM
+- Remote desktop: xrdp on `10.0.4.51:3389` (see Access)
+
+**Flux is suspended for this component** (`suspend: true` in
+`kubernetes/clusters/workload-prd/flux-system/vms.yaml`): changes here are applied from the
+terminal (`kubectl apply --server-side -f …`). Keep the files in sync with what you apply, and set
+`suspend: false` to hand it back to Flux.
 
 ## First boot setup
 
@@ -36,46 +42,27 @@ To stop the proxy:
 kill $(lsof -ti:5901)
 ```
 
-### Option 2 — direct LoadBalancer (persistent, no virtctl needed)
+### Option 2 — RDP on its own LoadBalancer IP (recommended)
 
-Runs a VNC server inside the VM and exposes it via a Cilium BGP LoadBalancer IP.
+`rdp-service.yaml` exposes TCP 3389 of the VM on **`10.0.4.51`** (Cilium LB pool, advertised over BGP
+by bahamut only, `externalTrafficPolicy: Local`, no NodePort). Nothing goes through the kube-apiserver.
+The `ubuntu-test-rdp-ingress` CiliumNetworkPolicy (`kubernetes/network-policies/base/vms-ubuntu-test.yaml`)
+allows it only from the trusted VLAN (`10.0.5.0/24`) and the Tailscale subnet router (`10.0.6.10`).
 
-**1. Install VNC server inside the VM** (one-time, via console or SSH):
-
-```bash
-sudo apt install -y tigervnc-standalone-server
-
-# Set a VNC password
-vncpasswd
-
-# Create a startup script for the XFCE session
-mkdir -p ~/.vnc
-cat > ~/.vnc/xstartup << 'EOF'
-#!/bin/sh
-exec startxfce4
-EOF
-chmod +x ~/.vnc/xstartup
-
-# Start VNC server on display :0 (port 5900)
-vncserver :0 -geometry 1920x1080 -depth 24
-
-# To auto-start on boot, enable the systemd service:
-sudo systemctl enable vncserver@:0
-```
-
-**2. Apply the LoadBalancer Service** (`kubernetes/vms/ubuntu-test/vnc-service.yaml`):
+**1. Install xrdp inside the VM** (one-time, via the console or SSH, as the desktop user):
 
 ```bash
-kubectl --kubeconfig ~/.kube/workload apply -f kubernetes/vms/ubuntu-test/vnc-service.yaml
+sudo apt install -y xrdp
+echo "startxfce4" > ~/.xsession          # XFCE session for RDP logins
+sudo adduser xrdp ssl-cert               # lets xrdp read its TLS key
+sudo systemctl enable --now xrdp
 ```
 
-**3. Get the assigned IP:**
+Log out of the XFCE session on the VM console first: a user can't be logged in on the console and
+over xrdp at the same time.
 
-```bash
-kubectl --kubeconfig ~/.kube/workload get svc ubuntu-test-vnc -n kubevirt-ubuntu-test
-```
-
-Connect TigerVNC Viewer to `<EXTERNAL-IP>:5900`.
+**2. Connect** with Microsoft "Windows App" (free, Mac App Store; macOS has no built-in RDP client)
+to `10.0.4.51`, with the VM user's credentials.
 
 ## Console access
 

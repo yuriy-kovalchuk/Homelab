@@ -310,6 +310,10 @@ installs them as routes to the node holding each service.
   `internal`, with a Let's Encrypt certificate (DNS-01 via Cloudflare) and an
   internal DNS record. Reachable from trusted, from k8s-workload, and from
   tailnet devices through the Tailscale VM.
+- **Non-HTTP services** get their own LoadBalancer IP from the pool instead of
+  the Gateway, plus a CiliumNetworkPolicy limiting the clients. Today: RDP to
+  the `ubuntu-test` VM on `10.0.4.51:3389` (`externalTrafficPolicy: Local`, so
+  only bahamut advertises it), from trusted and the Tailscale VM only.
 - **Public:** `cloudflared` runs a Cloudflare Tunnel from the cluster. Nothing
   needs to be port-forwarded for it.
 

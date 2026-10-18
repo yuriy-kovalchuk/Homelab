@@ -103,6 +103,7 @@ DHCP pool.
 | 10.0.4.11 | ixion | 78:55:36:03:b1:e0 | Worker; offline until its disk is replaced |
 | 10.0.4.12 | bahamut | 38:05:25:32:8e:dc | Worker; not always powered on. Static IP in its Talos config as well |
 | 10.0.4.50 | `internal` Gateway | — | Cilium Gateway for every HTTPS hostname |
+| 10.0.4.51 | `ubuntu-test-rdp` | — | RDP (TCP 3389) to the ubuntu-test VM on bahamut; trusted VLAN and Tailscale only |
 | 10.0.4.50–99 | Cilium LB pool | | Advertised over BGP (ASN 65002) |
 | 10.0.4.100–200 | DHCP pool | | |
 

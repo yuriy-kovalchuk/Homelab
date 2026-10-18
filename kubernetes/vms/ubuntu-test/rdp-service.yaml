@@ -1,0 +1,24 @@
+# RDP (xrdp inside the guest) straight to the VM on its own LoadBalancer IP,
+# advertised over BGP: no kube-apiserver / virtctl in the path. Only bahamut
+# runs the VM, and externalTrafficPolicy Local makes only that node advertise
+# the IP and keeps the client address (the ingress policy matches on it).
+# Client on macOS: Microsoft "Windows App" → 10.0.4.51
+apiVersion: v1
+kind: Service
+metadata:
+  name: ubuntu-test-rdp
+  namespace: kubevirt-ubuntu-test
+  annotations:
+    lbipam.cilium.io/ips: "10.0.4.51"
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  # Cilium serves the LB IP itself; no NodePort on every node.
+  allocateLoadBalancerNodePorts: false
+  selector:
+    kubevirt.io/vm: ubuntu-test
+  ports:
+    - name: rdp
+      port: 3389
+      targetPort: 3389
+      protocol: TCP
