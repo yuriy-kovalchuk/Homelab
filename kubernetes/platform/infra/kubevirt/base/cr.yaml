@@ -10,6 +10,11 @@ spec:
         - HostDevices
         - Sidecar
         - NetworkBindingPlugins
+      # 1.9 turns every Beta gate on by default; Template would deploy the
+      # virt-template components, which have no network policy or Kyverno
+      # exception here and are not used.
+      disabledFeatureGates:
+        - Template
     network:
       binding:
         passt:

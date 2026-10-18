@@ -6,6 +6,22 @@ k8sServicePort: 7445
 ipam:
   mode: kubernetes
 
+# Every node is on the same L2 (VLAN 4), so pod traffic goes straight to the
+# other node's address instead of a VXLAN tunnel (no 50-byte header, full MTU).
+routingMode: native
+autoDirectNodeRoutes: true
+ipv4NativeRoutingCIDR: 10.244.0.0/16
+
+# WireGuard between nodes (built into the Talos kernel). Pod-to-pod traffic is
+# encrypted on every node; nodeEncryption also covers host-to-host traffic,
+# except control planes, which opt out by default (etcd, kubelet and the API
+# are TLS already). Strict mode (dropping unencrypted traffic) is a later step,
+# once every node reports "Encryption: Wireguard".
+encryption:
+  enabled: true
+  type: wireguard
+  nodeEncryption: true
+
 cgroup:
   autoMount:
     enabled: false
@@ -42,16 +58,21 @@ l2announcements:
 externalIPs:
   enabled: true
 
+# Metrics are scraped by Alloy through the prometheus.io annotations the chart
+# puts on the pods. No ServiceMonitors: their CRD does not exist yet when this
+# Terraform unit installs Cilium on a fresh cluster.
 envoy:
   enabled: true
   prometheus:
-    enabled: false
+    enabled: true
     serviceMonitor:
       enabled: false
 
 hubble:
   relay:
     enabled: true
+    prometheus:
+      enabled: true
   ui:
     enabled: true
   metrics:
@@ -90,11 +111,11 @@ socketLB:
 operator:
   replicas: 2
   prometheus:
-    enabled: false
+    enabled: true
     serviceMonitor:
       enabled: false
 
 prometheus:
-  enabled: false
+  enabled: true
   serviceMonitor:
     enabled: false
