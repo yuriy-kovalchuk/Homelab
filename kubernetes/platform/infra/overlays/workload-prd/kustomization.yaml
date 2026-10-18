@@ -13,3 +13,4 @@ resources:
   - ../../metrics-server/overlays/workload-prd
   - ../../gpu-dra-driver/overlays/workload-prd
   - ../../node-feature-discovery/overlays/workload-prd
+  - ../../nvidia-dra-driver/overlays/workload-prd

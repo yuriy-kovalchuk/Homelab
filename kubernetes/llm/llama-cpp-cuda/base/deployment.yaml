@@ -17,7 +17,10 @@ spec:
     spec:
       containers:
         - name: llama-cpp
-          image: ghcr.io/ggml-org/llama.cpp:server-cuda
+          # CUDA 12 build: CUDA 13 dropped Pascal (sm_61, the GTX 1070).
+          image: ghcr.io/ggml-org/llama.cpp:server-cuda12-b10689
+          # Router mode: every model on the volume (filled by the
+          # llama-cpp-cuda-download Job) is loaded on demand, one at a time.
           args:
             - --host
             - "0.0.0.0"
@@ -38,8 +41,9 @@ spec:
               cpu: "500m"
               memory: 1Gi
             limits:
-              cpu: "8"
-              memory: 32Gi
+              cpu: "4"
+              # E2B/E4B keep their per-layer embeddings (up to 3 GB) in host RAM.
+              memory: 12Gi
           volumeMounts:
             - name: models
               mountPath: /models
@@ -63,7 +67,7 @@ spec:
       volumes:
         - name: models
           persistentVolumeClaim:
-            claimName: llama-cpp-models
+            claimName: llama-cpp-cuda-models
         - name: config
           configMap:
-            name: llama-cpp-models-preset
+            name: llama-cpp-cuda-models-preset

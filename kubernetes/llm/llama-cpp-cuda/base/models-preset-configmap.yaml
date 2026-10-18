@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: llama-cpp-cuda-models-preset
+  namespace: llm
+data:
+  # GTX 1070: 8 GiB VRAM, Pascal. Gemma 4's per-layer embeddings (E2B/E4B) and
+  # input token embeddings stay in host RAM, so VRAM use is below file size.
+  # Section name = file name without .gguf (llama-server router mode).
+  presets.ini: |
+    version = 1
+
+    [*]
+    n-gpu-layers = -1
+    c = 32768
+    flash-attn = on
+    cache-type-k = q8_0
+    cache-type-v = q8_0
+    parallel = 1
+    load-on-startup = false
+    stop-timeout = 60
+    ; Gemma 4 defaults (model card / GGUF general.sampling)
+    temp = 1.0
+    top-p = 0.95
+    top-k = 64
+
+    ; 12B QAT, ~6.7 GB on the GPU: the biggest that fits. Smaller ubatch keeps
+    ; the 262k-vocab logits buffer inside the ~1 GB left for KV + compute.
+    [gemma-4-12B-it-qat-UD-Q4_K_XL]
+    ubatch-size = 256
+    mmproj = /models/mmproj-gemma-4-12B-it-qat-F16.gguf
+
+    ; E4B Q8_0: 8.2 GB file, ~5.2 GB on the GPU (3 GB of per-layer embeddings in RAM)
+    [gemma-4-E4B-it-Q8_0]
+    mmproj = /models/mmproj-gemma-4-E4B-it-F16.gguf
+
+    ; E2B Q8_0: 5 GB file, ~2.6 GB on the GPU
+    [gemma-4-E2B-it-Q8_0]
+    c = 131072
+    mmproj = /models/mmproj-gemma-4-E2B-it-F16.gguf

@@ -1,0 +1,16 @@
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: llama-cpp-cuda-gtx1070
+  namespace: llm
+spec:
+  spec:
+    devices:
+      requests:
+        - name: gpu
+          exactly:
+            # Published by the NVIDIA DRA driver. The GTX 1070 on yojimbo is the
+            # only NVIDIA GPU in the cluster, so no selector is needed yet.
+            deviceClassName: gpu.nvidia.com
+            allocationMode: ExactCount
+            count: 1

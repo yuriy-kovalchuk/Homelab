@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: llama-cpp-cuda-models
+  namespace: llm
+spec:
+  # 1 replica, strict-local on yojimbo: the shared llama-cpp-models volume has
+  # its only replica on bahamut, which is often off.
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn-nvidia
+  resources:
+    requests:
+      storage: 50Gi

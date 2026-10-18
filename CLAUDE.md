@@ -67,7 +67,7 @@ One broken CEL expression denies every workload that shares those policyRefs; gu
 
 ## Storage
 
-- Longhorn node tags: `system` on control planes (default classes), `gpu` on bahamut (`longhorn-gpu`). New nodes pick up tags from the Talos annotation `node.longhorn.io/default-node-tags`.
+- Longhorn node tags: `system` on control planes (default classes), `gpu` on bahamut (`longhorn-gpu`), `vms` + `nvidia` on yojimbo (`longhorn-vms`, `longhorn-nvidia`; set live on the Longhorn node CR, the annotation was ignored). New nodes pick up tags from the Talos annotation `node.longhorn.io/default-node-tags`.
 - `longhorn-1r` is single-replica: when its one replica times out the volume faults, ext4 goes read-only, and the pod stays Running on a dead mount until it is **deleted** (a container restart reuses the bad mount). Longhorn's auto-remount needs the `longhorn-global-manager` lease; check `kubectl -n longhorn-system get lease longhorn-global-manager` exists.
 - Stale Longhorn node CRs (after a rename/removal) can only be deleted after `spec.allowScheduling: false` on the node; disk edits are refused once the Kubernetes node is gone.
 - A re-created Longhorn disk defaults to 30% reserved; workers use 10 GiB.

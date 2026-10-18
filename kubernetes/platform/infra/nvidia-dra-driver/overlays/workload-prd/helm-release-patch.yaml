@@ -1,0 +1,39 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nvidia-dra-driver
+  namespace: nvidia-dra-driver
+spec:
+  values:
+    # Creates the DeviceClass `gpu.nvidia.com` (plus mig/vfio ones, unused).
+    #
+    # Talos ships the driver and container toolkit as system extensions
+    # (nonfree-kmod-nvidia-lts, nvidia-container-toolkit-lts) under /usr/local,
+    # the same path Talos' GPU Operator guide uses as driverInstallDir.
+    nvidiaDriverRoot: /usr/local
+    # The chart refuses resources.gpus.enabled unless this confirms the
+    # standard NVIDIA device plugin isn't running; it isn't.
+    gpuResourcesEnabledOverride: true
+    # ComputeDomains (multi-node NVLink/IMEX) are the only thing the controller
+    # Deployment does; with them off only the kubelet plugin is deployed.
+    resources:
+      computeDomains:
+        enabled: false
+    kubeletPlugin:
+      # The chart's default affinity looks for pci-10de.present, but NFD's
+      # default labels are class_vendor (pci-0300_10de.present), so it would
+      # match nothing. yojimbo is the only NVIDIA node today.
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: feature.node.kubernetes.io/pci-0300_10de.present
+                    operator: In
+                    values:
+                      - "true"
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: gpu
+          effect: NoSchedule

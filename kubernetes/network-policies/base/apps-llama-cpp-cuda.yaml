@@ -21,6 +21,18 @@ spec:
         - ports:
             - port: "8080"
               protocol: TCP
+  # No egress block: models come from the llama-cpp-cuda-download Job below.
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: llama-cpp-cuda-download
+  namespace: llm
+spec:
+  endpointSelector:
+    matchLabels:
+      app: llama-cpp-cuda-download
+  # Hugging Face (huggingface.co + its CDN)
   egress:
     - toEntities:
         - world

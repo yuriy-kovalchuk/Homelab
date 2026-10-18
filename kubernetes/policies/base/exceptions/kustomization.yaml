@@ -18,6 +18,7 @@ resources:
   - platform-democratic-csi-nfs.yaml
   - platform-gpu-dra-driver.yaml
   - platform-node-feature-discovery.yaml
+  - platform-nvidia-dra-driver.yaml
   - platform-kubevirt.yaml
   - platform-longhorn.yaml
   - platform-trivy.yaml

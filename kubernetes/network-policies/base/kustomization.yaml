@@ -8,6 +8,7 @@ resources:
   - apps-httpbin.yaml
   - apps-immich.yaml
   - apps-llama-cpp.yaml
+  - apps-llama-cpp-cuda.yaml
   - apps-llama-cpp-igpu.yaml
   - apps-netbox.yaml
   - apps-open-webui.yaml
@@ -35,6 +36,7 @@ resources:
   - platform-democratic-csi-nfs.yaml
   - platform-gpu-dra-driver.yaml
   - platform-node-feature-discovery.yaml
+  - platform-nvidia-dra-driver.yaml
   - platform-kubevirt.yaml
   - platform-kyverno-reporter.yaml
   - platform-longhorn.yaml
