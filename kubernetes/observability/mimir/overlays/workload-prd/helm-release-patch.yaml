@@ -134,6 +134,11 @@ spec:
 
     querier:
       replicas: 2
+      # CPU request only (memory keeps the chart default): VPA measures ~15m
+      # against the default 100m, which left no room to drain a control plane.
+      resources:
+        requests:
+          cpu: 25m
       topologySpreadConstraints:
         maxSkew: 1
         topologyKey: kubernetes.io/hostname
@@ -141,6 +146,11 @@ spec:
 
     query_frontend:
       replicas: 2
+      # CPU request only (memory keeps the chart default): VPA measures ~15m
+      # against the default 100m, which left no room to drain a control plane.
+      resources:
+        requests:
+          cpu: 25m
       topologySpreadConstraints:
         maxSkew: 1
         topologyKey: kubernetes.io/hostname
@@ -148,6 +158,11 @@ spec:
 
     query_scheduler:
       replicas: 2
+      # CPU request only (memory keeps the chart default): VPA measures ~15m
+      # against the default 100m, which left no room to drain a control plane.
+      resources:
+        requests:
+          cpu: 25m
       topologySpreadConstraints:
         maxSkew: 1
         topologyKey: kubernetes.io/hostname
@@ -161,6 +176,11 @@ spec:
       zoneAwareReplication:
         enabled: false
       replicas: 3
+      # CPU request only (memory keeps the chart default): VPA measures ~15m
+      # against the default 100m, which left no room to drain a control plane.
+      resources:
+        requests:
+          cpu: 25m
       topologySpreadConstraints:
         maxSkew: 1
         topologyKey: kubernetes.io/hostname

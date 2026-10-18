@@ -4,7 +4,9 @@ metadata:
   name: pg-cluster-immich
   namespace: immich
 spec:
-  instances: 1
+  # 2 so drains do not block: the operator switches the primary over to the
+  # other instance instead of a single-instance PDB stopping the eviction.
+  instances: 2
   imageName: ghcr.io/tensorchord/cloudnative-vectorchord:17.5-0.4.3
   postgresql:
     shared_preload_libraries:

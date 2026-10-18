@@ -40,6 +40,11 @@ spec:
               app.kubernetes.io/instance: kyverno
     backgroundController:
       replicas: 2
+      # CPU request only (memory keeps the chart default): VPA measures
+      # 15-25m against the default 100m.
+      resources:
+        requests:
+          cpu: 25m
       podSecurityContext:
         seccompProfile:
           type: RuntimeDefault
@@ -53,6 +58,11 @@ spec:
               app.kubernetes.io/instance: kyverno
     cleanupController:
       replicas: 2
+      # CPU request only (memory keeps the chart default): VPA measures
+      # 15-25m against the default 100m.
+      resources:
+        requests:
+          cpu: 25m
       podSecurityContext:
         seccompProfile:
           type: RuntimeDefault

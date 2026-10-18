@@ -17,6 +17,13 @@ spec:
       defaultReplicaCount: 3
       taintToleration: workload=gpu:NoSchedule
       replicaAutoBalance: best-effort
+      # Every control plane holds the only replica of its longhorn-1r volumes
+      # (Loki/Mimir/Tempo ingesters, Mimir store-gateway: one per node, the apps
+      # replicate themselves). The default block-if-contains-last-replica keeps
+      # the instance-manager PDB at 0 for good, so every drain timed out. This
+      # still blocks while that last replica runs, and lets the drain finish once
+      # its pod is evicted and the volume detached (upgrades keep EPHEMERAL).
+      nodeDrainPolicy: allow-if-replica-is-stopped
     persistence:
       defaultClassReplicaCount: 3
       # Replicas of the default class only on Longhorn nodes tagged "system"

@@ -29,7 +29,11 @@ spec:
       app.kubernetes.io/name: cloudnative-pg
   egress:
     - toEndpoints:
+        # Without a namespace term a namespaced policy only selects pods in its
+        # own namespace (cnpg-system), so this matched no cluster at all.
         - matchExpressions:
+            - key: io.kubernetes.pod.namespace
+              operator: Exists
             - key: cnpg.io/cluster
               operator: Exists
       toPorts:

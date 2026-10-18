@@ -112,10 +112,14 @@ spec:
 
     # Chart defaults (8192/1024 MB) reserve ~9.6Gi + 1.2Gi of memory for caches
     # that use ~0.1Gi here; that reservation alone filled valefor.
+    # allocatedCPU is the CPU request (chart default 500m each); VPA measures
+    # ~11m. The 1 CPU they reserved stopped a control plane from being drained.
     chunksCache:
       allocatedMemory: 1024
+      allocatedCPU: 50m
     resultsCache:
       allocatedMemory: 256
+      allocatedCPU: 50m
 
     lokiCanary:
       tolerations:

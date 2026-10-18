@@ -4,7 +4,9 @@ metadata:
   name: pg-cluster-forgejo
   namespace: forgejo
 spec:
-  instances: 1
+  # 2 so drains do not block: the operator switches the primary over to the
+  # other instance instead of a single-instance PDB stopping the eviction.
+  instances: 2
   bootstrap:
     initdb:
       database: forgejo
