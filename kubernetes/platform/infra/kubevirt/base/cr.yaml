@@ -29,4 +29,13 @@ spec:
           resourceName: "amd.com/780m-audio"
           externalResourceProvider: false
   imagePullPolicy: IfNotPresent
+  # virt-handler (the per-node agent) must also run on bahamut, or that node
+  # offers no KVM device and no VM can be scheduled there.
+  workloads:
+    nodePlacement:
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
   workloadUpdateStrategy: {}

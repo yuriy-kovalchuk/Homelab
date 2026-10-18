@@ -24,6 +24,15 @@ spec:
       labels:
         kubevirt.io/vm: ubuntu-test
     spec:
+      # Runs on bahamut only (it tolerates the GPU taint). bahamut is not always
+      # on: with runStrategy Manual the VM simply does not start while it is off.
+      nodeSelector:
+        kubernetes.io/hostname: bahamut
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
       domain:
         cpu:
           cores: 4
