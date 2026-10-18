@@ -143,6 +143,18 @@ spec:
           seccompProfile:
             type: RuntimeDefault
           allowPrivilegeEscalation: false
+      # Power consumption (hostMetrics.energyMetrics scrapes it). Privileged
+      # DaemonSet on the host network (:9102) with /proc, /sys and /lib/modules;
+      # the namespace's PolicyExceptions already cover that. Every node exposes
+      # RAPL (/sys/class/powercap/intel-rapl), so CPU package/DRAM power is
+      # measured, not estimated; GPUs and the rest of the board are not.
+      kepler:
+        deploy: true
+        tolerations:
+          - key: workload
+            operator: Equal
+            value: gpu
+            effect: NoSchedule
 
     alloy-operator:
       podSecurityContext:
@@ -265,6 +277,8 @@ spec:
           useIntegrationAllowList: true
           includeMetrics:
             - node_thermal_zone_temp
+      energyMetrics:
+        enabled: true
 
     clusterEvents:
       enabled: true

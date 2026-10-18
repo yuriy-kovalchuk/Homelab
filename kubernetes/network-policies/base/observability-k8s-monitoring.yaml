@@ -35,6 +35,9 @@ spec:
               protocol: TCP
             - port: "9100"
               protocol: TCP
+            # Kepler (hostNetwork)
+            - port: "9102"
+              protocol: TCP
 ---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
