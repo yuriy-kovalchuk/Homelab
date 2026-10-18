@@ -17,10 +17,18 @@ spec:
       labels:
         app: forgejo-runner
     spec:
-      # Builds run on bahamut (Zen 4, 16 threads, the GPU node), e.g. the Strata
-      # ROCm image. bahamut is not always on: CI waits while it is down.
-      nodeSelector:
-        kubernetes.io/hostname: bahamut
+      # Builds run on any worker (bahamut, yojimbo), never on a control plane.
+      # The workers carry the gpu taint, so the runner tolerates it; its docker
+      # volume is iSCSI on TrueNAS, so it attaches wherever the pod lands. Images
+      # that compile CPU code must target their node's CPU explicitly, not the
+      # build host's (the Strata Dockerfiles do).
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: node-role.kubernetes.io/control-plane
+                    operator: DoesNotExist
       tolerations:
         - key: workload
           operator: Equal
