@@ -1,0 +1,10 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: pdfcraft
+  namespace: pdfcraft
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: pdfcraft

@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pdfcraft
+  namespace: pdfcraft
+  labels:
+    app: pdfcraft
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: pdfcraft
+  template:
+    metadata:
+      labels:
+        app: pdfcraft
+    spec:
+      # Static Next.js export served by nginx; all PDF processing runs in the browser.
+      securityContext:
+        runAsNonRoot: true
+        # nginx user of the nginx:alpine base image
+        runAsUser: 101
+        runAsGroup: 101
+        fsGroup: 101
+        seccompProfile:
+          type: RuntimeDefault
+        # The upstream nginx.conf listens on 80; lets the non-root user bind it
+        sysctls:
+          - name: net.ipv4.ip_unprivileged_port_start
+            value: "0"
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: pdfcraft
+      containers:
+        - name: pdfcraft
+          image: ghcr.io/pdfcrafttool/pdfcraft:latest
+          ports:
+            - name: http
+              containerPort: 80
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: "25m"
+              memory: "64Mi"
+            limits:
+              # gzip of the multi-MB WASM bundles (PyMuPDF, LibreOffice) is CPU-heavy
+              cpu: "500m"
+              memory: "256Mi"
+          volumeMounts:
+            - name: nginx-cache
+              mountPath: /var/cache/nginx
+            - name: nginx-run
+              mountPath: /var/run
+      volumes:
+        - name: nginx-cache
+          emptyDir: {}
+        - name: nginx-run
+          emptyDir: {}

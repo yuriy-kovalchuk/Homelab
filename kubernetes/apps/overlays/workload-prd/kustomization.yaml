@@ -11,3 +11,4 @@ resources:
   - ../../forgejo/overlays/workload-prd
   - ../../forgejo-runner/overlays/workload-prd
   - ../../netbox/overlays/workload-prd
+  - ../../pdfcraft/overlays/workload-prd

@@ -63,6 +63,13 @@
         namespace: opencloud
         app: opencloud
         podSelector: app=opencloud
+    - PDFCraft:
+        icon: mdi-file-pdf-box
+        href: https://pdfcraft.yuriykovalchuk.dev
+        description: PDF tools (in-browser)
+        namespace: pdfcraft
+        app: pdfcraft
+        podSelector: app=pdfcraft
     - Forgejo:
         icon: forgejo.svg
         href: https://git.yuriykovalchuk.dev
