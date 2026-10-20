@@ -12,7 +12,7 @@ This file holds the rules and pitfalls that are not obvious from the code.
 - **Node names are lowercase** everywhere, including prose: valefor, ifrit, shiva, ixion, bahamut (Final Fantasy eidolons). Old names (controlplane-1/2/3, worker-1) are gone; don't reintroduce them.
 - **Goal of the cluster:** drains and upgrades with no data loss and no downtime. Prefer changes that keep that true (spread constraints, PDBs, replicas ≥ 2 for stateless services).
 - **Workers are not always on**, bahamut especially. Anything that must stay up runs on the control planes, and its Longhorn data stays on `system`-tagged nodes.
-- **The workers (bahamut, yojimbo) are for GPU workloads only** (taint `workload=gpu:NoSchedule`). forgejo-runner is the one deliberate exception: it runs on whichever worker is up, never on a control plane.
+- **The workers (bahamut, yojimbo) are for GPU workloads only** (taint `workload=gpu:NoSchedule`). forgejo-runner is the one deliberate exception: it runs on whichever worker is up, never on a control plane. forgejo-runner-talos (Talos stack builds) is pinned to bahamut.
 - `docs/` and `netbox/homelab.yaml` must stay in sync: a new device, address, cable, VLAN or rule goes into DEVICES.md / NETWORK.md and homelab.yaml in the same change, then `netbox/sync.py` (idempotent, never deletes; token header in `.playground/netbox-auth-header`).
 
 ## Kubernetes conventions

@@ -4,10 +4,14 @@ metadata:
   name: forgejo-runner
   namespace: forgejo-runner
 spec:
-  description: "Forgejo Actions runner — polls Forgejo for jobs, DinD sidecar pulls job images/actions from the internet"
+  description: "Forgejo Actions runners (forgejo-runner, forgejo-runner-talos) — poll Forgejo for jobs, DinD sidecar pulls job images/actions/sources from the internet and pushes to Harbor"
   endpointSelector:
-    matchLabels:
-      app: forgejo-runner
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - forgejo-runner
+          - forgejo-runner-talos
   egress:
     - toEndpoints:
         - matchLabels:

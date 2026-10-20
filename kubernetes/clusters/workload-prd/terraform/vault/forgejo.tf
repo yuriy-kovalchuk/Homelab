@@ -30,3 +30,14 @@ resource "vault_kv_secret_v2" "forgejo_runner" {
     token = var.forgejo_runner_token
   })
 }
+
+resource "vault_kv_secret_v2" "forgejo_runner_talos" {
+  mount               = "kubernetes"
+  name                = "forgejo/runner-talos"
+  delete_all_versions = true
+
+  data_json = jsonencode({
+    uuid  = var.forgejo_runner_talos_uuid
+    token = var.forgejo_runner_talos_token
+  })
+}

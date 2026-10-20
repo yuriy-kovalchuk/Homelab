@@ -31,6 +31,18 @@ variable "forgejo_runner_token" {
   sensitive   = true
 }
 
+variable "forgejo_runner_talos_uuid" {
+  description = "UUID for the forgejo-runner-talos Actions runner connection (from Forgejo admin UI: /admin/actions/runners)"
+  type        = string
+  sensitive   = true
+}
+
+variable "forgejo_runner_talos_token" {
+  description = "Token for the forgejo-runner-talos Actions runner connection (from Forgejo admin UI: /admin/actions/runners)"
+  type        = string
+  sensitive   = true
+}
+
 variable "cloudflare_api_token" {
   type      = string
   sensitive = true
@@ -147,6 +159,35 @@ variable "netbox_superuser_api_token" {
 
 variable "netbox_db_password" {
   description = "Password for the netbox CNPG database user"
+  type        = string
+  sensitive   = true
+}
+
+variable "paperless_secret_key" {
+  description = "Paperless-ngx PAPERLESS_SECRET_KEY (50+ random characters)"
+  type        = string
+  sensitive   = true
+}
+
+variable "paperless_admin_user" {
+  description = "Paperless-ngx superuser name (created on first start only)"
+  type        = string
+  default     = "admin"
+}
+
+variable "paperless_admin_password" {
+  description = "Paperless-ngx superuser password (created on first start only)"
+  type        = string
+  sensitive   = true
+}
+
+variable "paperless_admin_mail" {
+  description = "Paperless-ngx superuser email"
+  type        = string
+}
+
+variable "paperless_db_password" {
+  description = "Password for the paperless CNPG database user"
   type        = string
   sensitive   = true
 }

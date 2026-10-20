@@ -1,0 +1,146 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: forgejo-runner-talos
+  namespace: forgejo-runner
+spec:
+  replicas: 1
+  # dockerd's /var/lib/docker is an RWO volume: a rolling update would leave
+  # the new pod waiting on an attach the old one still holds
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: forgejo-runner-talos
+  template:
+    metadata:
+      labels:
+        app: forgejo-runner-talos
+    spec:
+      # Dedicated runner for the Talos/Omni/image-factory source builds
+      # (git.yuriykovalchuk.dev/yuriy/talos-lab). Pinned to bahamut, the only
+      # node with the cores and RAM for toolchain/LLVM/kernel builds; its
+      # docker volume is strict-local Longhorn on bahamut's NVMe. Jobs queue
+      # while bahamut is off. Only workflows with `runs-on: talos-build` land here.
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - bahamut
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
+      containers:
+        - name: runner
+          image: data.forgejo.org/forgejo/runner:13.1.0
+          command:
+            - forgejo-runner
+            - daemon
+            - --config
+            - /config/config.yaml
+          env:
+            - name: DOCKER_HOST
+              value: tcp://localhost:2375
+            - name: HOME
+              value: /data
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 1000
+            # dockerd creates the socket 0660 root:docker, and the docker:29.8.0-dind
+            # image's docker group is gid 2375 — join it so the socket is usable
+            # without touching dind's /etc/group at runtime.
+            runAsGroup: 2375
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+            - name: data
+              mountPath: /data
+            - name: docker-sock
+              mountPath: /var/run/docker-sock
+        - name: dind
+          image: docker:29.8.0-dind
+          args:
+            - dockerd
+            - -H
+            - unix:///var/run/docker-sock/docker.sock
+            - -H
+            - tcp://127.0.0.1:2375
+            - --tls=false
+          securityContext:
+            privileged: true
+          # Builds use every core; the request makes the scheduler account for
+          # them next to the llama/strata pods on bahamut. No limits: LLVM and
+          # kernel links spike well past any sensible fixed cap.
+          resources:
+            requests:
+              cpu: "4"
+              memory: 8Gi
+          volumeMounts:
+            - name: docker-lib
+              mountPath: /var/lib/docker
+            - name: docker-sock
+              mountPath: /var/run/docker-sock
+        - name: prune
+          image: docker:29.8.0-cli
+          command:
+            - sh
+            - -c
+            # Prunes by size, not age (see forgejo-runner's prune for why).
+            # Built images live in Harbor, so the local cache is disposable.
+            - |
+              while true; do
+                sleep 86400
+                docker container prune -f --filter "until=24h"
+                docker network prune -f --filter "until=24h"
+                docker volume prune -af
+                # build cache: keep the most recently used 120 GB
+                docker builder prune -af --max-used-space 120gb
+                # unused images only once the volume is 80% full
+                set -- $(df -P /docker-lib | tail -1)
+                used=${5%\%}
+                if [ "$used" -ge 80 ]; then
+                  docker image prune -af
+                fi
+              done
+          env:
+            - name: DOCKER_HOST
+              value: tcp://localhost:2375
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          # read-only, only for df
+          volumeMounts:
+            - name: docker-lib
+              mountPath: /docker-lib
+              readOnly: true
+      volumes:
+        - name: config
+          secret:
+            secretName: forgejo-runner-talos-config
+        - name: data
+          emptyDir: {}
+        - name: docker-lib
+          persistentVolumeClaim:
+            claimName: forgejo-runner-talos-docker-lib
+        - name: docker-sock
+          emptyDir: {}

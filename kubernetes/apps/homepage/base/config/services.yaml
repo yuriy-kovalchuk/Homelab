@@ -63,6 +63,13 @@
         namespace: opencloud
         app: opencloud
         podSelector: app=opencloud
+    - Paperless:
+        icon: paperless-ngx.svg
+        href: https://paperless.yuriykovalchuk.dev
+        description: Documents
+        namespace: paperless
+        app: paperless
+        podSelector: app=paperless
     - PDFCraft:
         icon: mdi-file-pdf-box
         href: https://pdfcraft.yuriykovalchuk.dev

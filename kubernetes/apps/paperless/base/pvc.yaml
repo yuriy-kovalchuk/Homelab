@@ -1,0 +1,15 @@
+# data/ (search index, classifier, logs) and media/ (originals + archived PDFs)
+# on one iSCSI volume, mounted as subPaths. Block storage, so fsGroup applies
+# and the consumer's inotify works. Can only grow.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: paperless-data
+  namespace: paperless
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: truenas-iscsi
+  resources:
+    requests:
+      storage: 50Gi

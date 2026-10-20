@@ -10,6 +10,7 @@ resources:
   - apps-netbox.yaml
   - apps-open-webui.yaml
   - apps-opencloud.yaml
+  - apps-paperless.yaml
   - apps-pdfcraft.yaml
   - apps-whoami.yaml
   - apps-yk-portfolio.yaml

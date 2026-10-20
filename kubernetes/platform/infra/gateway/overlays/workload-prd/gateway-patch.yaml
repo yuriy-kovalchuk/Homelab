@@ -175,6 +175,21 @@ spec:
           selector:
             matchLabels:
               kubernetes.io/metadata.name: "whoami"
+    - name: https-paperless
+      port: 443
+      protocol: HTTPS
+      hostname: "paperless.yuriykovalchuk.dev"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: paperless-gw-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: "paperless"
     - name: https-pdfcraft
       port: 443
       protocol: HTTPS

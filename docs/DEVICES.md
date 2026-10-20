@@ -69,7 +69,8 @@ Node labels and taints:
   available lives only on them, since the workers are not always powered on.
 - bahamut: label `ai-node: oculink`, taint `workload=gpu:NoSchedule`, Longhorn
   tag `gpu`. Only GPU workloads (and forgejo-runner, which builds there)
-  tolerate it.
+  tolerate it. forgejo-runner-talos is pinned here and keeps its 200 Gi build
+  cache on a strict-local `longhorn-gpu` volume.
 - yojimbo: labels `machineSize: medium`, `gpu-vendor: nvidia`, taint
   `workload=gpu:NoSchedule` (set with kubectl: Talos cannot taint a worker),
   Longhorn node and disk tag `vms` (10 GiB reserved): only the `longhorn-vms`

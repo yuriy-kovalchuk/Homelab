@@ -1,0 +1,137 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paperless
+  namespace: paperless
+  labels:
+    app: paperless
+spec:
+  # One pod runs the webserver, Celery worker and consumer; its volume is RWO
+  # iSCSI, so a rolling update would wait on an attach the old pod still holds.
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: paperless
+  template:
+    metadata:
+      labels:
+        app: paperless
+    spec:
+      # The Service is named `paperless`, so Kubernetes would inject
+      # PAPERLESS_PORT=tcp://<ip>:8000, which paperless reads as its own
+      # listen-port setting and refuses to start.
+      enableServiceLinks: false
+      # Rootless mode: the process starts directly as uid 1000, no s6 privilege
+      # drop. Only possible because the OCR language (eng) ships in the image;
+      # PAPERLESS_OCR_LANGUAGES would need root and apt at startup.
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: paperless
+          image: ghcr.io/paperless-ngx/paperless-ngx:3.3.3
+          env:
+            - name: PAPERLESS_URL
+              value: https://paperless.yuriykovalchuk.dev
+            - name: PAPERLESS_REDIS
+              value: redis://paperless-valkey:6379
+            - name: PAPERLESS_DBENGINE
+              value: postgresql
+            - name: PAPERLESS_DBHOST
+              value: pg-cluster-paperless-rw
+            - name: PAPERLESS_DBNAME
+              value: paperless
+            - name: PAPERLESS_DBUSER
+              valueFrom:
+                secretKeyRef:
+                  name: paperless-db
+                  key: username
+            - name: PAPERLESS_DBPASS
+              valueFrom:
+                secretKeyRef:
+                  name: paperless-db
+                  key: password
+            - name: PAPERLESS_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: paperless-config
+                  key: secret_key
+            # Creates the superuser on first start only; later changes are made in the UI
+            - name: PAPERLESS_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: paperless-config
+                  key: admin_user
+            - name: PAPERLESS_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: paperless-config
+                  key: admin_password
+            - name: PAPERLESS_ADMIN_MAIL
+              valueFrom:
+                secretKeyRef:
+                  name: paperless-config
+                  key: admin_mail
+            - name: PAPERLESS_OCR_LANGUAGE
+              value: eng
+            # Control planes have 4 cores and run etcd: one worker, two OCR threads
+            - name: PAPERLESS_TASK_WORKERS
+              value: "1"
+            - name: PAPERLESS_THREADS_PER_WORKER
+              value: "2"
+            - name: PAPERLESS_WEBSERVER_WORKERS
+              value: "2"
+          ports:
+            - name: http
+              containerPort: 8000
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            # first start runs the database migrations
+            initialDelaySeconds: 120
+            periodSeconds: 30
+            failureThreshold: 5
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "1Gi"
+            limits:
+              cpu: "2"
+              memory: "3Gi"
+          volumeMounts:
+            - name: data
+              mountPath: /usr/src/paperless/data
+              subPath: data
+            - name: data
+              mountPath: /usr/src/paperless/media
+              subPath: media
+            - name: data
+              mountPath: /usr/src/paperless/consume
+              subPath: consume
+            - name: data
+              mountPath: /usr/src/paperless/export
+              subPath: export
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: paperless-data

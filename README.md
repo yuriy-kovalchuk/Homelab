@@ -182,7 +182,7 @@ ingesters are spread one per node; Loki's are not yet.
 |-----|---------|
 | immich | Photos; Radeon 680M on ixion via a shared DRA claim; CNPG Postgres |
 | opencloud | File cloud |
-| forgejo + forgejo-runner | Git server (CNPG Postgres) and Actions runner (builds on any worker) |
+| forgejo + forgejo-runner | Git server (CNPG Postgres) and Actions runners: `forgejo-runner` (builds on any worker) and `forgejo-runner-talos` (label `talos-build`, Talos stack source builds, bahamut only, 200 Gi `longhorn-gpu` volume) |
 | homepage | Dashboard |
 | netbox | Inventory and IPAM for the lab (experiment; CNPG Postgres, Valkey) |
 | yk-portfolio, yk-update-checker | Personal site, dependency update dashboard |

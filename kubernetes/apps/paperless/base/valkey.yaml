@@ -1,0 +1,68 @@
+# Celery broker: holds only the task queue, so no persistence.
+apiVersion: v1
+kind: Service
+metadata:
+  name: paperless-valkey
+  namespace: paperless
+  labels:
+    app: paperless-valkey
+spec:
+  selector:
+    app: paperless-valkey
+  ports:
+    - name: valkey
+      port: 6379
+      targetPort: 6379
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paperless-valkey
+  namespace: paperless
+  labels:
+    app: paperless-valkey
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: paperless-valkey
+  template:
+    metadata:
+      labels:
+        app: paperless-valkey
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: valkey
+          image: valkey/valkey:9
+          ports:
+            - name: valkey
+              containerPort: 6379
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          readinessProbe:
+            exec:
+              command: ["valkey-cli", "ping"]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command: ["valkey-cli", "ping"]
+            initialDelaySeconds: 15
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: "25m"
+              memory: "32Mi"
+            limits:
+              memory: "128Mi"

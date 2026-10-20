@@ -1,0 +1,97 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: paperless
+  namespace: paperless
+spec:
+  description: "Paperless — traffic from gateway/cluster, egress to db and broker only (OCR is local, no internet)"
+  endpointSelector:
+    matchLabels:
+      app: paperless
+  ingress:
+    - fromEntities:
+        - cluster
+        - ingress
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            cnpg.io/cluster: pg-cluster-paperless
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            app: paperless-valkey
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: paperless-postgres
+  namespace: paperless
+spec:
+  description: "Paperless CNPG cluster — paperless connects, operator manages, instance manager reaches the API server"
+  endpointSelector:
+    matchLabels:
+      cnpg.io/cluster: pg-cluster-paperless
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app: paperless
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: cnpg-system
+            app.kubernetes.io/name: cloudnative-pg
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
+  egress:
+    - toEntities:
+        - kube-apiserver
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
+    - toEntities:
+        - remote-node
+        - host
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: paperless-valkey
+  namespace: paperless
+spec:
+  description: "Paperless broker — only paperless may connect"
+  endpointSelector:
+    matchLabels:
+      app: paperless-valkey
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app: paperless
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP

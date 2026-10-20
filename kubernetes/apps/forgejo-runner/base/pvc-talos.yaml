@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: forgejo-runner-talos-docker-lib
+  namespace: forgejo-runner
+spec:
+  accessModes:
+    - ReadWriteOnce
+  # Single strict-local replica on bahamut's NVMe: compile I/O stays off the
+  # network, and the runner is pinned to bahamut anyway. The build cache is
+  # disposable (images are pushed to Harbor), so no replication is needed.
+  storageClassName: longhorn-gpu
+  resources:
+    requests:
+      # Talos stack source builds (stagex, toolchain, LLVM, kernel, pkgs) plus
+      # BuildKit cache. bahamut's disk is shared with strata and model volumes;
+      # 200Gi leaves ~180 GB free when full. Can only grow, never shrink.
+      storage: 200Gi
