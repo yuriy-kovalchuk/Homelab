@@ -66,7 +66,7 @@ envoy:
   prometheus:
     enabled: true
     serviceMonitor:
-      enabled: false
+      enabled: true
 
 hubble:
   relay:
@@ -89,7 +89,7 @@ hubble:
       - flows-to-world:any-drop=true
     enableOpenMetrics: true
     serviceMonitor:
-      enabled: false
+      enabled: true
     dashboards:
       enabled: true
       annotations:
@@ -113,9 +113,9 @@ operator:
   prometheus:
     enabled: true
     serviceMonitor:
-      enabled: false
+      enabled: true
 
 prometheus:
   enabled: true
   serviceMonitor:
-    enabled: false
+    enabled: true
