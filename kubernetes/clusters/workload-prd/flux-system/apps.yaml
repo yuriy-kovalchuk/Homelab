@@ -16,3 +16,15 @@ spec:
   prune: false
   wait: false
   timeout: 5m
+  # Same escape hatch as the llm Kustomization, but scoped to one Deployment:
+  # forgejo-runner-talos is parked with `kubectl scale` while bahamut is off.
+  # Git's replicas: 1 only seeds the object on creation; afterwards Flux leaves
+  # the count alone (still correcting image, resources, mounts, ...). Every
+  # other app in this layer keeps its replica count Git-owned.
+  ignore:
+    - paths:
+        - /spec/replicas
+      target:
+        kind: Deployment
+        name: ^forgejo-runner-talos$
+        namespace: forgejo-runner

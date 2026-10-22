@@ -120,6 +120,10 @@ Why it is split this way:
   `llm` namespace, so GPU workloads can be parked at 0 with `kubectl scale`.
   It prunes (removing a model server from Git deletes it and its volumes);
   `apps` does not.
+- The `apps` Kustomization ignores `/spec/replicas` for one object only — the
+  `forgejo-runner-talos` Deployment, matched by name and namespace. Git's
+  `replicas: 1` seeds it and `kubectl scale` sticks afterwards; every other app
+  in the layer keeps its replica count Git-owned.
 
 ## Components
 

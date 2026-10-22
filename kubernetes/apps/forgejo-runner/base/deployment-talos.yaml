@@ -4,6 +4,10 @@ metadata:
   name: forgejo-runner-talos
   namespace: forgejo-runner
 spec:
+  # Seed only: the apps Kustomization ignores /spec/replicas for this object,
+  # so `kubectl scale` (0 while bahamut is down) sticks. Never raise it past 1:
+  # a second replica would share the RWO docker-lib volume with another dockerd.
+  # Build concurrency is `capacity` in the forgejo-runner-talos-config secret.
   replicas: 1
   # dockerd's /var/lib/docker is an RWO volume: a rolling update would leave
   # the new pod waiting on an attach the old one still holds
