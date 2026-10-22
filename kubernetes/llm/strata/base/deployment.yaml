@@ -54,15 +54,16 @@ spec:
               mountPath: /data
       containers:
         - name: strata
-          # Built by git.yuriykovalchuk.dev/yuriy/Strata CI (Strata 7695859 = v0.1.43,
-          # gfx1201, ROCm 7.2.4, repo 3c52d49) -- 458 commits ahead of the previous
-          # pin (e8ca9af, v0.1.40.2). v0.1.43 turns on RDNA4 defaults that apply here
-          # with no config change: fused int8 prompt experts for IQ3_S/IQ3_XXS
-          # (R9700 prefill +15-20%), 16K chunks for a bare `--prefill auto`, the
-          # measured PCIe share (fits the OCuLink x4 link) and the route tail skip.
-          # Each has an opt-out env var if it misbehaves: STRATA_PF_FUSED=0,
-          # STRATA_GFX12_CHUNK=0, STRATA_PCIE_FRAC_DEFAULT=old, STRATA_ROUTE_TAIL_SKIP=0.
-          image: harbor.yuriykovalchuk.dev/homelab/strata:477ac13-gfx1201-rocm7.2.4-c40a550
+          # Built by git.yuriykovalchuk.dev/yuriy/Strata CI (Strata 011c9e6 = v0.2.2,
+          # gfx1201, ROCm 7.2.4, repo c5f7b02) -- 1181 commits ahead of the previous
+          # pin (477ac13, v0.1.45). Engine-side gains that apply here with no config
+          # change: gfx12 WMMA prompt attention (0.2.0), GPU queues opened in a fixed
+          # order at start (0.2.1; ended the 8-14% slower-prefill coin flip with MTP),
+          # and the HIP first-verify-window spec-decode hang fix (0.2.2). The pinned
+          # configs in configmap-model-configs.yaml still parse on v0.2.2 (every arg
+          # and path checked), but they keep 0.1.x setup's choices -- regenerate one
+          # with STRATA_MODE=auto and no seeded file to pick up 0.2.x setup defaults.
+          image: harbor.yuriykovalchuk.dev/homelab/strata:011c9e6-gfx1201-rocm7.2.4-c5f7b02
           env:
             # auto: if MODEL has no config yet, run Strata's setup first, then serve.
             # This pod has no internet egress, so setup runs offline on the files
