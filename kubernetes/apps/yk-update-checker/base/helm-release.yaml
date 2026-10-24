@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: yk-update-checker
-      version: "0.3.0"
+      version: "0.4.0"
       sourceRef:
         kind: HelmRepository
         name: yk-charts
@@ -24,69 +24,29 @@ spec:
       retries: -1
       remediateLastFailure: true
   values:
-
-    image:
-      repository: ghcr.io/yuriy-kovalchuk/yk-update-checker
-      pullPolicy: Always
-    resources:
-      requests:
-        cpu: 100m
-        memory: 64Mi
-      limits:
-        cpu: 500m
-        memory: 256Mi
     scanner:
-
-      resources:
-        requests:
-          cpu: 50m
-          memory: 64Mi
-        limits:
-          cpu: 100m
-          memory: 512Mi
-
       config:
         update_type: all
-        parallel_checks: 5
         repos:
           - name: homelab
             repo: https://github.com/yuriy-kovalchuk/homelab
+          - name: yk-update-checker
+            repo: https://github.com/yuriy-kovalchuk/yk-update-checker
+          - name: yk-dns-manager
+            repo: https://github.com/yuriy-kovalchuk/yk-dns-manager
+          - name: talos-monitoring
+            repo: https://github.com/yuriy-kovalchuk/talos-monitoring
+          - name: yk-talos-management
+            repo: https://github.com/yuriy-kovalchuk/yk-talos-management
 
-    # ── Prometheus / Alertmanager integration ──────────────────────────────────────
     grafana:
-      # Creates a ConfigMap with the pre-built Grafana dashboard JSON.
-      # When enabled, the label `grafana_dashboard: "1"` is added so that
-      # Grafana (or grafana-operator) auto-discovers and imports it.
       dashboard:
         enabled: true
-        # Sets the k8s-sidecar-target-directory annotation, which the Grafana
-        # sidecar uses to file the dashboard under this folder. Assumes the
-        # sidecar's watched base directory is its default, "/tmp/dashboards"
-        # (sidecarBaseDir below) — override if your Grafana release configured
-        # sidecar.dashboards.folder to something else.
-        folder: "Security"
+        folder: Security   # Grafana sidecar folder
 
     metrics:
-      # ServiceMonitor CRD — requires Prometheus Operator.
       serviceMonitor:
         enabled: true
-        additionalLabels: {}
-        interval: "5m"
-
-      # PrometheusRule CRD — generates alert rules routed to Alertmanager.
+        interval: 5m
       prometheusRule:
-        enabled: true
-        # Each entry becomes one rule.  Scope is matched against the metric label;
-        # severity is emitted as a label for Alertmanager routing.
-        # "unknown" covers non-semver-pinned dependencies (e.g. git SHAs) whose
-        # bump size can't be classified — treated as warning since it could be
-        # anything up to a major change.
-        rules:
-          - scope: major
-            severity: warning
-          - scope: minor
-            severity: info
-          - scope: patch
-            severity: info
-          - scope: unknown
-            severity: warning
+        enabled: true   # default rules: major/unknown warning, minor/patch info, stale scan, failed repo, digest drift
