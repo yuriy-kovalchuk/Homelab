@@ -26,7 +26,7 @@ spec:
           # stable-diffusion.cpp master @ f2f168f (2026-10-09), Vulkan build -- has
           # Qwen-Image-2.1 (added 2026-09-20). Upstream only publishes floating
           # master-* tags, so this pins the index digest.
-          image: ghcr.io/leejet/stable-diffusion.cpp:master-vulkan@sha256:e0762b8ae0d01a07845b48d6454aa52aa3f6d242ce5f387d803163089c26d9e6
+          image: ghcr.io/leejet/stable-diffusion.cpp:master-vulkan@sha256:e8c3b012e12517b13bd93d032710c3ef80e18a649acfda668dee5eee1be3ba2d
           command:
             - /sd-server
           args:

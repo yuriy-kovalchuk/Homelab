@@ -43,7 +43,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: download
-          image: alpine:3.21
+          image: alpine:3.24.3
           env:
             # IQ3_S: the biggest/recommended size in this repo — matches the base
             # model on AIME25 (100.00), exceeds it on GPQA-Diamond (92.93 vs 91.92)

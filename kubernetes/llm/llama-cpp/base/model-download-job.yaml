@@ -16,7 +16,7 @@ spec:
         fsGroup: 65532
       containers:
         - name: downloader
-          image: alpine:3.21
+          image: alpine:3.24.3
           command:
             - sh
             - -c
