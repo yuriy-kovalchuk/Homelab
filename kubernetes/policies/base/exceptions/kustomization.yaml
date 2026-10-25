@@ -6,6 +6,8 @@ resources:
   - apps-llama-cpp.yaml
   - apps-open-webui.yaml
   - apps-yk-update-checker.yaml
+  - llm-sd-server.yaml
+  - llm-strata.yaml
   - kube-system.yaml
   - observability-alertmanager.yaml
   - observability-grafana.yaml

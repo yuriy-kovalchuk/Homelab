@@ -2,19 +2,20 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: strata-data
-  namespace: llm
+  namespace: llm-strata
 spec:
   # 1 replica, strict-local on bahamut: the data is useless without the R9700
   # anyway, and reads stay on the node's NVMe (Strata reads its lookup table per token)
   accessModes:
     - ReadWriteOnce
   storageClassName: longhorn-gpu
+  # The volume made in the old llm namespace (PV set to Retain before the move):
+  # binds this claim to it instead of provisioning an empty one.
+  volumeName: pvc-5eed3802-0147-49de-92e9-0f595925414c
   resources:
     requests:
-      # Bumped from 200Gi: three Qwen3.8-Flash-Next sizes side by side (IQ2_XS,
-      # IQ3_XXS, IQ3_S) plus the shared ~29 GB shard-2 hardlink and mtp/packs
-      # filled it to 86% (167.6G/195.8G) and left too little headroom for a
-      # new size's setup-time disk-space precheck (it wants ~31 GB free even
-      # though the shard-2 copy ends up hardlinked, not duplicated). bahamut's
-      # longhorn-gpu disk has ~437 GiB available, so this is well within room.
+      # Bumped from 200Gi when three Qwen3.8-Flash-Next sizes sat side by side
+      # (IQ2_XS and IQ3_XXS since deleted; IQ3_S + mtp/packs is ~92 GB). A new
+      # size's setup-time disk-space precheck wants ~31 GB free even though the
+      # shard-2 copy ends up hardlinked, not duplicated.
       storage: 300Gi

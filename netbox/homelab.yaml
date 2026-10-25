@@ -197,8 +197,8 @@ devices:
     interfaces:
       - { name: enp4s0, type: 2.5gbase-t, description: Realtek RTL8125, mac: "38:05:25:32:8e:dc", ips: [10.0.4.12/24], primary: true }
     inventory:
-      - { name: Radeon AI PRO R9700, manufacturer: AMD, part_id: "0x7551", description: "Navi 48 gfx1201 on OCuLink — llama-cpp, strata, sd-server" }
-      - { name: Radeon 780M, manufacturer: AMD, part_id: "0x1900", description: "iGPU, HawkPoint gfx1103 — llama-cpp-igpu" }
+      - { name: Radeon AI PRO R9700, manufacturer: AMD, part_id: "0x7551", description: "Navi 48 gfx1201 on OCuLink — llama-cpp, strata" }
+      - { name: Radeon 780M, manufacturer: AMD, part_id: "0x1900", description: "iGPU, HawkPoint gfx1103 — sd-server" }
 
   - name: yojimbo
     type: desktop-pegatron-i7-7700k

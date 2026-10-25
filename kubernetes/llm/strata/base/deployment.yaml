@@ -2,10 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: strata
-  namespace: llm
+  namespace: llm-strata
 spec:
   # Parked at 0 like the other R9700 Deployments (the apps Kustomization ignores
-  # /spec/replicas in llm): scale llama-cpp / llama-cpp-rocm to 0, then this to 1.
+  # /spec/replicas in the llm namespaces): scale llama-cpp / llama-cpp-rocm to 0, then this to 1.
   replicas: 0
   selector:
     matchLabels:
@@ -38,8 +38,6 @@ spec:
             - -c
             - |
               set -eu
-              cp /configs/strata-iq2_xs.json /data/config/strata-iq2_xs.json
-              cp /configs/strata-iq3_xxs.json /data/config/strata-iq3_xxs.json
               cp /configs/strata-iq3_s.json /data/config/strata-iq3_s.json
           securityContext:
             allowPrivilegeEscalation: false
@@ -67,19 +65,25 @@ spec:
           env:
             # auto: if MODEL has no config yet, run Strata's setup first, then serve.
             # This pod has no internet egress, so setup runs offline on the files
-            # strata-download put on /data (it skips shards with a .done marker and
+            # strata-model-download put on /data (it skips shards with a .done marker and
             # reuses the MTP layer): it only packs the model and writes the config.
             # Setup must run here, not in the download Job: it needs the GPU.
             - name: STRATA_MODE
               value: auto
-            # Which model to serve. Switch only after strata-download has completed
-            # for it (download-job.yaml) — setup cannot download from this pod.
+            # Which model to serve (with FAMILY below): the defaults on first apply
+            # only. Flux ignores both values (clusters/workload-prd/flux-system/llm.yaml),
+            # switch them with `kubectl set env`, see ../README.md. The ignore rule
+            # points at env[1] and env[3]: keep this order (kubectl set env edits in
+            # place and appends a new name at the end, so the live list matches).
             - name: MODEL
               value: IQ3_S
             # Without an API key Strata only answers Host names it knows (DNS
             # rebinding guard); the gateway and in-cluster names have to be listed.
             - name: STRATA_ALLOWED_HOSTS
-              value: strata.yuriykovalchuk.dev,strata,strata.llm,strata.llm.svc,strata.llm.svc.cluster.local
+              value: strata.yuriykovalchuk.dev,strata,strata.llm-strata,strata.llm-strata.svc,strata.llm-strata.svc.cluster.local
+            # qwen = Qwen3.8-Flash-Next (MODEL IQ3_S), qwen36 = Qwen3.6-35B-A3B (MODEL Q8_0)
+            - name: FAMILY
+              value: qwen
           ports:
             - name: http
               containerPort: 8080
@@ -90,7 +94,7 @@ spec:
           resources:
             requests:
               cpu: "4"
-              # IQ3_S's shard 1 is 54.8 GB (vs IQ3_XXS's 47 GB) -> resident
+              # IQ3_S's shard 1 is 54.8 GB -> resident
               # experts in RAM (pageable on ROCm, STRATA_RESIDENT_PIN=0) scale
               # with it, est. ~46-47 GB, plus the engine and int8 KV past the
               # resident threshold -- bigger again at 256000 ctx than at 131072.

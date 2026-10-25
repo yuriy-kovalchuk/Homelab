@@ -2,11 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sd-server
-  namespace: llm
+  namespace: llm-sd-server
 spec:
-  # Parked at 0 like the other R9700 Deployments (the apps Kustomization ignores
-  # /spec/replicas in llm): scale strata / llama-cpp / llama-cpp-rocm to 0, then
-  # this to 1.
+  # Starts parked at 0 (the llm Kustomization ignores /spec/replicas, so
+  # `kubectl scale` sticks). On the 780M it runs beside llama-cpp / llama-cpp-rocm
+  # on the R9700, but not beside strata (not enough RAM for both, see resources).
   replicas: 0
   selector:
     matchLabels:
@@ -34,7 +34,7 @@ spec:
             - "0.0.0.0"
             - --listen-port
             - "1234"
-            # Files written by sd-server-download (download-job.yaml).
+            # Files written by sd-server-model-download (model-download/models.txt).
             - --diffusion-model
             - /models/diffusion_models/qwen-image-2.1-UC-Q8_0.gguf
             # Qwen's own Q8_0 GGUF of Qwen3-VL-8B-Instruct, not the int8_convrot
@@ -68,13 +68,16 @@ spec:
           resources:
             requests:
               cpu: "1"
-              memory: 4Gi
+              # The 780M is UMA: the ~18 GB of weights sit in system RAM (GTT)
+              # and count against this pod. The request reserves them, so the
+              # scheduler keeps strata (52Gi) and sd-server from sharing
+              # bahamut's ~60 GiB.
+              memory: 20Gi
             limits:
               cpu: "8"
-              # ~18 GB of weights pass through RAM on their way into the R9700's
-              # 32 GB (all of it fits there: 16.7 GB measured). On the 780M
-              # (UMA) the weights would count against this limit instead.
-              memory: 24Gi
+              # weights + compute buffers at 1024x1024 (16.7 GB measured on the
+              # R9700, where it all fit in VRAM)
+              memory: 32Gi
           # No /health route: /v1/models is the cheapest endpoint that answers
           # once the server is listening (it starts after the model context).
           startupProbe:

@@ -7,3 +7,4 @@ resources:
   - allow-flux-system.yaml
   - allow-alloy-metrics-scraping.yaml
   - allow-gateway-frontend.yaml
+  - allow-llm-model-download.yaml

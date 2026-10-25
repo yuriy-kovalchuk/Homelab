@@ -1,0 +1,12 @@
+# <url> <path under llama-cpp-cuda-models> [<sha256>]
+#
+# Adding a model: add it here and its section to models-preset-configmap.yaml.
+# The mmproj files share a name across repos, so each is saved under a
+# per-model name that presets.ini points at.
+https://huggingface.co/unsloth/gemma-4-12B-it-qat-GGUF/resolve/main/gemma-4-12B-it-qat-UD-Q4_K_XL.gguf gemma-4-12B-it-qat-UD-Q4_K_XL.gguf
+https://huggingface.co/unsloth/gemma-4-12B-it-qat-GGUF/resolve/main/mmproj-F16.gguf mmproj-gemma-4-12B-it-qat-F16.gguf
+https://huggingface.co/unsloth/gemma-4-E4B-it-GGUF/resolve/main/gemma-4-E4B-it-Q8_0.gguf gemma-4-E4B-it-Q8_0.gguf
+https://huggingface.co/unsloth/gemma-4-E4B-it-GGUF/resolve/main/mmproj-F16.gguf mmproj-gemma-4-E4B-it-F16.gguf
+https://huggingface.co/unsloth/gemma-4-E2B-it-GGUF/resolve/main/gemma-4-E2B-it-Q8_0.gguf gemma-4-E2B-it-Q8_0.gguf
+https://huggingface.co/unsloth/gemma-4-E2B-it-GGUF/resolve/main/mmproj-F16.gguf mmproj-gemma-4-E2B-it-F16.gguf
+https://huggingface.co/unsloth/Qwen3.6-35B-A3B-GGUF/resolve/main/Qwen3.6-35B-A3B-UD-IQ3_XXS.gguf Qwen3.6-35B-A3B-UD-IQ3_XXS.gguf

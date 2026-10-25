@@ -50,8 +50,8 @@ GPUs (claimed through Kubernetes DRA by PCI device ID):
 
 | Node | GPU | PCI ID | Used by |
 |------|-----|--------|---------|
-| bahamut | AMD Radeon AI PRO R9700 (Navi 48, gfx1201), on OCuLink | `0x7551` | llama-cpp, llama-cpp-rocm, strata, sd-server |
-| bahamut | Radeon 780M iGPU (HawkPoint, gfx1103) | `0x1900` | llama-cpp-igpu |
+| bahamut | AMD Radeon AI PRO R9700 (Navi 48, gfx1201), on OCuLink | `0x7551` | llama-cpp, llama-cpp-rocm, strata |
+| bahamut | Radeon 780M iGPU (HawkPoint, gfx1103) | `0x1900` | sd-server |
 | ixion | Radeon 680M iGPU (Rembrandt, gfx1035) | `0x1681` | Immich (server + machine learning) |
 | yojimbo | NVIDIA GeForce GTX 1070 (Pascal GP104), HDMI audio `0x10f0` | `0x1b81` | llama-cpp-cuda (NVIDIA DRA driver); VMs via VFIO passthrough planned |
 

@@ -24,9 +24,29 @@ spec:
   # workloads can be parked at 0 without Git fighting the change back to 1.
   # Only spec/replicas is exempt — image, args and everything else still
   # reconcile normally.
+  # One rule per namespace of this layer: add one for every new llm-* namespace.
   ignore:
     - paths:
         - /spec/replicas
       target:
         kind: Deployment
         namespace: llm
+    - paths:
+        - /spec/replicas
+      target:
+        kind: Deployment
+        namespace: llm-strata
+    - paths:
+        - /spec/replicas
+      target:
+        kind: Deployment
+        namespace: llm-sd-server
+    # Strata's model choice (FAMILY, MODEL) is switched live with `kubectl set env`
+    # (kubernetes/llm/strata/README.md): env[1] is MODEL, env[3] is FAMILY.
+    - paths:
+        - /spec/template/spec/containers/0/env/1/value
+        - /spec/template/spec/containers/0/env/3/value
+      target:
+        kind: Deployment
+        name: strata
+        namespace: llm-strata

@@ -15,6 +15,8 @@ resources:
   - apps-whoami.yaml
   - apps-yk-portfolio.yaml
   - apps-yk-update-checker.yaml
+  - llm-sd-server.yaml
+  - llm-strata.yaml
   - core-cert-manager.yaml
   - core-external-secrets.yaml
   - core-kyverno.yaml

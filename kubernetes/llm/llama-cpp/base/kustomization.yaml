@@ -3,15 +3,11 @@ kind: Kustomization
 resources:
   - pvc.yaml
   - models-preset-configmap.yaml
-  - model-download-job.yaml
+  - model-download
   - resource-claim-template.yaml
   - deployment.yaml
   - service.yaml
 configMapGenerator:
-  - name: llama-cpp-model-list
-    namespace: llm
-    files:
-      - models.txt
   # Chat templates a preset can point at with chat-template-file = /templates/<file>
   - name: llama-cpp-chat-templates
     namespace: llm

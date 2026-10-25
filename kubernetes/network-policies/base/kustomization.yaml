@@ -9,17 +9,16 @@ resources:
   - apps-immich.yaml
   - apps-llama-cpp.yaml
   - apps-llama-cpp-cuda.yaml
-  - apps-llama-cpp-igpu.yaml
   - apps-netbox.yaml
   - apps-open-webui.yaml
-  - apps-sd-server.yaml
-  - apps-strata.yaml
   - apps-opencloud.yaml
   - apps-paperless.yaml
   - apps-pdfcraft.yaml
   - apps-whoami.yaml
   - apps-yk-portfolio.yaml
   - apps-yk-update-checker.yaml
+  - llm-sd-server.yaml
+  - llm-strata.yaml
   - core-cert-manager.yaml
   - core-external-secrets.yaml
   - core-kyverno.yaml

@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sd-server
-  namespace: llm
+  namespace: llm-sd-server
 spec:
   template:
     spec:
@@ -14,12 +14,14 @@ spec:
       securityContext:
         seccompProfile:
           type: RuntimeDefault
-      # Claims the R9700 (0x7551), which pins the pod to bahamut.
-      # sd-server-radeon780m (0x1900) is the slower fallback card; on it, raise
-      # the memory request/limit (UMA: the weights come out of system RAM).
+      # Claims the 780M iGPU (0x1900), which pins the pod to bahamut and leaves
+      # the R9700 to the chat models, so images and chat run at the same time.
+      # Much slower than the R9700: for fast images, switch to sd-server-r9700
+      # (0x7551, exclusive with strata / llama-cpp / llama-cpp-rocm) and lower
+      # the memory in base/deployment.yaml back to 4Gi / 24Gi.
       resourceClaims:
         - name: gpu
-          resourceClaimTemplateName: sd-server-r9700
+          resourceClaimTemplateName: sd-server-radeon780m
       containers:
         - name: sd-server
           # No privileged/hostPath: the DRA driver injects this card's render

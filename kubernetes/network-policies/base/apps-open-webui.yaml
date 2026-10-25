@@ -27,7 +27,7 @@ spec:
     # Image generation (AUTOMATIC1111-compatible API of stable-diffusion.cpp)
     - toEndpoints:
         - matchLabels:
-            io.kubernetes.pod.namespace: llm
+            io.kubernetes.pod.namespace: llm-sd-server
             app: sd-server
       toPorts:
         - ports:

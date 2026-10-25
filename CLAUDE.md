@@ -64,7 +64,8 @@ One broken CEL expression denies every workload that shares those policyRefs; gu
 - Claims are exclusive cluster-wide. Two pods share a card only through one named `ResourceClaim` (Immich does this). Only one R9700 workload runs at a time.
 - GPU Deployments must use `strategy: Recreate` and tolerate `workload=gpu:NoSchedule`; the claim itself pins the node.
 - Immich spoofs gfx1035 with `HSA_OVERRIDE_GFX_VERSION=10.3.0`; change it if the claim moves to another card.
-- llama.cpp runs in router mode: models from the models PVC, per-model settings in `kubernetes/llm/llama-cpp/base/models-preset-configmap.yaml`, downloads in `models.txt`. Replicas in `llm` are ignored by Flux, so `kubectl scale` sticks.
+- llama.cpp runs in router mode: models from the models PVC, per-model settings in `kubernetes/llm/llama-cpp/base/models-preset-configmap.yaml`, downloads in its `model-download/models.txt`. Every engine downloads through the one Job in `kubernetes/llm/model-download/base` (one instance per volume, list format `<url> <path> [sha256]`, egress in `cluster-wide/allow-llm-model-download.yaml`); the engines themselves have no egress. Replicas in `llm` and the `llm-*` namespaces (strata, sd-server live in `llm-strata` / `llm-sd-server`) are ignored by Flux, so `kubectl scale` sticks.
+- Strata's model (`FAMILY`/`MODEL` env) is switched live with `kubectl set env`, never in Git: Flux ignores those two values by env index ([kubernetes/llm/strata/README.md](kubernetes/llm/strata/README.md)); keep the env order.
 
 ## Storage
 

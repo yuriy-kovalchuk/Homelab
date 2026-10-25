@@ -2,7 +2,7 @@ apiVersion: resource.k8s.io/v1
 kind: ResourceClaimTemplate
 metadata:
   name: sd-server-radeon780m
-  namespace: llm
+  namespace: llm-sd-server
 spec:
   spec:
     devices:
@@ -14,6 +14,6 @@ spec:
             count: 1
             selectors:
               - cel:
-                  # Radeon 780M iGPU (gfx1103) on bahamut -- same card as
-                  # llama-cpp-igpu: only one of the two can hold it.
+                  # Radeon 780M iGPU (gfx1103) on bahamut; sd-server is its
+                  # only user (the KubeVirt passthrough entry for it is unused).
                   expression: 'device.attributes["gpu.amd.com"].deviceID == "0x1900"'

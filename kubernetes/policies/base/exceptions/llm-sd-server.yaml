@@ -1,0 +1,15 @@
+apiVersion: policies.kyverno.io/v1beta1
+kind: PolicyException
+metadata:
+  name: sd-server
+  namespace: llm-sd-server
+spec:
+  # The sd-server image and its download Job's alpine run as uid 0.
+  matchConditions:
+    - name: exclude-sd-server
+      expression: "object.metadata.namespace == 'llm-sd-server'"
+  policyRefs:
+    - kind: ValidatingPolicy
+      name: require-run-as-non-root-user
+    - kind: ValidatingPolicy
+      name: require-run-as-nonroot

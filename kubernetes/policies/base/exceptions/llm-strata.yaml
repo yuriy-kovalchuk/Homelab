@@ -1,0 +1,15 @@
+apiVersion: policies.kyverno.io/v1beta1
+kind: PolicyException
+metadata:
+  name: strata
+  namespace: llm-strata
+spec:
+  # The strata image and its download Job's alpine run as uid 0.
+  matchConditions:
+    - name: exclude-strata
+      expression: "object.metadata.namespace == 'llm-strata'"
+  policyRefs:
+    - kind: ValidatingPolicy
+      name: require-run-as-non-root-user
+    - kind: ValidatingPolicy
+      name: require-run-as-nonroot

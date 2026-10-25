@@ -4,6 +4,6 @@ resources:
   - pvc.yaml
   - resource-claim-template.yaml
   - resource-claim-template-780m.yaml
-  - download-job.yaml
+  - model-download
   - deployment.yaml
   - service.yaml

@@ -2,13 +2,16 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: sd-server-models
-  namespace: llm
+  namespace: llm-sd-server
 spec:
   # 1 replica, strict-local on bahamut like strata-data: the weights are only
   # useful next to the R9700, and loads stay on the node's NVMe.
   accessModes:
     - ReadWriteOnce
   storageClassName: longhorn-gpu
+  # The volume made in the old llm namespace (PV set to Retain before the move):
+  # binds this claim to it instead of provisioning an empty one.
+  volumeName: pvc-424399fe-47e0-4f90-a4a0-fc17d274d306
   resources:
     requests:
       # Q8_0 transformer (7.6 GB) + int8 Qwen3-VL-8B text encoder (9.4 GB) + VAE

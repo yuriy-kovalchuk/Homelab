@@ -3,7 +3,7 @@ kind: Kustomization
 resources:
   - pvc.yaml
   - resource-claim-template.yaml
-  - download-job.yaml
+  - model-download
   - deployment.yaml
   - service.yaml
   - configmap-model-configs.yaml

@@ -48,8 +48,8 @@ spec:
               memory: 1Gi
             limits:
               cpu: "14"
-              # headroom for CPU-MoE offload (Flash-Next Q2 keeps ~60 GB of
-              # experts in system RAM); normal models sit well under this
+              # headroom for CPU-MoE offload of models bigger than the R9700's
+              # 32 GB (experts in system RAM); normal models sit well under this
               memory: 72Gi
           readinessProbe:
             httpGet:

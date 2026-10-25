@@ -8,4 +8,4 @@ patches:
     target:
       kind: Deployment
       name: strata
-      namespace: llm
+      namespace: llm-strata

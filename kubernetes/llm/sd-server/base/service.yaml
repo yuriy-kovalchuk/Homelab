@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: sd-server
-  namespace: llm
+  namespace: llm-sd-server
 spec:
   selector:
     app: sd-server

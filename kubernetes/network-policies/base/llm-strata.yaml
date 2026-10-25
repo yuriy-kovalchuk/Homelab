@@ -2,7 +2,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: strata
-  namespace: llm
+  namespace: llm-strata
 spec:
   endpointSelector:
     matchLabels:
@@ -23,22 +23,4 @@ spec:
               protocol: TCP
   # No egress block: the engine never leaves the cluster (cluster-wide allow-dns
   # already puts every pod in egress default-deny). Downloads happen in the
-  # strata-download Job below.
----
-apiVersion: cilium.io/v2
-kind: CiliumNetworkPolicy
-metadata:
-  name: strata-download
-  namespace: llm
-spec:
-  endpointSelector:
-    matchLabels:
-      app: strata-download
-  # Hugging Face: the GSQ-RCO shards (huggingface.co + its CDN)
-  egress:
-    - toEntities:
-        - world
-      toPorts:
-        - ports:
-            - port: "443"
-              protocol: TCP
+  # strata-model-download Job (cluster-wide/allow-llm-model-download.yaml).

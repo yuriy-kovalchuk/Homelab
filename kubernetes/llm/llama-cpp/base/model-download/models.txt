@@ -1,0 +1,11 @@
+# <url> <path under llama-cpp-models> [<sha256>]
+#
+# The router lists every *.gguf in /models as a model (section name in
+# models-preset-configmap.yaml = file name without .gguf); a split GGUF goes in
+# its own folder (<name>/<name>-0000N-of-0000M.gguf) so it loads as one model.
+https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/resolve/main/Qwen3.8-27B-UD-Q6_K_XL.gguf Qwen3.8-27B-UD-Q6_K_XL.gguf
+# ISTA-DASLab GSQ-RCO IQ3_S (3.5 bpw, "task-lossless") with the MTP head, ~12.1 GB
+https://huggingface.co/ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF/resolve/main/Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp.gguf Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp.gguf
+# its vision encoder (BF16, ~0.93 GB). The router never lists mmproj* files as
+# models; the IQ3_S preset attaches it with `mmproj =`.
+https://huggingface.co/ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF/resolve/main/mmproj-Qwen3.8-27B-BF16.gguf mmproj-Qwen3.8-27B-BF16.gguf

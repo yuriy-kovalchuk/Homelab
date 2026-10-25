@@ -117,7 +117,8 @@ Why it is split this way:
 - `platform-infra` holds only what other layers need to work; a broken tool
   in `platform-ops` cannot block anything else.
 - The `llm` Kustomization ignores `/spec/replicas` for Deployments in the
-  `llm` namespace, so GPU workloads can be parked at 0 with `kubectl scale`.
+  `llm`, `llm-strata` and `llm-sd-server` namespaces, so GPU workloads can be
+  parked at 0 with `kubectl scale`.
   It prunes (removing a model server from Git deletes it and its volumes);
   `apps` does not.
 - The `apps` Kustomization ignores `/spec/replicas` for one object only — the
@@ -196,10 +197,10 @@ ingesters are spread one per node; Loki's are not yet.
 
 | App | Purpose |
 |-----|---------|
-| llama-cpp, llama-cpp-rocm, llama-cpp-igpu | llama.cpp servers on the R9700 (Vulkan, ROCm) and the 780M |
+| llama-cpp, llama-cpp-rocm | llama.cpp servers on the R9700 (Vulkan, ROCm) |
 | llama-cpp-cuda | llama.cpp (CUDA 12) on the GTX 1070 (yojimbo): Gemma 4, Qwen3.6-35B-A3B |
 | strata | Expert-caching inference engine on the R9700 |
-| sd-server | stable-diffusion.cpp on the R9700 (parked at 0 by default) |
+| sd-server | stable-diffusion.cpp on the 780M, beside the chat models (parked at 0 by default) |
 | open-webui | Chat UI for the llama.cpp servers |
 
 Only one R9700 workload can run at a time: GPU claims are exclusive.

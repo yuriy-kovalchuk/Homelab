@@ -1,0 +1,23 @@
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: allow-llm-model-download
+spec:
+  description: "Hugging Face (huggingface.co + its CDN) for the llm layer's model-download Jobs (kubernetes/llm/model-download); the engine pods themselves have no egress"
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/component: model-download
+    matchExpressions:
+      - key: io.kubernetes.pod.namespace
+        operator: In
+        values:
+          - llm
+          - llm-strata
+          - llm-sd-server
+  egress:
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

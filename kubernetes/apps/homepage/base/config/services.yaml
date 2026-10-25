@@ -16,14 +16,14 @@
         icon: mdi-layers-triple
         href: https://strata.yuriykovalchuk.dev
         description: Qwen3.8 Flash-Next — R9700
-        namespace: llm
+        namespace: llm-strata
         app: strata
         podSelector: app=strata
     - Image generation:
         icon: mdi-palette
         href: https://sd.yuriykovalchuk.dev
-        description: Qwen-Image-2.1 (sd.cpp) — R9700
-        namespace: llm
+        description: Qwen-Image-2.1 (sd.cpp) — Radeon 780M
+        namespace: llm-sd-server
         app: sd-server
         podSelector: app=sd-server
     - llama.cpp Vulkan:
@@ -40,13 +40,6 @@
         namespace: llm
         app: llama-cpp-rocm
         podSelector: app=llama-cpp-rocm
-    - llama.cpp iGPU:
-        icon: mdi-robot-outline
-        href: https://vulkan-igpu.yuriykovalchuk.dev
-        description: llama-server — Radeon 780M
-        namespace: llm
-        app: llama-cpp-igpu
-        podSelector: app=llama-cpp-igpu
 
 - Apps:
     - Immich:

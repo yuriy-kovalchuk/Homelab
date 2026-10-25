@@ -2,7 +2,7 @@ apiVersion: resource.k8s.io/v1
 kind: ResourceClaimTemplate
 metadata:
   name: sd-server-r9700
-  namespace: llm
+  namespace: llm-sd-server
 spec:
   spec:
     devices:

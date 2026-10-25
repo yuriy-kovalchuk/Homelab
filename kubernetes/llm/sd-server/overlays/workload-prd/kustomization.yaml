@@ -8,4 +8,4 @@ patches:
     target:
       kind: Deployment
       name: sd-server
-      namespace: llm
+      namespace: llm-sd-server
