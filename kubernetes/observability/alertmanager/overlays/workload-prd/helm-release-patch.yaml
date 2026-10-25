@@ -29,17 +29,13 @@ spec:
     serviceMonitor:
       enabled: true
 
-    # Webhook URLs are read from files mounted from the ExternalSecret-backed
-    # Secrets (secrets/base/observability-alertmanager.yaml), so they never end
+    # The webhook URL is read from a file mounted from the ExternalSecret-backed
+    # Secret (secrets/base/observability-alertmanager.yaml), so it never ends
     # up in the rendered ConfigMap.
     extraSecretMounts:
       - name: slack-webhook
         mountPath: /etc/alertmanager-secrets/slack
         secretName: alertmanager-slack-webhook
-        readOnly: true
-      - name: deadmans-switch
-        mountPath: /etc/alertmanager-secrets/deadmans-switch
-        secretName: alertmanager-deadmans-switch
         readOnly: true
 
     # Rendered next to alertmanager.yml in /etc/alertmanager.
@@ -112,23 +108,12 @@ spec:
               title_link: 'https://github.com/yuriy-kovalchuk/{{ .CommonLabels.source }}'
               text: '{{ template "updates.text" . }}'
               footer: yk-update-checker
-        # healthchecks.io notifies when these pings stop.
-        - name: deadmans-switch
-          webhook_configs:
-            - url_file: /etc/alertmanager-secrets/deadmans-switch/PING_URL
-              send_resolved: false
       route:
         receiver: slack-alerts
         group_wait: 10s
         group_interval: 5m
         repeat_interval: 3h
         routes:
-          - matchers:
-              - alertname = "Watchdog"
-            receiver: deadmans-switch
-            group_wait: 0s
-            group_interval: 1m
-            repeat_interval: 5m
           - matchers:
               - alertname =~ "OutdatedDependency.*|UpdateCheckerDigestDrift"
             receiver: slack-updates

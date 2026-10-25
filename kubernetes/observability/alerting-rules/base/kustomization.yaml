@@ -12,4 +12,3 @@ resources:
   - cluster-core.yaml
   - secrets.yaml
   - admission-control.yaml
-  - watchdog.yaml

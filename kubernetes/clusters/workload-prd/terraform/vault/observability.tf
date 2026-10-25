@@ -51,13 +51,3 @@ resource "vault_kv_secret_v2" "alertmanager_slack" {
     webhook_url = var.alertmanager_slack_webhook_url
   })
 }
-
-resource "vault_kv_secret_v2" "alertmanager_deadmans_switch" {
-  mount               = "kubernetes"
-  name                = "alertmanager/deadmans-switch"
-  delete_all_versions = true
-
-  data_json = jsonencode({
-    ping_url = var.alertmanager_deadmans_switch_url
-  })
-}

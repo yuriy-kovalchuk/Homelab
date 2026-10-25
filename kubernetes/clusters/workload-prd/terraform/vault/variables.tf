@@ -121,12 +121,6 @@ variable "alertmanager_slack_webhook_url" {
   sensitive   = true
 }
 
-variable "alertmanager_deadmans_switch_url" {
-  description = "healthchecks.io ping URL that Alertmanager hits with the always-firing Watchdog alert"
-  type        = string
-  sensitive   = true
-}
-
 
 variable "netbox_secret_key" {
   description = "NetBox SECRET_KEY (50+ random characters)"
