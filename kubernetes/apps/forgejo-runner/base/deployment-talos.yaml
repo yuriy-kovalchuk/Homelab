@@ -75,7 +75,7 @@ spec:
             - name: docker-sock
               mountPath: /var/run/docker-sock
         - name: dind
-          image: docker:29.8.0-dind
+          image: docker:29.9.2-dind
           args:
             - dockerd
             - -H
@@ -98,7 +98,7 @@ spec:
             - name: docker-sock
               mountPath: /var/run/docker-sock
         - name: prune
-          image: docker:29.8.0-cli
+          image: docker:29.9.2-cli
           command:
             - sh
             - -c

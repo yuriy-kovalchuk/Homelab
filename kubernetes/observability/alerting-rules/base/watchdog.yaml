@@ -15,4 +15,4 @@ spec:
             component: alerting
           annotations:
             summary: "Alerting pipeline heartbeat"
-            description: "This alert is always firing. It confirms the Mimir ruler -> Alertmanager -> Slack pipeline is alive. If it stops appearing, the alerting pipeline itself is broken."
+            description: "This alert is always firing. Alertmanager forwards it to the external dead-man's switch (healthchecks.io), which notifies when the pings stop, i.e. when the Mimir ruler -> Alertmanager pipeline itself is broken."

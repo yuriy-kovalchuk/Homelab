@@ -16,3 +16,53 @@ spec:
           annotations:
             summary: "CloudNativePG instance {{ $labels.namespace }}/{{ $labels.pod }} is down"
             description: "The CNPG exporter reports the PostgreSQL instance {{ $labels.namespace }}/{{ $labels.pod }} as unreachable for more than 5 minutes."
+        # A crashlooping instance stops exporting cnpg_collector_up entirely, so
+        # CNPGInstanceDown never fires for it. Count ready pods per Cluster from
+        # kube-state-metrics instead.
+        - alert: CNPGClusterDegraded
+          expr: |
+            count by (namespace, owner_name) (kube_pod_owner{owner_kind="Cluster"})
+              - sum by (namespace, owner_name) (
+                  kube_pod_status_ready{condition="true"}
+                  * on (namespace, pod) group_left (owner_name) kube_pod_owner{owner_kind="Cluster"}
+                ) > 0
+          for: 15m
+          labels:
+            severity: warning
+            component: database
+          annotations:
+            summary: "CloudNativePG cluster {{ $labels.namespace }}/{{ $labels.owner_name }} has {{ $value }} instance(s) not ready"
+            description: "Not every instance of {{ $labels.namespace }}/{{ $labels.owner_name }} has been ready for 15 minutes. Check `kubectl -n {{ $labels.namespace }} get cluster {{ $labels.owner_name }}` and the pod logs."
+        - alert: CNPGClusterDown
+          expr: |
+            sum by (namespace, owner_name) (
+              kube_pod_status_ready{condition="true"}
+              * on (namespace, pod) group_left (owner_name) kube_pod_owner{owner_kind="Cluster"}
+            ) == 0
+          for: 5m
+          labels:
+            severity: critical
+            component: database
+          annotations:
+            summary: "CloudNativePG cluster {{ $labels.namespace }}/{{ $labels.owner_name }} has no ready instance"
+            description: "No instance of {{ $labels.namespace }}/{{ $labels.owner_name }} is ready: the application has no database."
+        # An inactive physical slot pins WAL on the primary until the volume is
+        # full; this is how pg-cluster-paperless ran out of disk in 2026-10.
+        - alert: CNPGReplicationSlotInactive
+          expr: cnpg_pg_replication_slots_active == 0
+          for: 30m
+          labels:
+            severity: warning
+            component: database
+          annotations:
+            summary: "Replication slot {{ $labels.slot_name }} in {{ $labels.namespace }} is inactive"
+            description: "The replica behind slot {{ $labels.slot_name }} on {{ $labels.pod }} has not been streaming for 30 minutes. The primary keeps all WAL for it; a replica that cannot rejoin must be destroyed and recreated."
+        - alert: CNPGReplicationSlotWALRetained
+          expr: cnpg_pg_replication_slots_pg_wal_lsn_diff > 1024 * 1024 * 1024
+          for: 15m
+          labels:
+            severity: warning
+            component: database
+          annotations:
+            summary: "Slot {{ $labels.slot_name }} in {{ $labels.namespace }} retains {{ $value | humanize1024 }}B of WAL"
+            description: "The primary {{ $labels.pod }} is holding more than 1 GiB of WAL for slot {{ $labels.slot_name }}. Left alone it fills the data volume and the cluster stops."

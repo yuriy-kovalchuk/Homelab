@@ -4,11 +4,6 @@ metadata:
   name: alertmanager
   namespace: alertmanager
 spec:
-  valuesFrom:
-    - kind: Secret
-      name: alertmanager-slack-webhook
-      valuesKey: SLACK_API_URL
-      targetPath: config.global.slack_api_url
   values:
     replicaCount: 1
 
@@ -34,9 +29,60 @@ spec:
     serviceMonitor:
       enabled: true
 
-    # slack_api_url is injected via valuesFrom (config.global.slack_api_url)
-    # from the alertmanager-slack-webhook Secret — see external-secret.yaml.
+    # Webhook URLs are read from files mounted from the ExternalSecret-backed
+    # Secrets (secrets/base/observability-alertmanager.yaml), so they never end
+    # up in the rendered ConfigMap.
+    extraSecretMounts:
+      - name: slack-webhook
+        mountPath: /etc/alertmanager-secrets/slack
+        secretName: alertmanager-slack-webhook
+        readOnly: true
+      - name: deadmans-switch
+        mountPath: /etc/alertmanager-secrets/deadmans-switch
+        secretName: alertmanager-deadmans-switch
+        readOnly: true
+
+    # Rendered next to alertmanager.yml in /etc/alertmanager.
+    templates:
+      updates.tmpl: |-
+        {{ define "updates.line" }}• <https://github.com/yuriy-kovalchuk/{{ .Labels.source }}/blob/main/{{ .Labels.path }}|{{ .Labels.dependency }}>  `{{ .Labels.current_version }}` → `{{ .Labels.latest_version }}`  _{{ .Labels.chart }}_
+        {{ end }}
+
+        {{ define "updates.color" }}
+        {{- $c := "good" }}
+        {{- range .Alerts.Firing }}{{ if eq .Labels.alertname "OutdatedDependencyMajor" "UpdateCheckerDigestDrift" }}{{ $c = "danger" }}{{ end }}{{ end }}
+        {{- $c }}
+        {{- end }}
+
+        {{ define "updates.text" }}
+        {{- $has := false }}{{ range .Alerts.Firing }}{{ if eq .Labels.alertname "OutdatedDependencyMajor" }}{{ $has = true }}{{ end }}{{ end }}
+        {{- if $has }}*:red_circle: Major*
+        {{ range .Alerts.Firing }}{{ if eq .Labels.alertname "OutdatedDependencyMajor" }}{{ template "updates.line" . }}{{ end }}{{ end }}{{ "\n" }}
+        {{- end }}
+        {{- $has = false }}{{ range .Alerts.Firing }}{{ if eq .Labels.alertname "OutdatedDependencyMinor" }}{{ $has = true }}{{ end }}{{ end }}
+        {{- if $has }}*:large_orange_circle: Minor*
+        {{ range .Alerts.Firing }}{{ if eq .Labels.alertname "OutdatedDependencyMinor" }}{{ template "updates.line" . }}{{ end }}{{ end }}{{ "\n" }}
+        {{- end }}
+        {{- $has = false }}{{ range .Alerts.Firing }}{{ if eq .Labels.alertname "OutdatedDependencyPatch" }}{{ $has = true }}{{ end }}{{ end }}
+        {{- if $has }}*:white_circle: Patch*
+        {{ range .Alerts.Firing }}{{ if eq .Labels.alertname "OutdatedDependencyPatch" }}{{ template "updates.line" . }}{{ end }}{{ end }}{{ "\n" }}
+        {{- end }}
+        {{- $has = false }}{{ range .Alerts.Firing }}{{ if eq .Labels.alertname "OutdatedDependencyUnknown" }}{{ $has = true }}{{ end }}{{ end }}
+        {{- if $has }}*:grey_question: Not semver (pin or check by hand)*
+        {{ range .Alerts.Firing }}{{ if eq .Labels.alertname "OutdatedDependencyUnknown" }}{{ template "updates.line" . }}{{ end }}{{ end }}{{ "\n" }}
+        {{- end }}
+        {{- $has = false }}{{ range .Alerts.Firing }}{{ if eq .Labels.alertname "UpdateCheckerDigestDrift" }}{{ $has = true }}{{ end }}{{ end }}
+        {{- if $has }}*:warning: Image digest moved (same tag, new image: check who published it)*
+        {{ range .Alerts.Firing }}{{ if eq .Labels.alertname "UpdateCheckerDigestDrift" }}• <https://github.com/yuriy-kovalchuk/{{ .Labels.source }}/blob/main/{{ .Labels.path }}|{{ .Labels.dependency }}>  _{{ .Labels.chart }}_
+        {{ end }}{{ end }}
+        {{- end }}
+        {{- end }}
+
     config:
+      global:
+        slack_api_url_file: /etc/alertmanager-secrets/slack/SLACK_API_URL
+      templates:
+        - /etc/alertmanager/*.tmpl
       receivers:
         - name: slack-alerts
           slack_configs:
@@ -54,17 +100,23 @@ spec:
                 {{ end }}{{ if .Labels.node }}*Node:* {{ .Labels.node }}
                 {{ end }}
                 {{ end }}
+        # One digest per scanned repo. Incoming webhooks post to the channel
+        # they were created for, so a separate #updates channel needs its own
+        # webhook (api_url_file) rather than a different `channel`.
         - name: slack-updates
           slack_configs:
             - channel: "#alerts"
-              send_resolved: true
-              title: >-
-                {{ if eq .Status "firing" }}:arrow_up:{{ else }}:white_check_mark:{{ end }}
-                [{{ .Status | toUpper }}] {{ .CommonLabels.alertname }} ({{ .Alerts | len }})
-              text: |-
-                {{ range .Alerts }}• {{ .Annotations.summary }}
-
-                {{ end }}
+              send_resolved: false
+              color: '{{ template "updates.color" . }}'
+              title: ':package: {{ .CommonLabels.source }}: {{ .Alerts.Firing | len }} updates available'
+              title_link: 'https://github.com/yuriy-kovalchuk/{{ .CommonLabels.source }}'
+              text: '{{ template "updates.text" . }}'
+              footer: yk-update-checker
+        # healthchecks.io notifies when these pings stop.
+        - name: deadmans-switch
+          webhook_configs:
+            - url_file: /etc/alertmanager-secrets/deadmans-switch/PING_URL
+              send_resolved: false
       route:
         receiver: slack-alerts
         group_wait: 10s
@@ -72,6 +124,16 @@ spec:
         repeat_interval: 3h
         routes:
           - matchers:
-              - alertname =~ "OutdatedDependency.*"
+              - alertname = "Watchdog"
+            receiver: deadmans-switch
+            group_wait: 0s
+            group_interval: 1m
+            repeat_interval: 5m
+          - matchers:
+              - alertname =~ "OutdatedDependency.*|UpdateCheckerDigestDrift"
             receiver: slack-updates
-            group_by: ['alertname']
+            group_by: ['source']
+            # Let a whole scan land before posting; remind once a day.
+            group_wait: 5m
+            group_interval: 1h
+            repeat_interval: 24h
