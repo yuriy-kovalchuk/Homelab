@@ -7,6 +7,11 @@ spec:
   # 2 so drains do not block: the operator switches the primary over to the
   # other instance instead of a single-instance PDB stopping the eviction.
   instances: 2
+  postgresql:
+    parameters:
+      # Cap WAL a broken replica's slot can pin. Without it a replica that
+      # could not rejoin filled the primary's volume and stopped the cluster.
+      max_slot_wal_keep_size: "2GB"
   bootstrap:
     initdb:
       database: paperless
@@ -16,7 +21,7 @@ spec:
       dataChecksums: true
   storage:
     storageClass: truenas-iscsi
-    size: 5Gi
+    size: 10Gi
   monitoring:
     enablePodMonitor: true
   resources:
