@@ -61,7 +61,7 @@ spec:
           # configs in configmap-model-configs.yaml still parse on v0.2.2 (every arg
           # and path checked), but they keep 0.1.x setup's choices -- regenerate one
           # with STRATA_MODE=auto and no seeded file to pick up 0.2.x setup defaults.
-          image: harbor.yuriykovalchuk.dev/homelab/strata:011c9e6-gfx1201-rocm7.2.4-c5f7b02
+          image: harbor.yuriykovalchuk.dev/homelab/strata:4b9e05a-gfx1201-rocm7.2.4-fef517b@sha256:a744cf9062dbeba54d63f9f3a0b6347c9cb6e4e2b6a50c46f5efadfc85679301
           env:
             # auto: if MODEL has no config yet, run Strata's setup first, then serve.
             # This pod has no internet egress, so setup runs offline on the files
@@ -84,6 +84,12 @@ spec:
             # qwen = Qwen3.8-Flash-Next (MODEL IQ3_S), qwen36 = Qwen3.6-35B-A3B (MODEL Q8_0)
             - name: FAMILY
               value: qwen
+            # Picture reader for the model's config: cpu | gpu | no (see ../README.md).
+            # Kept last on purpose -- the Flux ignore rule points at env[1] and env[3].
+            # Flux owns this one (not ignored): the reader IQ3_S really serves is the one
+            # in its seeded config, so change it and the ConfigMap in the same commit.
+            - name: VISION
+              value: cpu
           ports:
             - name: http
               containerPort: 8080

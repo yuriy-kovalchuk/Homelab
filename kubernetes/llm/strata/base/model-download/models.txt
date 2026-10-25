@@ -11,6 +11,11 @@
 https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF/resolve/ed59f92082b1e93c0e96d60a8b11aab089b52f09/IQ3_S/Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00001-of-00002.gguf models/IQ3_S/Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00001-of-00002.gguf
 https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF/resolve/ed59f92082b1e93c0e96d60a8b11aab089b52f09/IQ3_S/Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00002-of-00002.gguf models/IQ3_S/Qwen3.8-Flash-Next-GSQ-RCO-IQ3_S-00002-of-00002.gguf
 
+# its picture reader (0.9 GB; setup only uses it when VISION is cpu/gpu). It goes in
+# models/, next to the size folders, not inside one: setup looks for one file shared by
+# every size. The SHA-256 is Strata's own pin (setup.py's ISTA_FILES).
+https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF/resolve/ed59f92082b1e93c0e96d60a8b11aab089b52f09/mmproj-Qwen3.8-Flash-Next-BF16.gguf models/mmproj-Qwen3.8-Flash-Next-BF16.gguf b1a82259702816a5330d7bd7607cd9676b11780e79ff7348c21103ff3ce49bd0
+
 # Qwen3.6-35B-A3B (FAMILY=qwen36 MODEL=Q8_0), Unsloth's GGUF with the MTP block,
 # at the revision and SHA-256 Strata's setup.py pins (QWEN36_FILES). Setup finds
 # it in models/qwen36-<size>/ and runs it on its own engine path (no pack): the
@@ -18,6 +23,6 @@ https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF/resolve/ed59f
 # Not UD-Q8_K_XL: it keeps layers 34/38/39 partly in BF16, which Strata 0.2.2's
 # expert and dense kernels do not take.
 https://huggingface.co/unsloth/Qwen3.6-35B-A3B-MTP-GGUF/resolve/5bc3e238d916f48a861bac2f8a1990a0e9b7e98d/Qwen3.6-35B-A3B-Q8_0.gguf models/qwen36-Q8_0/Qwen3.6-35B-A3B-Q8_0.gguf c1283d8b80c3e38b2735ddbc9766d3b3126f44d6c484be419d4e101d09a76131
-# its image encoder (setup attaches it only with vision on; the entrypoint
-# passes --vision no today)
+# its image encoder (setup attaches it only with VISION=cpu/gpu, and for this own-path
+# family it looks for it in the model's own folder, not in models/)
 https://huggingface.co/unsloth/Qwen3.6-35B-A3B-MTP-GGUF/resolve/5bc3e238d916f48a861bac2f8a1990a0e9b7e98d/mmproj-F16.gguf models/qwen36-Q8_0/mmproj-F16.gguf 71f3cbc1f7cc0f30d09d41cfa924c0060827ebc33bf15ace7e86661e856f0160
