@@ -32,7 +32,10 @@ spec:
       enabled: false
       redis:
         enabled: false
-    openaiBaseApiUrl: "http://llama-cpp.llm.svc.cluster.local:8080/v1"
+    openaiBaseApiUrls:
+      - "http://llama-cpp.llm.svc.cluster.local:8080/v1"
+      - "http://llama-cpp-rocm.llm.svc.cluster.local:8080/v1"
+      - "http://strata.llm-strata.svc.cluster.local:8080/v1"
     ingress:
       enabled: false
 
