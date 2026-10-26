@@ -13,3 +13,5 @@ https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-GGUF/resolve/6b34e594
 https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-GGUF/resolve/6b34e59458d3eb7ba6a6f86a116aed5253dc02c3/vae/qwen_image_2.1_vae_bf16.safetensors vae/qwen_image_2.1_vae_bf16.safetensors bb21f7473051e1ac368515dd3f2e15cd44d7a11748ee8823e1ddca3e4876b7c9
 https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct-GGUF/resolve/f982a07559d4a2f6c8744d840bf6fccab30eea96/Qwen3VL-8B-Instruct-Q8_0.gguf text_encoders/Qwen3VL-8B-Instruct-Q8_0.gguf 0d264b3941185d00a74f75c4245521dae088ff1efc90ab8d1754e83f5844adb0
 https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct-GGUF/resolve/f982a07559d4a2f6c8744d840bf6fccab30eea96/mmproj-Qwen3VL-8B-Instruct-F16.gguf text_encoders/mmproj-Qwen3VL-8B-Instruct-F16.gguf ca524100ebf825c9a870db1c580d03879e0da0ab2541697e2458e64891cf9d38
+# Stock (non-fine-tuned) Qwen-Image-2.1, Unsloth Dynamic Q8_0, to compare against the UC fine-tune.
+https://huggingface.co/unsloth/Qwen-Image-2.1-GGUF/resolve/2c31ccd392b367a6637841a143813320a02dff55/qwen-image-2.1-Q8_0.gguf diffusion_models/qwen-image-2.1-Q8_0.gguf c0ed4b2ffd56cbe9c3df1e4a4098045256484ebe94ba5a7e4338d35ec046baa5

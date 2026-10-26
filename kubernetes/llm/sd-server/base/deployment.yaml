@@ -36,7 +36,7 @@ spec:
             - "1234"
             # Files written by sd-server-model-download (model-download/models.txt).
             - --diffusion-model
-            - /models/diffusion_models/qwen-image-2.1-UC-Q8_0.gguf
+            - /models/diffusion_models/qwen-image-2.1-Q8_0.gguf
             # Qwen's own Q8_0 GGUF of Qwen3-VL-8B-Instruct, not the int8_convrot
             # safetensors: ggml-vulkan crashes (SIGBUS at libggml-vulkan.so+0x6239f)
             # running int8_convrot on RADV. The int8 file stays on the PVC as a
