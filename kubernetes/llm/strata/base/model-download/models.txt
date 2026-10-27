@@ -26,3 +26,8 @@ https://huggingface.co/unsloth/Qwen3.6-35B-A3B-MTP-GGUF/resolve/5bc3e238d916f48a
 # its image encoder (setup attaches it only with VISION=cpu/gpu, and for this own-path
 # family it looks for it in the model's own folder, not in models/)
 https://huggingface.co/unsloth/Qwen3.6-35B-A3B-MTP-GGUF/resolve/5bc3e238d916f48a861bac2f8a1990a0e9b7e98d/mmproj-F16.gguf models/qwen36-Q8_0/mmproj-F16.gguf 71f3cbc1f7cc0f30d09d41cfa924c0060827ebc33bf15ace7e86661e856f0160
+
+# Qwen3.6-35B-A3B UD-Q6_K_XL (FAMILY=qwen36 MODEL=UD-Q6_K_XL): every expert fits the
+# R9700, so no CPU share (Q8_0 keeps only 130 of 256 per layer in VRAM). Same pins.
+https://huggingface.co/unsloth/Qwen3.6-35B-A3B-MTP-GGUF/resolve/5bc3e238d916f48a861bac2f8a1990a0e9b7e98d/Qwen3.6-35B-A3B-UD-Q6_K_XL.gguf models/qwen36-UD-Q6_K_XL/Qwen3.6-35B-A3B-UD-Q6_K_XL.gguf 35fce994cd36104a7dc1bd8a4bdf13778145664c00fdef6773aebc9246e5019c
+https://huggingface.co/unsloth/Qwen3.6-35B-A3B-MTP-GGUF/resolve/5bc3e238d916f48a861bac2f8a1990a0e9b7e98d/mmproj-F16.gguf models/qwen36-UD-Q6_K_XL/mmproj-F16.gguf 71f3cbc1f7cc0f30d09d41cfa924c0060827ebc33bf15ace7e86661e856f0160

@@ -11,6 +11,7 @@ Deployment, `FAMILY` and `MODEL`. Flux sets them once and then ignores them
 |---|---|---|---|
 | `qwen` | `IQ3_S` | Qwen3.8-Flash-Next GSQ-RCO IQ3_S (176B MoE, 256K context) | `models/IQ3_S/`, `packs/iq3_s/`, `mtp/` |
 | `qwen36` | `Q8_0` | Qwen3.6-35B-A3B Q8_0 with MTP (35B MoE, 3B active) | `models/qwen36-Q8_0/` |
+| `qwen36` | `UD-Q6_K_XL` | Qwen3.6-35B-A3B UD-Q6_K_XL with MTP (every expert in VRAM) | `models/qwen36-UD-Q6_K_XL/` |
 
 Both are listed in `base/model-download/models.txt`; a model must be fully
 downloaded (its `strata-model-download` Job `Complete`) before switching to it.
