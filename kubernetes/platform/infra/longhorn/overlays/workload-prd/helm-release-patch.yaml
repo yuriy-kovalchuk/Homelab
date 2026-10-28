@@ -24,6 +24,10 @@ spec:
       # still blocks while that last replica runs, and lets the drain finish once
       # its pod is evicted and the volume detached (upgrades keep EPHEMERAL).
       nodeDrainPolicy: allow-if-replica-is-stopped
+      # Let the weekly filesystem-trim job (platform/ops/longhorn-maintenance)
+      # also free blocks held by removed snapshots; otherwise volumes grow past
+      # their size (Mimir ingesters: 19 GB on 10 GB volumes).
+      removeSnapshotsDuringFilesystemTrim: true
     persistence:
       defaultClassReplicaCount: 3
       # Replicas of the default class only on Longhorn nodes tagged "system"

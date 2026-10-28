@@ -1,0 +1,31 @@
+# Instances of Longhorn's CRDs, so they live here (platform-ops) and not next
+# to the HelmRelease that installs them (platform-infra).
+#
+# The "default" group applies to every volume without its own recurring jobs.
+# snapshot-cleanup purges system-generated and removed snapshots (never user
+# snapshots); filesystem-trim then returns blocks freed inside the filesystem.
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: snapshot-cleanup
+  namespace: longhorn-system
+spec:
+  task: snapshot-cleanup
+  cron: "0 3 * * 0"
+  groups:
+    - default
+  concurrency: 2
+  retain: 0
+---
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: filesystem-trim
+  namespace: longhorn-system
+spec:
+  task: filesystem-trim
+  cron: "0 4 * * 0"
+  groups:
+    - default
+  concurrency: 2
+  retain: 0

@@ -8,7 +8,7 @@ spec:
   # Managed from the terminal for now (kubectl / virtctl): Flux does not apply
   # kubernetes/vms/ubuntu-test. Set to false to hand it back to Flux.
   suspend: true
-  interval: 2m
+  interval: 5m
   dependsOn:
     - name: platform-infra
   sourceRef:

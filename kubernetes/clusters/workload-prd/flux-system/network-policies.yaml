@@ -5,7 +5,7 @@ metadata:
   name: network-policies
   namespace: flux-system
 spec:
-  interval: 2m
+  interval: 5m
   dependsOn:
     - name: namespaces
   sourceRef:

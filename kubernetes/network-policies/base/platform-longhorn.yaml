@@ -186,3 +186,28 @@ spec:
               protocol: TCP
             - port: "443"
               protocol: TCP
+---
+# Recurring job pods (CronJobs created by longhorn-manager for the RecurringJobs
+# in platform/ops/longhorn-maintenance) read and update volumes through the API
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: longhorn-recurring-jobs
+  namespace: longhorn-system
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: recurring-job.longhorn.io
+        operator: Exists
+  egress:
+    - toEntities:
+        - kube-apiserver
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP

@@ -5,7 +5,7 @@ metadata:
   name: core
   namespace: flux-system
 spec:
-  interval: 2m
+  interval: 5m
   dependsOn:
     - name: namespaces
     - name: network-policies

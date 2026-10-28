@@ -14,6 +14,9 @@ spec:
         name: kyverno
         namespace: flux-system
   timeout: 5m
+  # Each release Secret is ~1.2 MB; every revision kept sits in etcd and in
+  # the API servers' watch cache.
+  maxHistory: 2
   install:
     createNamespace: false
     remediation:

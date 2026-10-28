@@ -5,7 +5,7 @@ metadata:
   name: platform-ops
   namespace: flux-system
 spec:
-  interval: 2m
+  interval: 5m
   dependsOn:
     - name: platform-infra
   sourceRef:

@@ -10,6 +10,9 @@ spec:
       scanJobTimeout: 1h
       scanJobsConcurrentLimit: 5
       infraAssessmentScannerEnabled: true
+      # SBOMs (~0.9 MB each, one per ReplicaSet revision) were the largest
+      # objects in etcd and the API server watch cache; nothing consumes them.
+      sbomGenerationEnabled: false
     serviceMonitor:
       enabled: true
     trivy:
