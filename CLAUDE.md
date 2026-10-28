@@ -84,6 +84,7 @@ One broken CEL expression denies every workload that shares those policyRefs; gu
 - Talos cannot add `nodeTaints` to a worker after it registers (NodeRestriction), and that failure also blocks its labels and annotations. Set them with kubectl.
 - Merge patches append to lists (e.g. interface addresses); to replace one, edit and apply the full config.
 - The homebrew talosctl may be older than the cluster; check `talosctl version --client`.
+- Cilium counts the `siderolink` interface (MTU 1280) as a device, so its MTU must stay pinned (`MTU: 1500` in the cni values). Symptom of a 1280 `cilium_host`: uploads through the gateway stall at 128 KiB.
 
 ## OPNsense / Ansible
 

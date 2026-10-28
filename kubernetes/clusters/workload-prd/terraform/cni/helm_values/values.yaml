@@ -22,6 +22,14 @@ encryption:
   type: wireguard
   nodeEncryption: true
 
+# Pinned: auto-detection takes the lowest MTU of all devices, and Talos'
+# siderolink (1280) dragged cilium_host down to 1280. Full-size packets
+# redirected to the gateway's Envoy were then dropped, stalling large uploads.
+MTU: 1500
+
+# The agents read cilium-config only at startup; roll them when it changes.
+rollOutCiliumPods: true
+
 cgroup:
   autoMount:
     enabled: false
@@ -110,6 +118,7 @@ socketLB:
 
 operator:
   replicas: 2
+  rollOutPods: true
   prometheus:
     enabled: true
     serviceMonitor:
