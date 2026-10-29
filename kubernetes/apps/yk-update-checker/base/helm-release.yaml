@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: yk-update-checker
-      version: "0.4.1"
+      version: "0.4.2"
       sourceRef:
         kind: HelmRepository
         name: yk-charts
@@ -42,11 +42,11 @@ spec:
     grafana:
       dashboard:
         enabled: true
-        folder: Security   # Grafana sidecar folder
+        folder: Security # Grafana sidecar folder
 
     metrics:
       serviceMonitor:
         enabled: true
         interval: 5m
       prometheusRule:
-        enabled: true   # default rules: major/unknown warning, minor/patch info, stale scan, failed repo, digest drift
+        enabled: true # default rules: major/unknown warning, minor/patch info, stale scan, failed repo, digest drift
