@@ -17,6 +17,12 @@ data:
     cache-type-k = q8_0
     cache-type-v = q8_0
     parallel = 1
+    ; No host-RAM prompt cache (default 8 GiB) and few context checkpoints
+    ; (default 32): both grow with every request, and in this 12Gi pod they
+    ; evict the mmapped MoE experts, which are then re-read from disk per token
+    ; (Qwen fell to 1-2 tok/s). Follow-up turns of the same chat still reuse KV.
+    cache-ram = 0
+    ctx-checkpoints = 4
     load-on-startup = false
     stop-timeout = 60
     ; Gemma 4 defaults (model card / GGUF general.sampling)
@@ -39,19 +45,25 @@ data:
     c = 131072
     mmproj = /models/mmproj-gemma-4-E2B-it-F16.gguf
 
-    ; Qwen3.6-35B-A3B UD-IQ3_XXS (13.2 GB, MoE, 3B active): the settings measured
-    ; on a GTX 1070 Ti in https://unbiasedbob.com/8gb-coding/ (~25 tok/s, ~400 tok/s
-    ; prompt, ~10 GB of RAM; 80.6% on its 86-task coding bench vs 77.5% for IQ2_M).
-    ; MoE cache (llama.cpp #29887): all 40 layers' routed experts stay in RAM and
-    ; the VRAM the 15 GPU expert layers used (~4.5 GB) becomes an SLRU cache of
-    ; hot experts across every layer; decode runs them on the GPU, only misses are
-    ; uploaded. Upstream measured -cmoe + cache well ahead of split layers. Tune
-    ; moe-cache-mib against the hit rate in the log; if it runs out of VRAM, lower
-    ; it first, then c to 65536. Fallback: n-cpu-moe = 25 without the cache.
-    [Qwen3.6-35B-A3B-UD-IQ3_XXS]
+    ; Qwen3.6-35B-A3B, 2-bit GSQ (ISTA-DASLab) as GGUF: routed experts Q2_0
+    ; (~8.5 GB), attention/shared experts/LM head Q8_0, 12.2 GB file. The experts
+    ; are small enough that all of them stay in RAM (n-cpu-moe 40) and the free
+    ; VRAM is a MoE cache (llama.cpp #29887) of hot experts; only misses cross
+    ; PCIe. Measured on b12019, 4.7k-token prompt + 512 generated, after 30
+    ; sustained requests (decode / prompt t/s, VRAM):
+    ;   IQ3_XXS, n-cpu-moe 25, no cache    21.0 / 556  7.7 GB  (previous model)
+    ;   IQ3_XXS, n-cpu-moe 33, cache 2200  26.2 / 549  7.9 GB  (RAM-bound, 33 layers max)
+    ;   GSQ, 131k, cache 3700              32.1 / 624  7.7 GB  <- this
+    ;   GSQ, 262k, ubatch 1024, cache 2600 28.5 / 453  7.4 GB  (full trained context)
+    ; GSM8K (first 30, no thinking): 29/30 for both; the miss is the same
+    ; ambiguous question running out of tokens. Model card: GSQ is 0-4 points
+    ; below BF16 (AIME25 93.3 = BF16, GPQA 80.3 vs 83.8, MMLU-Pro 81.0 vs 84.9).
+    ; More context: c 262144 needs ubatch-size 1024 and moe-cache-mib 2600
+    ; (the 2048 ubatch compute buffer is 1.9 GB at 262k).
+    [Qwen3.6-35B-A3B-GSQ-hybrid]
     c = 131072
     n-cpu-moe = 40
-    moe-cache-mib = 4096
+    moe-cache-mib = 3700
     batch-size = 2048
     ubatch-size = 2048
     cache-type-k = q4_0

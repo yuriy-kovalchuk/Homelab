@@ -36,6 +36,7 @@ spec:
       - "http://llama-cpp.llm.svc.cluster.local:8080/v1"
       - "http://llama-cpp-rocm.llm.svc.cluster.local:8080/v1"
       - "http://strata.llm-strata.svc.cluster.local:8080/v1"
+      - "http://llama-cpp-cuda.llm.svc.cluster.local:8080/v1"
     ingress:
       enabled: false
 

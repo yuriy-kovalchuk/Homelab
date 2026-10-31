@@ -9,4 +9,4 @@ https://huggingface.co/unsloth/gemma-4-E4B-it-GGUF/resolve/main/gemma-4-E4B-it-Q
 https://huggingface.co/unsloth/gemma-4-E4B-it-GGUF/resolve/main/mmproj-F16.gguf mmproj-gemma-4-E4B-it-F16.gguf
 https://huggingface.co/unsloth/gemma-4-E2B-it-GGUF/resolve/main/gemma-4-E2B-it-Q8_0.gguf gemma-4-E2B-it-Q8_0.gguf
 https://huggingface.co/unsloth/gemma-4-E2B-it-GGUF/resolve/main/mmproj-F16.gguf mmproj-gemma-4-E2B-it-F16.gguf
-https://huggingface.co/unsloth/Qwen3.6-35B-A3B-GGUF/resolve/main/Qwen3.6-35B-A3B-UD-IQ3_XXS.gguf Qwen3.6-35B-A3B-UD-IQ3_XXS.gguf
+https://huggingface.co/chtisgit/Qwen3.6-35B-A3B-2Bit-GSQ-hybrid-GGUF/resolve/main/Qwen3.6-35B-A3B-GSQ-hybrid.gguf Qwen3.6-35B-A3B-GSQ-hybrid.gguf 8e50912f5d0703401ca21b09deb2ee8a84d03536ade6fb44815fcb40a0b03596
