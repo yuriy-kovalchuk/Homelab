@@ -18,7 +18,7 @@ spec:
       containers:
         - name: llama-cpp
           # CUDA 12 build: CUDA 13 dropped Pascal (sm_61, the GTX 1070).
-          image: ghcr.io/ggml-org/llama.cpp:server-cuda12-b11870
+          image: ghcr.io/ggml-org/llama.cpp:server-cuda12-b12019
           # Router mode: every model on the volume (filled by the
           # llama-cpp-cuda-model-download Job) is loaded on demand, one at a time.
           args:
