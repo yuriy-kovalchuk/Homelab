@@ -71,6 +71,10 @@ externalIPs:
 # Terraform unit installs Cilium on a fresh cluster.
 envoy:
   enabled: true
+  # Gateway streams may stay silent this long (default 300s). Open WebUI's image
+  # generation is one request with no bytes until the image is done, and
+  # sd-server needs up to ~15 min. Cluster-wide: HTTPRoute cannot override it.
+  streamIdleTimeoutDurationSeconds: 1200
   prometheus:
     enabled: true
     serviceMonitor:
