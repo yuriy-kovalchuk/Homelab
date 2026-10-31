@@ -14,6 +14,9 @@ spec:
 
     mimir:
       structuredConfig:
+        # No usage reports to stats.grafana.org.
+        usage_stats:
+          enabled: false
         memberlist:
           cluster_label: "mimir"
           cluster_label_verification_disabled: false

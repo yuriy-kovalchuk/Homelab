@@ -19,6 +19,10 @@ spec:
     loki:
       auth_enabled: false
 
+      # No usage reports to stats.grafana.org.
+      analytics:
+        reporting_enabled: false
+
       storage:
         type: s3
         s3:

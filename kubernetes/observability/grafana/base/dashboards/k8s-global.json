@@ -61,11 +61,15 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 10,
   "links": [],
+  "liveNow": false,
   "panels": [
     {
       "collapsed": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -95,7 +99,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": 0
+                "value": null
               },
               {
                 "color": "red",
@@ -116,12 +120,6 @@
       "id": 77,
       "options": {
         "displayMode": "lcd",
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
         "maxVizHeight": 300,
         "minVizHeight": 10,
         "minVizWidth": 0,
@@ -138,7 +136,7 @@
         "sizing": "auto",
         "valueMode": "color"
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "11.2.0",
       "targets": [
         {
           "datasource": {
@@ -149,9 +147,9 @@
           "exemplar": true,
           "expr": "avg(sum by (instance, cpu) (rate(node_cpu_seconds_total{mode!~\"idle|iowait|steal\", cluster=\"$cluster\", job=\"$job\"}[$__rate_interval])))",
           "interval": "",
-          "legendFormat": "Real Linux",
+          "legendFormat": "Real",
           "range": true,
-          "refId": "Real Linux"
+          "refId": "Real"
         },
         {
           "datasource": {
@@ -159,21 +157,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "exemplar": true,
-          "expr": "avg(sum by (core) (rate(windows_cpu_time_total{mode!=\"idle\", cluster=\"$cluster\"}[$__rate_interval])))",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "Real Windows",
-          "range": true,
-          "refId": "Real Windows"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "sum(kube_pod_container_resource_requests{resource=\"cpu\", cluster=\"$cluster\"}) / sum(machine_cpu_cores{cluster=\"$cluster\"})",
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"cpu\", cluster=\"$cluster\"} and on(namespace, pod) max by (namespace, pod) (kube_pod_status_phase{phase=\"Running\", cluster=\"$cluster\"} == 1)) / sum(machine_cpu_cores{cluster=\"$cluster\"})",
           "hide": false,
           "legendFormat": "Requests",
           "range": true,
@@ -185,7 +169,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(kube_pod_container_resource_limits{resource=\"cpu\", cluster=\"$cluster\"}) / sum(machine_cpu_cores{cluster=\"$cluster\"})",
+          "expr": "sum(kube_pod_container_resource_limits{resource=\"cpu\", cluster=\"$cluster\"} and on(namespace, pod) max by (namespace, pod) (kube_pod_status_phase{phase=\"Running\", cluster=\"$cluster\"} == 1)) / sum(machine_cpu_cores{cluster=\"$cluster\"})",
           "hide": false,
           "legendFormat": "Limits",
           "range": true,
@@ -193,41 +177,6 @@
         }
       ],
       "title": "Global CPU  Usage",
-      "transformations": [
-        {
-          "id": "calculateField",
-          "options": {
-            "alias": "Real",
-            "mode": "reduceRow",
-            "reduce": {
-              "include": [
-                "Real Linux",
-                "Real Windows"
-              ],
-              "reducer": "mean"
-            }
-          }
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Real Linux": true,
-              "Real Windows": true,
-              "Time": true
-            },
-            "indexByName": {
-              "Limits": 5,
-              "Real": 1,
-              "Real Linux": 2,
-              "Real Windows": 3,
-              "Requests": 4,
-              "Time": 0
-            },
-            "renameByName": {}
-          }
-        }
-      ],
       "type": "bargauge"
     },
     {
@@ -249,7 +198,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": 0
+                "value": null
               },
               {
                 "color": "red",
@@ -270,12 +219,6 @@
       "id": 78,
       "options": {
         "displayMode": "lcd",
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
         "maxVizHeight": 300,
         "minVizHeight": 10,
         "minVizWidth": 0,
@@ -293,7 +236,7 @@
         "text": {},
         "valueMode": "color"
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "11.2.0",
       "targets": [
         {
           "datasource": {
@@ -305,9 +248,9 @@
           "expr": "sum(node_memory_MemTotal_bytes{cluster=\"$cluster\", job=\"$job\"} - node_memory_MemAvailable_bytes{cluster=\"$cluster\", job=\"$job\"}) / sum(node_memory_MemTotal_bytes{cluster=\"$cluster\", job=\"$job\"})",
           "hide": false,
           "interval": "",
-          "legendFormat": "Real Linux",
+          "legendFormat": "Real",
           "range": true,
-          "refId": "Real Linux"
+          "refId": "Real"
         },
         {
           "datasource": {
@@ -315,20 +258,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "exemplar": true,
-          "expr": "sum(windows_memory_available_bytes{cluster=\"$cluster\"} + windows_memory_cache_bytes{cluster=\"$cluster\"}) / sum(windows_os_visible_memory_bytes{cluster=\"$cluster\"})",
-          "interval": "",
-          "legendFormat": "Real Windows",
-          "range": true,
-          "refId": "Real Windows"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "sum(kube_pod_container_resource_requests{resource=\"memory\", cluster=\"$cluster\"}) / sum(machine_memory_bytes{cluster=\"$cluster\"})",
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"memory\", cluster=\"$cluster\"} and on(namespace, pod) max by (namespace, pod) (kube_pod_status_phase{phase=\"Running\", cluster=\"$cluster\"} == 1)) / sum(machine_memory_bytes{cluster=\"$cluster\"})",
           "hide": false,
           "legendFormat": "Requests",
           "range": true,
@@ -340,7 +270,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(kube_pod_container_resource_limits{resource=\"memory\", cluster=\"$cluster\"}) / sum(machine_memory_bytes{cluster=\"$cluster\"})",
+          "expr": "sum(kube_pod_container_resource_limits{resource=\"memory\", cluster=\"$cluster\"} and on(namespace, pod) max by (namespace, pod) (kube_pod_status_phase{phase=\"Running\", cluster=\"$cluster\"} == 1)) / sum(machine_memory_bytes{cluster=\"$cluster\"})",
           "hide": false,
           "legendFormat": "Limits",
           "range": true,
@@ -348,42 +278,6 @@
         }
       ],
       "title": "Global RAM Usage",
-      "transformations": [
-        {
-          "id": "calculateField",
-          "options": {
-            "alias": "Real",
-            "mode": "reduceRow",
-            "reduce": {
-              "include": [
-                "Real Linux",
-                "Real Windows"
-              ],
-              "reducer": "mean"
-            }
-          }
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Real Linux": true,
-              "Real Windows": true,
-              "Time": true
-            },
-            "includeByName": {},
-            "indexByName": {
-              "Limits": 5,
-              "Real": 3,
-              "Real Linux": 1,
-              "Real Windows": 2,
-              "Requests": 4,
-              "Time": 0
-            },
-            "renameByName": {}
-          }
-        }
-      ],
       "type": "bargauge"
     },
     {
@@ -400,7 +294,7 @@
             "steps": [
               {
                 "color": "blue",
-                "value": 0
+                "value": null
               }
             ]
           }
@@ -432,7 +326,7 @@
         "textMode": "value",
         "wideLayout": true
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "11.2.0",
       "targets": [
         {
           "datasource": {
@@ -485,7 +379,6 @@
               "type": "linear"
             },
             "showPoints": "never",
-            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -501,7 +394,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": 0
+                "value": null
               },
               {
                 "color": "red",
@@ -534,12 +427,11 @@
           "sortDesc": true
         },
         "tooltip": {
-          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "8.3.3",
       "targets": [
         {
           "datasource": {
@@ -712,7 +604,7 @@
             "steps": [
               {
                 "color": "blue",
-                "value": 0
+                "value": null
               }
             ]
           }
@@ -744,7 +636,7 @@
         "textMode": "value",
         "wideLayout": true
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "11.2.0",
       "targets": [
         {
           "datasource": {
@@ -774,7 +666,7 @@
             "steps": [
               {
                 "color": "rgb(255, 255, 255)",
-                "value": 0
+                "value": null
               }
             ]
           },
@@ -807,7 +699,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "11.2.0",
       "targets": [
         {
           "datasource": {
@@ -818,9 +710,9 @@
           "exemplar": true,
           "expr": "sum(rate(node_cpu_seconds_total{mode!~\"idle|iowait|steal\", cluster=\"$cluster\", job=\"$job\"}[$__rate_interval]))",
           "interval": "",
-          "legendFormat": "Real Linux",
+          "legendFormat": "Real",
           "range": true,
-          "refId": "Real Linux"
+          "refId": "Real"
         },
         {
           "datasource": {
@@ -828,21 +720,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "exemplar": true,
-          "expr": "sum(rate(windows_cpu_time_total{mode!=\"idle\", cluster=\"$cluster\"}[$__rate_interval]))",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "Real Windows",
-          "range": true,
-          "refId": "Real Windows"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "sum(kube_pod_container_resource_requests{resource=\"cpu\", cluster=\"$cluster\"})",
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"cpu\", cluster=\"$cluster\"} and on(namespace, pod) max by (namespace, pod) (kube_pod_status_phase{phase=\"Running\", cluster=\"$cluster\"} == 1))",
           "hide": false,
           "legendFormat": "Requests",
           "range": true,
@@ -854,7 +732,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(kube_pod_container_resource_limits{resource=\"cpu\", cluster=\"$cluster\"})",
+          "expr": "sum(kube_pod_container_resource_limits{resource=\"cpu\", cluster=\"$cluster\"} and on(namespace, pod) max by (namespace, pod) (kube_pod_status_phase{phase=\"Running\", cluster=\"$cluster\"} == 1))",
           "hide": false,
           "legendFormat": "Limits",
           "range": true,
@@ -874,46 +752,6 @@
         }
       ],
       "title": "CPU Usage",
-      "transformations": [
-        {
-          "id": "calculateField",
-          "options": {
-            "alias": "Real",
-            "mode": "reduceRow",
-            "reduce": {
-              "include": [
-                "Real Linux",
-                "Real Windows"
-              ],
-              "reducer": "sum"
-            }
-          }
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Real Linux": true,
-              "Real Windows": true,
-              "Time": true,
-              "Total Linux": true,
-              "Total Windows": true
-            },
-            "indexByName": {
-              "Limits": 5,
-              "Real": 3,
-              "Real Linux": 1,
-              "Real Windows": 2,
-              "Requests": 4,
-              "Time": 0,
-              "Total": 8,
-              "Total Linux": 6,
-              "Total Windows": 7
-            },
-            "renameByName": {}
-          }
-        }
-      ],
       "type": "stat"
     },
     {
@@ -930,7 +768,7 @@
             "steps": [
               {
                 "color": "rgb(255, 255, 255)",
-                "value": 0
+                "value": null
               }
             ]
           },
@@ -963,7 +801,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "11.2.0",
       "targets": [
         {
           "datasource": {
@@ -974,9 +812,9 @@
           "exemplar": true,
           "expr": "sum(node_memory_MemTotal_bytes{cluster=\"$cluster\", job=\"$job\"} - node_memory_MemAvailable_bytes{cluster=\"$cluster\", job=\"$job\"})",
           "interval": "",
-          "legendFormat": "Real Linux",
+          "legendFormat": "Real",
           "range": true,
-          "refId": "Real Linux"
+          "refId": "Real"
         },
         {
           "datasource": {
@@ -984,21 +822,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "exemplar": true,
-          "expr": "sum(windows_os_visible_memory_bytes{cluster=\"$cluster\"} - windows_memory_available_bytes{cluster=\"$cluster\"} - windows_memory_cache_bytes{cluster=\"$cluster\"})",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "Real Windows",
-          "range": true,
-          "refId": "Real Windows"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "sum(kube_pod_container_resource_requests{resource=\"memory\", cluster=\"$cluster\"})",
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"memory\", cluster=\"$cluster\"} and on(namespace, pod) max by (namespace, pod) (kube_pod_status_phase{phase=\"Running\", cluster=\"$cluster\"} == 1))",
           "hide": false,
           "legendFormat": "Requests",
           "range": true,
@@ -1010,7 +834,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "sum(kube_pod_container_resource_limits{resource=\"memory\", cluster=\"$cluster\"})",
+          "expr": "sum(kube_pod_container_resource_limits{resource=\"memory\", cluster=\"$cluster\"} and on(namespace, pod) max by (namespace, pod) (kube_pod_status_phase{phase=\"Running\", cluster=\"$cluster\"} == 1))",
           "hide": false,
           "legendFormat": "Limits",
           "range": true,
@@ -1030,43 +854,6 @@
         }
       ],
       "title": "RAM Usage",
-      "transformations": [
-        {
-          "id": "calculateField",
-          "options": {
-            "alias": "Real",
-            "mode": "reduceRow",
-            "reduce": {
-              "include": [
-                "Real Linux",
-                "Real Windows"
-              ],
-              "reducer": "mean"
-            }
-          }
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Real Linux": true,
-              "Real Windows": true,
-              "Time": true
-            },
-            "includeByName": {},
-            "indexByName": {
-              "Limits": 5,
-              "Real": 3,
-              "Real Linux": 1,
-              "Real Windows": 2,
-              "Requests": 4,
-              "Time": 0,
-              "Total": 6
-            },
-            "renameByName": {}
-          }
-        }
-      ],
       "type": "stat"
     },
     {
@@ -1083,7 +870,7 @@
             "steps": [
               {
                 "color": "blue",
-                "value": 0
+                "value": null
               }
             ]
           }
@@ -1115,7 +902,7 @@
         "textMode": "value",
         "wideLayout": true
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "11.2.0",
       "targets": [
         {
           "datasource": {
@@ -1133,6 +920,10 @@
     },
     {
       "collapsed": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -1182,7 +973,6 @@
               "type": "linear"
             },
             "showPoints": "never",
-            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -1199,7 +989,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": 0
+                "value": null
               },
               {
                 "color": "yellow",
@@ -1230,12 +1020,11 @@
           "showLegend": false
         },
         "tooltip": {
-          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "8.3.3",
       "targets": [
         {
           "datasource": {
@@ -1246,23 +1035,9 @@
           "exemplar": true,
           "expr": "avg(sum by (instance, cpu) (rate(node_cpu_seconds_total{mode!~\"idle|iowait|steal\", cluster=\"$cluster\", job=\"$job\"}[$__rate_interval])))",
           "interval": "$resolution",
-          "legendFormat": "Linux",
+          "legendFormat": "CPU usage in %",
           "range": true,
-          "refId": "Linux"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "exemplar": true,
-          "expr": "1 - avg(rate(windows_cpu_time_total{cluster=\"$cluster\",mode=\"idle\"}[$__rate_interval]))",
-          "hide": false,
-          "interval": "$resolution",
-          "legendFormat": "Windows",
-          "range": true,
-          "refId": "Windows"
+          "refId": "A"
         }
       ],
       "title": "Cluster CPU Utilization",
@@ -1315,7 +1090,6 @@
               "type": "linear"
             },
             "showPoints": "never",
-            "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
@@ -1331,7 +1105,7 @@
             "steps": [
               {
                 "color": "green",
-                "value": 0
+                "value": null
               },
               {
                 "color": "#EAB839",
@@ -1367,12 +1141,11 @@
           "showLegend": false
         },
         "tooltip": {
-          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
       },
-      "pluginVersion": "12.3.0",
+      "pluginVersion": "8.3.3",
       "targets": [
         {
           "datasource": {
@@ -1383,23 +1156,9 @@
           "exemplar": true,
           "expr": "sum(node_memory_MemTotal_bytes{cluster=\"$cluster\", job=\"$job\"} - node_memory_MemAvailable_bytes{cluster=\"$cluster\", job=\"$job\"}) / sum(node_memory_MemTotal_bytes{cluster=\"$cluster\", job=\"$job\"})",
           "interval": "$resolution",
-          "legendFormat": "Linux",
+          "legendFormat": "Memory usage in %",
           "range": true,
-          "refId": "Linux"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "exemplar": true,
-          "expr": "sum(windows_os_visible_memory_bytes{cluster=\"$cluster\"} - windows_memory_available_bytes{cluster=\"$cluster\"}) / sum(windows_os_visible_memory_bytes{cluster=\"$cluster\"})",
-          "hide": false,
-          "interval": "$resolution",
-          "legendFormat": "Windows",
-          "range": true,
-          "refId": "Windows"
+          "refId": "A"
         }
       ],
       "title": "Cluster Memory Utilization",
@@ -1470,7 +1229,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1516,7 +1276,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum(rate(container_cpu_usage_seconds_total{image!=\"\", cluster=\"$cluster\"}[$__rate_interval])) by (namespace)\n+ on (namespace)\n(sum(rate(windows_container_cpu_usage_seconds_total{container_id!=\"\", cluster=\"$cluster\"}[$__rate_interval]) * on (container_id) group_left (container, pod, namespace) max by ( container, container_id, pod, namespace) (kube_pod_container_info{container_id!=\"\", cluster=\"$cluster\"}) OR kube_namespace_created{cluster=\"$cluster\"} * 0) by (namespace))",
+          "expr": "sum(rate(container_cpu_usage_seconds_total{image!=\"\", cluster=\"$cluster\"}[$__rate_interval])) by (namespace)",
           "format": "time_series",
           "hide": false,
           "interval": "$resolution",
@@ -1576,7 +1336,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1622,7 +1383,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum(container_memory_working_set_bytes{image!=\"\", cluster=\"$cluster\"}) by (namespace)\n+ on (namespace)\n(sum(windows_container_memory_usage_commit_bytes{container_id!=\"\", cluster=\"$cluster\"} * on (container_id) group_left (container, pod, namespace) max by ( container, container_id, pod, namespace) (kube_pod_container_info{container_id!=\"\", cluster=\"$cluster\"}) OR kube_namespace_created{cluster=\"$cluster\"} * 0) by (namespace))",
+          "expr": "sum(container_memory_working_set_bytes{image!=\"\", cluster=\"$cluster\"}) by (namespace)",
           "interval": "$resolution",
           "legendFormat": "{{ namespace }}",
           "range": true,
@@ -1681,7 +1442,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1731,21 +1493,7 @@
           "interval": "$resolution",
           "legendFormat": "{{ node }}",
           "range": true,
-          "refId": "Linux"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "exemplar": true,
-          "expr": "avg(sum by (instance,core) (rate(windows_cpu_time_total{mode!=\"idle\", cluster=\"$cluster\"}[$__rate_interval]))) by (instance)",
-          "hide": false,
-          "interval": "$resolution",
-          "legendFormat": "{{ node }}",
-          "range": true,
-          "refId": "Windows"
+          "refId": "A"
         }
       ],
       "title": "CPU Utilization by instance",
@@ -1799,7 +1547,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1850,21 +1599,7 @@
           "interval": "$resolution",
           "legendFormat": "{{ instance }}",
           "range": true,
-          "refId": "Linux"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "exemplar": true,
-          "expr": "sum(windows_os_visible_memory_bytes{cluster=\"$cluster\"} - windows_memory_available_bytes{cluster=\"$cluster\"}) by (instance)",
-          "hide": false,
-          "interval": "$resolution",
-          "legendFormat": "{{ instance }}",
-          "range": true,
-          "refId": "Windows"
+          "refId": "A"
         }
       ],
       "title": "Memory Utilization by instance",
@@ -1923,7 +1658,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2032,7 +1768,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2149,7 +1886,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2265,7 +2003,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2370,7 +2109,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2475,7 +2215,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2533,6 +2274,10 @@
     },
     {
       "collapsed": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -2593,7 +2338,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2637,7 +2383,7 @@
           "interval": "$resolution",
           "legendFormat": "Received : {{ device }}",
           "range": true,
-          "refId": "Linux Received"
+          "refId": "A"
         },
         {
           "datasource": {
@@ -2650,35 +2396,7 @@
           "interval": "$resolution",
           "legendFormat": "Transmitted : {{ device }}",
           "range": true,
-          "refId": "Linux Transmitted"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "exemplar": true,
-          "expr": "sum(rate(windows_net_bytes_received_total{cluster=\"$cluster\"}[$__rate_interval])) by (nic)",
-          "hide": false,
-          "interval": "$resolution",
-          "legendFormat": "Received : {{ nic }}",
-          "range": true,
-          "refId": "Windows Received"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "exemplar": true,
-          "expr": "- sum(rate(windows_net_bytes_sent_total{cluster=\"$cluster\"}[$__rate_interval])) by (nic)",
-          "hide": false,
-          "interval": "$resolution",
-          "legendFormat": "Transmitted : {{ device }}",
-          "range": true,
-          "refId": "Windows Transmitted"
+          "refId": "B"
         }
       ],
       "title": "Global Network Utilization by device",
@@ -2732,7 +2450,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2774,9 +2493,9 @@
           "exemplar": true,
           "expr": "sum(rate(node_network_receive_drop_total{cluster=\"$cluster\", job=\"$job\"}[$__rate_interval]))",
           "interval": "$resolution",
-          "legendFormat": "Linux Packets dropped (receive)",
+          "legendFormat": "Packets dropped (receive)",
           "range": true,
-          "refId": "Linux Packets dropped (receive)"
+          "refId": "A"
         },
         {
           "datasource": {
@@ -2787,85 +2506,13 @@
           "exemplar": true,
           "expr": "- sum(rate(node_network_transmit_drop_total{cluster=\"$cluster\", job=\"$job\"}[$__rate_interval]))",
           "interval": "$resolution",
-          "legendFormat": "Linux Packets dropped (transmit)",
+          "legendFormat": "Packets dropped (transmit)",
           "range": true,
-          "refId": "Linux Packets dropped (transmit)"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "exemplar": true,
-          "expr": "sum(rate(windows_net_packets_received_discarded_total{cluster=\"$cluster\"}[$__rate_interval]))",
-          "hide": false,
-          "interval": "$resolution",
-          "legendFormat": "Windows Packets dropped (receive)",
-          "range": true,
-          "refId": "Windows Packets dropped (receive)"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "exemplar": true,
-          "expr": "- sum(rate(windows_net_packets_outbound_discarded_total{cluster=\"$cluster\"}[$__rate_interval]))",
-          "hide": false,
-          "interval": "$resolution",
-          "legendFormat": "Windows Packets dropped (transmit)",
-          "range": true,
-          "refId": "Windows Packets dropped (transmit)"
+          "refId": "B"
         }
       ],
       "title": "Network Saturation - Packets dropped",
-      "transformations": [
-        {
-          "id": "calculateField",
-          "options": {
-            "alias": "Packets dropped (receive)",
-            "mode": "reduceRow",
-            "reduce": {
-              "include": [
-                "Linux Packets dropped (receive)",
-                "Windows Packets dropped (receive)"
-              ],
-              "reducer": "mean"
-            }
-          }
-        },
-        {
-          "id": "calculateField",
-          "options": {
-            "alias": "Packets dropped (transmit)",
-            "mode": "reduceRow",
-            "reduce": {
-              "include": [
-                "Linux Packets dropped (transmit)",
-                "Windows Packets dropped (transmit)"
-              ],
-              "reducer": "mean"
-            }
-          }
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Linux Packets dropped (receive)": true,
-              "Linux Packets dropped (transmit)": true,
-              "Time": false,
-              "Windows Packets dropped (receive)": true,
-              "Windows Packets dropped (transmit)": true
-            },
-            "includeByName": {},
-            "indexByName": {},
-            "renameByName": {}
-          }
-        }
-      ],
+      "transformations": [],
       "type": "timeseries"
     },
     {
@@ -2916,7 +2563,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2956,7 +2604,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum(rate(container_network_receive_bytes_total{cluster=\"$cluster\"}[$__rate_interval])) by (namespace)\n+ on (namespace)\n(sum(rate(windows_container_network_receive_bytes_total{container_id!=\"\", cluster=\"$cluster\"}[$__rate_interval]) * on (container_id) group_left (container, pod, namespace) max by ( container, container_id, pod, namespace) (kube_pod_container_info{container_id!=\"\", cluster=\"$cluster\"}) OR kube_namespace_created{cluster=\"$cluster\"} * 0) by (namespace))",
+          "expr": "sum(rate(container_network_receive_bytes_total{cluster=\"$cluster\"}[$__rate_interval])) by (namespace)",
           "interval": "$resolution",
           "legendFormat": "Received : {{ namespace }}",
           "range": true,
@@ -2968,7 +2616,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "- (sum(rate(container_network_transmit_bytes_total{cluster=\"$cluster\"}[$__rate_interval])) by (namespace)\n+ on (namespace)\n(sum(rate(windows_container_network_transmit_bytes_total{container_id!=\"\", cluster=\"$cluster\"}[$__rate_interval]) * on (container_id) group_left (container, pod, namespace) max by ( container, container_id, pod, namespace) (kube_pod_container_info{container_id!=\"\", cluster=\"$cluster\"}) OR kube_namespace_created{cluster=\"$cluster\"} * 0) by (namespace)))",
+          "expr": "- sum(rate(container_network_transmit_bytes_total{cluster=\"$cluster\"}[$__rate_interval])) by (namespace)",
           "hide": false,
           "interval": "$resolution",
           "legendFormat": "Transmitted : {{ namespace }}",
@@ -3027,7 +2675,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -3071,7 +2720,7 @@
           "interval": "$resolution",
           "legendFormat": "Received bytes in {{ instance }}",
           "range": true,
-          "refId": "Linux Received bytes"
+          "refId": "A"
         },
         {
           "datasource": {
@@ -3084,34 +2733,7 @@
           "interval": "$resolution",
           "legendFormat": "Transmitted bytes in {{ instance }}",
           "range": true,
-          "refId": "Linux Transmitted bytes"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "exemplar": true,
-          "expr": "sum(rate(windows_net_bytes_received_total{cluster=\"$cluster\"}[$__rate_interval])) by (instance)",
-          "hide": false,
-          "interval": "$resolution",
-          "legendFormat": "Received bytes in {{ instance }}",
-          "range": true,
-          "refId": "Windows Received bytes"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "expr": "- sum(rate(windows_net_bytes_sent_total{cluster=\"$cluster\"}[$__rate_interval])) by (instance)",
-          "hide": false,
-          "interval": "$resolution",
-          "legendFormat": "Transmitted bytes in {{ instance }}",
-          "range": true,
-          "refId": "Windows Transmitted bytes"
+          "refId": "B"
         }
       ],
       "title": "Total Network Received (with all virtual devices) by instance",
@@ -3166,7 +2788,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -3224,34 +2847,6 @@
           "legendFormat": "Transmitted bytes in {{ instance }}",
           "range": true,
           "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "exemplar": true,
-          "expr": "sum(rate(windows_net_bytes_received_total{nic!~\".*Virtual.*\",cluster=\"$cluster\"}[$__rate_interval])) by (instance)",
-          "hide": false,
-          "interval": "$resolution",
-          "legendFormat": "Received bytes in {{ instance }}",
-          "range": true,
-          "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "editorMode": "code",
-          "exemplar": true,
-          "expr": "- sum(rate(windows_net_bytes_sent_total{nic!~\".*Virtual.*\",cluster=\"$cluster\"}[$__rate_interval])) by (instance)",
-          "hide": false,
-          "interval": "$resolution",
-          "legendFormat": "Transmitted bytes in {{ instance }}",
-          "range": true,
-          "refId": "D"
         }
       ],
       "title": "Network Received (without loopback)  by instance",
@@ -3306,7 +2901,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -3370,9 +2966,8 @@
       "type": "timeseries"
     }
   ],
-  "preload": false,
   "refresh": "30s",
-  "schemaVersion": 42,
+  "schemaVersion": 39,
   "tags": [
     "Kubernetes",
     "Prometheus"
@@ -3384,25 +2979,28 @@
           "text": "Mimir",
           "value": "mimir-metrics"
         },
+        "hide": 0,
         "includeAll": false,
+        "multi": false,
         "name": "datasource",
         "options": [],
         "query": "prometheus",
+        "queryValue": "",
         "refresh": 1,
         "regex": "",
+        "skipUrlSync": false,
         "type": "datasource"
       },
       {
-        "current": {
-          "text": "homelab-cluster",
-          "value": "homelab-cluster"
-        },
+        "current": {},
         "datasource": {
           "type": "prometheus",
           "uid": "${datasource}"
         },
         "definition": "label_values(kube_node_info,cluster)",
+        "hide": 0,
         "includeAll": false,
+        "multi": false,
         "name": "cluster",
         "options": [],
         "query": {
@@ -3412,15 +3010,19 @@
         },
         "refresh": 1,
         "regex": "",
+        "skipUrlSync": false,
         "sort": 1,
         "type": "query"
       },
       {
         "current": {
+          "selected": false,
           "text": "30s",
           "value": "30s"
         },
+        "hide": 0,
         "includeAll": false,
+        "multi": false,
         "name": "resolution",
         "options": [
           {
@@ -3455,22 +3057,22 @@
           }
         ],
         "query": "1s, 15s, 30s, 1m, 3m, 5m",
+        "queryValue": "",
+        "skipUrlSync": false,
         "type": "custom"
       },
       {
         "current": {
-          "text": [
-            "integrations/node_exporter"
-          ],
-          "value": [
-            "integrations/node_exporter"
-          ]
+          "selected": false,
+          "text": "",
+          "value": ""
         },
         "datasource": {
           "type": "prometheus",
           "uid": "${datasource}"
         },
         "definition": "label_values(node_cpu_seconds_total{cluster=\"$cluster\"},job)",
+        "hide": 0,
         "includeAll": false,
         "multi": true,
         "name": "job",
@@ -3482,6 +3084,7 @@
         },
         "refresh": 1,
         "regex": "",
+        "skipUrlSync": false,
         "sort": 1,
         "type": "query"
       }
@@ -3495,5 +3098,7 @@
   "timezone": "",
   "title": "Kubernetes / Views / Global",
   "uid": "k8s_views_global",
-  "version": 1
+  "version": 45,
+  "weekStart": "",
+  "id": null
 }

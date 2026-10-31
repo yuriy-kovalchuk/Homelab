@@ -84,9 +84,10 @@ spec:
               memory: 64Mi
           securityContext:
             readOnlyRootFilesystem: true
+          # tcpSocket, not httpGet /metrics: the kubelet closes the connection
+          # mid-response, and the exporter logs a broken pipe on every probe.
           readinessProbe:
-            httpGet:
-              path: /metrics
+            tcpSocket:
               port: 9835
             periodSeconds: 30
       volumes:

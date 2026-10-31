@@ -28,14 +28,32 @@ spec:
         default_theme: dark
       dashboards:
         default_home_dashboard_path: /tmp/dashboards/Kubernetes/k8s-global.json
+      # No calls home: usage stats, version checks, feedback links, gravatar
+      # avatars, public snapshots (snapshots.raintank.io), plugin signing-key
+      # refresh (the bundled key is used) and Grafana's own default plugin
+      # installs/updates. The only remaining internet traffic is the install of
+      # the plugins listed below at startup (storage is an emptyDir).
       analytics:
         reporting_enabled: false
         check_for_updates: false
         check_for_plugin_updates: false
+        feedback_links_enabled: false
+      security:
+        disable_gravatar: true
+      snapshots:
+        external_enabled: false
+      plugins:
+        preinstall_disabled: true
+        public_key_retrieval_disabled: true
 
+    # preinstall_disabled also skips GF_INSTALL_PLUGINS; FORCE makes the image
+    # entrypoint install these with grafana cli instead.
+    env:
+      GF_INSTALL_PLUGINS_FORCE: "true"
     plugins:
       - grafana-lokiexplore-app
       - grafana-metricsdrilldown-app
+      - grafana-exploretraces-app
 
     sidecar:
       image:

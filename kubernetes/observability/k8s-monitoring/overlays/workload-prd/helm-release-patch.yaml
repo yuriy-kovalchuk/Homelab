@@ -41,10 +41,26 @@ spec:
             regex = "longhorn_rest_client_(rate_limiter_latency|request_latency)_seconds_bucket|longhorn_workqueue_(queue|work)_duration_seconds_bucket"
             action = "drop"
           }
+          // Kept for flux-system and external-secrets only (under 1k series):
+          // the Flux Control Plane (grafana.com 21149) and External Secrets
+          // (21640) dashboards use histogram_quantile() on them. RE2 has no
+          // negative lookahead, so tag those series, drop untagged ones, then
+          // remove the tag.
           write_relabel_config {
-            source_labels = ["__name__"]
-            regex = "workqueue_(queue|work)_duration_seconds_bucket|controller_runtime_reconcile_time_seconds_bucket"
+            source_labels = ["__name__", "namespace"]
+            regex = "(workqueue_(queue|work)_duration_seconds_bucket|controller_runtime_reconcile_time_seconds_bucket);(flux-system|external-secrets)"
+            target_label = "__keep_bucket"
+            replacement = "1"
+            action = "replace"
+          }
+          write_relabel_config {
+            source_labels = ["__name__", "__keep_bucket"]
+            regex = "(workqueue_(queue|work)_duration_seconds_bucket|controller_runtime_reconcile_time_seconds_bucket);"
             action = "drop"
+          }
+          write_relabel_config {
+            regex = "__keep_bucket"
+            action = "labeldrop"
           }
           write_relabel_config {
             source_labels = ["__name__"]
