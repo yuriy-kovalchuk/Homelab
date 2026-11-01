@@ -1,0 +1,20 @@
+# Upstream requires a control-plane node for virt-operator. Here all of KubeVirt
+# runs on the workers (hypervisor layer): any node without the control-plane
+# role, tolerating the workers' workload=gpu taint.
+- op: replace
+  path: /spec/template/spec/affinity/nodeAffinity
+  value:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: node-role.kubernetes.io/control-plane
+              operator: DoesNotExist
+- op: replace
+  path: /spec/template/spec/tolerations
+  value:
+    - key: CriticalAddonsOnly
+      operator: Exists
+    - key: workload
+      operator: Equal
+      value: gpu
+      effect: NoSchedule

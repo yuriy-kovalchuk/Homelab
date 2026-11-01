@@ -29,7 +29,7 @@ resources:
   - observability-mimir.yaml
   - observability-talos-monitoring.yaml
   - observability-tempo.yaml
-  - platform-cdi.yaml
+  - hypervisor-cdi.yaml
   - platform-clean-pods.yaml
   - platform-cloudflared.yaml
   - platform-cloudnative-pg.yaml
@@ -38,7 +38,7 @@ resources:
   - platform-gpu-dra-driver.yaml
   - platform-node-feature-discovery.yaml
   - platform-nvidia-dra-driver.yaml
-  - platform-kubevirt.yaml
+  - hypervisor-kubevirt.yaml
   - platform-kyverno-reporter.yaml
   - platform-longhorn.yaml
   - platform-trivy-converter.yaml

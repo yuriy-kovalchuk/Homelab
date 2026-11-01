@@ -30,6 +30,7 @@ This file holds the rules and pitfalls that are not obvious from the code.
 - Renaming or deleting a Kustomization, or moving resources out of one, garbage-collects what it manages. Set `spec.prune: false` live on the affected Kustomization **before** the change merges.
 - `llm` prunes, `apps` does not: removing or renaming a component under `kubernetes/llm/` deletes its objects, PVCs included (model volumes hold only downloads; open-webui's holds chats). In `apps`, a removed component stays in the cluster and must be deleted by hand.
 - One unhealthy ExternalSecret in `secrets` blocks every layer below it.
+- `hypervisor` (Multus, Kube-OVN, KubeVirt, CDI) runs on the workers only and has `wait: false`; only VM layers depend on it. Anything that lives only on workers goes there, never into `platform-infra` (`wait: true`), where a powered-off worker would block every later layer.
 - Immutable objects (Jobs, StorageClasses) need `kustomize.toolkit.fluxcd.io/force: enabled` before their spec can change.
 
 **Network policies (Cilium)**

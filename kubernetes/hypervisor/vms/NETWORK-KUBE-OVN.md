@@ -187,7 +187,7 @@ traffic and everything else in the cluster.
 
 ## Repo shape
 
-- `kubernetes/platform/infra/multus/`: raw manifests (no official chart), thick plugin
+- `kubernetes/hypervisor/multus/`: raw manifests (no official chart), thick plugin
   v4.3.1, NAD CRD shipped alongside (raw CRD may share the Kustomization). DaemonSet
   pinned to yojimbo for the first rollout; **target is every worker** (bahamut,
   yojimbo), never the control planes. kube-ovn's CNI agent follows the same node set.
@@ -195,13 +195,14 @@ traffic and everything else in the cluster.
   unless it asks for a NAD. Hostnetwork, so no CiliumNetworkPolicy applies to it.
   **Prerequisite:** Cilium `cni.exclusive: false` (Terraform `clusters/workload-prd/terraform/cni`),
   applied before the DaemonSet lands.
-- `kubernetes/platform/infra/kube-ovn/`: official `kube-ovn-v2` chart (OCI,
-  `OCIRepository` in `flux-system`), v1.16.17, `cni.nonPrimaryCNI: true`. Base holds the
+- `kubernetes/hypervisor/kube-ovn/`: official `kube-ovn-v2` chart (OCI,
+  `HelmRepository` type `oci` in `flux-system`; not an `OCIRepository`, whose
+  `+digest` chart version breaks the pre-upgrade hook's labels), v1.16.17, `cni.nonPrimaryCNI: true`. Base holds the
   behaviour (Talos paths, `disableModulesManagement`, join CIDR `172.31.255.0/24`
   instead of Tailscale's `100.64/10`, OVN LB and NetworkPolicy off); the overlay holds
   placement (yojimbo; `kube-ovn-cni` pinned and `kube-ovn-pinger` removed through
   `postRenderers`, the chart has no values for either). `disableWait` on install/upgrade
-  so a powered-off worker never blocks `platform-infra` (`wait: true`).
+  so an install/upgrade while the workers are off cannot fail the release.
 - CNI file ordering: the agent always writes a conflist, even non-primary. It is
   `90-kube-ovn.conflist` (after `05-cilium`) and Multus is pinned with
   `multusMasterCNI: 05-cilium.conflist`; either alone stops Kube-OVN from becoming the

@@ -1,0 +1,40 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: CDI
+metadata:
+  name: cdi
+  namespace: cdi
+spec:
+  config:
+    filesystemOverhead:
+      global: "0.055"
+  imagePullPolicy: IfNotPresent
+  # All of CDI runs on the workers (hypervisor layer). infra = apiserver,
+  # deployment (controller), uploadproxy; workload = importer/uploader/cloner
+  # pods. CDI's schema has no nodePlacement wrapper (unlike KubeVirt's CR).
+  # Longhorn volumes still keep their replicas on the control planes.
+  infra:
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: node-role.kubernetes.io/control-plane
+                  operator: DoesNotExist
+    tolerations:
+      - key: workload
+        operator: Equal
+        value: gpu
+        effect: NoSchedule
+  workload:
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: node-role.kubernetes.io/control-plane
+                  operator: DoesNotExist
+    tolerations:
+      - key: workload
+        operator: Equal
+        value: gpu
+        effect: NoSchedule

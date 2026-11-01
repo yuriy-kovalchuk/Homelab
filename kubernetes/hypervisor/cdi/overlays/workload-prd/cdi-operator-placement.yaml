@@ -1,0 +1,16 @@
+# All of CDI runs on the workers (hypervisor layer), like KubeVirt.
+- op: add
+  path: /spec/template/spec/affinity/nodeAffinity
+  value:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: node-role.kubernetes.io/control-plane
+              operator: DoesNotExist
+- op: add
+  path: /spec/template/spec/tolerations
+  value:
+    - key: workload
+      operator: Equal
+      value: gpu
+      effect: NoSchedule

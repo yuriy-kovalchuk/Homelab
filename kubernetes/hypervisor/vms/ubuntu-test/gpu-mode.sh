@@ -5,11 +5,12 @@
 #   gpu-mode.sh vfio     card + HDMI audio + USB controller -> vfio-pci (KubeVirt
 #                        nvidia.com/gtx1070, nvidia.com/gtx1070-audio, intel.com/xhci)
 #   gpu-mode.sh nvidia   card -> nvidia (DRA gpu.nvidia.com, llama-cpp-cuda) and the
-#                        USB controller -> xhci_pci (keyboard/mouse back to the node)
+#                        USB controller -> xhci_hcd (keyboard/mouse back to the node)
 #   gpu-mode.sh status   show which driver holds each device
 #
-# Boot default stays nvidia + xhci_pci (yojimbo's Omni patch is unchanged), so a
-# reboot also returns everything to the node.
+# Boot default stays nvidia + xhci_hcd (yojimbo's Omni patch is unchanged), so a
+# reboot also returns everything to the node. Running 'nvidia' twice, or 'vfio'
+# twice, is safe: each rebind is skipped when the device is already where it belongs.
 #
 # Why not the DRA vfio claim: driver 0.5.1 can't prepare it on Talos, see
 # kubernetes/platform/infra/nvidia-dra-driver/VFIO-TALOS-ISSUES.md. This script
@@ -58,8 +59,18 @@ if [ "$mode" = vfio ]; then
   [ -z "$claims" ] || { echo "GPU still claimed: $claims" >&2; exit 1; }
   talosctl -e "$TALOS_EP" -n "$TALOS_NODE" service ext-nvidia-persistenced stop
 fi
-if [ "$mode" = nvidia ] && k -n "$NS" get vmi ubuntu-test >/dev/null 2>&1; then
-  echo "ubuntu-test is running; stop it first: virtctl stop ubuntu-test -n $NS" >&2; exit 1
+if [ "$mode" = nvidia ]; then
+  if k -n "$NS" get vmi ubuntu-test >/dev/null 2>&1; then
+    echo "ubuntu-test is running; stop it first: virtctl stop ubuntu-test -n $NS" >&2; exit 1
+  fi
+  # The VMI can be gone while virt-launcher is still terminating, and its QEMU still
+  # holds the card: unbinding vfio-pci then hangs until the 30s timeout. Wait it out.
+  for _ in $(seq 1 30); do
+    holders=$(k -n "$NS" get pods -l kubevirt.io/vm=ubuntu-test -o name 2>/dev/null | wc -l)
+    [ "$holders" -eq 0 ] && break
+    sleep 2
+  done
+  [ "$holders" -eq 0 ] || { echo "virt-launcher for ubuntu-test still holds the card" >&2; exit 1; }
 fi
 
 # Runs inside the pod. In a privileged container /sys is the node's sysfs, so the
@@ -94,11 +105,16 @@ case "$mode" in
     rebind $USB vfio-pci
     show ;;
   nvidia)
-    rebind $AUDIO ''
-    rebind $GPU ''
-    echo > /sys/bus/pci/devices/$GPU/driver_override
-    echo $GPU > /sys/bus/pci/drivers/nvidia/bind
-    # No explicit bind: clear the override and let xhci_pci re-claim it by ID.
+    # Bind nvidia by name: never unbind a device the nvidia driver already holds.
+    # Unbinding it with a non-zero usage count hangs the rebind and leaves the card
+    # unusable until the driver is reloaded (dmesg: "Attempting to remove device ...
+    # with non-zero usage count").
+    rebind $GPU nvidia
+    if [ "\$(drv $AUDIO)" = vfio-pci ]; then rebind $AUDIO ''; fi
+    # Let the kernel pick the audio function back up instead of leaving it dangling,
+    # so 'status' reports the real state rather than 'none'.
+    echo $AUDIO > /sys/bus/pci/drivers_probe
+    # No explicit bind: clear the override and let xhci_hcd re-claim it by ID.
     rebind $USB ''
     echo $USB > /sys/bus/pci/drivers_probe
     show ;;

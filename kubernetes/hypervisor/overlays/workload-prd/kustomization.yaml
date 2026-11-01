@@ -1,0 +1,10 @@
+# hypervisor layer: everything VMs need. Runs on the workers only (bahamut,
+# yojimbo), which are not always on, so the Flux Kustomization does not wait
+# for health and only VM layers depend on it. Order: Multus before Kube-OVN.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../multus/overlays/workload-prd
+  - ../../kube-ovn/overlays/workload-prd
+  - ../../kubevirt/overlays/workload-prd
+  - ../../cdi/overlays/workload-prd

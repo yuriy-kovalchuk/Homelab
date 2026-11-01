@@ -1,0 +1,27 @@
+---
+# Everything VMs need: Multus, Kube-OVN, KubeVirt, CDI. Runs on the workers
+# only, which are not always on: wait is off so a powered-off worker never
+# fails this layer's health, and only VM layers depend on it (never apps, llm,
+# observability). Kube-OVN vnet objects (Subnet/Vpc/NAD) go in a later layer
+# that depends on this one (their CRDs come from the kube-ovn HelmRelease).
+# Same dependencies as platform-infra, not platform-infra itself: nothing here
+# needs storage or the gateway to apply, and it keeps this layer reconciling
+# while platform-infra is suspended (a suspended dependency counts as not
+# ready). VM layers depend on both.
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: hypervisor
+  namespace: flux-system
+spec:
+  interval: 5m
+  dependsOn:
+    - name: policies
+    - name: secrets
+  sourceRef:
+    kind: GitRepository
+    name: homelab
+  path: ./kubernetes/hypervisor/overlays/workload-prd
+  prune: true
+  wait: false
+  timeout: 10m

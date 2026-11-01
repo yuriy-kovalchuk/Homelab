@@ -6,7 +6,7 @@ metadata:
 spec:
   values:
     # Creates the DeviceClasses `gpu.nvidia.com` (containers) and
-    # `vfio.gpu.nvidia.com` (KubeVirt passthrough, see kubernetes/vms/ubuntu-test),
+    # `vfio.gpu.nvidia.com` (KubeVirt passthrough, see kubernetes/hypervisor/vms/ubuntu-test),
     # plus a mig one, unused.
     #
     # Talos ships the driver and container toolkit as system extensions

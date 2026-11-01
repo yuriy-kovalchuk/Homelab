@@ -15,13 +15,13 @@ resources:
   - observability-loki.yaml
   - observability-mimir.yaml
   - observability-tempo.yaml
-  - platform-cdi.yaml
+  - hypervisor-cdi.yaml
   - platform-democratic-csi-iscsi.yaml
   - platform-democratic-csi-nfs.yaml
   - platform-gpu-dra-driver.yaml
   - platform-node-feature-discovery.yaml
   - platform-nvidia-dra-driver.yaml
-  - platform-kubevirt.yaml
+  - hypervisor-kubevirt.yaml
   - platform-longhorn.yaml
   - platform-trivy.yaml
   - vms-ubuntu-test.yaml

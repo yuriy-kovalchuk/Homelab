@@ -6,15 +6,16 @@ metadata:
   namespace: flux-system
 spec:
   # Managed from the terminal for now (kubectl / virtctl): Flux does not apply
-  # kubernetes/vms/ubuntu-test. Set to false to hand it back to Flux.
+  # kubernetes/hypervisor/vms/ubuntu-test. Set to false to hand it back to Flux.
   suspend: true
   interval: 5m
   dependsOn:
     - name: platform-infra
+    - name: hypervisor
   sourceRef:
     kind: GitRepository
     name: homelab
-  path: ./kubernetes/vms/ubuntu-test
+  path: ./kubernetes/hypervisor/vms/ubuntu-test
   prune: false
   wait: false
   timeout: 5m

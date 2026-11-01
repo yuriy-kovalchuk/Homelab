@@ -97,9 +97,9 @@ attached. Keep modeset off. If it is ever turned on (`nvidia-drm.modeset=1`), pa
    v0.5.1 with both cherry-picked, push to `harbor.yuriykovalchuk.dev/homelab` (amd64 via buildx),
    and set the chart's image in the overlay. With #1568 persistenced no longer needs stopping.
 3. **Manual rebind + KubeVirt `permittedHostDevices`** (**in use since 2026-11-01**):
-   `kubernetes/vms/ubuntu-test/gpu-mode.sh vfio|nvidia` does the switch the driver would do, at
+   `kubernetes/hypervisor/vms/ubuntu-test/gpu-mode.sh vfio|nvidia` does the switch the driver would do, at
    runtime, without the fuser check. Boot config unchanged; a reboot returns the card to `nvidia`.
-   Not automatic: stop the VM / scale llama-cpp-cuda by hand. See `kubernetes/vms/ubuntu-test/README.md`.
+   Not automatic: stop the VM / scale llama-cpp-cuda by hand. See `kubernetes/hypervisor/vms/ubuntu-test/README.md`.
 
 ## Re-test once fixed
 
@@ -112,4 +112,4 @@ virtctl stop ubuntu-test -n kubevirt-ubuntu-test
 TALOSCONFIG=~/.talos/config-prod talosctl -e 10.0.4.5 -n 10.0.4.13 ls /sys/bus/pci/drivers/nvidia   # 0000:01:00.0 is back
 ```
 
-Then delete this file and the "blocked" note in `kubernetes/vms/ubuntu-test/README.md`.
+Then delete this file and the "blocked" note in `kubernetes/hypervisor/vms/ubuntu-test/README.md`.

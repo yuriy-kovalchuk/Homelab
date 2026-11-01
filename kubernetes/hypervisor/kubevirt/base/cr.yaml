@@ -30,7 +30,7 @@ spec:
           externalResourceProvider: false
         # yojimbo's GTX 1070 and its HDMI audio (same IOMMU group). virt-handler
         # only offers them while they are bound to vfio-pci, i.e. after
-        # kubernetes/vms/ubuntu-test/gpu-mode.sh vfio (boot default is nvidia).
+        # kubernetes/hypervisor/vms/ubuntu-test/gpu-mode.sh vfio (boot default is nvidia).
         # The DRA path (vfio.gpu.nvidia.com) is blocked on Talos, see
         # platform/infra/nvidia-dra-driver/VFIO-TALOS-ISSUES.md.
         - pciVendorSelector: "10DE:1B81"
@@ -43,16 +43,39 @@ spec:
         # VM can use a keyboard/mouse plugged into the machine (KubeVirt passes PCI
         # devices, not individual USB devices). Alone in IOMMU group 3. Boot driver
         # is xhci_pci; gpu-mode.sh vfio moves it to vfio-pci together with the card.
-        # valefor (i7-7700K, same PCH) has this exact device ID, so virt-handler
-        # offers it there too: any VM using it must pin itself by hostname.
+        # valefor has this exact device ID too, but virt-handler no longer runs
+        # on the control planes, so only yojimbo offers it.
         - pciVendorSelector: "8086:A12F"
           resourceName: "intel.com/xhci"
           externalResourceProvider: false
   imagePullPolicy: IfNotPresent
-  # virt-handler (the per-node agent) must also run on bahamut, or that node
-  # offers no KVM device and no VM can be scheduled there.
+  # All of KubeVirt runs on the workers (hypervisor layer), never the control
+  # planes. infra = virt-api, virt-controller, virt-exportproxy; workloads =
+  # virt-handler, the per-node agent that offers KVM, so VMs can only be
+  # scheduled on the workers. Must include bahamut (Radeon 780M passthrough).
+  infra:
+    nodePlacement:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: node-role.kubernetes.io/control-plane
+                    operator: DoesNotExist
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
   workloads:
     nodePlacement:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: node-role.kubernetes.io/control-plane
+                    operator: DoesNotExist
       tolerations:
         - key: workload
           operator: Equal

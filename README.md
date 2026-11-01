@@ -66,13 +66,14 @@ Homelab/
 │   ├── policies/             Kyverno PolicyExceptions and mutating/generating policies
 │   ├── secrets/              ClusterSecretStore + every ExternalSecret
 │   ├── platform/
-│   │   ├── infra/            What other layers need: gateway, BGP, storage, CNPG, KubeVirt, GPU DRA driver
+│   │   ├── infra/            What other layers need: gateway, BGP, storage, CNPG, GPU DRA driver
 │   │   └── ops/              Day-2 tooling: Trivy, VPA/Goldilocks, cloudflared, Hubble UI, cleanup jobs
 │   ├── observability/        Loki, Mimir, Tempo, Alloy, Grafana, Alertmanager, talos-monitoring
 │   │   └── alerting-rules/   PrometheusRules
 │   ├── apps/                 User-facing apps
 │   ├── llm/                  llama.cpp, Strata, stable-diffusion, Open WebUI (its own llm layer)
-│   └── vms/                  KubeVirt VMs
+│   └── hypervisor/           What VMs need, workers only: Multus, Kube-OVN, KubeVirt, CDI
+│       └── vms/              KubeVirt VMs, one Flux Kustomization each (prune off)
 ├── proxmox-nodes/
 │   ├── terraform/            Terragrunt: OPNsense, TrueNAS and Tailscale VMs, TrueNAS datasets and apps, Proxmox ACME, tailnet (policy, DNS, keys)
 │   └── ansible/              OPNsense configuration (VLANs, DHCP, firewall, DNS, BGP, HAProxy), the Tailscale VM, the Docker VM
@@ -105,7 +106,8 @@ namespaces
                 │   └── alerting-rules
                 ├── apps                (also depends on policies)
                 ├── llm                 (also depends on policies)
-                └── vm-ubuntu-test
+                └── vm-ubuntu-test      (also depends on hypervisor)
+        hypervisor                      (after policies + secrets; wait: false, workers only)
 ```
 
 Why it is split this way:
@@ -116,6 +118,9 @@ Why it is split this way:
   policies, secrets and policies are separate layers after `core`.
 - `platform-infra` holds only what other layers need to work; a broken tool
   in `platform-ops` cannot block anything else.
+- `hypervisor` runs only on the workers, which are not always on. It does not
+  wait for health, and only VM layers depend on it, so a powered-off worker
+  never blocks `platform-infra` or anything that is not a VM.
 - The `llm` Kustomization ignores `/spec/replicas` for Deployments in the
   `llm`, `llm-strata` and `llm-sd-server` namespaces, so GPU workloads can be
   parked at 0 with `kubectl scale`.
@@ -150,10 +155,17 @@ Chart versions as deployed.
 | Longhorn | 1.13.0 | Replicated block storage on the nodes |
 | democratic-csi (nfs, iscsi) | 0.15.1 | TrueNAS volumes |
 | CloudNativePG | 0.29.1 | Postgres operator; one cluster per app |
-| KubeVirt + CDI | — | Virtual machines and disk import |
 | metrics-server | 3.14.0 | Resource metrics for VPA/HPA |
 | k8s-gpu-dra-driver | v1.0.1 | AMD GPUs as DRA devices (`gpu.amd.com`) |
 | dra-driver-nvidia-gpu | 0.5.1 | NVIDIA GPU as DRA devices: `gpu.nvidia.com` (containers) and `vfio.gpu.nvidia.com` (KubeVirt passthrough) |
+
+**hypervisor** (workers only)
+
+| Component | Version | Purpose |
+|-----------|---------|---------|
+| Multus | v4.3.1 | Meta-CNI: extra NICs from NetworkAttachmentDefinitions; Cilium stays primary |
+| Kube-OVN | v1.16.17 | Secondary CNI (non-primary mode): private virtual networks for VMs |
+| KubeVirt + CDI | — | Virtual machines and disk import |
 
 **platform-ops**
 

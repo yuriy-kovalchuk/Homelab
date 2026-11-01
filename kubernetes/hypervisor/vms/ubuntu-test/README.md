@@ -25,20 +25,20 @@ back to containers.
 | Mode | Driver | Offered as | Used by |
 |---|---|---|---|
 | `nvidia` (boot default) | `nvidia` | DRA `gpu.nvidia.com` (`gpu-0`) | llama-cpp-cuda |
-| `vfio` | `vfio-pci` | KubeVirt `nvidia.com/gtx1070` + `nvidia.com/gtx1070-audio` (`permittedHostDevices` in `platform/infra/kubevirt/base/cr.yaml`) | this VM (`vm.yaml` `gpus` / `hostDevices`) |
+| `vfio` | `vfio-pci` | KubeVirt `nvidia.com/gtx1070` + `nvidia.com/gtx1070-audio` (`permittedHostDevices` in `hypervisor/kubevirt/base/cr.yaml`) | this VM (`vm.yaml` `gpus` / `hostDevices`) |
 
 ```bash
 # to the VM
 kubectl -n llm scale deploy llama-cpp-cuda --replicas=0
-kubernetes/vms/ubuntu-test/gpu-mode.sh vfio      # refuses while anything claims the card
+kubernetes/hypervisor/vms/ubuntu-test/gpu-mode.sh vfio      # refuses while anything claims the card
 virtctl --kubeconfig ~/.kube/workload start ubuntu-test -n kubevirt-ubuntu-test
 
 # back to containers
 virtctl --kubeconfig ~/.kube/workload stop ubuntu-test -n kubevirt-ubuntu-test
-kubernetes/vms/ubuntu-test/gpu-mode.sh nvidia    # refuses while the VM runs
+kubernetes/hypervisor/vms/ubuntu-test/gpu-mode.sh nvidia    # refuses while the VM runs
 kubectl -n llm scale deploy llama-cpp-cuda --replicas=1
 
-kubernetes/vms/ubuntu-test/gpu-mode.sh status    # which driver holds each function
+kubernetes/hypervisor/vms/ubuntu-test/gpu-mode.sh status    # which driver holds each function
 ```
 
 The script does the rebind from a short-lived privileged busybox pod on yojimbo in
@@ -56,7 +56,7 @@ nvidia.com/gtx1070`). That is harmless; switch modes and it schedules.
 
 Why not DRA: the dynamic `vfio.gpu.nvidia.com` claim (`resource-claim-template.yaml`, not applied)
 would do this switch automatically, but driver 0.5.1 can't prepare it on Talos. See
-[`platform/infra/nvidia-dra-driver/VFIO-TALOS-ISSUES.md`](../../platform/infra/nvidia-dra-driver/VFIO-TALOS-ISSUES.md).
+[`platform/infra/nvidia-dra-driver/VFIO-TALOS-ISSUES.md`](../../../platform/infra/nvidia-dra-driver/VFIO-TALOS-ISSUES.md).
 Once that is fixed, re-add the claim and drop `gpu-mode.sh`.
 
 ### In the guest
