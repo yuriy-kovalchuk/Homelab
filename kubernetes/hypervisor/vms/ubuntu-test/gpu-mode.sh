@@ -20,6 +20,13 @@
 # /dev/nvidia0 open and makes the unbind from nvidia hang, so the script stops
 # that service on the way to vfio and starts it again on the way back.
 #
+# yojimbo's monitor (Talos dashboard) hangs off the card. The firmware
+# framebuffer it boots with is removed for good once the card goes to vfio-pci,
+# so after the first round trip the monitor stays dark until the next reboot.
+# Do not "fix" that with nvidia_drm modeset=1 fbdev=1: tried on 2026-11-01,
+# binding the card back to nvidia then crashes the kernel the moment fbcon takes
+# over the new nvidia-drm framebuffer (driver 580, Pascal), rebooting yojimbo.
+#
 # The rebind runs in a short-lived privileged pod on yojimbo in
 # nvidia-dra-driver (privileged Pod Security level and a PolicyException for
 # the driver's own mounts). Afterwards virt-handler and the DRA kubelet plugin
@@ -152,6 +159,19 @@ k -n nvidia-dra-driver rollout status ds/dra-driver-nvidia-gpu-kubelet-plugin --
 if [ "$mode" = nvidia ]; then
   talosctl -e "$TALOS_EP" -n "$TALOS_NODE" service ext-nvidia-persistenced start
 fi
-sleep 10
-echo "yojimbo offers: $(k get node $NODE -o json | jq -c '.status.allocatable | with_entries(select(.key | test("gtx1070")))')"
-echo "DRA devices:    $(k get resourceslices -o json | jq -c '[.items[] | select(.spec.driver=="gpu.nvidia.com" and .spec.nodeName=="'$NODE'") | .spec.devices[].name]')"
+offers() { k get node $NODE -o json | jq -c '.status.allocatable | with_entries(select(.key | test("gtx1070|xhci")))'; }
+dra() { k get resourceslices -o json | jq -c '[.items[] | select(.spec.driver=="gpu.nvidia.com" and .spec.nodeName=="'$NODE'") | .spec.devices[].name]'; }
+# The plugins need a few seconds after their restart to re-register; wait for
+# the state the mode should produce instead of a fixed sleep.
+ready=no
+for _ in $(seq 1 45); do
+  case "$mode" in
+    vfio)   offers | jq -e 'to_entries | length == 3 and all(.value == "1")' >/dev/null && ready=yes ;;
+    nvidia) dra | jq -e 'index("gpu-0") != null' >/dev/null && ready=yes ;;
+  esac
+  [ "$ready" = yes ] && break
+  sleep 2
+done
+echo "yojimbo offers: $(offers)"
+echo "DRA devices:    $(dra)"
+[ "$ready" = yes ] || { echo "devices not advertised as expected after 90s" >&2; exit 1; }

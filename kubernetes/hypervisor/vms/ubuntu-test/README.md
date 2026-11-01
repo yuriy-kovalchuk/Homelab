@@ -6,9 +6,10 @@ Ubuntu 24.04 (Noble) test VM running on KubeVirt in the `kubevirt-ubuntu-test` n
 
 - 4 vCPU, 8 GB RAM
 - 50 GB Longhorn PVC (RWO — no live migration), one replica on yojimbo's `vms` disk (volume `nodeSelector`/`diskSelector: [vms]`, set on the Longhorn volume, not in Git). Unavailable while yojimbo is off, which is also when the VM can't run.
-- Networking: KubeVirt bridge mode (VM shares pod IP, no iptables/passt required)
-- Desktop: XFCE4 + LightDM
-- Remote desktop: xrdp on `10.0.4.51:3389`; SSH on `10.0.4.51:22` (see Access)
+- Networking: one NIC on VNet `vnet-test`, subnet `vnet-test-vms` (Kube-OVN custom Vpc,
+  `172.20.1.0/24`): address `172.20.1.10` from OVN's DHCP, MAC `02:00:ac:14:01:0a`. No pod-network
+  NIC, so **no internet and no remote access** for now (see Networking notes)
+- Desktop: XFCE4 + LightDM, on yojimbo's own monitor/keyboard/mouse while the VM holds the card
 
 **Flux is suspended for this component** (`suspend: true` in
 `kubernetes/clusters/workload-prd/flux-system/vms.yaml`): changes here are applied from the
@@ -40,6 +41,14 @@ kubectl -n llm scale deploy llama-cpp-cuda --replicas=1
 
 kubernetes/hypervisor/vms/ubuntu-test/gpu-mode.sh status    # which driver holds each function
 ```
+
+yojimbo's monitor follows the card: the VM while it holds it, the Talos dashboard otherwise, but
+only until the first round trip. The firmware framebuffer yojimbo boots with is removed for good
+once the card goes to `vfio-pci`, so after `gpu-mode.sh nvidia` the monitor stays dark until the
+next reboot of yojimbo. Known and accepted. Do not set `nvidia_drm modeset=1 fbdev=1` to get the
+console back: tried on 2026-11-01, and every bind back to `nvidia` crashed the kernel the moment
+fbcon took over the new nvidia-drm framebuffer (driver 580, Pascal), rebooting yojimbo (last
+kernel line: `fbcon: nvidia-drmdrmfb (fb0) is primary device`). Retry only with a newer driver.
 
 The script does the rebind from a short-lived privileged busybox pod on yojimbo in
 `nvidia-dra-driver` (privileged Pod Security level and a PolicyException there). It stops the Talos
@@ -111,6 +120,12 @@ sudo reboot
 ```
 
 ## Access
+
+> Since the VM moved to `vnet-test-vms` (single Kube-OVN NIC), Options 1–2 and SSH below **do not
+> work**: VNC needs the emulated display (`autoattachGraphicsDevice: false`), and the `10.0.4.51`
+> LoadBalancer Services point at the virt-launcher pod, which the VM is no longer attached to.
+> What works: yojimbo's monitor/keyboard/mouse (while the VM holds the card) and the serial console.
+> Kept for when ingress into the VNet exists (an edge gateway with inbound NAT rules).
 
 ### Option 1 — virtctl proxy (no extra setup)
 
@@ -191,16 +206,19 @@ See `kubernetes/clusters/workload-prd/terraform/vault/kubevirt-ubuntu-test.tf`.
 
 ## Networking notes
 
-Bridge mode is used because Talos Linux + Cilium (eBPF, kube-proxy replacement) does not load
-netfilter/iptables kernel modules. Masquerade networking requires `nf_nat` (unavailable), and
-passt networking requires user namespaces (`user.max_user_namespaces > 0`, disabled by default on
-Talos). Bridge mode uses virt-launcher's built-in DHCP server with no kernel module dependencies.
+The VM has a single NIC on VNet `vnet-test` / subnet `vnet-test-vms`
+(`kubernetes/hypervisor/networks/vnet-test/`), attached through the NAD `vnet-test-vms` in this
+namespace (`autoattachPodInterface: false`, no pod-network NIC). That Vpc is isolated: no route to
+the pod network, the nodes, the LAN or the internet. Internet and inbound access are planned as a
+per-VNet edge gateway (outbound NAT + inbound NAT rules), not built yet.
 
-Do **not** set `interfaces[].macAddress`: with this binding Cilium keys its KubeVirt datapath off
-the pod's MAC, and a forced VM MAC makes it drop every frame at the `k6t-eth0` bridge — the VM
-boots, looks Running, and has no network at all (cilium/cilium#21347). Only `pciAddress` is
-pinned, which is what keeps the NIC's guest slot (and name) stable when host devices are added;
-netplan in the guest therefore matches the name glob `e*`, never a MAC.
-
-Moving the VM onto its own Kube-OVN network (own subnet, fixed IP, LAN-reachable without a
-LoadBalancer) is proposed in [../NETWORK-KUBE-OVN.md](../NETWORK-KUBE-OVN.md).
+- Address: OVN's DHCP hands out the address Kube-OVN reserved for the VM (`172.20.1.10`, kept across
+  restarts by `enableKeepVmIps`), with `router=172.20.1.1`, `mtu=1400`. Nothing is pinned by an
+  annotation.
+- The MAC is fixed (`02:00:ac:14:01:0a`, no Cilium on this port, so that is safe) and the guest's
+  netplan (`/etc/netplan/50-cloud-init.yaml`, same as the cloud-init `networkData`) matches the NIC
+  by that MAC, so its guest name does not matter.
+- The NIC is pinned to `pciAddress: 0000:01:00.0`, the slot the old pod NIC had, so the GPU, USB
+  and disk slots stay where they have always been.
+- The virt-launcher pod still has its own Cilium `eth0` (the namespace's Cilium policy applies to
+  it), but the VM is not connected to it.

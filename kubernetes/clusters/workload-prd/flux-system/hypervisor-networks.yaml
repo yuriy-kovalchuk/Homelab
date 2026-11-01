@@ -1,0 +1,25 @@
+---
+# VM networks: Kube-OVN Subnets/Vpcs and their NetworkAttachmentDefinitions.
+# Separate from hypervisor because the Subnet CRD is installed by the kube-ovn
+# HelmRelease there (CRD instances never share the Kustomization that installs
+# the CRD through Helm). hypervisor does not wait, so on a cold start the first
+# attempts here can fail until the chart has installed the CRDs; retryInterval
+# keeps that short. wait: false for the same reason as hypervisor (Kube-OVN
+# runs on the workers only).
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: hypervisor-networks
+  namespace: flux-system
+spec:
+  interval: 5m
+  retryInterval: 1m
+  dependsOn:
+    - name: hypervisor
+  sourceRef:
+    kind: GitRepository
+    name: homelab
+  path: ./kubernetes/hypervisor/networks
+  prune: true
+  wait: false
+  timeout: 5m

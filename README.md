@@ -73,6 +73,7 @@ Homelab/
 │   ├── apps/                 User-facing apps
 │   ├── llm/                  llama.cpp, Strata, stable-diffusion, Open WebUI (its own llm layer)
 │   └── hypervisor/           What VMs need, workers only: Multus, Kube-OVN, KubeVirt, CDI
+│       ├── networks/         VM networks, Azure-style: per VNet a Kube-OVN Vpc + Subnets + NADs
 │       └── vms/              KubeVirt VMs, one Flux Kustomization each (prune off)
 ├── proxmox-nodes/
 │   ├── terraform/            Terragrunt: OPNsense, TrueNAS and Tailscale VMs, TrueNAS datasets and apps, Proxmox ACME, tailnet (policy, DNS, keys)
@@ -108,6 +109,7 @@ namespaces
                 ├── llm                 (also depends on policies)
                 └── vm-ubuntu-test      (also depends on hypervisor)
         hypervisor                      (after policies + secrets; wait: false, workers only)
+        └── hypervisor-networks         (Kube-OVN Vpcs, Subnets, NADs; CRDs come from hypervisor)
 ```
 
 Why it is split this way:

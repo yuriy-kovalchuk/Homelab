@@ -1,0 +1,9 @@
+# VM networks, Azure-style: one folder per VNet = a dedicated Kube-OVN Vpc + its
+# Subnets + their NetworkAttachmentDefinitions. Applied
+# by the hypervisor-networks Flux Kustomization, after hypervisor: the Subnet
+# CRD comes from the kube-ovn HelmRelease, so instances can never share the
+# hypervisor Kustomization (CRD cold-start rule).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - vnet-test

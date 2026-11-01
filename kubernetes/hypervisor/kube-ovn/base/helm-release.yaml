@@ -1,7 +1,8 @@
 # Kube-OVN as a *secondary* CNI: it never touches a pod's eth0 (Cilium keeps
 # that); it only builds the extra NICs that Multus asks for through a
-# NetworkAttachmentDefinition of type kube-ovn. Design and rationale:
-# kubernetes/hypervisor/vms/NETWORK-KUBE-OVN.md.
+# NetworkAttachmentDefinition of type kube-ovn. The VM networks themselves
+# (Azure-style: one Vpc per VNet, Subnets, NADs) are in
+# kubernetes/hypervisor/networks/.
 #
 # The chart installs its CRDs (Vpc, Subnet, IP, ...). Instances of them live in
 # a later Flux layer, never in platform-infra (CRD cold-start rule).

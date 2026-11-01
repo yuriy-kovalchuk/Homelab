@@ -1,0 +1,20 @@
+# Azure VNet equivalent. Unlike Azure, a Kube-OVN Vpc has no address space:
+# each Subnet declares its own CIDR and nothing forces it inside a parent range.
+# The annotation records the intended space; keep every subnet of this VNet
+# inside it (convention, not enforced).
+#
+# What a custom Vpc means here:
+# - no route to the default Vpc, the cluster, the nodes, or another Vpc
+#   (open up explicitly with VpcPeering / StaticRoute later);
+# - no egress: natOutgoing only exists in the default Vpc, and a VpcNatGateway
+#   needs a macvlan NIC on the LAN, which yojimbo (single NIC) cannot give;
+# - no cluster DNS (CoreDNS is unreachable; vpc-dns would be the add-on).
+# spec.namespaces stays empty (any namespace may attach): setting it makes
+# Kube-OVN annotate those namespaces, which is not wanted alongside Cilium.
+apiVersion: kubeovn.io/v1
+kind: Vpc
+metadata:
+  name: vnet-test
+  annotations:
+    homelab.yuriykovalchuk.dev/address-space: 172.20.0.0/16
+spec: {}

@@ -83,36 +83,43 @@ spec:
             - name: tablet
               type: tablet
               bus: usb
+          # Single NIC on VNet vnet-test / subnet vnet-test-vms (Kube-OVN custom Vpc).
+          # No pod-network NIC: the VM has no 10.244.x address, so no internet (the
+          # Vpc has no egress), no Cilium datapath and no LoadBalancer reachability;
+          # access is the local monitor/keyboard, virtctl console, the guest agent.
+          # The virt-launcher pod itself still has its Cilium eth0.
+          autoattachPodInterface: false
           interfaces:
-            - name: default
+            # Fixed MAC (safe here, no Cilium on this port; the guest's netplan
+            # matches it). Pinned to the slot the pod NIC used to have, so the GPU,
+            # USB and disk slots stay exactly where they have always been.
+            - name: vnet-test-vms
               bridge: {}
-              # Pinned PCI address only: it keeps the guest's NIC slot (and therefore
-              # its name) stable when devices are added. Do NOT pin macAddress here -
-              # with the pod-network bridge binding Cilium keys its KubeVirt datapath
-              # off the pod's MAC and a forced VM MAC desynchronizes it, which drops
-              # every frame at the k6t bridge (cilium/cilium#21347).
+              macAddress: "02:00:ac:14:01:0a"
               pciAddress: "0000:01:00.0"
       networks:
-        - name: default
-          pod: {}
+        - name: vnet-test-vms
+          multus:
+            networkName: vnet-test-vms
       volumes:
         - name: rootdisk
           dataVolume:
             name: ubuntu-test-disk
         - name: cloudinit
           cloudInitNoCloud:
-            # Matched by name glob, never by MAC or exact slot name: the MAC is
-            # re-randomized on every start (see interfaces[] above) and the name follows
-            # the PCI slot, so a MAC or exact-name match leaves the link unmanaged and
-            # the VM without SSH/RDP. cloud-init only writes this file on first boot, so
-            # the same content is already in the image at /etc/netplan/50-cloud-init.yaml.
+            # The single NIC is matched by its fixed MAC (interfaces[] above), so its
+            # guest name does not matter. OVN's DHCP hands out the address Kube-OVN
+            # reserved and a default route via 172.20.1.1 (leads nowhere today; works
+            # unchanged if the VNet ever gets egress). cloud-init only writes this file
+            # on first boot, so the same content is kept by hand in the guest's
+            # /etc/netplan/50-cloud-init.yaml.
             networkData: |
               network:
                 version: 2
                 ethernets:
-                  primary:
+                  vnet-test-vms:
                     match:
-                      name: "e*"
+                      macaddress: "02:00:ac:14:01:0a"
                     dhcp4: true
             secretRef:
               name: ubuntu-test-cloudinit

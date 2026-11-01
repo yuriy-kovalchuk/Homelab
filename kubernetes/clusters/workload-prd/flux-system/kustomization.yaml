@@ -9,6 +9,7 @@ resources:
   - secrets.yaml
   - platform-infra.yaml
   - hypervisor.yaml
+  - hypervisor-networks.yaml
   - platform-ops.yaml
   - observability.yaml
   - alerting-rules.yaml

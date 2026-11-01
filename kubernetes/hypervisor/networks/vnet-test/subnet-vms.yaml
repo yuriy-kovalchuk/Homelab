@@ -1,0 +1,36 @@
+# Azure subnet equivalent, inside VNet vnet-test (address space 172.20.0.0/16).
+# Kube-OVN Subnet names are cluster-wide, hence the <vnet>-<subnet> name.
+apiVersion: kubeovn.io/v1
+kind: Subnet
+metadata:
+  name: vnet-test-vms
+spec:
+  vpc: vnet-test
+  protocol: IPv4
+  cidrBlock: 172.20.1.0/24
+  # The Vpc router's port on this subnet; guests get it as default route via
+  # DHCP. The router has no way out (see vpc.yaml).
+  gateway: 172.20.1.1
+  # Must equal the NAD's provider: <nad name>.<nad namespace>.ovn
+  provider: vnet-test-vms.kubevirt-ubuntu-test.ovn
+  # OVN answers the guests' DHCP itself, handing out each VM's fixed address.
+  enableDHCP: true
+  # Subnets of one VNet route to each other, as in Azure. Set private (+
+  # allowSubnets/acls) on a subnet for an NSG-like default deny.
+  private: false
+---
+# Attaches VMs in kubevirt-ubuntu-test to vnet-test-vms. Multus calls the
+# kube-ovn CNI binary, which asks the kube-ovn-cni daemon (socket) for the port.
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: vnet-test-vms
+  namespace: kubevirt-ubuntu-test
+spec:
+  config: |
+    {
+      "cniVersion": "0.3.1",
+      "type": "kube-ovn",
+      "server_socket": "/run/openvswitch/kube-ovn-daemon.sock",
+      "provider": "vnet-test-vms.kubevirt-ubuntu-test.ovn"
+    }

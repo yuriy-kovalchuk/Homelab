@@ -1,0 +1,8 @@
+# One Azure-style VNet: a dedicated Kube-OVN Vpc (own OVN logical router,
+# isolated from every other Vpc and from the default ovn-cluster Vpc) plus its
+# subnets, each with the NAD that attaches VMs to it.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - vpc.yaml
+  - subnet-vms.yaml
