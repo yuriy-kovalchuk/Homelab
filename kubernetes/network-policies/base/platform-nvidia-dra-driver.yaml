@@ -7,7 +7,9 @@ spec:
   description: "Kubelet plugin publishes a ResourceSlice per node and watches ResourceClaims, so it needs the API server; everything else it does is over the local kubelet socket"
   endpointSelector:
     matchLabels:
-      app.kubernetes.io/name: nvidia-dra-driver-gpu
+      # release name: the same for the NGC chart (nvidia-dra-driver-gpu) and
+      # the k8s-sigs chart (dra-driver-nvidia-gpu), whose name labels differ
+      app.kubernetes.io/instance: nvidia-dra-driver-gpu
   egress:
     - toEntities:
         - kube-apiserver
