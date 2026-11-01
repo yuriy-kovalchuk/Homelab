@@ -8,6 +8,7 @@ resources:
   - ../../democratic-csi-nfs/overlays/workload-prd
   - ../../democratic-csi-iscsi/overlays/workload-prd
   - ../../cloudnative-pg/overlays/workload-prd
+  - ../../multus/overlays/workload-prd
   - ../../kubevirt/overlays/workload-prd
   - ../../cdi/overlays/workload-prd
   - ../../metrics-server/overlays/workload-prd

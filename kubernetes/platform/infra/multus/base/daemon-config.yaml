@@ -1,0 +1,25 @@
+# multus-daemon settings. "multusConfigFile: auto" writes 00-multus.conf in
+# /etc/cni/net.d, delegating to the first other config it finds there
+# (05-cilium.conflist). Cilium therefore stays the primary network for every
+# pod on the node; nothing is attached beyond eth0 unless a pod or VM asks for
+# a NetworkAttachmentDefinition (no defaultNetworks, no clusterNetwork override).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: multus-daemon-config
+  namespace: kube-system
+  labels:
+    app: multus
+    tier: node
+data:
+  daemon-config.json: |
+    {
+        "chrootDir": "/hostroot",
+        "cniVersion": "0.3.1",
+        "logLevel": "error",
+        "logToStderr": true,
+        "cniConfigDir": "/host/etc/cni/net.d",
+        "multusAutoconfigDir": "/host/etc/cni/net.d",
+        "multusConfigFile": "auto",
+        "socketDir": "/host/run/multus/"
+    }

@@ -6,6 +6,15 @@ k8sServicePort: 7445
 ipam:
   mode: kubernetes
 
+# Multus (platform/infra/multus) writes 00-multus.conf next to Cilium's
+# 05-cilium.conflist and delegates to it. An exclusive Cilium renames every
+# other config in /etc/cni/net.d to *.cilium_bak, silently disabling Multus.
+# Must be applied before the Multus DaemonSet lands. Rollback of Multus: delete
+# the DaemonSet, set this back to true and restart the agent on the node, which
+# moves 00-multus.conf aside (Talos has no shell to delete it).
+cni:
+  exclusive: false
+
 # Every node is on the same L2 (VLAN 4), so pod traffic goes straight to the
 # other node's address instead of a VXLAN tunnel (no 50-byte header, full MTU).
 routingMode: native

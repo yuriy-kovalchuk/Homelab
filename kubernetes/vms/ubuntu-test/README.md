@@ -195,3 +195,12 @@ Bridge mode is used because Talos Linux + Cilium (eBPF, kube-proxy replacement) 
 netfilter/iptables kernel modules. Masquerade networking requires `nf_nat` (unavailable), and
 passt networking requires user namespaces (`user.max_user_namespaces > 0`, disabled by default on
 Talos). Bridge mode uses virt-launcher's built-in DHCP server with no kernel module dependencies.
+
+Do **not** set `interfaces[].macAddress`: with this binding Cilium keys its KubeVirt datapath off
+the pod's MAC, and a forced VM MAC makes it drop every frame at the `k6t-eth0` bridge — the VM
+boots, looks Running, and has no network at all (cilium/cilium#21347). Only `pciAddress` is
+pinned, which is what keeps the NIC's guest slot (and name) stable when host devices are added;
+netplan in the guest therefore matches the name glob `e*`, never a MAC.
+
+Moving the VM onto its own Kube-OVN network (own subnet, fixed IP, LAN-reachable without a
+LoadBalancer) is proposed in [../NETWORK-KUBE-OVN.md](../NETWORK-KUBE-OVN.md).

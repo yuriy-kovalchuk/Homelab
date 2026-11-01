@@ -53,34 +53,25 @@ spec:
           # controller, i.e. the keyboard and mouse plugged into yojimbo itself
           # (README, Local input).
           #
-          # PCI addresses are pinned on purpose. KubeVirt otherwise places devices on
-          # root ports in spec order, so adding one shifts every later slot: the NIC
-          # changed name (enp1s0 -> enp3s0, netplan stopped matching it, VM lost its
-          # IP) and the card moved off the BusID the guest's xorg.conf uses (X died,
-          # dark monitor). Keep these in sync with the guest (README).
+          # PCI slots: KubeVirt has no address field for gpus/hostDevices (only
+          # interfaces/disks do), so QEMU places them on root ports in the order they
+          # appear here and adding a device shifts every later slot. That is what
+          # killed this VM once: the NIC moved (enp1s0 -> enp3s0, netplan stopped
+          # matching it, no IP) and the card moved off the BusID the guest's xorg.conf
+          # pinned (X died, dark monitor). The guest side therefore matches the NIC by
+          # MAC and X takes the only display device there is: the emulated one is off
+          # (autoattachGraphicsDevice), so no address is hardcoded anywhere and virtctl
+          # vnc is expected to fail. Keep the NIC's pciAddress and macAddress stable;
+          # the NIC name in the guest comes from that slot.
+          autoattachGraphicsDevice: false
           gpus:
             - name: gtx1070
               deviceName: nvidia.com/gtx1070
-              address:
-                type: pci
-                bus: "0x0b"
-                slot: "0x00"
-                function: "0x0"
           hostDevices:
             - name: gtx1070-audio
               deviceName: nvidia.com/gtx1070-audio
-              address:
-                type: pci
-                bus: "0x0a"
-                slot: "0x00"
-                function: "0x0"
             - name: usb-controller
               deviceName: intel.com/xhci
-              address:
-                type: pci
-                bus: "0x09"
-                slot: "0x00"
-                function: "0x0"
           disks:
             - name: rootdisk
               disk:
@@ -95,14 +86,12 @@ spec:
           interfaces:
             - name: default
               bridge: {}
-              # Pinned with the PCI address below: the guest names the NIC after the
-              # slot, and cloud-init's networkData matches it by MAC.
-              macAddress: "5e:6f:a2:06:3d:7b"
-              address:
-                type: pci
-                bus: "0x01"
-                slot: "0x00"
-                function: "0x0"
+              # Pinned PCI address only: it keeps the guest's NIC slot (and therefore
+              # its name) stable when devices are added. Do NOT pin macAddress here -
+              # with the pod-network bridge binding Cilium keys its KubeVirt datapath
+              # off the pod's MAC and a forced VM MAC desynchronizes it, which drops
+              # every frame at the k6t bridge (cilium/cilium#21347).
+              pciAddress: "0000:01:00.0"
       networks:
         - name: default
           pod: {}
@@ -112,16 +101,18 @@ spec:
             name: ubuntu-test-disk
         - name: cloudinit
           cloudInitNoCloud:
-            # Match by MAC, not by slot-derived name, so the VM keeps its network
-            # even if a device ever moves (the guest's own file is 50-cloud-init.yaml).
+            # Matched by name glob, never by MAC or exact slot name: the MAC is
+            # re-randomized on every start (see interfaces[] above) and the name follows
+            # the PCI slot, so a MAC or exact-name match leaves the link unmanaged and
+            # the VM without SSH/RDP. cloud-init only writes this file on first boot, so
+            # the same content is already in the image at /etc/netplan/50-cloud-init.yaml.
             networkData: |
               network:
                 version: 2
                 ethernets:
-                  vm-nic:
+                  primary:
                     match:
-                      macaddress: 5e:6f:a2:06:3d:7b
-                    set-name: eth0
+                      name: "e*"
                     dhcp4: true
             secretRef:
               name: ubuntu-test-cloudinit
