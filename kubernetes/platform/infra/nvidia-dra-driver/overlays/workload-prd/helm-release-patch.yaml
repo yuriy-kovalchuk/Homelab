@@ -5,7 +5,9 @@ metadata:
   namespace: nvidia-dra-driver
 spec:
   values:
-    # Creates the DeviceClass `gpu.nvidia.com` (plus mig/vfio ones, unused).
+    # Creates the DeviceClasses `gpu.nvidia.com` (containers) and
+    # `vfio.gpu.nvidia.com` (KubeVirt passthrough, see kubernetes/vms/ubuntu-test),
+    # plus a mig one, unused.
     #
     # Talos ships the driver and container toolkit as system extensions
     # (nonfree-kmod-nvidia-lts, nvidia-container-toolkit-lts) under /usr/local,
@@ -19,6 +21,21 @@ spec:
     resources:
       computeDomains:
         enabled: false
+    # VFIO passthrough for KubeVirt (alpha gates). With them the card is
+    # advertised twice in yojimbo's ResourceSlice, as gpu-0 (type gpu) and
+    # gpu-vfio-0 (type vfio): same hardware, so a container and a VM claim can
+    # both be allocated and the second prepare fails. Run one at a time. The
+    # driver binds the card to vfio-pci while a VM claim is prepared and gives
+    # it back to the nvidia driver when the claim goes away.
+    # DeviceMetadata publishes the pciBusID file virt-launcher builds the
+    # libvirt hostdev from; it needs PassthroughSupport. Both need the plugin
+    # to mount host /, /proc and /lib/modules (covered by the PolicyException's
+    # disallow-host-path).
+    # VM prepare does not work on Talos yet (no fuser, persistenced not
+    # detected): see ../../VFIO-TALOS-ISSUES.md for the upstream PRs to track.
+    featureGates:
+      PassthroughSupport: true
+      DeviceMetadata: true
     kubeletPlugin:
       # The chart's default affinity looks for pci-10de.present, but NFD's
       # default labels are class_vendor (pci-0300_10de.present), so it would

@@ -1,5 +1,5 @@
 # SSH straight to the VM on the same LoadBalancer IP as RDP (10.0.4.51, shared
-# through the lbipam sharing-key), advertised over BGP by bahamut only; no
+# through the lbipam sharing-key), advertised over BGP by yojimbo only; no
 # kube-apiserver / virtctl in the path. externalTrafficPolicy Local keeps the
 # client address for the ingress policy.
 apiVersion: v1

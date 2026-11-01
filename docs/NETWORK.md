@@ -316,7 +316,7 @@ installs them as routes to the node holding each service.
 - **Non-HTTP services** get their own LoadBalancer IP from the pool instead of
   the Gateway, plus a CiliumNetworkPolicy limiting the clients. Today: RDP and SSH to
   the `ubuntu-test` VM on `10.0.4.51` (3389, 22; two Services sharing the IP) (`externalTrafficPolicy: Local`, so
-  only bahamut advertises it), from trusted and the Tailscale VM only.
+  only yojimbo advertises it), from trusted and the Tailscale VM only.
 - **Public:** `cloudflared` runs a Cloudflare Tunnel from the cluster. Nothing
   needs to be port-forwarded for it.
 

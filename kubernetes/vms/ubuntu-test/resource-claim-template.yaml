@@ -1,0 +1,38 @@
+# NOT APPLIED (not in kustomization.yaml) while gpu-mode.sh switches the
+# card by hand. Re-add it, and the claim in vm.yaml, once the DRA driver
+# can prepare VFIO claims on Talos (nvidia-dra-driver/VFIO-TALOS-ISSUES.md).
+#
+# The GTX 1070 on yojimbo as a VFIO device (DeviceClass vfio.gpu.nvidia.com,
+# NVIDIA DRA driver with PassthroughSupport + DeviceMetadata). While the VM's
+# claim is prepared the driver binds 01:00.0 to vfio-pci; when the VM stops
+# the claim goes away and the card returns to the nvidia driver for containers
+# (llama-cpp-cuda). The card is advertised twice (gpu-0 and gpu-vfio-0), so
+# scale llama-cpp-cuda to 0 before starting the VM.
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: gtx1070-vfio
+  namespace: kubevirt-ubuntu-test
+spec:
+  spec:
+    devices:
+      requests:
+        - name: gpu
+          exactly:
+            allocationMode: ExactCount
+            count: 1
+            deviceClassName: vfio.gpu.nvidia.com
+      config:
+        - requests:
+            - gpu
+          opaque:
+            driver: gpu.nvidia.com
+            parameters:
+              apiVersion: resource.nvidia.com/v1beta1
+              kind: VfioDeviceConfig
+              iommu:
+                # KubeVirt needs the legacy /dev/vfio/<group> backend (and the
+                # Talos kernel has no IOMMUFD anyway) plus /dev/vfio/vfio.
+                # enableAPIDevice defaults to true only from driver 0.6.0.
+                backendPolicy: LegacyOnly
+                enableAPIDevice: true

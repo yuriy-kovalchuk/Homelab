@@ -153,6 +153,7 @@ Chart versions as deployed.
 | KubeVirt + CDI | — | Virtual machines and disk import |
 | metrics-server | 3.14.0 | Resource metrics for VPA/HPA |
 | k8s-gpu-dra-driver | v1.0.1 | AMD GPUs as DRA devices (`gpu.amd.com`) |
+| dra-driver-nvidia-gpu | 0.5.1 | NVIDIA GPU as DRA devices: `gpu.nvidia.com` (containers) and `vfio.gpu.nvidia.com` (KubeVirt passthrough) |
 
 **platform-ops**
 

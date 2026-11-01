@@ -28,6 +28,26 @@ spec:
         - pciVendorSelector: "1002:1640"
           resourceName: "amd.com/780m-audio"
           externalResourceProvider: false
+        # yojimbo's GTX 1070 and its HDMI audio (same IOMMU group). virt-handler
+        # only offers them while they are bound to vfio-pci, i.e. after
+        # kubernetes/vms/ubuntu-test/gpu-mode.sh vfio (boot default is nvidia).
+        # The DRA path (vfio.gpu.nvidia.com) is blocked on Talos, see
+        # platform/infra/nvidia-dra-driver/VFIO-TALOS-ISSUES.md.
+        - pciVendorSelector: "10DE:1B81"
+          resourceName: "nvidia.com/gtx1070"
+          externalResourceProvider: false
+        - pciVendorSelector: "10DE:10F0"
+          resourceName: "nvidia.com/gtx1070-audio"
+          externalResourceProvider: false
+        # yojimbo's PCH xHCI: handing over the whole controller is the only way a
+        # VM can use a keyboard/mouse plugged into the machine (KubeVirt passes PCI
+        # devices, not individual USB devices). Alone in IOMMU group 3. Boot driver
+        # is xhci_pci; gpu-mode.sh vfio moves it to vfio-pci together with the card.
+        # valefor (i7-7700K, same PCH) has this exact device ID, so virt-handler
+        # offers it there too: any VM using it must pin itself by hostname.
+        - pciVendorSelector: "8086:A12F"
+          resourceName: "intel.com/xhci"
+          externalResourceProvider: false
   imagePullPolicy: IfNotPresent
   # virt-handler (the per-node agent) must also run on bahamut, or that node
   # offers no KVM device and no VM can be scheduled there.

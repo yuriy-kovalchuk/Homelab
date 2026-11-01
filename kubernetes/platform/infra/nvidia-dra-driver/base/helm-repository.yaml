@@ -1,8 +1,11 @@
+# The NGC chart (helm.ngc.nvidia.com/nvidia, nvidia-dra-driver-gpu) stopped at
+# 25.12.0; the driver now lives in kubernetes-sigs and ships its chart as OCI.
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
-  name: nvidia
+  name: dra-driver-nvidia
   namespace: flux-system
 spec:
+  type: oci
   interval: 1h
-  url: https://helm.ngc.nvidia.com/nvidia
+  url: oci://registry.k8s.io/dra-driver-nvidia/charts

@@ -24,10 +24,14 @@ spec:
       labels:
         kubevirt.io/vm: ubuntu-test
     spec:
-      # Runs on bahamut only (it tolerates the GPU taint). bahamut is not always
-      # on: with runStrategy Manual the VM simply does not start while it is off.
+      # Runs on yojimbo with its GTX 1070 passed through (it tolerates the GPU
+      # taint). yojimbo is not always on: with
+      # runStrategy Manual the VM simply does not start while it is off. The
+      # disk is local to yojimbo: its Longhorn volume was pinned live to the
+      # `vms` node/disk tags with 1 replica (like longhorn-vms); the PVC still
+      # says `longhorn`, the class it was created with.
       nodeSelector:
-        kubernetes.io/hostname: bahamut
+        kubernetes.io/hostname: yojimbo
       tolerations:
         - key: workload
           operator: Equal
@@ -41,6 +45,42 @@ spec:
         memory:
           guest: 8Gi
         devices:
+          # KubeVirt permittedHostDevices: only offered while gpu-mode.sh has bound
+          # them to vfio-pci (README, GPU passthrough); otherwise the VM stays
+          # Pending. The DRA claim (resource-claim-template.yaml, not applied) would
+          # replace the card/audio entries once the driver works on Talos
+          # (nvidia-dra-driver/VFIO-TALOS-ISSUES.md). xhci is the node's whole USB
+          # controller, i.e. the keyboard and mouse plugged into yojimbo itself
+          # (README, Local input).
+          #
+          # PCI addresses are pinned on purpose. KubeVirt otherwise places devices on
+          # root ports in spec order, so adding one shifts every later slot: the NIC
+          # changed name (enp1s0 -> enp3s0, netplan stopped matching it, VM lost its
+          # IP) and the card moved off the BusID the guest's xorg.conf uses (X died,
+          # dark monitor). Keep these in sync with the guest (README).
+          gpus:
+            - name: gtx1070
+              deviceName: nvidia.com/gtx1070
+              address:
+                type: pci
+                bus: "0x0b"
+                slot: "0x00"
+                function: "0x0"
+          hostDevices:
+            - name: gtx1070-audio
+              deviceName: nvidia.com/gtx1070-audio
+              address:
+                type: pci
+                bus: "0x0a"
+                slot: "0x00"
+                function: "0x0"
+            - name: usb-controller
+              deviceName: intel.com/xhci
+              address:
+                type: pci
+                bus: "0x09"
+                slot: "0x00"
+                function: "0x0"
           disks:
             - name: rootdisk
               disk:
@@ -55,6 +95,14 @@ spec:
           interfaces:
             - name: default
               bridge: {}
+              # Pinned with the PCI address below: the guest names the NIC after the
+              # slot, and cloud-init's networkData matches it by MAC.
+              macAddress: "5e:6f:a2:06:3d:7b"
+              address:
+                type: pci
+                bus: "0x01"
+                slot: "0x00"
+                function: "0x0"
       networks:
         - name: default
           pod: {}
@@ -64,11 +112,16 @@ spec:
             name: ubuntu-test-disk
         - name: cloudinit
           cloudInitNoCloud:
+            # Match by MAC, not by slot-derived name, so the VM keeps its network
+            # even if a device ever moves (the guest's own file is 50-cloud-init.yaml).
             networkData: |
               network:
                 version: 2
                 ethernets:
-                  enp1s0:
+                  vm-nic:
+                    match:
+                      macaddress: 5e:6f:a2:06:3d:7b
+                    set-name: eth0
                     dhcp4: true
             secretRef:
               name: ubuntu-test-cloudinit

@@ -53,7 +53,7 @@ GPUs (claimed through Kubernetes DRA by PCI device ID):
 | bahamut | AMD Radeon AI PRO R9700 (Navi 48, gfx1201), on OCuLink | `0x7551` | llama-cpp, llama-cpp-rocm, strata |
 | bahamut | Radeon 780M iGPU (HawkPoint, gfx1103) | `0x1900` | sd-server |
 | ixion | Radeon 680M iGPU (Rembrandt, gfx1035) | `0x1681` | Immich (server + machine learning) |
-| yojimbo | NVIDIA GeForce GTX 1070 (Pascal GP104), HDMI audio `0x10f0` | `0x1b81` | llama-cpp-cuda (NVIDIA DRA driver); VMs via VFIO passthrough planned |
+| yojimbo | NVIDIA GeForce GTX 1070 (Pascal GP104), HDMI audio `0x10f0` | `0x1b81` | llama-cpp-cuda (DRA `gpu.nvidia.com`, boot default) or the ubuntu-test VM (KubeVirt `nvidia.com/gtx1070` after `kubernetes/vms/ubuntu-test/gpu-mode.sh vfio`), one at a time. Dynamic switching via DRA blocked, see `kubernetes/platform/infra/nvidia-dra-driver/VFIO-TALOS-ISSUES.md` |
 
 Talos image schematics (factory.talos.dev):
 
@@ -113,7 +113,7 @@ DHCP pool.
 | 10.0.4.12 | bahamut | 38:05:25:32:8e:dc | Worker; not always powered on. Static IP in its Talos config as well |
 | 10.0.4.13 | yojimbo | 10:05:01:43:06:f7 | Worker, GTX 1070 for VMs. Kea reservation and static IP in its Talos config |
 | 10.0.4.50 | `internal` Gateway | — | Cilium Gateway for every HTTPS hostname |
-| 10.0.4.51 | `ubuntu-test-rdp` / `ubuntu-test-ssh` | — | RDP (TCP 3389) and SSH (TCP 22) to the ubuntu-test VM on bahamut (shared LB IP); trusted VLAN and Tailscale only |
+| 10.0.4.51 | `ubuntu-test-rdp` / `ubuntu-test-ssh` | — | RDP (TCP 3389) and SSH (TCP 22) to the ubuntu-test VM on yojimbo (shared LB IP); trusted VLAN and Tailscale only |
 | 10.0.4.50–99 | Cilium LB pool | | Advertised over BGP (ASN 65002) |
 | 10.0.4.100–200 | DHCP pool | | |
 

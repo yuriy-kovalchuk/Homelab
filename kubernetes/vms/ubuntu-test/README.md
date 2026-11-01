@@ -1,11 +1,11 @@
 # ubuntu-test VM
 
-Ubuntu 24.04 (Noble) test VM running on KubeVirt in the `kubevirt-ubuntu-test` namespace on `bahamut`.
+Ubuntu 24.04 (Noble) test VM running on KubeVirt in the `kubevirt-ubuntu-test` namespace on `yojimbo`, with its GTX 1070 passed through on demand (see GPU passthrough).
 
 ## Specs
 
 - 4 vCPU, 8 GB RAM
-- 50 GB Longhorn PVC (RWO — no live migration)
+- 50 GB Longhorn PVC (RWO — no live migration), one replica on yojimbo's `vms` disk (volume `nodeSelector`/`diskSelector: [vms]`, set on the Longhorn volume, not in Git). Unavailable while yojimbo is off, which is also when the VM can't run.
 - Networking: KubeVirt bridge mode (VM shares pod IP, no iptables/passt required)
 - Desktop: XFCE4 + LightDM
 - Remote desktop: xrdp on `10.0.4.51:3389`; SSH on `10.0.4.51:22` (see Access)
@@ -14,6 +14,92 @@ Ubuntu 24.04 (Noble) test VM running on KubeVirt in the `kubevirt-ubuntu-test` n
 `kubernetes/clusters/workload-prd/flux-system/vms.yaml`): changes here are applied from the
 terminal (`kubectl apply --server-side -f …`). Keep the files in sync with what you apply, and set
 `suspend: false` to hand it back to Flux.
+
+## GPU passthrough (GTX 1070)
+
+The card (`10de:1b81`, `01:00.0`) and its HDMI audio (`10de:10f0`, `01:00.1`, same IOMMU group)
+belong either to containers or to this VM, switched at runtime with [`gpu-mode.sh`](gpu-mode.sh).
+yojimbo's Talos config is unchanged: it boots with the card on `nvidia`, so a reboot also gives it
+back to containers.
+
+| Mode | Driver | Offered as | Used by |
+|---|---|---|---|
+| `nvidia` (boot default) | `nvidia` | DRA `gpu.nvidia.com` (`gpu-0`) | llama-cpp-cuda |
+| `vfio` | `vfio-pci` | KubeVirt `nvidia.com/gtx1070` + `nvidia.com/gtx1070-audio` (`permittedHostDevices` in `platform/infra/kubevirt/base/cr.yaml`) | this VM (`vm.yaml` `gpus` / `hostDevices`) |
+
+```bash
+# to the VM
+kubectl -n llm scale deploy llama-cpp-cuda --replicas=0
+kubernetes/vms/ubuntu-test/gpu-mode.sh vfio      # refuses while anything claims the card
+virtctl --kubeconfig ~/.kube/workload start ubuntu-test -n kubevirt-ubuntu-test
+
+# back to containers
+virtctl --kubeconfig ~/.kube/workload stop ubuntu-test -n kubevirt-ubuntu-test
+kubernetes/vms/ubuntu-test/gpu-mode.sh nvidia    # refuses while the VM runs
+kubectl -n llm scale deploy llama-cpp-cuda --replicas=1
+
+kubernetes/vms/ubuntu-test/gpu-mode.sh status    # which driver holds each function
+```
+
+The script does the rebind from a short-lived privileged busybox pod on yojimbo in
+`nvidia-dra-driver` (privileged Pod Security level and a PolicyException there). It stops the Talos
+`ext-nvidia-persistenced` service first (it holds `/dev/nvidia0` open, and the unbind from `nvidia`
+would hang on it), sets `driver_override`, unbinds and binds, then restarts virt-handler and the DRA
+kubelet plugin on yojimbo so both re-scan the card. `nvidia` mode starts persistenced again. If the
+unbind times out (30 s), something still holds the card.
+
+It talks to yojimbo's Talos API too: `TALOSCONFIG` defaults to `~/.talos/config-prod`, endpoint
+`10.0.4.5` and node `10.0.4.13` (override with `TALOS_ENDPOINT` / `TALOS_NODE_IP`).
+
+Starting the VM while the card is in `nvidia` mode leaves it Pending (`Insufficient
+nvidia.com/gtx1070`). That is harmless; switch modes and it schedules.
+
+Why not DRA: the dynamic `vfio.gpu.nvidia.com` claim (`resource-claim-template.yaml`, not applied)
+would do this switch automatically, but driver 0.5.1 can't prepare it on Talos. See
+[`platform/infra/nvidia-dra-driver/VFIO-TALOS-ISSUES.md`](../../platform/infra/nvidia-dra-driver/VFIO-TALOS-ISSUES.md).
+Once that is fixed, re-add the claim and drop `gpu-mode.sh`.
+
+### In the guest
+
+`lspci -nn -d 10de:` shows `10de:1b81` and `10de:10f0`. Install the 580 driver (the last branch
+with Pascal) and check it:
+
+```bash
+sudo apt install -y nvidia-driver-580-server nvidia-utils-580-server   # pulls nvidia-dkms + dkms
+sudo reboot
+nvidia-smi
+```
+
+### Local display on the 1070
+
+Left alone, X auto-configures onto QEMU's emulated VGA (`1234:1111`) and the monitor plugged into
+the card stays dark; vfio gives no option ROM, so there is no POST picture either. Pin X to the GPU
+with `/etc/X11/xorg.conf.d/10-nvidia.conf` in the guest:
+
+```xorg
+Section "ServerFlags"
+    Option "AutoAddGPU" "false"
+EndSection
+
+Section "Device"
+    Identifier "GP104"
+    Driver     "nvidia"
+    BusID      "PCI:11:0:0"
+EndSection
+
+Section "Screen"
+    Identifier "scr"
+    Device     "GP104"
+EndSection
+```
+
+`PCI:11:0:0` is the guest slot QEMU gave the card (`lspci` shows `0b:00.0`) — not the host's
+`01:00.0`, so re-check it if the VM's PCI topology changes. The monitor is on the card's HDMI out
+(`HDMI-0`). `xrandr` on `:0` (as root, `XAUTHORITY=/var/run/lightdm/root/:0`) is the check.
+After this, `virtctl vnc` shows nothing (the emulated VGA is idle); RDP on `10.0.4.51:3389` runs its
+own X on `:10` and is unaffected.
+
+A drain or Talos upgrade of yojimbo stops the VM hard (no live migration with a passthrough device).
 
 ## First boot setup
 
@@ -45,7 +131,7 @@ kill $(lsof -ti:5901)
 ### Option 2 — RDP on its own LoadBalancer IP (recommended)
 
 `rdp-service.yaml` exposes TCP 3389 of the VM on **`10.0.4.51`** (Cilium LB pool, advertised over BGP
-by bahamut only, `externalTrafficPolicy: Local`, no NodePort). Nothing goes through the kube-apiserver.
+by yojimbo only, `externalTrafficPolicy: Local`, no NodePort). Nothing goes through the kube-apiserver.
 The `ubuntu-test-remote-ingress` CiliumNetworkPolicy (`kubernetes/network-policies/base/vms-ubuntu-test.yaml`)
 allows it only from the trusted VLAN (`10.0.5.0/24`) and the Tailscale subnet router (`10.0.6.10`).
 
