@@ -1,4 +1,4 @@
-# VM networks with Multus + Kube-OVN (proposal — stage 1 written)
+# VM networks with Multus + Kube-OVN (stage 1 live, stage 2 written)
 
 Design record for giving VMs their own virtual networks instead of sharing the Cilium
 pod network. Not applied yet: `ubuntu-test` still runs on `bridge: {}` + `pod: {}`,
@@ -195,9 +195,17 @@ traffic and everything else in the cluster.
   unless it asks for a NAD. Hostnetwork, so no CiliumNetworkPolicy applies to it.
   **Prerequisite:** Cilium `cni.exclusive: false` (Terraform `clusters/workload-prd/terraform/cni`),
   applied before the DaemonSet lands.
-- `kubernetes/platform/infra/kube-ovn/`: `base/` HelmRepository + HelmRelease,
-  `overlays/workload-prd/helm-release-patch.yaml`, registered in
-  `platform/infra/overlays/workload-prd/kustomization.yaml`.
+- `kubernetes/platform/infra/kube-ovn/`: official `kube-ovn-v2` chart (OCI,
+  `OCIRepository` in `flux-system`), v1.16.17, `cni.nonPrimaryCNI: true`. Base holds the
+  behaviour (Talos paths, `disableModulesManagement`, join CIDR `172.31.255.0/24`
+  instead of Tailscale's `100.64/10`, OVN LB and NetworkPolicy off); the overlay holds
+  placement (yojimbo; `kube-ovn-cni` pinned and `kube-ovn-pinger` removed through
+  `postRenderers`, the chart has no values for either). `disableWait` on install/upgrade
+  so a powered-off worker never blocks `platform-infra` (`wait: true`).
+- CNI file ordering: the agent always writes a conflist, even non-primary. It is
+  `90-kube-ovn.conflist` (after `05-cilium`) and Multus is pinned with
+  `multusMasterCNI: 05-cilium.conflist`; either alone stops Kube-OVN from becoming the
+  primary network after a Multus restart.
 - kube-ovn CRDs ship from the chart → `Vpc`/`Subnet`/NAD instances go in a **later**
   Kustomization with `dependsOn` (CRD-through-Helm cold-start rule).
 - vnets are data, not infra: keep `vms/<name>/network.yaml` (NAD) + a `vnet` layer of
@@ -207,14 +215,18 @@ traffic and everything else in the cluster.
 
 ## Staged plan (each step reversible)
 
-1. *(written, not applied)* Cilium `cni.exclusive: false`, then Multus on yojimbo →
+1. *(done 2026-11-01)* Cilium `cni.exclusive: false`, then Multus on yojimbo →
    verify `00-multus.conf` exists and no `*.cilium_bak`, a fresh pod on yojimbo still
    gets `10.244.x` + DNS, an existing policy still enforces, `ubuntu-test` still has
    network after a restart. Highest-risk step; revert = delete the DaemonSet, set
    `cni.exclusive: true` again and restart the yojimbo agent (moves `00-multus.conf` aside).
-2. kube-ovn non-primary mode, overlay, `ovs-ovn` limited to VM-capable nodes if the
-   chart allows → verify Cilium untouched, no `ovn-default` subnet stealing pod
-   allocation, kube-ovn pods healthy. Revert = delete the HelmRelease.
+2. *(written, not applied)* kube-ovn non-primary on yojimbo → verify: pods healthy;
+   `/etc/cni/net.d` = `00-multus.conf`, `05-cilium.conflist`, `90-kube-ovn.conflist`,
+   and `00-multus.conf` still delegates to Cilium; `cilium-dbg status` devices still
+   `enp4s0 siderolink` (no `ovn0`); a fresh pod on yojimbo still gets only `eth0`
+   `10.244.x`; ubuntu-test still boots with network. Revert = delete the HelmRelease
+   (its post-delete hook cleans OVN state). `90-kube-ovn.conflist` stays behind as a
+   dead file; harmless, because Multus is pinned to Cilium.
 3. One test vnet + NAD + a throwaway cirros VM on a **second** NIC → verify fixed IP/MAC
    survives restart, `private: true` really blocks, `allowSubnets` opens exactly one
    pair, NetworkPolicy behaviour on the VM port, and what DNS the guest receives.
@@ -232,9 +244,7 @@ traffic and everything else in the cluster.
    `vpc-dns`).
 4. Desktop access: (a) only, or (a)+(b) with a per-vnet Tailscale subnet router, or (c)
    through the Gateway.
-5. Chart: v1 (`cni_conf.NON_PRIMARY_CNI`) is what the non-primary and Talos docs show;
-   v2 is upstream-recommended with different keys. Pin one and verify values before
-   merging — Flux reverts a hand-tuned release.
+5. ~~Chart v1 vs v2~~ — decided: v2 (`cni.nonPrimaryCNI`), rendered and checked.
 6. ~~Where kube-ovn's `ovs-ovn` runs~~ — decided: same node set as Multus, i.e. the
    workers only (yojimbo first, then bahamut), never the control planes.
 7. Availability is unchanged: the GPU pins the VM to yojimbo, so one VM per vnet stays a

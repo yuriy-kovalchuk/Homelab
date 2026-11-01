@@ -1,0 +1,14 @@
+# Official Kube-OVN chart, v2 flavour (upstream's long-term chart), published
+# only as OCI. A HelmRepository (type oci) on purpose, not an OCIRepository +
+# chartRef: with chartRef Flux sets the chart version to <version>+<digest>,
+# and the chart's pre-upgrade hook Job carries that version in a label, where
+# '+' is invalid. The first upgrade then fails and stalls platform-infra.
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: kube-ovn
+  namespace: flux-system
+spec:
+  type: oci
+  interval: 1h
+  url: oci://ghcr.io/kubeovn/charts

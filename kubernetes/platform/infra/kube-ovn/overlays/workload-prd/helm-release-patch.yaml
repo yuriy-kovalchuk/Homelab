@@ -1,0 +1,94 @@
+# Placement: workers only, never the control planes. First rollout is yojimbo
+# alone (same node set as Multus); target is every worker. To add a worker,
+# extend each hostname list below. ovn-central/monitor stay on ONE node: the
+# OVN databases are Raft clusters and need 1 or 3 members, never 2.
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kube-ovn
+  namespace: kube-system
+spec:
+  values:
+    # Node IPs running ovn-central (OVN NB/SB databases + northd). Explicit, so
+    # the chart does not have to discover them with a Helm lookup.
+    masterNodes:
+      - 10.0.4.13
+    # Node affinity (OR-ed terms) of ovn-central and kube-ovn-monitor, and the
+    # nodeSelector (AND) of ovn-central. Helm merges in the chart default
+    # kube-ovn/role=master, which no node carries: harmless in the affinity,
+    # but in the nodeSelector it matches nothing, so the post-renderer below
+    # removes that key.
+    masterNodesLabels:
+      kubernetes.io/hostname: yojimbo
+
+    controller:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                  - yojimbo
+
+    ovsOvn:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - yojimbo
+
+  postRenderers:
+    - kustomize:
+        patches:
+          # The agent (kube-ovn-cni) has no placement value in the chart and
+          # would land on every node, control planes included.
+          - target:
+              kind: DaemonSet
+              name: kube-ovn-cni
+            patch: |
+              apiVersion: apps/v1
+              kind: DaemonSet
+              metadata:
+                name: kube-ovn-cni
+              spec:
+                template:
+                  spec:
+                    affinity:
+                      nodeAffinity:
+                        requiredDuringSchedulingIgnoredDuringExecution:
+                          nodeSelectorTerms:
+                            - matchExpressions:
+                                - key: kubernetes.io/hostname
+                                  operator: In
+                                  values:
+                                    - yojimbo
+          # See masterNodesLabels above: drop the default label nobody has
+          # from the nodeSelector, leaving kubernetes.io/hostname=yojimbo.
+          - target:
+              kind: Deployment
+              name: ovn-central
+            patch: |
+              - op: remove
+                path: /spec/template/spec/nodeSelector/kube-ovn~1role
+          # kube-ovn-pinger only probes connectivity (pings 1.1.1.1, resolves an
+          # external name, pings every node) for metrics. The chart cannot turn
+          # it off; it would be the only Kube-OVN pod on the Cilium pod network
+          # and need its own egress policy. Dropped.
+          - patch: |
+              $patch: delete
+              apiVersion: apps/v1
+              kind: DaemonSet
+              metadata:
+                name: kube-ovn-pinger
+                namespace: kube-system
+          - patch: |
+              $patch: delete
+              apiVersion: v1
+              kind: Service
+              metadata:
+                name: kube-ovn-pinger
+                namespace: kube-system

@@ -3,6 +3,12 @@
 # (05-cilium.conflist). Cilium therefore stays the primary network for every
 # pod on the node; nothing is attached beyond eth0 unless a pod or VM asks for
 # a NetworkAttachmentDefinition (no defaultNetworks, no clusterNetwork override).
+#
+# multusMasterCNI pins the primary to Cilium. Without it, Multus picks the
+# alphabetically first file at every daemon start, and Kube-OVN's agent drops
+# its own conflist into the same directory (90-kube-ovn.conflist here, but
+# 01-... by default): a restart could silently make Kube-OVN the primary
+# network of every new pod on the node. Read only at daemon start.
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -21,5 +27,6 @@ data:
         "cniConfigDir": "/host/etc/cni/net.d",
         "multusAutoconfigDir": "/host/etc/cni/net.d",
         "multusConfigFile": "auto",
+        "multusMasterCNI": "05-cilium.conflist",
         "socketDir": "/host/run/multus/"
     }

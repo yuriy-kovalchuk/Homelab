@@ -1,0 +1,86 @@
+# Kube-OVN as a *secondary* CNI: it never touches a pod's eth0 (Cilium keeps
+# that); it only builds the extra NICs that Multus asks for through a
+# NetworkAttachmentDefinition of type kube-ovn. Design and rationale:
+# kubernetes/vms/NETWORK-KUBE-OVN.md.
+#
+# The chart installs its CRDs (Vpc, Subnet, IP, ...). Instances of them live in
+# a later Flux layer, never in platform-infra (CRD cold-start rule).
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kube-ovn
+  namespace: kube-system
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: kube-ovn-v2
+      version: v1.16.17
+      sourceRef:
+        kind: HelmRepository
+        name: kube-ovn
+        namespace: flux-system
+  timeout: 10m
+  install:
+    crds: CreateReplace
+    # Everything runs on the workers only, and workers are not always on. With
+    # wait enabled, an install/upgrade while they are off would fail on Pending
+    # pods and, through platform-infra (wait: true), block every later layer.
+    disableWait: true
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+    disableWait: true
+    remediation:
+      retries: 3
+      remediateLastFailure: true
+  values:
+    cni:
+      # Do not allocate or own eth0; only serve NAD-requested interfaces.
+      nonPrimaryCNI: true
+      # The agent always drops a conflist into /etc/cni/net.d, even in
+      # non-primary mode. The default "01" sorts before 05-cilium.conflist, and
+      # Multus (auto mode, on restart) wraps the first file it finds: every new
+      # pod on the node would get Kube-OVN as its primary network. "90" keeps it
+      # behind Cilium; Multus is also pinned to Cilium (multusMasterCNI).
+      configPriority: "90"
+      # Would overwrite Talos' own loopback/portmap and add macvlan in
+      # /opt/cni/bin. Only the kube-ovn binary is needed.
+      installCNIPlugins: false
+      # Talos: /usr/local/bin is read-only; kubectl-ko stays inside the pod.
+      mountToolingDirectory: false
+
+    ovsOvn:
+      # Talos owns the kernel: openvswitch, geneve and vport_geneve are built
+      # in (talosctl get modules), so there is nothing to load or unload. With
+      # this set, the ovs-ovn init container skips `ovs-ctl load-kmod` and points
+      # modprobe/modinfo/rmmod (pod-local /usr/local/sbin) at /bin/true, so no
+      # OVS script ever tries to load or remove a kernel module on the node.
+      disableModulesManagement: true
+      # Talos: /etc is read-only; the chart defaults (/etc/origin/...) fail.
+      ovsDirectory: /var/lib/openvswitch
+      ovnDirectory: /var/lib/ovn
+      ovsIpsecKeysDirectory: /var/lib/ovs_ipsec_keys
+
+    networking:
+      # Node-to-OVN "join" network (ovn0 on every node). The default
+      # 100.64.0.0/16 sits inside Tailscale's 100.64.0.0/10.
+      join:
+        cidr:
+          v4: 172.31.255.0/24
+      # ovn-default (10.16.0.0/16) is still created in non-primary mode but no
+      # pod uses it; it overlaps nothing here (LAN 10.0.x, pods 10.244/16,
+      # services 10.96/12).
+
+    features:
+      # Services/LoadBalancers stay Cilium's; secondary networks are outside
+      # the Service datapath anyway. Saves the controller from mirroring every
+      # Service and Endpoint into OVN.
+      enableLoadbalancer: false
+      # Isolation of vnets uses Subnet private/allowSubnets/acls. Kubernetes
+      # NetworkPolicies stay with Cilium; with this on, Kube-OVN would also
+      # translate the cluster's existing NetworkPolicies into OVN ACLs.
+      enableNetworkPolicies: false
+      # Keeps a VM's IP/MAC across restarts (default, stated on purpose).
+      enableKeepVmIps: true
