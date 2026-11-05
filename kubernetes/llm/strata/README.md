@@ -115,5 +115,11 @@ image with the readers → one commit with the new image tag, `VISION` and the c
   the pod to serve, then `kubectl -n llm-strata set env deploy/strata REINSTALL-`.
   The Flash-Next config is seeded from `base/configmap-model-configs.yaml` on
   every start, so change its context there, in Git.
+- **Routing is kept exact on purpose.** `STRATA_ROUTE_TAIL_SKIP=0` and
+  `STRATA_ROUTE_PRIOR=0` (after `VISION` in the env list) turn off upstream's
+  speed-for-quality routing: the tail skip is on by default on gfx1201 whenever
+  some experts are not in VRAM. A model config's own `"env"` overrides the pod env,
+  so don't let one set them back. When bumping Strata, check the release notes for
+  new defaults that change routing.
 - **If the Deployment is ever recreated,** it starts from the Git defaults
   (Flash-Next IQ3_S); set the env again.

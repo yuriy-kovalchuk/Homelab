@@ -18,7 +18,7 @@ spec:
       containers:
         - name: llama-cpp
           # CUDA 12 build: CUDA 13 dropped Pascal (sm_61, the GTX 1070).
-          image: ghcr.io/ggml-org/llama.cpp:server-cuda12-b12019
+          image: ghcr.io/ggml-org/llama.cpp:server-cuda12-b12110
           # Router mode: every model on the volume (filled by the
           # llama-cpp-cuda-model-download Job) is loaded on demand, one at a time.
           args:
@@ -70,7 +70,7 @@ spec:
         # nvidia-smi and the driver libraries into every container that uses it.
         # It stops with the pod, so the GTX 1070 is only measured while this runs.
         - name: gpu-exporter
-          image: utkuozdemir/nvidia_gpu_exporter:1.15.1
+          image: utkuozdemir/nvidia_gpu_exporter:1.17.0
           ports:
             - name: gpu-metrics
               containerPort: 9835

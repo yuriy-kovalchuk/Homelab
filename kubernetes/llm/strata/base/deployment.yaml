@@ -52,15 +52,10 @@ spec:
               mountPath: /data
       containers:
         - name: strata
-          # Built by git.yuriykovalchuk.dev/yuriy/Strata CI (Strata 011c9e6 = v0.2.2,
-          # gfx1201, ROCm 7.2.4, repo c5f7b02) -- 1181 commits ahead of the previous
-          # pin (477ac13, v0.1.45). Engine-side gains that apply here with no config
-          # change: gfx12 WMMA prompt attention (0.2.0), GPU queues opened in a fixed
-          # order at start (0.2.1; ended the 8-14% slower-prefill coin flip with MTP),
-          # and the HIP first-verify-window spec-decode hang fix (0.2.2). The pinned
-          # configs in configmap-model-configs.yaml still parse on v0.2.2 (every arg
-          # and path checked), but they keep 0.1.x setup's choices -- regenerate one
-          # with STRATA_MODE=auto and no seeded file to pick up 0.2.x setup defaults.
+          # Built by git.yuriykovalchuk.dev/yuriy/Strata CI (Strata 4b9e05a = v0.2.6,
+          # gfx1201, ROCm 7.2.4, repo fef517b). The pinned configs in
+          # configmap-model-configs.yaml keep 0.1.x setup's choices -- regenerate one
+          # with STRATA_MODE=auto and no seeded file to pick up newer setup defaults.
           image: harbor.yuriykovalchuk.dev/homelab/strata:4b9e05a-gfx1201-rocm7.2.4-fef517b@sha256:a744cf9062dbeba54d63f9f3a0b6347c9cb6e4e2b6a50c46f5efadfc85679301
           env:
             # auto: if MODEL has no config yet, run Strata's setup first, then serve.
@@ -90,6 +85,21 @@ spec:
             # in its seeded config, so change it and the ConfigMap in the same commit.
             - name: VISION
               value: cpu
+            # Exact expert routing, no speed-for-quality trades (after VISION: the
+            # Flux ignore rule points at env[1] and env[3]). The engine inherits the
+            # pod env; a model config's own "env" would override it.
+            # Tail skip is ON by default on gfx1201 whenever some experts are not
+            # in VRAM (IQ3_S, Qwen3.6 Q8_0): a missed expert that every token of a
+            # verify window routes at rank 7 or lower is neither copied nor computed.
+            # Upstream measured teacher-forced KL 0.077 vs off (0.20 on agent text)
+            # for +6-15% decode.
+            - name: STRATA_ROUTE_TAIL_SKIP
+              value: "0"
+            # Residency-biased routing (router prefers experts already on the card).
+            # Off by default and CUDA-only today, but 0.2.7 once turned it on by
+            # itself; pinning 0 keeps a future default from flipping it back.
+            - name: STRATA_ROUTE_PRIOR
+              value: "0"
           ports:
             - name: http
               containerPort: 8080
