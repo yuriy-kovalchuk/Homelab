@@ -28,6 +28,16 @@ spec:
         - pciVendorSelector: "1002:1640"
           resourceName: "amd.com/780m-audio"
           externalResourceProvider: false
+        # bahamut's Radeon AI PRO R9700 and its HDMI/DP audio (each alone in its
+        # IOMMU group). virt-handler only offers them while they are bound to
+        # vfio-pci, i.e. after kubernetes/hypervisor/gpu-passthrough/r9700/gpu-mode.sh
+        # vfio (boot default is amdgpu, DRA gpu.amd.com for strata/llama-cpp).
+        - pciVendorSelector: "1002:7551"
+          resourceName: "amd.com/r9700"
+          externalResourceProvider: false
+        - pciVendorSelector: "1002:AB40"
+          resourceName: "amd.com/r9700-audio"
+          externalResourceProvider: false
         # yojimbo's GTX 1070 and its HDMI audio (same IOMMU group). virt-handler
         # only offers them while they are bound to vfio-pci, i.e. after
         # kubernetes/hypervisor/vms/ubuntu-test/gpu-mode.sh vfio (boot default is nvidia).
