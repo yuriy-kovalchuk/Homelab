@@ -1,0 +1,99 @@
+# SteamOS VM on bahamut (kubernetes/hypervisor/vms/steamos). Its NIC is the pod
+# network (KubeVirt masquerade), so the virt-launcher pod's Cilium identity is the
+# VM's: Steam needs the internet (login, updates, downloads, Remote Play relay).
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: virt-launcher-egress
+  namespace: kubevirt-steamos
+spec:
+  endpointSelector:
+    matchLabels:
+      kubevirt.io: virt-launcher
+  egress:
+    - toEntities:
+        - world
+    - toEntities:
+        - kube-apiserver
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
+---
+# CDI pods in this namespace: the blank game disk is written by an importer pod,
+# the installer image arrives through `virtctl image-upload` (cdi-uploadproxy in
+# namespace cdi -> the upload server pod here, 8443).
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: cdi-pods
+  namespace: kubevirt-steamos
+spec:
+  endpointSelector:
+    matchLabels:
+      app: containerized-data-importer
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: cdi
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
+  egress:
+    - toEntities:
+        - kube-apiserver
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
+---
+# Game streaming to the VM on its LoadBalancer IP 10.0.4.52 (steamos-streaming),
+# from the trusted VLAN and the Tailscale subnet router only. externalTrafficPolicy
+# Local keeps the client address, so these CIDRs match the real clients.
+# SSH: TCP 22. Sunshine (Moonlight): TCP 47984/47989/47990/48010, UDP 47998-48000.
+# Steam Remote Play: TCP 27036-27037, UDP 27031-27036.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: steamos-streaming-ingress
+  namespace: kubevirt-steamos
+spec:
+  endpointSelector:
+    matchLabels:
+      kubevirt.io/vm: steamos
+  ingress:
+    - fromCIDR:
+        - 10.0.5.0/24
+        - 10.0.6.10/32
+      toPorts:
+        - ports:
+            - port: "22"
+              protocol: TCP
+            - port: "47984"
+              protocol: TCP
+            - port: "47989"
+              protocol: TCP
+            - port: "47990"
+              protocol: TCP
+            - port: "48010"
+              protocol: TCP
+            - port: "47998"
+              endPort: 48000
+              protocol: UDP
+            - port: "27036"
+              endPort: 27037
+              protocol: TCP
+            - port: "27031"
+              endPort: 27036
+              protocol: UDP

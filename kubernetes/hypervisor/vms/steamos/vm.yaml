@@ -1,0 +1,137 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: steamos
+  namespace: kubevirt-steamos
+spec:
+  runStrategy: Manual
+  dataVolumeTemplates:
+    # The game disk: one replica on bahamut's own NVMe (longhorn-gpu, strict-local).
+    - metadata:
+        name: steamos-disk
+      spec:
+        source:
+          blank: {}
+        storage:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 150Gi
+          storageClassName: longhorn-gpu
+  template:
+    metadata:
+      labels:
+        kubevirt.io/vm: steamos
+    spec:
+      # bahamut only: the R9700 and the game disk are there. Not always on; with
+      # runStrategy Manual the VM simply does not start while it is off. The card
+      # must be in vfio mode first (kubernetes/hypervisor/gpu-passthrough/r9700),
+      # otherwise the VM stays Pending on amd.com/r9700.
+      nodeSelector:
+        kubernetes.io/hostname: bahamut
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
+      domain:
+        cpu:
+          cores: 6
+          sockets: 1
+          threads: 1
+          # No CPU hot-plug: KubeVirt reserves 4x the sockets by default (24
+          # vCPUs), which QEMU warns about on this 16-thread host.
+          maxSockets: 1
+          # games want the real CPU flags (AVX-512 on the Ryzen 7 255)
+          model: host-passthrough
+          features:
+            # Some games refuse to start in a VM. Clear the CPUID hypervisor bit
+            # (with kvm.hidden below and the SMBIOS strings in the KubeVirt CR).
+            - name: hypervisor
+              policy: disable
+            # Invariant TSC: KubeVirt's migratable=on hides it, leaving the guest
+            # on the slow acpi_pm clock (bad frame timing), and with the KVM
+            # signature hidden there is no kvm-clock either. The VM can't migrate
+            # anyway (passthrough devices), so nothing is lost.
+            - name: invtsc
+              policy: require
+        memory:
+          guest: 16Gi
+        # Reserve all 6 vCPUs in the scheduler. KubeVirt's default request is
+        # 0.1 CPU per vCPU (600m, QoS Burstable): fine while bahamut is idle, but
+        # under load (a forgejo-runner-talos build) the game then only gets a small
+        # guaranteed CPU share and stutters. No limit: it may still burst higher.
+        # Memory needs nothing here: KubeVirt requests guest memory + overhead.
+        resources:
+          requests:
+            cpu: "6"
+        firmware:
+          bootloader:
+            # SteamOS boots UEFI only; the R9700's 32 GiB BAR needs it too.
+            efi:
+              secureBoot: false
+        features:
+          smm:
+            enabled: false
+          # Hide the KVM CPUID signature (KVMKVMKVM) from anti-VM checks.
+          kvm:
+            hidden: true
+        devices:
+          # PCI slots: KubeVirt places gpus/hostDevices in list order (see
+          # vms/ubuntu-test/vm.yaml); append new devices at the end.
+          gpus:
+            - name: r9700
+              deviceName: amd.com/r9700
+          hostDevices:
+            - name: r9700-audio
+              deviceName: amd.com/r9700-audio
+            # bahamut's USB controller c7:00.3: the 8BitDo receiver and the
+            # MT7925 Bluetooth (gpu-passthrough/r9700/README.md)
+            - name: usb-controller
+              deviceName: amd.com/bahamut-xhci
+            # bahamut's MT7925 Wi-Fi: SteamOS's first-boot setup only accepts a
+            # Wi-Fi network. Its traffic leaves on the SSID's VLAN, outside Cilium.
+            - name: wifi
+              deviceName: mediatek.com/bahamut-wifi
+            # bahamut's USB controller c9:00.3: the hub with the keyboard and mouse.
+            - name: usb-input
+              deviceName: amd.com/bahamut-xhci-input
+          disks:
+            # Empty until SteamOS is installed: the firmware falls through to the
+            # installer. Afterwards it boots first.
+            - name: rootdisk
+              bootOrder: 1
+              disk:
+                bus: virtio
+            - name: installer
+              bootOrder: 2
+              disk:
+                bus: virtio
+          # No emulated display (and so no VNC tablet): SteamOS drives the
+          # R9700's outputs, and QEMU's bochs display would otherwise show up as a
+          # second connected monitor (Virtual-1) that Game Mode and games may pick.
+          # Access is the R9700's monitor, SSH and Sunshine. virtctl vnc fails.
+          #
+          # REINSTALL: the installer is driven over virtctl vnc, so swap these back:
+          # delete the autoattachGraphicsDevice line and uncomment the inputs block
+          # (the tablet keeps the VNC pointer aligned). Undo after the install.
+          autoattachGraphicsDevice: false
+          # inputs:
+          #   - name: tablet
+          #     type: tablet
+          #     bus: usb
+          interfaces:
+            - name: default
+              masquerade: {}
+              model: virtio
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - name: rootdisk
+          dataVolume:
+            name: steamos-disk
+        - name: installer
+          dataVolume:
+            name: steamos-installer

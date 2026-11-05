@@ -2,19 +2,27 @@
 # Switch bahamut's Radeon AI PRO R9700 between containers and KubeVirt VMs, at
 # runtime, without touching the Talos config or rebooting.
 #
-#   gpu-mode.sh vfio     card + HDMI audio -> vfio-pci (KubeVirt amd.com/r9700,
-#                        amd.com/r9700-audio, see hypervisor/kubevirt/base/cr.yaml)
+#   gpu-mode.sh vfio     card + HDMI audio + USB controller -> vfio-pci (KubeVirt
+#                        amd.com/r9700, amd.com/r9700-audio, amd.com/bahamut-xhci,
+#                        see hypervisor/kubevirt/base/cr.yaml)
 #   gpu-mode.sh amdgpu   card -> amdgpu (DRA gpu.amd.com: strata, llama-cpp,
-#                        llama-cpp-rocm), audio -> unbound (its boot state)
+#                        llama-cpp-rocm), audio -> unbound (its boot state),
+#                        USB controller -> xhci_hcd
 #   gpu-mode.sh status   which driver holds each function, who claims the card
 #
-# Boot default is amdgpu and bahamut does not load vfio-pci by itself, so a
-# reboot also returns the card to containers. Running a mode twice is safe:
+# Boot default is amdgpu (vfio_pci is only loaded, from bahamut's Omni patch
+# like yojimbo's, and binds nothing), so a reboot also returns the card to
+# containers. Running a mode twice is safe:
 # a rebind is skipped when the function is already where it belongs.
 #
 # Only the R9700 moves. The 780M (c7:00.0, sd-server) stays on amdgpu. The two
 # PCIe switch ports above the card (01:00.0, 02:00.0, AMD 1478/1479) stay on
 # pcieport. Card and audio are alone in their IOMMU groups (16, 17).
+#
+# The USB controller c7:00.3 (1022:15b9, alone in IOMMU group 24) goes with the
+# card, as yojimbo's xHCI does: its ports carry the 8BitDo receiver (2dc8:301c)
+# and the MT7925's Bluetooth (0e8d:7925, unused by the host), so the VM gets
+# both. Whatever else is plugged into its ports goes to the VM too.
 #
 # The rebind runs in a short-lived privileged pod on bahamut in kube-amd-gpu
 # (privileged Pod Security level and a PolicyException that already covers
@@ -28,9 +36,17 @@ NODE=bahamut
 POD_NS=kube-amd-gpu
 GPU=0000:03:00.0      # 1002:7551 Navi 48
 AUDIO=0000:03:00.1    # 1002:ab40 HDMI/DP audio, no host driver at boot
+# PCIe switch ports above the card (inside the R9700, behind OCuLink).
+PORTS="0000:01:00.0 0000:02:00.0"
+USB_INPUT=0000:c9:00.3 # 1022:15c0 xHCI: USB hub with the Razer keyboard + mouse
+WIFI=0000:05:00.0     # 14c3:7925 MT7925 Wi-Fi, no host driver at boot (bahamut is wired)
+USB=0000:c7:00.3      # 1022:15b9 xHCI: 8BitDo receiver + MT7925 Bluetooth
 DEVICE_ID=0x7551      # DRA attribute deviceID (sysfs PCI device ID)
 RES=amd.com/r9700     # KubeVirt resource names (permittedHostDevices)
 RES_AUDIO=amd.com/r9700-audio
+RES_USB=amd.com/bahamut-xhci
+RES_WIFI=mediatek.com/bahamut-wifi
+RES_USB_INPUT=amd.com/bahamut-xhci-input
 POD="gpu-mode-$$"
 k() { kubectl --context "$CTX" "$@"; }
 
@@ -89,7 +105,7 @@ drv() { # current driver of a PCI function, 'none' when unbound
   link=\$(readlink /sys/bus/pci/devices/\$1/driver 2>/dev/null) || { echo none; return; }
   basename "\$link"
 }
-show() { echo "$GPU: \$(drv $GPU)   $AUDIO: \$(drv $AUDIO)"; }
+show() { echo "$GPU: \$(drv $GPU) (\$(cat /sys/bus/pci/devices/$GPU/power_state), reset: \$(cat /sys/bus/pci/devices/$GPU/reset_method))   $AUDIO: \$(drv $AUDIO)   $USB: \$(drv $USB)   $WIFI: \$(drv $WIFI)   $USB_INPUT: \$(drv $USB_INPUT)"; }
 # Processes on the node holding this card's DRM nodes (card*/renderD*). /dev/kfd
 # is shared with the 780M, so it can't tell the two apart and is not checked.
 holders() {
@@ -104,6 +120,19 @@ holders() {
       fi
     done
   done | sort -u
+}
+# Keep the card awake. vfio-pci lets an idle device runtime-suspend, and the R9700
+# then drops to D3cold behind its switch and never answers again (2026-11-05: config
+# space all ff, 'Unable to change power state from D3cold to D0', QEMU hung on the
+# FLR). 'on' resumes a suspended device and keeps it from suspending; disable_idle_d3
+# stops vfio putting idle devices into D3 at all (also set in bahamut's Omni patch).
+wake() {
+  echo Y > /sys/module/vfio_pci/parameters/disable_idle_d3 2>/dev/null || true
+  for d in $PORTS $GPU $AUDIO $USB; do echo on > /sys/bus/pci/devices/\$d/power/control; done
+  sleep 1
+  v=\$(cat /sys/bus/pci/devices/$GPU/vendor 2>/dev/null)
+  h=\$(od -An -tx1 -N4 /sys/bus/pci/devices/$GPU/config 2>/dev/null | tr -d ' ')
+  [ "\$h" != ffffffff ] || { echo "the R9700 does not answer (config space all ff, \$(cat /sys/bus/pci/devices/$GPU/power_state)): reboot bahamut" >&2; exit 1; }
 }
 rebind() { # \$1 device, \$2 target driver ('' = none), \$3 timeout for the bind
   dev=/sys/bus/pci/devices/\$1
@@ -124,21 +153,41 @@ case "$mode" in
     show
     h=\$(holders); [ -z "\$h" ] || echo "\$h" ;;
   vfio)
-    # bahamut boots without vfio-pci loaded (yojimbo's comes from the NVIDIA DRA
-    # plugin). Signed module from the node's own /lib/modules.
+    # Normally loaded at boot by bahamut's Omni patch (machine.kernel.modules
+    # vfio_pci, vfio_iommu_type1, as on yojimbo). Fallback for a node without
+    # it: the signed module from the node's own /lib/modules.
     if [ ! -d /sys/bus/pci/drivers/vfio-pci ]; then
-      modprobe vfio-pci || { echo "modprobe vfio-pci failed; add machine.kernel.modules [vfio_pci] to bahamut's Talos config" >&2; exit 1; }
+      modprobe vfio-pci || { echo "modprobe vfio-pci failed; add machine.kernel.modules vfio_pci + vfio_iommu_type1 to bahamut's Omni patch" >&2; exit 1; }
     fi
     h=\$(holders)
     if [ -n "\$h" ]; then echo "the R9700 is still in use on the node:" >&2; echo "\$h" >&2; exit 1; fi
+    wake
     rebind $GPU vfio-pci
+    # No PCI reset at all (empty reset_method). The R9700 does not survive vfio's
+    # generic resets: FLR timed out on the first VM start and the card ended up off
+    # the bus (2026-11-05). Like the container path, leave every reset to amdgpu,
+    # which resets the card through its SMU firmware: the guest's amdgpu when the VM
+    # boots, the host's when gpu-mode.sh amdgpu binds it back.
+    echo > /sys/bus/pci/devices/$GPU/reset_method
     rebind $AUDIO vfio-pci
+    rebind $USB vfio-pci
+    rebind $WIFI vfio-pci
+    rebind $USB_INPUT vfio-pci
     show ;;
   amdgpu)
     # amdgpu re-initializes the card (firmware, VRAM training): give the bind time.
+    wake
+    echo default > /sys/bus/pci/devices/$GPU/reset_method
     rebind $GPU amdgpu 120
     # Back to the boot state: no driver (the Talos kernel has no snd_hda_intel).
     rebind $AUDIO ''
+    # No explicit bind: clear the override and let xhci_hcd re-claim it by ID.
+    rebind $USB ''
+    echo $USB > /sys/bus/pci/drivers_probe
+    # Back to its boot state: no driver.
+    rebind $WIFI ''
+    rebind $USB_INPUT ''
+    echo $USB_INPUT > /sys/bus/pci/drivers_probe
     ls /sys/bus/pci/devices/$GPU/drm >/dev/null 2>&1 || { echo "amdgpu bound but registered no DRM device; check dmesg, a reboot of bahamut resets the card" >&2; exit 1; }
     show ;;
 esac
@@ -183,12 +232,12 @@ k -n "$POD_NS" delete pod -l app.kubernetes.io/name=k8s-gpu-dra-driver,app.kuber
 k -n kubevirt rollout status ds/virt-handler --timeout=180s >/dev/null
 k -n "$POD_NS" rollout status ds/gpu-dra-driver-k8s-gpu-dra-driver-kubeletplugin --timeout=180s >/dev/null
 
-offers() { k get node $NODE -o json | jq -c '.status.allocatable | with_entries(select(.key | test("r9700")))'; }
+offers() { k get node $NODE -o json | jq -c '.status.allocatable | with_entries(select(.key | test("r9700|bahamut-xhci|bahamut-wifi")))'; }
 # Wait for the state the mode should produce instead of a fixed sleep.
 ready=no
 for _ in $(seq 1 45); do
   case "$mode" in
-    vfio)   offers | jq -e --arg a "$RES" --arg b "$RES_AUDIO" '.[$a] == "1" and .[$b] == "1"' >/dev/null && ready=yes ;;
+    vfio)   offers | jq -e --arg a "$RES" --arg b "$RES_AUDIO" --arg c "$RES_USB" --arg w "$RES_WIFI" --arg i "$RES_USB_INPUT" '.[$a] == "1" and .[$b] == "1" and .[$c] == "1" and .[$w] == "1" and .[$i] == "1"' >/dev/null && ready=yes ;;
     amdgpu) [ -n "$(r9700_device)" ] && ready=yes ;;
   esac
   [ "$ready" = yes ] && break

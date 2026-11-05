@@ -44,4 +44,5 @@ resources:
   - platform-trivy.yaml
   - platform-vpa.yaml
   - platform-yk-dns-manager.yaml
+  - vms-steamos.yaml
   - vms-ubuntu-test.yaml

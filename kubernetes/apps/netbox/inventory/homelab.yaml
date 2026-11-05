@@ -72,6 +72,7 @@ ip_ranges:
 standalone_ips:
   - { address: 10.0.4.50/24, dns_name: "*.yuriykovalchuk.dev", description: "Cilium Gateway 'internal' — every HTTPS hostname" }
   - { address: 10.0.4.51/24, description: "ubuntu-test-rdp / ubuntu-test-ssh — RDP (3389) and SSH (22) to the ubuntu-test VM on yojimbo" }
+  - { address: 10.0.4.52/24, description: "steamos-streaming — SSH (22), Sunshine and Steam Remote Play to the steamos VM on bahamut" }
 
 devices:
   - name: isp-router

@@ -1,0 +1,25 @@
+# Valve's SteamOS image for PCs, filled by `virtctl image-upload` (README,
+# Install): the download page is behind JavaScript and the image is .bz2,
+# which CDI can't import from a URL, so it is downloaded and unpacked locally.
+# On the default `longhorn` class (control planes), not bahamut's own disk:
+# longhorn-gpu has ~168 GiB left to schedule and the game disk takes 150.
+# A VM on bahamut attaches it over the network like any Longhorn volume.
+# Delete it (and its volume in vm.yaml) once SteamOS is installed.
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: steamos-installer
+  namespace: kubevirt-steamos
+  annotations:
+    # keep the PVC after the upload instead of garbage-collecting the DataVolume
+    cdi.kubevirt.io/storage.deleteAfterCompletion: "false"
+spec:
+  source:
+    upload: {}
+  storage:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 16Gi
+    storageClassName: longhorn

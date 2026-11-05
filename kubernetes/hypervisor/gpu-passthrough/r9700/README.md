@@ -3,14 +3,18 @@
 bahamut's Radeon AI PRO R9700 belongs either to containers (DRA `gpu.amd.com`: strata,
 llama-cpp, llama-cpp-rocm) or to one KubeVirt VM, switched at runtime with
 [`gpu-mode.sh`](gpu-mode.sh). Same approach as the GTX 1070 on yojimbo
-([`vms/ubuntu-test`](../../vms/ubuntu-test/README.md)). bahamut's Talos config is unchanged: it
-boots with the card on `amdgpu` and without `vfio-pci` loaded, so a reboot gives the card back
-to containers.
+([`vms/ubuntu-test`](../../vms/ubuntu-test/README.md)). bahamut boots with the card on
+`amdgpu`; its Omni patch only loads `vfio_pci` and `vfio_iommu_type1` (`machine.kernel.modules`,
+same as yojimbo), which binds nothing, so a reboot gives the card back to containers. No kernel
+arguments are needed: the AMD IOMMU is on by default (yojimbo's `intel_iommu=on` is Intel-only).
 
 | Function | PCI | ID | IOMMU group | Boot driver | VM resource |
 |---|---|---|---|---|---|
 | GPU (Navi 48, gfx1201) | `0000:03:00.0` | `1002:7551` | 16 | `amdgpu` | `amd.com/r9700` |
 | HDMI/DP audio | `0000:03:00.1` | `1002:ab40` | 17 | none | `amd.com/r9700-audio` |
+| USB controller (8BitDo receiver, MT7925 Bluetooth) | `0000:c7:00.3` | `1022:15b9` | 24 | `xhci_hcd` | `amd.com/bahamut-xhci` |
+| USB controller (hub with Razer keyboard and mouse) | `0000:c9:00.3` | `1022:15c0` | 29 | `xhci_hcd` | `amd.com/bahamut-xhci-input` |
+| MT7925 Wi-Fi (SteamOS setup needs Wi-Fi) | `0000:05:00.0` | `14c3:7925` | 19 | none | `mediatek.com/bahamut-wifi` |
 
 The PCIe switch ports above the card (`01:00.0`, `02:00.0`, `1002:1478/1479`) stay on
 `pcieport`, and the 780M (`c7:00.0`, sd-server) is not touched.
@@ -18,7 +22,7 @@ The PCIe switch ports above the card (`01:00.0`, `02:00.0`, `1002:1478/1479`) st
 | Mode | Driver | Offered as | Used by |
 |---|---|---|---|
 | `amdgpu` (boot default) | `amdgpu` | DRA `gpu.amd.com`, deviceID `0x7551` | strata, llama-cpp, llama-cpp-rocm |
-| `vfio` | `vfio-pci` | KubeVirt `amd.com/r9700` + `amd.com/r9700-audio` (`permittedHostDevices` in `hypervisor/kubevirt/base/cr.yaml`) | one VM at a time |
+| `vfio` | `vfio-pci` | KubeVirt `amd.com/r9700` + `amd.com/r9700-audio` + `amd.com/bahamut-xhci` (`permittedHostDevices` in `hypervisor/kubevirt/base/cr.yaml`) | one VM at a time |
 
 ```bash
 # to a VM
@@ -38,8 +42,8 @@ What the script does, from a short-lived privileged busybox pod on bahamut in `k
 (its Pod Security level and PolicyException already allow privileged, host PID and hostPath):
 
 - **vfio:** checks that no DRA claim is allocated on the R9700 and no process on the node has
-  its `card*`/`renderD*` open, loads `vfio-pci` (signed module from the node's
-  `/lib/modules`), unbinds the card from `amdgpu`, sets `driver_override` and binds both
+  its `card*`/`renderD*` open, loads `vfio-pci` if the Omni patch did not (signed
+  module from the node's `/lib/modules`), unbinds the card from `amdgpu`, sets `driver_override` and binds both
   functions to `vfio-pci`.
 - **amdgpu:** waits for VM pods requesting `amd.com/r9700` to be gone (QEMU holds the card until
   then), binds the card back to `amdgpu` (up to 120 s: it re-initializes the card) and leaves the
@@ -52,6 +56,8 @@ Starting a VM while the card is in `amdgpu` mode leaves it Pending (`Insufficien
 amd.com/r9700`). That is harmless; switch modes and it schedules.
 
 ## A VM on bahamut
+
+The SteamOS VM ([`vms/steamos`](../../vms/steamos/README.md)) is the worked example.
 
 KubeVirt already runs on bahamut (virt-handler is on both workers). A VM needs the node, the
 taint toleration and the two devices. Use `longhorn-gpu` for its disk (one replica, strict-local
@@ -99,6 +105,5 @@ Keep the PCI slot note from `vms/ubuntu-test/vm.yaml` in mind: KubeVirt places `
   (the guest sees the card with no memory, or `amdgpu` fails with a BAR error), the BAR can be
   shrunk while the card is unbound (`resource0_resize`). The script does not do that today.
 - **Local display and input.** The monitor follows the card's outputs while the VM holds it.
-  Unlike yojimbo, no USB controller is passed through yet: bahamut's xHCI controllers are on the
-  APU (`c7:00.3`, `c7:00.4` in their own IOMMU groups, more functions on bus `c9`); which one serves
-  which port is not mapped yet.
+  The USB controller `c7:00.3` goes to the VM with the card, like yojimbo's xHCI: whatever is
+  plugged into its ports (the 8BitDo receiver) and the MT7925's Bluetooth.

@@ -24,4 +24,5 @@ resources:
   - hypervisor-kubevirt.yaml
   - platform-longhorn.yaml
   - platform-trivy.yaml
+  - vms-steamos.yaml
   - vms-ubuntu-test.yaml

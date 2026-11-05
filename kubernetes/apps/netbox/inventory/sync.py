@@ -6,7 +6,7 @@ deleted — remove objects from NetBox by hand.
 Usage:
   NETBOX_URL=https://netbox.yuriykovalchuk.dev \
   NETBOX_AUTH_HEADER="Bearer nbt_<key>.<token>" \
-  python netbox/sync.py [--dry-run]
+  python kubernetes/apps/netbox/inventory/sync.py [--dry-run]
 
 Needs pynetbox and PyYAML.
 """

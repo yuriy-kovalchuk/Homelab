@@ -19,3 +19,25 @@ spec:
   prune: false
   wait: false
   timeout: 5m
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: vm-steamos
+  namespace: flux-system
+spec:
+  # SteamOS on bahamut with the R9700 passed through
+  # (kubernetes/hypervisor/vms/steamos/README.md). runStrategy Manual: Flux keeps
+  # the definition, virtctl starts and stops it. No pruning: removing the folder
+  # must not delete the game disk.
+  interval: 5m
+  dependsOn:
+    - name: platform-infra
+    - name: hypervisor
+  sourceRef:
+    kind: GitRepository
+    name: homelab
+  path: ./kubernetes/hypervisor/vms/steamos
+  prune: false
+  wait: false
+  timeout: 5m

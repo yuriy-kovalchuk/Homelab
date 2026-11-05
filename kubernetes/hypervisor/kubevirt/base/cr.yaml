@@ -20,6 +20,16 @@ spec:
         passt:
           domainAttachmentType: managedTap
     imagePullPolicy: IfNotPresent
+    # SMBIOS of every VM: bahamut's own (Minisforum AI series) instead of
+    # KubeVirt / Red Hat, which some games treat as "running in a VM" (read
+    # through Wine as the Windows system manufacturer). Cluster-wide: KubeVirt
+    # has no per-VM SMBIOS; harmless for the other VMs.
+    smbios:
+      manufacturer: Micro Computer (HK) Tech Limited
+      product: AI Series
+      version: "1.0"
+      family: AI
+      sku: MGF8BSC
     permittedHostDevices:
       pciHostDevices:
         - pciVendorSelector: "1002:1900"
@@ -37,6 +47,24 @@ spec:
           externalResourceProvider: false
         - pciVendorSelector: "1002:AB40"
           resourceName: "amd.com/r9700-audio"
+          externalResourceProvider: false
+        # bahamut's xHCI c7:00.3 (alone in IOMMU group 24): the port with the 8BitDo
+        # receiver, plus the MT7925's Bluetooth, unused by the host. Moved to vfio-pci
+        # together with the R9700 by gpu-mode.sh; boot driver xhci_hcd.
+        - pciVendorSelector: "1022:15B9"
+          resourceName: "amd.com/bahamut-xhci"
+          externalResourceProvider: false
+        # bahamut's MT7925 Wi-Fi (05:00.0, alone in IOMMU group 19, no host
+        # driver: bahamut is wired). For the SteamOS VM, whose Deck-style setup
+        # insists on Wi-Fi. Moved to vfio-pci with the R9700 by gpu-mode.sh.
+        # bahamut's xHCI c9:00.3 (alone in IOMMU group 29): the USB hub with the
+        # Razer keyboard (1532:021e) and mouse (1532:005c). Moved to vfio-pci with
+        # the R9700 by gpu-mode.sh; boot driver xhci_hcd.
+        - pciVendorSelector: "1022:15C0"
+          resourceName: "amd.com/bahamut-xhci-input"
+          externalResourceProvider: false
+        - pciVendorSelector: "14C3:7925"
+          resourceName: "mediatek.com/bahamut-wifi"
           externalResourceProvider: false
         # yojimbo's GTX 1070 and its HDMI audio (same IOMMU group). virt-handler
         # only offers them while they are bound to vfio-pci, i.e. after

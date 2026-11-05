@@ -1,0 +1,37 @@
+# Game streaming straight to the VM on its own LoadBalancer IP, advertised over
+# BGP: Sunshine for Moonlight clients (add 10.0.4.52 by hand in Moonlight) and
+# Steam Remote Play's ports. Steam Link's LAN discovery is broadcast and does not
+# cross this IP; Steam Remote Play still works through Valve's relay without it.
+# Only bahamut runs the VM; externalTrafficPolicy Local makes only it advertise
+# the IP and keeps the client address (steamos-streaming-ingress matches on it).
+apiVersion: v1
+kind: Service
+metadata:
+  name: steamos-streaming
+  namespace: kubevirt-steamos
+  annotations:
+    lbipam.cilium.io/ips: "10.0.4.52"
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  allocateLoadBalancerNodePorts: false
+  selector:
+    kubevirt.io/vm: steamos
+  ports:
+    # SSH into the guest (sshd enabled by hand in SteamOS, key auth, README).
+    - { name: ssh, port: 22, targetPort: 22, protocol: TCP }
+    - { name: sunshine-https, port: 47984, targetPort: 47984, protocol: TCP }
+    - { name: sunshine-http, port: 47989, targetPort: 47989, protocol: TCP }
+    - { name: sunshine-web, port: 47990, targetPort: 47990, protocol: TCP }
+    - { name: sunshine-rtsp, port: 48010, targetPort: 48010, protocol: TCP }
+    - { name: sunshine-video, port: 47998, targetPort: 47998, protocol: UDP }
+    - { name: sunshine-control, port: 47999, targetPort: 47999, protocol: UDP }
+    - { name: sunshine-audio, port: 48000, targetPort: 48000, protocol: UDP }
+    - { name: steam-rp-tcp-1, port: 27036, targetPort: 27036, protocol: TCP }
+    - { name: steam-rp-tcp-2, port: 27037, targetPort: 27037, protocol: TCP }
+    - { name: steam-rp-udp-1, port: 27031, targetPort: 27031, protocol: UDP }
+    - { name: steam-rp-udp-2, port: 27032, targetPort: 27032, protocol: UDP }
+    - { name: steam-rp-udp-3, port: 27033, targetPort: 27033, protocol: UDP }
+    - { name: steam-rp-udp-4, port: 27034, targetPort: 27034, protocol: UDP }
+    - { name: steam-rp-udp-5, port: 27035, targetPort: 27035, protocol: UDP }
+    - { name: steam-rp-udp-6, port: 27036, targetPort: 27036, protocol: UDP }
