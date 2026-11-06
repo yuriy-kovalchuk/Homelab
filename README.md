@@ -215,6 +215,7 @@ ingesters are spread one per node; Loki's are not yet.
 | llama-cpp, llama-cpp-rocm | llama.cpp servers on the R9700 (Vulkan, ROCm) |
 | llama-cpp-cuda | llama.cpp (CUDA 12) on the GTX 1070 (yojimbo): Gemma 4, Qwen3.6-35B-A3B |
 | strata | Expert-caching inference engine on the R9700 |
+| strata-cuda | Strata's strata-poly engine (UnbiasedStrata, CUDA 12) on the GTX 1070 (yojimbo); parked, takes turns with llama-cpp-cuda |
 | sd-server | stable-diffusion.cpp on the 780M, beside the chat models (parked at 0 by default) |
 | open-webui | Chat UI for the llama.cpp servers |
 

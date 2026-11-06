@@ -19,6 +19,7 @@ resources:
   - apps-yk-update-checker.yaml
   - llm-sd-server.yaml
   - llm-strata.yaml
+  - llm-strata-cuda.yaml
   - core-cert-manager.yaml
   - core-external-secrets.yaml
   - core-kyverno.yaml

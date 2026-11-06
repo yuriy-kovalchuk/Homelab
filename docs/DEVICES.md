@@ -53,7 +53,7 @@ GPUs (claimed through Kubernetes DRA by PCI device ID):
 | bahamut | AMD Radeon AI PRO R9700 (Navi 48, gfx1201), on OCuLink | `0x7551` | llama-cpp, llama-cpp-rocm, strata (DRA `gpu.amd.com`, boot default) or one KubeVirt VM (`amd.com/r9700` + audio `0xab40` + USB controllers `c7:00.3` (8BitDo, Bluetooth) and `c9:00.3` (keyboard, mouse) + MT7925 Wi-Fi `05:00.0` after `kubernetes/hypervisor/gpu-passthrough/r9700/gpu-mode.sh vfio`), one at a time |
 | bahamut | Radeon 780M iGPU (HawkPoint, gfx1103) | `0x1900` | sd-server |
 | ixion | Radeon 680M iGPU (Rembrandt, gfx1035) | `0x1681` | Immich (server + machine learning) |
-| yojimbo | NVIDIA GeForce GTX 1070 (Pascal GP104), HDMI audio `0x10f0` | `0x1b81` | llama-cpp-cuda (DRA `gpu.nvidia.com`, boot default) or the ubuntu-test VM (KubeVirt `nvidia.com/gtx1070` after `kubernetes/hypervisor/vms/ubuntu-test/gpu-mode.sh vfio`), one at a time. Dynamic switching via DRA blocked, see `kubernetes/platform/infra/nvidia-dra-driver/VFIO-TALOS-ISSUES.md` |
+| yojimbo | NVIDIA GeForce GTX 1070 (Pascal GP104), HDMI audio `0x10f0` | `0x1b81` | llama-cpp-cuda (DRA `gpu.nvidia.com`, boot default) or strata-cuda (same claim class, parked) or the ubuntu-test VM (KubeVirt `nvidia.com/gtx1070` after `kubernetes/hypervisor/vms/ubuntu-test/gpu-mode.sh vfio`), one at a time. Dynamic switching via DRA blocked, see `kubernetes/platform/infra/nvidia-dra-driver/VFIO-TALOS-ISSUES.md` |
 
 Talos image schematics (factory.talos.dev):
 

@@ -1,0 +1,77 @@
+# Qwen3.6-35B-A3B's MTP draft block (~308 MiB) onto llama-cpp-cuda-models, for
+# strata-cuda's --draft-model. The GSQ-hybrid file has no block; this cuts it out
+# of Unsloth's UD-Q2_K_XL with range requests (cut_draft.py) instead of
+# downloading 12.6 GB. Idempotent: a file whose SHA-256 matches is kept.
+#
+# Not the shared model-download Job: that one fetches whole files.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: strata-cuda-draft-cut
+  namespace: llm
+  annotations:
+    # immutable: a changed script (new ConfigMap hash) needs a recreate
+    kustomize.toolkit.fluxcd.io/force: enabled
+spec:
+  backoffLimit: 4
+  template:
+    metadata:
+      labels:
+        # the egress to Hugging Face (cluster-wide/allow-llm-model-download.yaml)
+        # is granted by this label in the llm namespaces
+        app.kubernetes.io/component: model-download
+    spec:
+      restartPolicy: OnFailure
+      # llama-cpp-cuda-models is strict-local on yojimbo; RWO is per node, so this
+      # mounts it while strata-cuda (or llama-cpp-cuda) has it too.
+      nodeSelector:
+        kubernetes.io/hostname: yojimbo
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: cut
+          image: python:3.13.18-alpine3.24
+          command:
+            - python3
+            - -I
+            - /scripts/cut_draft.py
+            - /models/Qwen3.6-35B-A3B-MTP-draft.gguf
+          env:
+            # of the file written from unsloth/Qwen3.6-35B-A3B-MTP-GGUF@5bc3e238,
+            # 322,838,048 bytes (checked 2026-11-06)
+            - name: DRAFT_SHA256
+              value: d4890d88e0f143951b5358dda9dd6f1d2727113f6de13faa5bfdbacaa51765b1
+          # Root: the volume's files and directory belong to uid 0 (the llm
+          # PolicyException covers it).
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: "1"
+              memory: 256Mi
+          volumeMounts:
+            - name: models
+              mountPath: /models
+            - name: scripts
+              mountPath: /scripts
+              readOnly: true
+      volumes:
+        - name: models
+          persistentVolumeClaim:
+            claimName: llama-cpp-cuda-models
+        - name: scripts
+          configMap:
+            name: strata-cuda-draft-cut

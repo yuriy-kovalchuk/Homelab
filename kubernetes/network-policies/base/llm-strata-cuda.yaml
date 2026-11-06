@@ -1,0 +1,26 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: strata-cuda
+  namespace: llm
+spec:
+  endpointSelector:
+    matchLabels:
+      app: strata-cuda
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: open-webui
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    - fromEntities:
+        - cluster
+        - ingress
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+  # No egress block: the engine never leaves the cluster. Its model is
+  # llama-cpp-cuda's, downloaded by that component's Job.

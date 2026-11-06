@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: strata-cuda
+  namespace: llm
+spec:
+  template:
+    spec:
+      # The claim pins the pod to yojimbo.
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
+      resourceClaims:
+        - name: gpu
+          resourceClaimTemplateName: strata-cuda-gtx1070
+      containers:
+        - name: strata
+          resources:
+            claims:
+              - name: gpu
+        - name: gpu-exporter
+          resources:
+            claims:
+              - name: gpu

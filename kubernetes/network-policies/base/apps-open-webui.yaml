@@ -42,6 +42,14 @@ spec:
               protocol: TCP
     - toEndpoints:
         - matchLabels:
+            io.kubernetes.pod.namespace: llm
+            app: strata-cuda
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
             io.kubernetes.pod.namespace: llm-strata
             app: strata
       toPorts:

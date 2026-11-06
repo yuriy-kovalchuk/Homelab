@@ -1,0 +1,200 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: strata-cuda
+  namespace: llm
+spec:
+  # Parked: the GTX 1070 is exclusive and llama-cpp-cuda holds it by default.
+  # Flux ignores /spec/replicas in llm, so `kubectl scale` sticks (README.md).
+  replicas: 0
+  selector:
+    matchLabels:
+      app: strata-cuda
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: strata-cuda
+    spec:
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      # The engine stops at load when --draft-model is missing; the Job that writes
+      # it (rename after the SHA-256 check) may still be running on first rollout.
+      initContainers:
+        - name: wait-for-draft
+          image: alpine:3.24.3
+          command:
+            - sh
+            - -c
+            - |
+              until [ -f /models/Qwen3.6-35B-A3B-MTP-draft.gguf ]; do
+                echo "waiting for the draft block (Job strata-cuda-draft-cut)"; sleep 10
+              done
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 50m
+              memory: 32Mi
+          volumeMounts:
+            - name: models
+              mountPath: /models
+              readOnly: true
+      containers:
+        - name: strata
+          # UnbiasedStrata (strata-poly + the unbiased-strata front end) for sm_61,
+          # built by git.yuriykovalchuk.dev/yuriy/Strata (Dockerfile.unbiased-cuda12,
+          # UnbiasedStrata ff19037, CUDA 12.9.1, repo 70781ea): the Q2_0 MMQ patch and
+          # the AVX2 Q2_0 CPU kernel backported from llama.cpp b12110.
+          image: harbor.yuriykovalchuk.dev/homelab/unbiased-strata:ff19037-sm61-cuda12.9.1-70781ea@sha256:908bb35e300b63c9c491a6ac568274cad2077820b77ca30a3ff406a20e096d9f
+          # Front end options before `--`, engine (strata-poly) options after it.
+          # The model is llama-cpp-cuda's GSQ-hybrid file (Q2_0 experts, no MTP
+          # block), read in place from its volume.
+          args:
+            - --engine
+            - strata-poly
+            - -m
+            - /models/Qwen3.6-35B-A3B-GSQ-hybrid.gguf
+            - --host
+            - "0.0.0.0"
+            - --port
+            - "8080"
+            - --alias
+            - qwen3.6-35b-a3b-gsq
+            # the llama-cpp-cuda preset's sampling, so the two compare like for like
+            - --temp
+            - "0.7"
+            - --top-k
+            - "20"
+            - --top-p
+            - "0.8"
+            - --min-p
+            - "0.0"
+            - --
+            - --model
+            - /models/Qwen3.6-35B-A3B-GSQ-hybrid.gguf
+            # llama-cpp-cuda serves 131k. The attention cache grows with the
+            # conversation (the expert cache has that VRAM until then); q8_0 halves it.
+            - --max-context
+            - "131072"
+            - --kv
+            - q8_0
+            # The GSQ file has no MTP block: it comes from Unsloth's UD-Q2_K_XL, cut
+            # out by the strata-cuda-draft-cut Job (~308 MiB; ~350 fewer experts fit
+            # in VRAM). Default window: 8 tokens, 3 of them guessed by the block.
+            # --no-draft in place of these two turns it off.
+            - --draft-model
+            - /models/Qwen3.6-35B-A3B-MTP-draft.gguf
+            # Exact routing, as on bahamut: no skipping of low-ranked experts that
+            # are not in VRAM (setup would give Qwen3.6 6).
+            - --tail-skip
+            - "0"
+            # Expert use counts: choose what goes into VRAM at start, written back
+            # after answers. Lost with the pod (emptyDir); the cache then starts
+            # from the file order and learns again.
+            - --expert-profile
+            - /state/expert-profile.txt
+          env:
+            - name: STRATA_ROUTE_TAIL_SKIP
+              value: "0"
+            - name: HOME
+              value: /tmp
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: "3"
+              memory: 6Gi
+            limits:
+              # The engine's threads follow the CPU quota (i7-7700K, 4C/8T).
+              cpu: "7"
+              # The experts are read from an mmap of the 12.2 GB file: the page
+              # cache keeps the hot ones and is charged to this limit, so it is set
+              # as high as yojimbo allows (~15 GiB allocatable). Below file + ~8 GiB
+              # the engine warns once that misses will be read from disk.
+              memory: 13Gi
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            periodSeconds: 10
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            periodSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            periodSeconds: 30
+            failureThreshold: 5
+          volumeMounts:
+            - name: models
+              mountPath: /models
+              readOnly: true
+            - name: state
+              mountPath: /state
+            - name: tmp
+              mountPath: /tmp
+        # GPU power, utilisation, memory and temperature, as in llama-cpp-cuda: it
+        # shares the pod's GPU claim (overlay), the only way to reach the card.
+        - name: gpu-exporter
+          image: utkuozdemir/nvidia_gpu_exporter:1.17.0
+          ports:
+            - name: gpu-metrics
+              containerPort: 9835
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          readinessProbe:
+            tcpSocket:
+              port: 9835
+            periodSeconds: 30
+      volumes:
+        # llama-cpp-cuda's volume (longhorn-nvidia, strict-local on yojimbo). RWO
+        # is per node, so both Deployments can mount it; only one runs anyway.
+        - name: models
+          persistentVolumeClaim:
+            claimName: llama-cpp-cuda-models
+            readOnly: true
+        - name: state
+          emptyDir:
+            sizeLimit: 64Mi
+        - name: tmp
+          emptyDir:
+            sizeLimit: 256Mi

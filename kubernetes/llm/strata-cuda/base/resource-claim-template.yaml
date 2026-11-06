@@ -1,0 +1,17 @@
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: strata-cuda-gtx1070
+  namespace: llm
+spec:
+  spec:
+    devices:
+      requests:
+        - name: gpu
+          exactly:
+            # The GTX 1070 on yojimbo, the only NVIDIA GPU in the cluster (as
+            # llama-cpp-cuda-gtx1070). Claims are exclusive: llama-cpp-cuda and
+            # strata-cuda never run at the same time.
+            deviceClassName: gpu.nvidia.com
+            allocationMode: ExactCount
+            count: 1
