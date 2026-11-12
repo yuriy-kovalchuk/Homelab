@@ -28,7 +28,7 @@ spec:
       # (draft-block, then llama-cpp-cuda's mtp-merge) may still be running.
       initContainers:
         - name: wait-for-model
-          image: alpine:3.24.3
+          image: alpine:3.24.4
           command:
             - sh
             - -c
@@ -162,7 +162,7 @@ spec:
         # GPU power, utilisation, memory and temperature, as in llama-cpp-cuda: it
         # shares the pod's GPU claim (overlay), the only way to reach the card.
         - name: gpu-exporter
-          image: utkuozdemir/nvidia_gpu_exporter:1.17.0
+          image: utkuozdemir/nvidia_gpu_exporter:1.18.0
           ports:
             - name: gpu-metrics
               containerPort: 9835

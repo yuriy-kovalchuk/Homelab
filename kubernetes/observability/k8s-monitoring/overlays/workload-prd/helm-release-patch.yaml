@@ -69,7 +69,7 @@ spec:
           }
       tempo:
         type: otlp
-        url: http://tempo-distributor.tempo.svc.cluster.local:4317
+        url: http://tempo.tempo.svc.cluster.local:4317
         protocol: grpc
         tls:
           insecure: true

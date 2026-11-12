@@ -142,10 +142,10 @@ Chart versions as deployed.
 | Component | Version | Purpose |
 |-----------|---------|---------|
 | Gateway API CRDs | — | Gateway/HTTPRoute/TCPRoute types |
-| prometheus-operator-crds | 32.0.1 | ServiceMonitor/PodMonitor/PrometheusRule types |
+| prometheus-operator-crds | 33.0.2 | ServiceMonitor/PodMonitor/PrometheusRule types |
 | cert-manager | v1.21.2 | Let's Encrypt certificates via Cloudflare DNS-01 |
-| external-secrets | 2.11.0 | Vault → Kubernetes Secrets |
-| Kyverno (+ kyverno-policies) | 3.9.1 | Admission policies, baseline Pod Security |
+| external-secrets | 2.15.0 | Vault → Kubernetes Secrets |
+| Kyverno (+ kyverno-policies) | 3.10.0 | Admission policies, baseline Pod Security |
 
 **platform-infra**
 
@@ -165,8 +165,8 @@ Chart versions as deployed.
 
 | Component | Version | Purpose |
 |-----------|---------|---------|
-| Multus | v4.3.1 | Meta-CNI: extra NICs from NetworkAttachmentDefinitions; Cilium stays primary |
-| Kube-OVN | v1.16.17 | Secondary CNI (non-primary mode): private virtual networks for VMs |
+| Multus | v4.3.2 | Meta-CNI: extra NICs from NetworkAttachmentDefinitions; Cilium stays primary |
+| Kube-OVN | v1.17.0 | Secondary CNI (non-primary mode): private virtual networks for VMs |
 | KubeVirt + CDI | — | Virtual machines and disk import |
 
 **platform-ops**
@@ -186,15 +186,16 @@ Chart versions as deployed.
 | Component | Version | Purpose |
 |-----------|---------|---------|
 | Mimir (mimir-distributed) | 6.2.0 | Metrics, ruler |
-| Loki | 7.3.0 | Logs |
-| Tempo (tempo-distributed) | 2.23.4 | Traces |
+| Loki | 7.6.0 | Logs |
+| Tempo (tempo, single binary) | 3.2.1 | Traces |
 | k8s-monitoring (Alloy) | 4.5.2 | Collectors for metrics, logs, traces |
 | Grafana | 10.5.15 | Dashboards |
-| Alertmanager | 2.0.1 | Alerts to Slack |
+| Alertmanager | 2.5.1 | Alerts to Slack |
 | talos-monitoring | 0.1.0 | Talos node monitoring |
 
-Mimir, Loki and Tempo store data in RustFS (S3 on TrueNAS). Mimir and Tempo
-ingesters are spread one per node; Loki's are not yet.
+Mimir, Loki and Tempo store data in RustFS (S3 on TrueNAS). Mimir's
+ingesters are spread one per node; Loki's are not yet. Tempo runs as one pod
+(Tempo 3 microservices need Kafka); a drain pauses trace ingest briefly.
 
 **apps**
 
@@ -229,7 +230,7 @@ Only one R9700 workload can run at a time: GPU claims are exclusive.
 | Class | Backend | Use |
 |-------|---------|-----|
 | `longhorn` (default) | Longhorn, 3 replicas on `system` nodes | General persistent data |
-| `longhorn-1r` | Longhorn, 1 replica, best-effort locality, `system` nodes | Data the app already replicates: Mimir, Loki, Tempo, Alertmanager |
+| `longhorn-1r` | Longhorn, 1 replica, best-effort locality, `system` nodes | Data the app already replicates: Mimir, Loki, Alertmanager |
 | `longhorn-gpu` | Longhorn, 1 replica, strict-local, `gpu` nodes | Model weights on bahamut |
 | `longhorn-static` | Longhorn | Pre-created volumes |
 | `truenas-nfs` | TrueNAS NFS | Shared (RWX) data |

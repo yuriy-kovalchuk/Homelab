@@ -1,6 +1,6 @@
 # Multus thick plugin, from multus-cni v4.3.1 deployments/multus-daemonset-thick.yml.
 # Changes from upstream:
-# - image pinned to v4.3.1-thick (upstream ships snapshot-thick)
+# - image pinned to v4.3.2-thick (upstream ships snapshot-thick)
 # - only on yojimbo for now (first rollout). Target: every worker (bahamut,
 #   yojimbo), never the control planes: Multus wraps every pod sandbox on the
 #   nodes it runs on, and a dead daemon blocks new pods there. Widen the
@@ -51,7 +51,7 @@ spec:
           effect: NoExecute
       initContainers:
         - name: install-multus-binary
-          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.3.1-thick
+          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.3.2-thick
           command:
             - /usr/src/multus-cni/bin/install_multus
             - -d
@@ -73,7 +73,7 @@ spec:
               mountPropagation: Bidirectional
       containers:
         - name: kube-multus
-          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.3.1-thick
+          image: ghcr.io/k8snetworkplumbingwg/multus-cni:v4.3.2-thick
           command:
             - /usr/src/multus-cni/bin/multus-daemon
           env:

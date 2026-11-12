@@ -4,105 +4,89 @@ metadata:
   name: tempo
   namespace: tempo
 spec:
-  valuesFrom:
-    - kind: Secret
-      name: tempo-s3-secret
-      valuesKey: S3_ACCESS_KEY
-      targetPath: storage.trace.s3.access_key
-    - kind: Secret
-      name: tempo-s3-secret
-      valuesKey: S3_SECRET_KEY
-      targetPath: storage.trace.s3.secret_key
   values:
-    reportingEnabled: false
+    replicas: 1
 
-    storage:
-      trace:
-        backend: s3
-        s3:
-          bucket: tempo-traces
-          endpoint: s3.yuriykovalchuk.dev:443
-          region: eu-south-1
-          insecure: false
-          forcepathstyle: true
-        wal:
-          path: /var/tempo/wal
-        block:
-          version: vParquet4
+    tempo:
+      reportingEnabled: false
 
-    traces:
-      otlp:
-        grpc:
-          enabled: true
-        http:
-          enabled: true
+      # S3 keys come from the env (tempo-s3-secret), expanded into tempo.yaml at
+      # start, so they stay out of the chart's ConfigMap.
+      extraArgs:
+        config.expand-env: "true"
+      extraEnvFrom:
+        - secretRef:
+            name: tempo-s3-secret
 
-    distributor:
-      replicas: 1
+      # 2.x kept blocks 48h (tempo-distributed's compactor default); this chart
+      # defaults to 24h.
+      retention: 48h
 
-    ingester:
-      replicas: 3
-      zoneAwareReplication:
-        enabled: false
-      # Chart default is only *preferred* anti-affinity plus a spread on a zone
-      # label these nodes don't have; require one ingester per node instead.
-      affinity: |
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchLabels:
-                  {{- include "tempo.selectorLabels" (dict "ctx" . "component" "ingester") | nindent 18 }}
-              topologyKey: kubernetes.io/hostname
-      topologySpreadConstraints: |
-        - maxSkew: 1
-          topologyKey: kubernetes.io/hostname
-          whenUnsatisfiable: DoNotSchedule
-          labelSelector:
-            matchLabels:
-              {{- include "tempo.selectorLabels" (dict "ctx" . "component" "ingester") | nindent 14 }}
-      # WAL survives pod restarts; blocks flush to S3 continuously
-      persistence:
+      storage:
+        trace:
+          backend: s3
+          s3:
+            bucket: tempo-traces
+            endpoint: s3.yuriykovalchuk.dev:443
+            region: eu-south-1
+            insecure: false
+            forcepathstyle: true
+            access_key: ${S3_ACCESS_KEY}
+            secret_key: ${S3_SECRET_KEY}
+          wal:
+            path: /var/tempo/wal
+          # 3.1 writes vParquet5 by default; stay on the format 2.x wrote.
+          block:
+            version: vParquet4
+
+      # Receivers: chart defaults (OTLP 4317/4318, plus Jaeger, which the chart's
+      # Service template requires). Cilium only admits OTLP from Alloy.
+
+      # Generates RED (rate/error/duration) metrics from traces and writes to Mimir.
+      # Powers the Service Graph and Span Metrics panels in Grafana.
+      metricsGenerator:
         enabled: true
-        size: 5Gi
-        storageClass: longhorn-1r
-
-    querier:
-      replicas: 1
-
-    queryFrontend:
-      replicas: 1
-
-    compactor:
-      replicas: 1
-
-    # Generates RED (rate/error/duration) metrics from traces and writes to Mimir.
-    # Powers the Service Graph and Span Metrics panels in Grafana.
-    metricsGenerator:
-      enabled: true
-      replicas: 1
-      config:
         storage:
           path: /var/tempo/generator/wal
-        remote_write:
-          - url: http://mimir-distributor.mimir.svc.cluster.local:8080/api/v1/push
-            headers:
-              X-Scope-OrgID: "anonymous"
-      global_overrides:
+          remote_write:
+            - url: http://mimir-distributor.mimir.svc.cluster.local:8080/api/v1/push
+              headers:
+                X-Scope-OrgID: "anonymous"
+
+      overrides:
         defaults:
           metrics_generator:
             processors:
               - service-graphs
               - span-metrics
 
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          memory: 2Gi
+
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop:
+            - ALL
+
+    securityContext:
+      runAsUser: 10001
+      runAsGroup: 10001
+      fsGroup: 10001
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+
+    # WAL and live-store blocks; replicated so the pod can move on a drain.
+    persistence:
+      enabled: true
+      storageClassName: longhorn
+      size: 10Gi
+
     serviceMonitor:
       enabled: true
-
-    prometheusRule:
-      enabled: false
-
-    metaMonitoring:
-      dashboards:
-        enabled: true
-        namespace: grafana
-        annotations:
-          k8s-sidecar-target-directory: /tmp/dashboards/Tempo Dashboards

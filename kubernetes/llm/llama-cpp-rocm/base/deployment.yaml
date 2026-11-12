@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: llama-cpp
-          image: ghcr.io/ggml-org/llama.cpp:server-rocm-b12110
+          image: ghcr.io/ggml-org/llama.cpp:server-rocm-b12316
           args:
             - --host
             - "0.0.0.0"

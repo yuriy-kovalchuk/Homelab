@@ -35,7 +35,7 @@ metadata:
 spec:
   endpointSelector:
     matchLabels:
-      app.kubernetes.io/component: metrics-generator
+      app.kubernetes.io/name: tempo
       app.kubernetes.io/instance: tempo
   egress:
     - toEndpoints:
@@ -48,7 +48,7 @@ spec:
             - port: "8080"
               protocol: TCP
 ---
-# alloy-receiver sends OTLP traces to the distributor
+# alloy-receiver sends OTLP traces to Tempo
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
@@ -57,7 +57,7 @@ metadata:
 spec:
   endpointSelector:
     matchLabels:
-      app.kubernetes.io/component: distributor
+      app.kubernetes.io/name: tempo
       app.kubernetes.io/instance: tempo
   ingress:
     - fromEndpoints:
@@ -70,7 +70,7 @@ spec:
             - port: "4318"
               protocol: TCP
 ---
-# Grafana queries the query-frontend
+# Grafana queries Tempo
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
@@ -79,7 +79,7 @@ metadata:
 spec:
   endpointSelector:
     matchLabels:
-      app.kubernetes.io/component: query-frontend
+      app.kubernetes.io/name: tempo
       app.kubernetes.io/instance: tempo
   ingress:
     - fromEndpoints:
