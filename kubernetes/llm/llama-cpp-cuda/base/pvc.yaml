@@ -11,4 +11,6 @@ spec:
   storageClassName: longhorn-nvidia
   resources:
     requests:
-      storage: 50Gi
+      # 50 -> 70Gi (2026-11-06): room for the GSQ-hybrid file with the MTP block
+      # merged in (Qwen3.6-35B-A3B-GSQ-hybrid-MTP.gguf) beside the original.
+      storage: 70Gi

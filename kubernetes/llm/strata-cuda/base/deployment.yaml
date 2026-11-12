@@ -24,17 +24,17 @@ spec:
         runAsGroup: 65532
         seccompProfile:
           type: RuntimeDefault
-      # The engine stops at load when --draft-model is missing; the Job that writes
-      # it (rename after the SHA-256 check) may still be running on first rollout.
+      # The engine stops at load when its model is missing; the Jobs that write it
+      # (draft-block, then llama-cpp-cuda's mtp-merge) may still be running.
       initContainers:
-        - name: wait-for-draft
+        - name: wait-for-model
           image: alpine:3.24.3
           command:
             - sh
             - -c
             - |
-              until [ -f /models/Qwen3.6-35B-A3B-MTP-draft.gguf ]; do
-                echo "waiting for the draft block (Job strata-cuda-draft-cut)"; sleep 10
+              until [ -f /models/Qwen3.6-35B-A3B-GSQ-hybrid-MTP.gguf ]; do
+                echo "waiting for the merged model (Jobs strata-cuda-draft-cut, llama-cpp-cuda-mtp-merge)"; sleep 10
               done
           securityContext:
             allowPrivilegeEscalation: false
@@ -61,13 +61,13 @@ spec:
           # the AVX2 Q2_0 CPU kernel backported from llama.cpp b12110.
           image: harbor.yuriykovalchuk.dev/homelab/unbiased-strata:ff19037-sm61-cuda12.9.1-70781ea@sha256:908bb35e300b63c9c491a6ac568274cad2077820b77ca30a3ff406a20e096d9f
           # Front end options before `--`, engine (strata-poly) options after it.
-          # The model is llama-cpp-cuda's GSQ-hybrid file (Q2_0 experts, no MTP
-          # block), read in place from its volume.
+          # The model is llama-cpp-cuda's GSQ-hybrid file with the MTP block merged in
+          # (Q2_0 experts; llama-cpp-cuda/base/mtp-merge), read in place from its volume.
           args:
             - --engine
             - strata-poly
             - -m
-            - /models/Qwen3.6-35B-A3B-GSQ-hybrid.gguf
+            - /models/Qwen3.6-35B-A3B-GSQ-hybrid-MTP.gguf
             - --host
             - "0.0.0.0"
             - --port
@@ -85,19 +85,18 @@ spec:
             - "0.0"
             - --
             - --model
-            - /models/Qwen3.6-35B-A3B-GSQ-hybrid.gguf
+            - /models/Qwen3.6-35B-A3B-GSQ-hybrid-MTP.gguf
             # llama-cpp-cuda serves 131k. The attention cache grows with the
             # conversation (the expert cache has that VRAM until then); q8_0 halves it.
             - --max-context
             - "131072"
             - --kv
             - q8_0
-            # The GSQ file has no MTP block: it comes from Unsloth's UD-Q2_K_XL, cut
-            # out by the strata-cuda-draft-cut Job (~308 MiB; ~350 fewer experts fit
-            # in VRAM). Default window: 8 tokens, 3 of them guessed by the block.
-            # --no-draft in place of these two turns it off.
-            - --draft-model
-            - /models/Qwen3.6-35B-A3B-MTP-draft.gguf
+            # The MTP block is in the model file, so the engine drafts with it on its
+            # own (--no-draft turns it off). Window 4 (default 8): on the compute-bound
+            # GTX 1070 a smaller verify window measured 25-27 tok/s against 22-26.
+            - --window
+            - "4"
             # Exact routing, as on bahamut: no skipping of low-ranked experts that
             # are not in VRAM (setup would give Qwen3.6 6).
             - --tail-skip

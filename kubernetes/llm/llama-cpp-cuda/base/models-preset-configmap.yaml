@@ -76,3 +76,28 @@ data:
     min-p = 0.0
     presence-penalty = 0.0
     repeat-penalty = 1.0
+
+    ; The same model with Unsloth's MTP draft block appended (mtp-merge Job): the
+    ; block guesses up to 3 tokens ahead and the model checks them in one pass,
+    ; sharing the model's embeddings and output head (~308 MiB more VRAM, so a
+    ; smaller MoE cache). Answers are the same as without it. The MTP context's own
+    ; compute buffers take ~672 MiB at ubatch 2048 (3300 did not fit), and a 13k
+    ; prompt still ran out of VRAM at 2048: ubatch 1024 halves both contexts' buffers.
+    [Qwen3.6-35B-A3B-GSQ-hybrid-MTP]
+    c = 131072
+    n-cpu-moe = 40
+    moe-cache-mib = 2600
+    batch-size = 1024
+    ubatch-size = 1024
+    cache-type-k = q4_0
+    cache-type-v = q4_0
+    spec-type = draft-mtp
+    spec-draft-n-max = 3
+    reasoning-budget = 8192
+    n-predict = 32768
+    temp = 0.7
+    top-k = 20
+    top-p = 0.8
+    min-p = 0.0
+    presence-penalty = 0.0
+    repeat-penalty = 1.0
