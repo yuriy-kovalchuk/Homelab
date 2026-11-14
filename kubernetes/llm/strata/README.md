@@ -119,7 +119,14 @@ image with the readers → one commit with the new image tag, `VISION` and the c
   `STRATA_ROUTE_PRIOR=0` (after `VISION` in the env list) turn off upstream's
   speed-for-quality routing: the tail skip is on by default on gfx1201 whenever
   some experts are not in VRAM. A model config's own `"env"` overrides the pod env,
-  so don't let one set them back. When bumping Strata, check the release notes for
-  new defaults that change routing.
+  so don't let one set them back. `STRATA_SELECT_WMMA=0` (after those) does the
+  same for long-context attention: since 0.2.11 gfx12 scores the attention blocks of
+  prompts past 28,672 tokens on the matrix cores, which changes the answers.
+  `STRATA_HC_Q8=0` keeps the bf16 hyper-connection weights (gfx12 re-quantizes them
+  to Q8_0 by default) and `STRATA_PREFILL_CPU_SHARE=0` keeps short prompts' experts on
+  the card's path instead of the CPU's. The engine log says which defaults "change the
+  answers" / "answers differ" at start: grep it after every bump. When
+  bumping Strata, check the release notes and `include/strata/core/gfx12_extra.hpp`
+  ("Changes the answers") for new defaults that trade accuracy for speed.
 - **If the Deployment is ever recreated,** it starts from the Git defaults
   (Flash-Next IQ3_S); set the env again.

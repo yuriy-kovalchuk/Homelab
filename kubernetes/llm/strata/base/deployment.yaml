@@ -52,11 +52,11 @@ spec:
               mountPath: /data
       containers:
         - name: strata
-          # Built by git.yuriykovalchuk.dev/yuriy/Strata CI (Strata 4b9e05a = v0.2.6,
-          # gfx1201, ROCm 7.2.4, repo fef517b). The pinned configs in
+          # Built by git.yuriykovalchuk.dev/yuriy/Strata CI (Strata 628f749 = v0.2.13.1,
+          # engine 0.1.59.1, gfx1201, ROCm 7.2.4, repo 2f515b4). The pinned configs in
           # configmap-model-configs.yaml keep 0.1.x setup's choices -- regenerate one
           # with STRATA_MODE=auto and no seeded file to pick up newer setup defaults.
-          image: harbor.yuriykovalchuk.dev/homelab/strata:4b9e05a-gfx1201-rocm7.2.4-fef517b@sha256:a744cf9062dbeba54d63f9f3a0b6347c9cb6e4e2b6a50c46f5efadfc85679301
+          image: harbor.yuriykovalchuk.dev/homelab/strata:628f749-gfx1201-rocm7.2.4-2f515b4@sha256:d24fb1cb5be272cc87b641118d2540b07aaa2593b97685ba8ca61afe6a2b7007
           env:
             # auto: if MODEL has no config yet, run Strata's setup first, then serve.
             # This pod has no internet egress, so setup runs offline on the files
@@ -99,6 +99,24 @@ spec:
             # Off by default and CUDA-only today, but 0.2.7 once turned it on by
             # itself; pinning 0 keeps a future default from flipping it back.
             - name: STRATA_ROUTE_PRIOR
+              value: "0"
+            # Exact long-context attention. Since 0.2.11 gfx12 scores which blocks of
+            # the past context attention reads on the matrix cores once a prompt is past
+            # 28,672 tokens: +5.7% prompt at 98K, but it changes the answers (first-token
+            # KL 0.0018 mean, 0.0055 max upstream). We serve 256K and want the exact path.
+            # Per switch, not STRATA_GFX12_DEFAULTS=0: that would also drop the
+            # bit-exact gfx12 speed switches.
+            - name: STRATA_SELECT_WMMA
+              value: "0"
+            # Keep the model's own bf16 hyper-connection weights. On by default on
+            # gfx12: the engine re-quantizes them to Q8_0 at load for +2.5-4% decode
+            # ("answers differ slightly", KL 0.0003-0.0010 over noise upstream).
+            - name: STRATA_HC_Q8
+              value: "0"
+            # No CPU share in the prompt path. Since 0.2.9 a single gfx12 card has the
+            # CPU take some experts of prompt chunks up to 1,536 tokens (+18-31% on
+            # 500-1,000-token prompts, first-token KL ~0.02 at 1K upstream).
+            - name: STRATA_PREFILL_CPU_SHARE
               value: "0"
           ports:
             - name: http
