@@ -14,3 +14,29 @@ patches:
       kind: Deployment
       name: immich-machine-learning
       namespace: immich
+  # TEMPORARY while ixion is offline: CPU-only, ixion or yojimbo. Remove these
+  # three entries (and ixion-offline-patch.yaml) when ixion is back.
+  - path: ixion-offline-patch.yaml
+    target:
+      kind: Deployment
+      name: immich-(server|machine-learning)
+      namespace: immich
+  - target:
+      kind: Deployment
+      name: immich-valkey
+      namespace: immich
+    patch: |
+      - op: add
+        path: /spec/template/spec/tolerations
+        value:
+          - {key: workload, operator: Equal, value: gpu, effect: NoSchedule}
+  - target:
+      kind: Cluster
+      name: pg-cluster-immich
+      namespace: immich
+    patch: |
+      - op: add
+        path: /spec/affinity
+        value:
+          tolerations:
+            - {key: workload, operator: Equal, value: gpu, effect: NoSchedule}

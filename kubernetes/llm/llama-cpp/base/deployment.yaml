@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: llama-cpp
-          image: ghcr.io/ggml-org/llama.cpp:server-vulkan-b12375
+          image: ghcr.io/ggml-org/llama.cpp:server-vulkan-b12464
           args:
             - --host
             - "0.0.0.0"

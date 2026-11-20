@@ -162,7 +162,7 @@ spec:
         # GPU power, utilisation, memory and temperature, as in llama-cpp-cuda: it
         # shares the pod's GPU claim (overlay), the only way to reach the card.
         - name: gpu-exporter
-          image: utkuozdemir/nvidia_gpu_exporter:1.18.0
+          image: utkuozdemir/nvidia_gpu_exporter:2.0.0
           ports:
             - name: gpu-metrics
               containerPort: 9835

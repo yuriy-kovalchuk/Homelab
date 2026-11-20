@@ -36,7 +36,7 @@ spec:
           effect: NoSchedule
       containers:
         - name: runner
-          image: data.forgejo.org/forgejo/runner:13.2.1
+          image: data.forgejo.org/forgejo/runner:13.2.2
           command:
             - forgejo-runner
             - daemon
@@ -69,7 +69,7 @@ spec:
             - name: docker-sock
               mountPath: /var/run/docker-sock
         - name: dind
-          image: docker:29.9.3-dind
+          image: docker:29.10.0-dind
           args:
             - dockerd
             - -H
@@ -85,7 +85,7 @@ spec:
             - name: docker-sock
               mountPath: /var/run/docker-sock
         - name: prune
-          image: docker:29.9.3-cli
+          image: docker:29.10.0-cli
           command:
             - sh
             - -c

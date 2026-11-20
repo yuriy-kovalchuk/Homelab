@@ -1,0 +1,33 @@
+# TEMPORARY, while ixion is offline (failed NVMe, see docs/DEVICES.md).
+#
+# The immich-gpu claim can only be met by the 680M on ixion, so with ixion down
+# immich-server and immich-machine-learning stay Pending. This patch drops the
+# claim (both pods run on CPU: no VAAPI transcoding, CPU inference) and lets
+# them run on yojimbo as well as ixion. yojimbo's GTX 1070 is not claimed; it
+# stays with llama-cpp-cuda / strata-cuda.
+#
+# Revert when ixion is back: remove this patch from kustomization.yaml (the
+# GPU patches above it stay as they are) and delete this file.
+- op: remove
+  path: /spec/template/spec/resourceClaims
+- op: remove
+  path: /spec/template/spec/containers/0/resources/claims
+- op: add
+  path: /spec/template/spec/tolerations
+  value:
+    - key: workload
+      operator: Equal
+      value: gpu
+      effect: NoSchedule
+- op: add
+  path: /spec/template/spec/affinity
+  value:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                  - ixion
+                  - yojimbo
