@@ -8,3 +8,8 @@ spec:
   url: oci://ghcr.io/netbox-community/netbox-chart/netbox
   ref:
     tag: "8.3.109"
+  # Since 8.3.101 the provenance layer comes first; without a selector Flux
+  # extracts that one and fails with "gzip: invalid header".
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy

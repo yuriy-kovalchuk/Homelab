@@ -97,16 +97,25 @@ spec:
                 - ALL
             seccompProfile:
               type: RuntimeDefault
+          # Host: localhost — since 3.5, PAPERLESS_URL limits ALLOWED_HOSTS to its
+          # hostname plus localhost, and the kubelet sends the pod IP as Host,
+          # which gets a 400 (DisallowedHost) and a liveness restart loop.
           readinessProbe:
             httpGet:
               path: /
               port: http
+              httpHeaders:
+                - name: Host
+                  value: localhost
             initialDelaySeconds: 20
             periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /
               port: http
+              httpHeaders:
+                - name: Host
+                  value: localhost
             # first start runs the database migrations
             initialDelaySeconds: 120
             periodSeconds: 30
