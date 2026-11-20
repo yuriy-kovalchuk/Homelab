@@ -1,0 +1,4 @@
+# ykode settings for this project. A key here overrides ~/.ykode/settings.yaml;
+# a key left out keeps the global value. /settings edits this file.
+base_url: https://cuda.yuriykovalchuk.dev
+model: Qwen3.6-35B-A3B-GSQ-hybrid-MTP

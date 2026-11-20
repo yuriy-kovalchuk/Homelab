@@ -1,31 +1,49 @@
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+apiVersion: policies.kyverno.io/v1
+kind: GeneratingPolicy
 metadata:
   name: generate-same-namespace-network-policy
+  annotations:
+    policies.kyverno.io/title: Allow Same-Namespace Traffic
+    policies.kyverno.io/subject: Namespace, CiliumNetworkPolicy
+    policies.kyverno.io/description: >-
+      Generates a CiliumNetworkPolicy `allow-same-namespace` in every Namespace
+      that allows ingress and egress between pods of that Namespace. It does
+      not allow the kube-apiserver; every component still needs its own policy.
 spec:
-  background: true
-  rules:
-    - name: generate-allow-same-namespace
-      match:
-        any:
-          - resources:
-              kinds:
-                - Namespace
-      generate:
-        synchronize: true
-        generateExisting: true
-        apiVersion: cilium.io/v2
-        kind: CiliumNetworkPolicy
-        name: allow-same-namespace
-        namespace: "{{request.object.metadata.name}}"
-        data:
-          spec:
-            endpointSelector: {}
-            ingress:
-              - fromEndpoints:
-                  - matchLabels:
-                      io.kubernetes.pod.namespace: "{{request.object.metadata.name}}"
-            egress:
-              - toEndpoints:
-                  - matchLabels:
-                      io.kubernetes.pod.namespace: "{{request.object.metadata.name}}"
+  evaluation:
+    # also generate into Namespaces that already exist
+    generateExisting:
+      enabled: true
+    # re-create / revert the policy when it is deleted or edited
+    synchronize:
+      enabled: true
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["namespaces"]
+  variables:
+    - name: nsName
+      expression: object.metadata.name
+    - name: sameNamespace
+      expression: >-
+        [{"matchLabels": {"io.kubernetes.pod.namespace": variables.nsName}}]
+    - name: downstream
+      expression: >-
+        [
+          {
+            "apiVersion": dyn("cilium.io/v2"),
+            "kind": dyn("CiliumNetworkPolicy"),
+            "metadata": dyn({
+              "name": "allow-same-namespace"
+            }),
+            "spec": dyn({
+              "endpointSelector": {},
+              "ingress": [{"fromEndpoints": variables.sameNamespace}],
+              "egress": [{"toEndpoints": variables.sameNamespace}]
+            })
+          }
+        ]
+  generate:
+    - expression: generator.Apply(variables.nsName, variables.downstream)

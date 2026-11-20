@@ -58,6 +58,10 @@ spec:
         operator: In
         values:
           - kyverno-migrate-resources
+          # chart hook Jobs (pre-upgrade / pre-delete)
+          - kyverno-check-legacy-policies
+          - kyverno-rm-webhooks
+          - kyverno-scale-to-zero
   egress:
     - toEntities:
         - kube-apiserver
