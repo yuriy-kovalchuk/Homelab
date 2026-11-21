@@ -25,7 +25,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: yk-portfolio
-          image: ghcr.io/yuriy-kovalchuk/yk-portfolio:20260927
+          image: ghcr.io/yuriy-kovalchuk/yk-portfolio:20261121@sha256:d8a631dcd923a95e7bd8865456dd4dcbbcd224ee3713c5614ee7917e9315d1c2
           ports:
             - name: http
               containerPort: 8080
