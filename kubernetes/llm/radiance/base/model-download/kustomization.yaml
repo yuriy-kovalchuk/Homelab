@@ -1,0 +1,33 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: llm-radiance
+namePrefix: radiance-
+resources:
+  - ../../../model-download/base
+configMapGenerator:
+  - name: model-download-list
+    files:
+      - models.txt
+patches:
+  - target:
+      kind: Job
+      name: model-download
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/volumes/0/persistentVolumeClaim/claimName
+        value: radiance-models
+      # Non-root, unlike the other instances: radiance runs as uid 1000 and only
+      # reads the volume, so nothing here needs root and the namespace needs no
+      # Kyverno exception. fsGroup makes the fresh volume writable for 1000.
+      - op: add
+        path: /spec/template/spec/securityContext/runAsNonRoot
+        value: true
+      - op: add
+        path: /spec/template/spec/securityContext/runAsUser
+        value: 1000
+      - op: add
+        path: /spec/template/spec/securityContext/runAsGroup
+        value: 1000
+      - op: add
+        path: /spec/template/spec/securityContext/fsGroup
+        value: 1000

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: llm-radiance
+  labels:
+    # restricted, unlike the other llm-* namespaces (their engines run as root):
+    # radiance and its download Job both run as uid 1000 with every capability
+    # dropped, and the card comes through DRA, not hostPath or privileged. No
+    # Kyverno PolicyException either.
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted

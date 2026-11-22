@@ -1,12 +1,21 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: llama-cpp-models
+  # Was llama-cpp-models (longhorn, on the control planes' disks). A PVC's class
+  # cannot change, so the TrueNAS volume has a new name; the llm Kustomization
+  # pruned the old one and the model-download Job filled this one again.
+  name: llama-cpp-models-iscsi
   namespace: llm
 spec:
+  # TrueNAS like radiance-models: llama.cpp reads a model once at load (then it
+  # sits in VRAM), so the network hop only costs load time. RWO: the download
+  # Job and the server rarely run together; if they do, the server waits for
+  # the attach until the Job is done.
   accessModes:
-    - ReadWriteMany
-  storageClassName: longhorn
+    - ReadWriteOnce
+  storageClassName: truenas-iscsi
   resources:
     requests:
-      storage: 200Gi
+      # Inkling-2-Mini UD-Q4_K_XL + mmproj are 18.3 GB; room for a few more.
+      # The class allows expansion.
+      storage: 100Gi

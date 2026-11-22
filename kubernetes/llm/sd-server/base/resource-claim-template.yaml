@@ -14,7 +14,7 @@ spec:
             count: 1
             selectors:
               - cel:
-                  # Same physical card as strata, llama-cpp and llama-cpp-rocm
+                  # Same physical card as strata, llama-cpp and radiance
                   # (R9700, 0x7551): only one of them can hold it, the others
                   # stay Pending until it is scaled to 0.
                   expression: 'device.attributes["gpu.amd.com"].deviceID == "0x7551"'

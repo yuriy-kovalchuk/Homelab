@@ -1,0 +1,31 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: radiance
+  namespace: llm-radiance
+spec:
+  endpointSelector:
+    matchLabels:
+      app: radiance
+  # Only Open WebUI and the gateway (CLI clients through
+  # radiance.yuriykovalchuk.dev) reach the API. Health probes and Alloy scraping
+  # are allowed cluster-wide.
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: open-webui
+            app.kubernetes.io/name: open-webui
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    - fromEntities:
+        - ingress
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+  # No egress block: the cluster-wide allow-dns already puts every pod in
+  # egress default-deny, so the engine reaches nothing outside DNS: no internet,
+  # no kube-apiserver (its token is not even mounted). The model comes from the
+  # radiance-model-download Job (cluster-wide/allow-llm-model-download.yaml).

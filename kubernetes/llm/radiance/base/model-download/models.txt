@@ -1,0 +1,11 @@
+# <url> <path under radiance-models> [<sha256>]
+#
+# One .rad container holds everything the server needs: weights, tokenizer, chat
+# template, the vision tower and the DFlash2 drafter. Pinned revision + LFS SHA-256.
+#
+# Qwen3.8-27B IQR-V4 IQ4R-L (4.79 bpw, 18.7 GB): KL 0.0030 against bf16 on
+# radiance's board, where Unsloth's UD-Q4_K_M (same size) scores 0.0082 and
+# UD-Q6_K (6.43 bpw) 0.0019. Needs radiance > 1.16.0.
+# Other sizes: https://huggingface.co/StillDeadcode/qwen3.8-27b-iqr-v4 (up to
+# IQ5R fits one 32 GB card with long context).
+https://huggingface.co/StillDeadcode/qwen3.8-27b-iqr-v4/resolve/e5f1b3ef70741d705a64a28b852acf3fcefcead7/qwen3.8-27b-iq4r-l-v4.rad qwen3.8-27b-iq4r-l-v4.rad d57d1428218e20a4cd578c3e286f30a2e566e589c832bf5004f49e164cb48ae4

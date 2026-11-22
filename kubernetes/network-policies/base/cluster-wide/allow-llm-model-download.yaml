@@ -13,6 +13,7 @@ spec:
         values:
           - llm
           - llm-strata
+          - llm-radiance
           - llm-sd-server
   egress:
     - toEntities:

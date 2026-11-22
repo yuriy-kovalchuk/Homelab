@@ -5,7 +5,7 @@ metadata:
   namespace: llm-strata
 spec:
   # Parked at 0 like the other R9700 Deployments (the apps Kustomization ignores
-  # /spec/replicas in the llm namespaces): scale llama-cpp / llama-cpp-rocm to 0, then this to 1.
+  # /spec/replicas in the llm namespaces): scale llama-cpp / radiance to 0, then this to 1.
   replicas: 0
   selector:
     matchLabels:

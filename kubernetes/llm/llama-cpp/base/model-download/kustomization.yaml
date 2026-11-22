@@ -15,4 +15,4 @@ patches:
     patch: |-
       - op: replace
         path: /spec/template/spec/volumes/0/persistentVolumeClaim/claimName
-        value: llama-cpp-models
+        value: llama-cpp-models-iscsi

@@ -1,7 +1,7 @@
 # Qwen3.6-35B-A3B-GSQ-hybrid-MTP.gguf: the GSQ-hybrid file with Unsloth's MTP draft
-# block appended (merge_mtp.py), so llama.cpp can run --spec-type draft-mtp and
-# strata-poly finds the block in the model's own file. Reads the two inputs on the
-# volume (the block comes from strata-cuda's draft-block Job), needs no network.
+# block appended (merge_mtp.py), so llama.cpp can run --spec-type draft-mtp. Reads
+# the two inputs on the volume (the block comes from the draft-block Job), needs no
+# network.
 # Idempotent: an output whose SHA-256 matches is kept.
 apiVersion: batch/v1
 kind: Job
@@ -11,7 +11,7 @@ metadata:
   annotations:
     kustomize.toolkit.fluxcd.io/force: enabled
 spec:
-  # retries until the draft block exists (strata-cuda-draft-cut)
+  # retries until the draft block exists (llama-cpp-cuda-draft-cut)
   backoffLimit: 10
   template:
     spec:
@@ -41,7 +41,7 @@ spec:
             # as pinned in model-download/models.txt
             - name: MODEL_SHA256
               value: 8e50912f5d0703401ca21b09deb2ee8a84d03536ade6fb44815fcb40a0b03596
-            # as pinned in strata-cuda/base/draft-block/job.yaml
+            # as pinned in draft-block/job.yaml
             - name: DRAFT_SHA256
               value: d4890d88e0f143951b5358dda9dd6f1d2727113f6de13faa5bfdbacaa51765b1
             # of the merged file (11.68 GiB, first written 2026-11-06)

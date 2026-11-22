@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: llama-cpp
-          image: ghcr.io/ggml-org/llama.cpp:server-vulkan-b12464
+          image: ghcr.io/ggml-org/llama.cpp:server-vulkan-b12627
           args:
             - --host
             - "0.0.0.0"
@@ -36,9 +36,6 @@ spec:
               mountPath: /models
             - name: config
               mountPath: /config
-              readOnly: true
-            - name: chat-templates
-              mountPath: /templates
               readOnly: true
           resources:
             requests:
@@ -66,10 +63,7 @@ spec:
       volumes:
         - name: models
           persistentVolumeClaim:
-            claimName: llama-cpp-models
+            claimName: llama-cpp-models-iscsi
         - name: config
           configMap:
             name: llama-cpp-models-preset
-        - name: chat-templates
-          configMap:
-            name: llama-cpp-chat-templates

@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: radiance-models
+  namespace: llm-radiance
+spec:
+  # TrueNAS, not longhorn-gpu: bahamut's Longhorn disk is fully scheduled
+  # (strata-data 300, forgejo-runner-talos 200, steamos 158, sd-server 50). The
+  # engine reads the container once at load (~19 GB, then all of it sits in
+  # VRAM), so the network hop only costs load time.
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: truenas-iscsi
+  resources:
+    requests:
+      # qwen3.8-27b-iq4r-l-v4.rad is 18.7 GB; room for one other size beside it
+      # (IQ5R 20.9 GB, IQ6R-S 23 GB) to compare before deleting the old one.
+      storage: 50Gi

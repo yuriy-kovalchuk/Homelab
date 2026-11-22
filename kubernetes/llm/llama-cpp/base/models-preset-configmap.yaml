@@ -13,54 +13,30 @@ data:
 
     ; --- Add a section per model file (name = filename without .gguf) ---
 
-    [Qwen3.8-27B-UD-Q6_K_XL]
-    c = 180224
-    cont-batching = true
-    parallel = 1
-    flash-attn = on
-    cache-type-k = q8_0
-    cache-type-v = q8_0
-    ; MTP head built into the model
-    spec-type = draft-mtp
-    ; n-max=2 avoids an unconfirmed upstream report of output drift at n-max=3 on MTP models
-    spec-draft-n-max = 2
-    spec-draft-p-min = 0.8
-    load-on-startup = false
-    stop-timeout = 60
-    temp = 1.0
-    top-p = 0.95
-    top-k = 20
-    min-p = 0.00
-    presence-penalty = 0.0
-
-    ; Qwen3.8-27B GSQ-RCO IQ3_S (ISTA-DASLab): 3.5 bpw, half the size of the
-    ; UD-Q6_K_XL above (12.1 GB with the MTP head). Learned rounding (GSQ) +
-    ; loss-optimised per-tensor formats (RCO). Their eval vs BF16: AIME25, LCB v6
-    ; identical, GPQA-D -0.5, perplexity +0.3% (wiki2) / +2.5-2.7% (c4, fineweb).
-    ; Half the bytes per token -> faster decode than Q6 on the same card, and the
-    ; native 262k context fits: ~12 GB weights + KV + compute well under 32 GB.
-    ; Same sampling as the Q6 (Qwen's thinking-mode defaults).
-    ; chat-template-file: ISTA ships the stock Qwen template, which rejects the
-    ; `developer` role and reasoning_effort "high"; Unsloth's fixed one keeps it
-    ; behaving exactly like the Q6 for every client.
-    [Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp]
+    ; Inkling-2-Mini UD-Q4_K_XL (Unsloth, mainline layout). 24 layers, only 4 of
+    ; them global attention (the rest a 1024-token sliding window); the middle 12
+    ; run 3x, so at most 8 global KV caches: ~4.3 GiB of q8_0 KV at 262k context.
+    ; 16.4 GiB weights + 0.6 mmproj + KV + compute fit the R9700's 32 GB. The
+    ; native 1M context would need ~17 GiB of KV and does not fit.
+    ; Not UD-Q8_K_XL: it keeps the trunk in BF16 with NVFP4 experts, which
+    ; b12627's Vulkan backend runs slowly (17 tok/s decode, 2026-11-22); this
+    ; file is K-quants, which have tuned (RDNA4) Vulkan kernels.
+    ; Sampling: the model card's (temp 1.0, no truncation). Its embedded chat
+    ; template takes reasoning_effort (none..max or 0.0-0.99, default 0.9) and
+    ; rejects the `developer` role. No speculative decoding: its DSpark drafter
+    ; is not in mainline llama.cpp (#32218), and it has no MTP head.
+    [Inkling-2-Mini-UD-Q4_K_XL]
     c = 262144
     cont-batching = true
     parallel = 1
     flash-attn = on
     cache-type-k = q8_0
     cache-type-v = q8_0
-    chat-template-file = /templates/qwen3.8-27b-unsloth.jinja
-    ; image input: the base model's BF16 vision encoder (~1 GB more VRAM)
-    mmproj = /models/mmproj-Qwen3.8-27B-BF16.gguf
-    ; MTP head shipped in the -mtp file
-    spec-type = draft-mtp
-    spec-draft-n-max = 2
-    spec-draft-p-min = 0.8
+    mmproj = /models/mmproj-Inkling-2-Mini-F16.gguf
     load-on-startup = false
     stop-timeout = 60
     temp = 1.0
-    top-p = 0.95
-    top-k = 20
+    top-p = 1.0
+    top-k = 0
     min-p = 0.00
     presence-penalty = 0.0

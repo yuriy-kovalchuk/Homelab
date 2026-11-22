@@ -1,8 +1,8 @@
 apiVersion: resource.k8s.io/v1
 kind: ResourceClaimTemplate
 metadata:
-  name: llama-cpp-rocm-r9700
-  namespace: llm
+  name: radiance-r9700
+  namespace: llm-radiance
 spec:
   spec:
     devices:
@@ -14,7 +14,7 @@ spec:
             count: 1
             selectors:
               - cel:
-                  # Same physical card as llama-cpp's claim (R9700, 0x7551).
-                  # Two separate claims for one device means exactly one of the
-                  # two Deployments can hold it; the other stays Pending.
+                  # The R9700 (0x7551), shared with strata and llama-cpp:
+                  # only one of them holds it, the others stay
+                  # Pending until it is scaled to 0.
                   expression: 'device.attributes["gpu.amd.com"].deviceID == "0x7551"'

@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: radiance
+  namespace: llm-radiance
+spec:
+  # Parked at 0 like the other R9700 Deployments (the llm Kustomization ignores
+  # /spec/replicas in llm-radiance): scale strata / llama-cpp to 0, then
+  # this to 1.
+  replicas: 0
+  selector:
+    matchLabels:
+      app: radiance
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: radiance
+    spec:
+      # SIGTERM: the server finishes the step in flight and releases the card.
+      terminationGracePeriodSeconds: 60
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: radiance
+          # radiance 2.2.0 (codeberg.org/StillDeadcode/radiance v2.2.0), the
+          # upstream image: kernels for gfx1201, ROCm 10.1 user space.
+          image: docker.io/stilldeadcode/radiance:2.2.0@sha256:a70008971617b615ab01cca61d856003160b52c1d73866b0b88420af634cefa2
+          args:
+            - --config
+            - /etc/radiance/radiance.yaml
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - name: models
+              mountPath: /models
+              readOnly: true
+            - name: config
+              mountPath: /etc/radiance
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              cpu: "2"
+              # Host side: the container's page cache while it loads, the
+              # pinned snapshot store (checkpoint-slots, capped at an eighth of
+              # host memory) and staging. The weights and KV live in VRAM.
+              memory: 12Gi
+            limits:
+              cpu: "8"
+              # radiance caps its pinned host memory at 75% of this limit.
+              memory: 24Gi
+          # Loading reads ~19 GB from the volume and builds the plan; the 27B
+          # took 13.5 s from local disk upstream, minutes over iSCSI.
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            periodSeconds: 10
+            failureThreshold: 90
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            periodSeconds: 10
+            failureThreshold: 6
+          # /health turns 503 "stuck" once the card has advanced nothing for a
+          # minute; the server also exits on its own after 60 s stuck.
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            periodSeconds: 30
+            failureThreshold: 5
+      volumes:
+        - name: models
+          persistentVolumeClaim:
+            claimName: radiance-models
+        - name: config
+          configMap:
+            name: radiance-config
+        - name: tmp
+          emptyDir:
+            sizeLimit: 1Gi

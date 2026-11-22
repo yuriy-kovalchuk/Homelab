@@ -17,7 +17,7 @@ spec:
       # Claims the 780M iGPU (0x1900), which pins the pod to bahamut and leaves
       # the R9700 to the chat models, so images and chat run at the same time.
       # Much slower than the R9700: for fast images, switch to sd-server-r9700
-      # (0x7551, exclusive with strata / llama-cpp / llama-cpp-rocm) and lower
+      # (0x7551, exclusive with strata / radiance / llama-cpp) and lower
       # the memory in base/deployment.yaml back to 4Gi / 24Gi.
       resourceClaims:
         - name: gpu

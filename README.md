@@ -71,7 +71,7 @@ Homelab/
 │   ├── observability/        Loki, Mimir, Tempo, Alloy, Grafana, Alertmanager, talos-monitoring
 │   │   └── alerting-rules/   PrometheusRules
 │   ├── apps/                 User-facing apps
-│   ├── llm/                  llama.cpp, Strata, stable-diffusion, Open WebUI (its own llm layer)
+│   ├── llm/                  llama.cpp, Strata, radiance, stable-diffusion, Open WebUI (its own llm layer)
 │   └── hypervisor/           What VMs need, workers only: Multus, Kube-OVN, KubeVirt, CDI
 │       ├── networks/         VM networks, Azure-style: per VNet a Kube-OVN Vpc + Subnets + NADs
 │       └── vms/              KubeVirt VMs, one Flux Kustomization each (prune off)
@@ -124,7 +124,7 @@ Why it is split this way:
   wait for health, and only VM layers depend on it, so a powered-off worker
   never blocks `platform-infra` or anything that is not a VM.
 - The `llm` Kustomization ignores `/spec/replicas` for Deployments in the
-  `llm`, `llm-strata` and `llm-sd-server` namespaces, so GPU workloads can be
+  `llm`, `llm-strata`, `llm-radiance` and `llm-sd-server` namespaces, so GPU workloads can be
   parked at 0 with `kubectl scale`.
   It prunes (removing a model server from Git deletes it and its volumes);
   `apps` does not.
@@ -213,12 +213,12 @@ ingesters are spread one per node; Loki's are not yet. Tempo runs as one pod
 
 | App | Purpose |
 |-----|---------|
-| llama-cpp, llama-cpp-rocm | llama.cpp servers on the R9700 (Vulkan, ROCm) |
+| llama-cpp | llama.cpp server on the R9700 (Vulkan) |
 | llama-cpp-cuda | llama.cpp (CUDA 12) on the GTX 1070 (yojimbo): Gemma 4, Qwen3.6-35B-A3B |
 | strata | Expert-caching inference engine on the R9700 |
-| strata-cuda | Strata's strata-poly engine (UnbiasedStrata, CUDA 12) on the GTX 1070 (yojimbo); parked, takes turns with llama-cpp-cuda |
+| radiance | radiance (HIP) on the R9700: Qwen3.8-27B IQR-V4 with the DFlash2 drafter (parked at 0 by default) |
 | sd-server | stable-diffusion.cpp on the 780M, beside the chat models (parked at 0 by default) |
-| open-webui | Chat UI for the llama.cpp servers |
+| open-webui | Chat UI for the llama.cpp, Strata and radiance servers |
 
 Only one R9700 workload can run at a time: GPU claims are exclusive.
 

@@ -21,7 +21,7 @@ Steam Remote Play).
 Flux manages the definition (`vm-steamos` in `clusters/workload-prd/flux-system/vms.yaml`,
 `prune: false`); `virtctl` starts and stops it (`runStrategy: Manual`).
 
-The VM and the R9700 LLM workloads (strata, llama-cpp, llama-cpp-rocm) never run at the same
+The VM and the R9700 LLM workloads (strata, radiance, llama-cpp) never run at the same
 time: the card is exclusive, and strata's 52 GiB memory request leaves no room for the VM anyway.
 
 ## Start / stop

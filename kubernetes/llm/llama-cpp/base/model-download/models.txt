@@ -1,11 +1,13 @@
-# <url> <path under llama-cpp-models> [<sha256>]
+# <url> <path under llama-cpp-models-iscsi> [<sha256>]
 #
 # The router lists every *.gguf in /models as a model (section name in
 # models-preset-configmap.yaml = file name without .gguf); a split GGUF goes in
 # its own folder (<name>/<name>-0000N-of-0000M.gguf) so it loads as one model.
-https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/resolve/main/Qwen3.8-27B-UD-Q6_K_XL.gguf Qwen3.8-27B-UD-Q6_K_XL.gguf
-# ISTA-DASLab GSQ-RCO IQ3_S (3.5 bpw, "task-lossless") with the MTP head, ~12.1 GB
-https://huggingface.co/ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF/resolve/main/Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp.gguf Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp.gguf
-# its vision encoder (BF16, ~0.93 GB). The router never lists mmproj* files as
-# models; the IQ3_S preset attaches it with `mmproj =`.
-https://huggingface.co/ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF/resolve/main/mmproj-Qwen3.8-27B-BF16.gguf mmproj-Qwen3.8-27B-BF16.gguf
+# Inkling-2-Mini (Thinking Machines; 26.2B MoE, 3.4B active, middle 12 layers looped 3x),
+# Unsloth UD-Q4_K_XL (~17.6 GB; UD-Q8_K_XL is BF16 + NVFP4, slow on Vulkan). The Mainline_Support file, not
+# the root one: the root files use Unsloth's own looped layout and only load in their
+# llama.cpp fork. Mainline needs ggml-org/llama.cpp#32704 (merged 2026-11-21, after
+# b12608); an older build loads it but outputs gibberish. Pinned revision + LFS SHA-256.
+https://huggingface.co/unsloth/Inkling-2-Mini-GGUF/resolve/ae9327c5fbc7333116ba32eee78bb5d2bbefae4f/Mainline_Support/Inkling-2-Mini-UD-Q4_K_XL.gguf_file Inkling-2-Mini-UD-Q4_K_XL.gguf e64276656f072e9b2197a61723667cbdb71da66a716ffd966e572c21088f3cd3
+# its vision encoder (F16, ~0.64 GB), saved under a per-model name (the preset's `mmproj =`)
+https://huggingface.co/unsloth/Inkling-2-Mini-GGUF/resolve/ae9327c5fbc7333116ba32eee78bb5d2bbefae4f/mmproj-F16.gguf mmproj-Inkling-2-Mini-F16.gguf 3bff75ffeb2d6e0371ba7bd42e30d26a7d98aea681fa44b03b5a20891cfa2c5f

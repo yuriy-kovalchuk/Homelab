@@ -1,7 +1,7 @@
 """Qwen3.6-35B-A3B's MTP draft block, cut out of Unsloth's GGUF with HTTP range requests.
 
-strata-cuda serves the GSQ-hybrid file, which has no draft block. strata-poly takes the block from
-another file of the same model (--draft-model): blk.<n>.* with blk.<n>.nextn.eh_proj.weight, plus
+llama-cpp-cuda serves the GSQ-hybrid file, which has no draft block. The mtp-merge Job appends the
+block from another file of the same model: blk.<n>.* with blk.<n>.nextn.eh_proj.weight, plus
 general.architecture; everything else comes from the main file. The block is ~310 MiB of a 12.6 GB
 file, so only the GGUF's tensor directory and the block's own bytes are read.
 
@@ -23,7 +23,7 @@ URL = ("https://huggingface.co/unsloth/Qwen3.6-35B-A3B-MTP-GGUF/resolve/%s/Qwen3
 SHA256 = os.environ.get("DRAFT_SHA256", "")   # of the file this writes; empty = print it, don't check
 ALIGN = 32
 NUMBER = {0: "B", 1: "b", 2: "H", 3: "h", 4: "I", 5: "i", 6: "f", 7: "?", 10: "Q", 11: "q", 12: "d"}
-UA = {"User-Agent": "homelab-strata-cuda-draft-cut"}
+UA = {"User-Agent": "homelab-llama-cpp-cuda-draft-cut"}
 
 
 def get(start, end):

@@ -5,8 +5,8 @@
 #   gpu-mode.sh vfio     card + HDMI audio + USB controller -> vfio-pci (KubeVirt
 #                        amd.com/r9700, amd.com/r9700-audio, amd.com/bahamut-xhci,
 #                        see hypervisor/kubevirt/base/cr.yaml)
-#   gpu-mode.sh amdgpu   card -> amdgpu (DRA gpu.amd.com: strata, llama-cpp,
-#                        llama-cpp-rocm), audio -> unbound (its boot state),
+#   gpu-mode.sh amdgpu   card -> amdgpu (DRA gpu.amd.com: strata, radiance,
+#                        llama-cpp), audio -> unbound (its boot state),
 #                        USB controller -> xhci_hcd
 #   gpu-mode.sh status   which driver holds each function, who claims the card
 #
@@ -82,7 +82,7 @@ if [ "$mode" = vfio ]; then
   if [ -n "$claims" ]; then
     echo "R9700 still claimed through DRA: $(echo $claims)" >&2
     echo "scale its owners to 0 first, e.g. kubectl -n llm-strata scale deploy/strata --replicas=0" >&2
-    echo "(the R9700 Deployments: llm-strata/strata, llm/llama-cpp, llm/llama-cpp-rocm)" >&2
+    echo "(the R9700 Deployments: llm-strata/strata, llm-radiance/radiance, llm/llama-cpp)" >&2
     exit 1
   fi
 fi

@@ -310,21 +310,6 @@ spec:
           selector:
             matchLabels:
               kubernetes.io/metadata.name: "llm"
-    - name: https-llama-cpp-rocm
-      port: 443
-      protocol: HTTPS
-      hostname: "rocm.yuriykovalchuk.dev"
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: llama-cpp-rocm-gw-tls
-            kind: Secret
-      allowedRoutes:
-        namespaces:
-          from: Selector
-          selector:
-            matchLabels:
-              kubernetes.io/metadata.name: "llm"
     - name: https-strata
       port: 443
       protocol: HTTPS
@@ -340,21 +325,21 @@ spec:
           selector:
             matchLabels:
               kubernetes.io/metadata.name: "llm-strata"
-    - name: https-strata-cuda
+    - name: https-radiance
       port: 443
       protocol: HTTPS
-      hostname: "strata-cuda.yuriykovalchuk.dev"
+      hostname: "radiance.yuriykovalchuk.dev"
       tls:
         mode: Terminate
         certificateRefs:
-          - name: strata-cuda-gw-tls
+          - name: radiance-gw-tls
             kind: Secret
       allowedRoutes:
         namespaces:
           from: Selector
           selector:
             matchLabels:
-              kubernetes.io/metadata.name: "llm"
+              kubernetes.io/metadata.name: "llm-radiance"
     - name: https-sd
       port: 443
       protocol: HTTPS

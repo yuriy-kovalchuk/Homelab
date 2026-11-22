@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: radiance-config
+  namespace: llm-radiance
+data:
+  # The server's whole configuration (radiance takes no other options). Keys are
+  # documented in `radiance --help` and docs/GUIDE.md §4.11 of the release in use.
+  # One model in the file: it loads at startup and is never parked.
+  radiance.yaml: |
+    server:
+      host: "0.0.0.0"
+      port: 8080
+      # No API key, like strata: access is closed by the CiliumNetworkPolicy
+      # (gateway + open-webui only). Without a key the admin routes
+      # (/diagnostics, LoRA load, prefix-cache reset, session delete) still
+      # answer only loopback callers.
+      # The API is only called server-side (open-webui, CLI clients through the
+      # gateway): no browser page on another origin may read it.
+      no-cors: true
+    memory:
+      # radiance's own one-card setting for the R9700 (deploy/compose/tp1.radiance.yaml)
+      gpu-headroom-mib: 160
+    models:
+      # The model id requests name (`model`) and /v1/models lists.
+      qwen3.8-27b:
+        model: /models/qwen3.8-27b-iq4r-l-v4.rad
+        tp: 1
+        # The trained context (the release tested 200K). Weights ~18.7 GB +
+        # int8 KV; the cache gets what the card has left, at least one full
+        # context.
+        max-model-len: 262144
+        kv-cache-dtype: i8
+        # radiance's one-card row runs 8; 4 keeps the pinned host snapshot store
+        # (144 MiB a slot) small next to the other bahamut pods. Single user.
+        max-num-seqs: 4
+        # Qwen's thinking-mode defaults, as llama.cpp served this model before.
+        temp: 1.0
+        top-p: 0.95
+        top-k: 20
+        min-p: 0.0
+        presence-penalty: 0.0
+        # Qwen3.8's template takes xhigh|medium|low; clients send OpenAI's
+        # `high` (the reason llama.cpp needed Unsloth's template). The
+        # `developer` role is accepted by the server itself.
+        reasoning-effort-map: {high: xhigh}

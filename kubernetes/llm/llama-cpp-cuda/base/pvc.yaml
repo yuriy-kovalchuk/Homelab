@@ -4,8 +4,8 @@ metadata:
   name: llama-cpp-cuda-models
   namespace: llm
 spec:
-  # 1 replica, strict-local on yojimbo: the shared llama-cpp-models volume has
-  # its only replica on bahamut, which is often off.
+  # 1 replica, strict-local on yojimbo: a model volume elsewhere would sit on a
+  # node that is not up whenever yojimbo is (bahamut is often off).
   accessModes:
     - ReadWriteOnce
   storageClassName: longhorn-nvidia

@@ -1,5 +1,5 @@
 # Qwen3.6-35B-A3B's MTP draft block (~308 MiB) onto llama-cpp-cuda-models, for
-# strata-cuda's --draft-model. The GSQ-hybrid file has no block; this cuts it out
+# the mtp-merge Job. The GSQ-hybrid file has no block; this cuts it out
 # of Unsloth's UD-Q2_K_XL with range requests (cut_draft.py) instead of
 # downloading 12.6 GB. Idempotent: a file whose SHA-256 matches is kept.
 #
@@ -7,7 +7,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: strata-cuda-draft-cut
+  name: llama-cpp-cuda-draft-cut
   namespace: llm
   annotations:
     # immutable: a changed script (new ConfigMap hash) needs a recreate
@@ -23,7 +23,7 @@ spec:
     spec:
       restartPolicy: OnFailure
       # llama-cpp-cuda-models is strict-local on yojimbo; RWO is per node, so this
-      # mounts it while strata-cuda (or llama-cpp-cuda) has it too.
+      # mounts it while llama-cpp-cuda has it too.
       nodeSelector:
         kubernetes.io/hostname: yojimbo
       tolerations:
@@ -74,4 +74,4 @@ spec:
             claimName: llama-cpp-cuda-models
         - name: scripts
           configMap:
-            name: strata-cuda-draft-cut
+            name: llama-cpp-cuda-draft-cut

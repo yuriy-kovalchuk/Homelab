@@ -14,7 +14,7 @@ spec:
     name: homelab
   path: ./kubernetes/llm/overlays/workload-prd
   # Unlike apps, removing a model server from Git deletes it, its PVCs included:
-  # the model volumes (llama-cpp-models, strata-data, ...) hold only downloads.
+  # the model volumes (llama-cpp-models-iscsi, strata-data, ...) hold only downloads.
   # open-webui's PVC holds chats: never rename or remove it without a backup.
   prune: true
   wait: false
@@ -41,6 +41,11 @@ spec:
       target:
         kind: Deployment
         namespace: llm-sd-server
+    - paths:
+        - /spec/replicas
+      target:
+        kind: Deployment
+        namespace: llm-radiance
     # Strata's model choice (FAMILY, MODEL) is switched live with `kubectl set env`
     # (kubernetes/llm/strata/README.md): env[1] is MODEL, env[3] is FAMILY.
     - paths:

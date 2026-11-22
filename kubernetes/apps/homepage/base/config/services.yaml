@@ -19,6 +19,13 @@
         namespace: llm-strata
         app: strata
         podSelector: app=strata
+    - Radiance:
+        icon: mdi-white-balance-sunny
+        href: https://radiance.yuriykovalchuk.dev
+        description: Qwen3.8-27B IQR-V4 — R9700
+        namespace: llm-radiance
+        app: radiance
+        podSelector: app=radiance
     - Image generation:
         icon: mdi-palette
         href: https://sd.yuriykovalchuk.dev
@@ -33,13 +40,6 @@
         namespace: llm
         app: llama-cpp
         podSelector: app=llama-cpp
-    - llama.cpp ROCm:
-        icon: mdi-robot-outline
-        href: https://rocm.yuriykovalchuk.dev
-        description: llama-server — R9700
-        namespace: llm
-        app: llama-cpp-rocm
-        podSelector: app=llama-cpp-rocm
 
 - Apps:
     - Immich:

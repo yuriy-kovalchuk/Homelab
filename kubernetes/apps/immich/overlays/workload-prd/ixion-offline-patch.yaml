@@ -4,7 +4,7 @@
 # immich-server and immich-machine-learning stay Pending. This patch drops the
 # claim (both pods run on CPU: no VAAPI transcoding, CPU inference) and lets
 # them run on yojimbo as well as ixion. yojimbo's GTX 1070 is not claimed; it
-# stays with llama-cpp-cuda / strata-cuda.
+# stays with llama-cpp-cuda.
 #
 # Revert when ixion is back: remove this patch from kustomization.yaml (the
 # GPU patches above it stay as they are) and delete this file.

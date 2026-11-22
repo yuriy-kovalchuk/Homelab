@@ -1,7 +1,7 @@
 # R9700 passthrough to KubeVirt VMs (bahamut)
 
 bahamut's Radeon AI PRO R9700 belongs either to containers (DRA `gpu.amd.com`: strata,
-llama-cpp, llama-cpp-rocm) or to one KubeVirt VM, switched at runtime with
+radiance, llama-cpp) or to one KubeVirt VM, switched at runtime with
 [`gpu-mode.sh`](gpu-mode.sh). Same approach as the GTX 1070 on yojimbo
 ([`vms/ubuntu-test`](../../vms/ubuntu-test/README.md)). bahamut boots with the card on
 `amdgpu`; its Omni patch only loads `vfio_pci` and `vfio_iommu_type1` (`machine.kernel.modules`,
@@ -21,7 +21,7 @@ The PCIe switch ports above the card (`01:00.0`, `02:00.0`, `1002:1478/1479`) st
 
 | Mode | Driver | Offered as | Used by |
 |---|---|---|---|
-| `amdgpu` (boot default) | `amdgpu` | DRA `gpu.amd.com`, deviceID `0x7551` | strata, llama-cpp, llama-cpp-rocm |
+| `amdgpu` (boot default) | `amdgpu` | DRA `gpu.amd.com`, deviceID `0x7551` | strata, radiance, llama-cpp |
 | `vfio` | `vfio-pci` | KubeVirt `amd.com/r9700` + `amd.com/r9700-audio` + `amd.com/bahamut-xhci` (`permittedHostDevices` in `hypervisor/kubevirt/base/cr.yaml`) | one VM at a time |
 
 ```bash

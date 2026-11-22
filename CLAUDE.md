@@ -65,7 +65,8 @@ One broken CEL expression denies every workload that shares those policyRefs; gu
 - Claims are exclusive cluster-wide. Two pods share a card only through one named `ResourceClaim` (Immich does this). Only one R9700 workload runs at a time.
 - GPU Deployments must use `strategy: Recreate` and tolerate `workload=gpu:NoSchedule`; the claim itself pins the node.
 - Immich spoofs gfx1035 with `HSA_OVERRIDE_GFX_VERSION=10.3.0`; change it if the claim moves to another card.
-- llama.cpp runs in router mode: models from the models PVC, per-model settings in `kubernetes/llm/llama-cpp/base/models-preset-configmap.yaml`, downloads in its `model-download/models.txt`. Every engine downloads through the one Job in `kubernetes/llm/model-download/base` (one instance per volume, list format `<url> <path> [sha256]`, egress in `cluster-wide/allow-llm-model-download.yaml`); the engines themselves have no egress. Replicas in `llm` and the `llm-*` namespaces (strata, sd-server live in `llm-strata` / `llm-sd-server`) are ignored by Flux, so `kubectl scale` sticks.
+- llama.cpp runs in router mode: models from the models PVC, per-model settings in `kubernetes/llm/llama-cpp/base/models-preset-configmap.yaml`, downloads in its `model-download/models.txt`. Every engine downloads through the one Job in `kubernetes/llm/model-download/base` (one instance per volume, list format `<url> <path> [sha256]`, egress in `cluster-wide/allow-llm-model-download.yaml`); the engines themselves have no egress. Replicas in `llm` and the `llm-*` namespaces (strata, radiance, sd-server live in `llm-strata` / `llm-radiance` / `llm-sd-server`; a new `llm-*` namespace needs its own ignore rule in `clusters/workload-prd/flux-system/llm.yaml`) are ignored by Flux, so `kubectl scale` sticks.
+- The Qwen3.8-27B is served by radiance (`kubernetes/llm/radiance`), not llama.cpp. Its whole config is one YAML file in a ConfigMap; radiance takes no CLI flags. The image is pinned by version: a `.rad` container needs the release it was made for, and keys change between releases (`radiance --config … --check` validates a file). It runs as uid 1000 in a `restricted` namespace; keep it that way.
 - Strata's model (`FAMILY`/`MODEL` env) is switched live with `kubectl set env`, never in Git: Flux ignores those two values by env index ([kubernetes/llm/strata/README.md](kubernetes/llm/strata/README.md)); keep the env order.
 
 ## Storage
@@ -74,6 +75,7 @@ One broken CEL expression denies every workload that shares those policyRefs; gu
 - `longhorn-1r` is single-replica: when its one replica times out the volume faults, ext4 goes read-only, and the pod stays Running on a dead mount until it is **deleted** (a container restart reuses the bad mount). Longhorn's auto-remount needs the `longhorn-global-manager` lease; check `kubectl -n longhorn-system get lease longhorn-global-manager` exists.
 - Stale Longhorn node CRs (after a rename/removal) can only be deleted after `spec.allowScheduling: false` on the node; disk edits are refused once the Kubernetes node is gone.
 - A re-created Longhorn disk defaults to 30% reserved; workers use 10 GiB.
+- bahamut's `gpu` disk is fully scheduled (908 of 919 GiB on 2026-11-22: strata-data, forgejo-runner-talos, steamos, sd-server), so a new `longhorn-gpu` volume will not schedule. Volumes only read at load (radiance's models) go to `truenas-iscsi`.
 - TrueNAS must keep its static IP; democratic-csi and Vault break otherwise.
 
 ## Talos

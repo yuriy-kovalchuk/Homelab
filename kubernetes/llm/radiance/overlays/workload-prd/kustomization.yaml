@@ -7,5 +7,5 @@ patches:
   - path: gpu-patch.yaml
     target:
       kind: Deployment
-      name: strata-cuda
-      namespace: llm
+      name: radiance
+      namespace: llm-radiance

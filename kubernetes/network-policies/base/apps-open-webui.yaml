@@ -27,23 +27,7 @@ spec:
     - toEndpoints:
         - matchLabels:
             io.kubernetes.pod.namespace: llm
-            app: llama-cpp-rocm
-      toPorts:
-        - ports:
-            - port: "8080"
-              protocol: TCP
-    - toEndpoints:
-        - matchLabels:
-            io.kubernetes.pod.namespace: llm
             app: llama-cpp-cuda
-      toPorts:
-        - ports:
-            - port: "8080"
-              protocol: TCP
-    - toEndpoints:
-        - matchLabels:
-            io.kubernetes.pod.namespace: llm
-            app: strata-cuda
       toPorts:
         - ports:
             - port: "8080"
@@ -52,6 +36,14 @@ spec:
         - matchLabels:
             io.kubernetes.pod.namespace: llm-strata
             app: strata
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: llm-radiance
+            app: radiance
       toPorts:
         - ports:
             - port: "8080"

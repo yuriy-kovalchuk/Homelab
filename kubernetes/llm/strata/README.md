@@ -32,8 +32,8 @@ Changing the env restarts the pod (strategy `Recreate`). If Strata is parked:
 kubectl -n llm-strata scale deploy/strata --replicas=1
 ```
 
-The R9700 is exclusive: scale `llama-cpp` and `llama-cpp-rocm` (namespace `llm`)
-to 0 first, or the strata pod stays Pending. sd-server (780M) can't run beside
+The R9700 is exclusive: scale `llama-cpp` (namespace `llm`)
+and `radiance` (namespace `llm-radiance`) to 0 first, or the strata pod stays Pending. sd-server (780M) can't run beside
 it either: Strata's 52Gi memory request leaves no room for sd-server's 20Gi.
 
 ## Check

@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: radiance
+  namespace: llm-radiance
+spec:
+  template:
+    spec:
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
+      # Claims the R9700 (0x7551), which pins the pod to bahamut.
+      resourceClaims:
+        - name: gpu
+          resourceClaimTemplateName: radiance-r9700
+      containers:
+        - name: radiance
+          # No privileged/hostPath/extra groups: the DRA driver injects /dev/kfd
+          # and the card's render node via CDI, both mode 0666, so uid 1000
+          # opens them. No IPC_LOCK: memlock only matters for Flash-Next's
+          # n-gram table on the host backend; card-pinned memory is not counted.
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            claims:
+              - name: gpu

@@ -198,7 +198,7 @@ devices:
     interfaces:
       - { name: enp4s0, type: 2.5gbase-t, description: Realtek RTL8125, mac: "38:05:25:32:8e:dc", ips: [10.0.4.12/24], primary: true }
     inventory:
-      - { name: Radeon AI PRO R9700, manufacturer: AMD, part_id: "0x7551", description: "Navi 48 gfx1201 on OCuLink — llama-cpp, strata, or a KubeVirt VM via vfio (gpu-mode.sh)" }
+      - { name: Radeon AI PRO R9700, manufacturer: AMD, part_id: "0x7551", description: "Navi 48 gfx1201 on OCuLink — llama-cpp, strata, radiance, or a KubeVirt VM via vfio (gpu-mode.sh)" }
       - { name: Radeon 780M, manufacturer: AMD, part_id: "0x1900", description: "iGPU, HawkPoint gfx1103 — sd-server" }
 
   - name: yojimbo
@@ -211,7 +211,7 @@ devices:
     interfaces:
       - { name: enp4s0, type: 1000base-t, description: Realtek RTL8111/8168, mac: "10:05:01:43:06:f7", ips: [10.0.4.13/24], primary: true }
     inventory:
-      - { name: GeForce GTX 1070, manufacturer: NVIDIA, part_id: "0x1b81", description: "Pascal GP104 — llama-cpp-cuda or strata-cuda (NVIDIA DRA); VMs via VFIO planned" }
+      - { name: GeForce GTX 1070, manufacturer: NVIDIA, part_id: "0x1b81", description: "Pascal GP104 — llama-cpp-cuda (NVIDIA DRA); VMs via VFIO planned" }
 
 cables:
   - [gateway/nic0, isp-router/lan]

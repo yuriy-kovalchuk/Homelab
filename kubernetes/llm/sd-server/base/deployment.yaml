@@ -5,7 +5,7 @@ metadata:
   namespace: llm-sd-server
 spec:
   # Starts parked at 0 (the llm Kustomization ignores /spec/replicas, so
-  # `kubectl scale` sticks). On the 780M it runs beside llama-cpp / llama-cpp-rocm
+  # `kubectl scale` sticks). On the 780M it runs beside llama-cpp
   # on the R9700, but not beside strata (not enough RAM for both, see resources).
   replicas: 0
   selector:
