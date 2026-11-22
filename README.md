@@ -191,7 +191,7 @@ Chart versions as deployed.
 | k8s-monitoring (Alloy) | 4.5.2 | Collectors for metrics, logs, traces |
 | Grafana | 10.5.15 | Dashboards |
 | Alertmanager | 2.5.1 | Alerts to Slack |
-| talos-monitoring | 0.1.0 | Talos node monitoring |
+| talos-monitoring | 0.2.0 | Talos node monitoring (direct os:admin talosconfig from Vault, for hwmon/GPU temperatures) |
 
 Mimir, Loki and Tempo store data in RustFS (S3 on TrueNAS). Mimir's
 ingesters are spread one per node; Loki's are not yet. Tempo runs as one pod

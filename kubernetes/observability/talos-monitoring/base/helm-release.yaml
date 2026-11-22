@@ -19,14 +19,42 @@ spec:
     remediation:
       retries: 3
       remediateLastFailure: true
+  # Omni refuses os:admin for in-cluster Talos API access (the talos.dev
+  # ServiceAccount the chart creates), and the file-based collectors (sensors →
+  # CPU/GPU/NVMe temperatures, GPU counters, PCI link speed) need the admin-only
+  # Read RPC. So the pod mounts the direct (non-Omni) os:admin talosconfig from
+  # Vault instead (secrets/base/observability-talos-monitoring.yaml) and the
+  # chart's talos.dev ServiceAccount is dropped. The chart (0.2.0) has no value
+  # for an existing Secret, hence the post-renderer.
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: Deployment
+              name: talos-monitoring
+            patch: |
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata:
+                name: talos-monitoring
+              spec:
+                template:
+                  spec:
+                    volumes:
+                      - name: talos-config
+                        secret:
+                          secretName: talos-monitoring-talosconfig
+          - target:
+              group: talos.dev
+              kind: ServiceAccount
+              name: talos-monitoring
+            patch: |
+              $patch: delete
+              apiVersion: talos.dev/v1alpha1
+              kind: ServiceAccount
+              metadata:
+                name: talos-monitoring
   values:
-    talos:
-      # Omni (which manages the Talos configs) refuses os:admin for in-cluster
-      # Talos API access, so the nodes only allow os:reader. Every COSI /
-      # machine-API collector works with it; the file-based ones (sensors,
-      # hwmon, DMI), which need the admin-only Read RPC, switch themselves off.
-      roles:
-        - os:reader
     serviceMonitor:
       enabled: true
     grafana:
