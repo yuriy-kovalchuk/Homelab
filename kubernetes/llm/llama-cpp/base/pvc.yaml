@@ -17,5 +17,7 @@ spec:
   resources:
     requests:
       # Inkling-2-Mini UD-Q4_K_XL + mmproj are 18.3 GB; room for a few more.
+      # kubernetes/llm/inkling (Strata) mounts this claim read-only and serves that
+      # same GGUF: keep its file name, or change MODEL_PATH there too.
       # The class allows expansion.
       storage: 100Gi

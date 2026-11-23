@@ -37,6 +37,7 @@ spec:
       - "http://strata.llm-strata.svc.cluster.local:8080/v1"
       - "http://radiance.llm-radiance.svc.cluster.local:8080/v1"
       - "http://llama-cpp-cuda.llm.svc.cluster.local:8080/v1"
+      - "http://inkling.llm.svc.cluster.local:8080/v1"
     ingress:
       enabled: false
 

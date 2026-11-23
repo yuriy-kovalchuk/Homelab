@@ -21,10 +21,6 @@ spec:
         - ports:
             - port: "8080"
               protocol: TCP
-  egress:
-    - toEntities:
-        - world
-      toPorts:
-        - ports:
-            - port: "443"
-              protocol: TCP
+  # No egress block: the engine never leaves the cluster (cluster-wide allow-dns
+  # already puts every pod in egress default-deny). Models come from the
+  # llama-cpp-model-download Job (cluster-wide/allow-llm-model-download.yaml).

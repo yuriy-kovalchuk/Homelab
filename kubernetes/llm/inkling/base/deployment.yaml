@@ -1,0 +1,127 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inkling
+  # In llm, not an llm-* namespace of its own: the model is the Unsloth GGUF on
+  # llama-cpp's volume, and a pod can only mount a claim of its own namespace.
+  namespace: llm
+spec:
+  # Parked like the other R9700 Deployments (Flux ignores /spec/replicas in llm):
+  # scale llama-cpp, strata and radiance to 0, then this to 1.
+  replicas: 0
+  selector:
+    matchLabels:
+      app: inkling
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: inkling
+    spec:
+      terminationGracePeriodSeconds: 120
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: inkling
+          # Upstream's official image for RDNA4 (gfx1200/gfx1201): Terminal 0.2.20 and
+          # the prebuilt engine packages 0.1.66-linux-x86_64-hip-rx9070, including the
+          # strata-inkling shape engine (/opt/strata/components/shapes/inkling2), so
+          # nothing is compiled or fetched at start. Runs as root (the image has no USER).
+          image: ghcr.io/niko1221/strata:0.2.20-rocm-gfx120x@sha256:e5cfeb2b71f3bfcae4300b21d6eea9c1564a9d823c3a115c9fdc38ba50c20f93
+          env:
+            # Strata's own SQ-20 pack (bit-exact to the original weights, 19.3 GB, every
+            # expert on the R9700), downloaded by llama-cpp-model-download into its own
+            # folder. Setup finds the picture reader (Inkling-2-Mini-Vision.strata) and
+            # tokenizer.json / chat_template.jinja beside it, so nothing is fetched.
+            # Not Unsloth's UD-Q4_K_XL GGUF: 20 of its 24 layers' experts are NVFP4,
+            # which has no HIP kernel and is re-quantized to S4_K at load (slower and a
+            # second rounding); only its 4 Q8_0 layers ran natively (512/3072 experts).
+            - name: FAMILY
+              value: inkling-2-mini
+            - name: MODEL_PATH
+              value: /models/inkling-2-mini/Inkling-2-Mini-SQ-20.strata
+            - name: CONTEXT
+              value: 128k
+            - name: VISION
+              value: "on"
+            # Exactness. fp16 KV is the engine's default, but it switches to FP8 by
+            # itself at 16 or more parallel requests: pin fp16 and keep PARALLEL
+            # below 16 (the entrypoint allows 1-8).
+            - name: KV
+              value: fp16
+            # One slot, so every turn of a conversation lands in the slot that holds it
+            # and the engine reuses the prompt read so far. With more slots Strata's
+            # pick_slot sends agent turns elsewhere and re-reads the whole prompt (36K
+            # tokens = ~60 s): it only recognizes a turn by Qwen's <|im_start|> token
+            # (server.py TURN_ID = 248045, not in Inkling's vocabulary), and the held
+            # stream never matches exactly because Strata drops the hidden thinking.
+            # Concurrent requests queue instead.
+            - name: PARALLEL
+              value: "1"
+            # DSpark drafting checks every guess against the model (rejection sampling,
+            # same answers). The SQ packs carry the drafter inside, so auto turns it on.
+            - name: DRAFTING
+              value: auto
+            # Tuning measures the card at first start and writes a preset: skip it, so
+            # every start is the same (and /data is an emptyDir).
+            - name: TUNE
+              value: skip
+            # No API key, like strata: "none" is Strata's word for "serve without one".
+            # The Host check then needs every name clients use.
+            - name: API_KEY
+              value: none
+            - name: STRATA_ALLOWED_HOSTS
+              value: inkling.yuriykovalchuk.dev,inkling,inkling.llm,inkling.llm.svc,inkling.llm.svc.cluster.local
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - name: models
+              mountPath: /models
+              readOnly: true
+            - name: data
+              mountPath: /data
+          resources:
+            requests:
+              cpu: "2"
+              # The 19.3 GB pack fits the R9700's 32 GB with the KV cache, so no expert
+              # lives in RAM: small enough to run beside sd-server's 20Gi on bahamut.
+              memory: 8Gi
+            limits:
+              cpu: "15"
+              memory: 32Gi
+          # The port opens once the plan is made, the tokenizer exported and the
+          # 19.3 GB read from TrueNAS over iSCSI.
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            periodSeconds: 15
+            failureThreshold: 120
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            periodSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            periodSeconds: 30
+            failureThreshold: 5
+      volumes:
+        # RWO, shared with llama-cpp: both pods land on bahamut (the R9700 claim pins
+        # them), and RWO allows several pods on one node. They never run together anyway.
+        - name: models
+          persistentVolumeClaim:
+            claimName: llama-cpp-models-iscsi
+            readOnly: true
+        # Strata's state (run config, tokenizer export, preset): rebuilt each start
+        # from the GGUF in about a minute, so nothing worth a Longhorn volume.
+        - name: data
+          emptyDir:
+            sizeLimit: 10Gi

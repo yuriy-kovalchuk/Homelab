@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inkling
+  namespace: llm
+spec:
+  template:
+    spec:
+      tolerations:
+        - key: workload
+          operator: Equal
+          value: gpu
+          effect: NoSchedule
+      # Claims the R9700 (0x7551), which pins the pod to bahamut.
+      resourceClaims:
+        - name: gpu
+          resourceClaimTemplateName: inkling-r9700
+      containers:
+        - name: inkling
+          # No privileged/hostPath: the DRA driver injects /dev/kfd and this card's
+          # render node via CDI.
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            claims:
+              - name: gpu

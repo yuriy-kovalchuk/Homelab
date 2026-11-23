@@ -11,3 +11,14 @@
 https://huggingface.co/unsloth/Inkling-2-Mini-GGUF/resolve/ae9327c5fbc7333116ba32eee78bb5d2bbefae4f/Mainline_Support/Inkling-2-Mini-UD-Q4_K_XL.gguf_file Inkling-2-Mini-UD-Q4_K_XL.gguf e64276656f072e9b2197a61723667cbdb71da66a716ffd966e572c21088f3cd3
 # its vision encoder (F16, ~0.64 GB), saved under a per-model name (the preset's `mmproj =`)
 https://huggingface.co/unsloth/Inkling-2-Mini-GGUF/resolve/ae9327c5fbc7333116ba32eee78bb5d2bbefae4f/mmproj-F16.gguf mmproj-Inkling-2-Mini-F16.gguf 3bff75ffeb2d6e0371ba7bd42e30d26a7d98aea681fa44b03b5a20891cfa2c5f
+
+# Inkling-2-Mini for Strata (kubernetes/llm/inkling, which mounts this volume read-only):
+# Strata's own SQ-20 pack, bit-exact to the original weights (19.3 GB, every expert fits
+# the R9700), its picture reader, and the tokenizer files that setup otherwise
+# fetches at start (the pod has no egress). In their own folder, which llama.cpp's
+# router ignores (no .gguf in it). Pinned revision; the SHA-256s are the ones Strata
+# 0.2.20 pins (terminal/strata_control/inkling_family.py), chat_template's measured.
+https://huggingface.co/strata-engine/Inkling-2-Mini-Strata/resolve/04996a1e2c45009b6a04f2af126cb6bdb2ba3587/Inkling-2-Mini-SQ-20.strata inkling-2-mini/Inkling-2-Mini-SQ-20.strata 0bbfd52344f0dd4779a7807b5f73554a812f24c035e6877b63cd0d499f7e1b97
+https://huggingface.co/strata-engine/Inkling-2-Mini-Strata/resolve/04996a1e2c45009b6a04f2af126cb6bdb2ba3587/Inkling-2-Mini-Vision.strata inkling-2-mini/Inkling-2-Mini-Vision.strata 6589eff47f9c20bc3a032faa3d449f10bf4f04a84cc6b2ee8a44d51d2b6fc677
+https://huggingface.co/strata-engine/Inkling-2-Mini-Strata/resolve/04996a1e2c45009b6a04f2af126cb6bdb2ba3587/tokenizer.json inkling-2-mini/tokenizer.json 7f332727f9a3f093dd452a39cc978e6757627e5dad1b0673aa4e75174f236dd6
+https://huggingface.co/strata-engine/Inkling-2-Mini-Strata/resolve/04996a1e2c45009b6a04f2af126cb6bdb2ba3587/chat_template.jinja inkling-2-mini/chat_template.jinja 53a9035f3255945704b5857657cfb00c1165090c0641c4f782a0cbf268cc16dc

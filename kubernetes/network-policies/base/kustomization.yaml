@@ -17,6 +17,7 @@ resources:
   - apps-whoami.yaml
   - apps-yk-portfolio.yaml
   - apps-yk-update-checker.yaml
+  - llm-inkling.yaml
   - llm-radiance.yaml
   - llm-sd-server.yaml
   - llm-strata.yaml

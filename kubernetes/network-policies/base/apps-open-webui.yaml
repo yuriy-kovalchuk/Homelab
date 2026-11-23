@@ -32,6 +32,15 @@ spec:
         - ports:
             - port: "8080"
               protocol: TCP
+    # Inkling-2-Mini on Strata (kubernetes/llm/inkling)
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: llm
+            app: inkling
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
     - toEndpoints:
         - matchLabels:
             io.kubernetes.pod.namespace: llm-strata

@@ -19,6 +19,13 @@
         namespace: llm-strata
         app: strata
         podSelector: app=strata
+    - Inkling:
+        icon: mdi-brain
+        href: https://inkling.yuriykovalchuk.dev
+        description: Inkling-2-Mini UD-Q4_K_XL (Strata) — R9700
+        namespace: llm
+        app: inkling
+        podSelector: app=inkling
     - Radiance:
         icon: mdi-white-balance-sunny
         href: https://radiance.yuriykovalchuk.dev
