@@ -25,11 +25,13 @@ spec:
           type: RuntimeDefault
       containers:
         - name: inkling
-          # Upstream's official image for RDNA4 (gfx1200/gfx1201): Terminal 0.2.20 and
-          # the prebuilt engine packages 0.1.66-linux-x86_64-hip-rx9070, including the
+          # Upstream's official image for RDNA4 (gfx1200/gfx1201): Terminal 0.2.21 and
+          # the prebuilt engine packages 0.1.67-linux-x86_64-hip-rx9070, including the
           # strata-inkling shape engine (/opt/strata/components/shapes/inkling2), so
           # nothing is compiled or fetched at start. Runs as root (the image has no USER).
-          image: ghcr.io/niko1221/strata:0.2.20-rocm-gfx120x@sha256:e5cfeb2b71f3bfcae4300b21d6eea9c1564a9d823c3a115c9fdc38ba50c20f93
+          # 0.2.21 is the first release where Inkling thinks: 0.2.20 forced
+          # reasoning_effort "none" in inkling_dialect.py and threw the thinking span away.
+          image: ghcr.io/niko1221/strata:0.2.21-rocm-gfx120x@sha256:441976b7ed5073d03e513f3c22a9cadd86b4cc55ad85c56094158e0b67b3e446
           env:
             # Strata's own SQ-20 pack (bit-exact to the original weights, 19.3 GB, every
             # expert on the R9700), downloaded by llama-cpp-model-download into its own
@@ -64,6 +66,15 @@ spec:
             # same answers). The SQ packs carry the drafter inside, so auto turns it on.
             - name: DRAFTING
               value: auto
+            # Thinking level of a request that names none (a request's own
+            # reasoning_effort still wins: none, minimal, low, medium, high, xhigh, max).
+            # Only the server process's environment sets it: the config's
+            # "reasoning_effort" and a run config's "env" are both ignored for Inkling
+            # in 0.2.21 (Niko1221/Strata#7035). "low" is upstream's default, pinned here.
+            # Known 0.2.21 bug: after the thinking-budget wrap-up the model can open a
+            # second, uncapped thinking turn and run to max_tokens (#7084, fix due 0.2.22).
+            - name: STRATA_INKLING_EFFORT
+              value: low
             # Tuning measures the card at first start and writes a preset: skip it, so
             # every start is the same (and /data is an emptyDir).
             - name: TUNE
