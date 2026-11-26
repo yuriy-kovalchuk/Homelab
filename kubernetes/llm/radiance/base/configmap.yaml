@@ -6,7 +6,12 @@ metadata:
 data:
   # The server's whole configuration (radiance takes no other options). Keys are
   # documented in `radiance --help` and docs/GUIDE.md §4.11 of the release in use.
-  # One model in the file: it loads at startup and is never parked.
+  # Two models, one card: Qwen (18.7 GB) and Inkling (14.4 GB) do not fit the
+  # R9700 together, so the one a request names comes on and the other parks
+  # (same priority: the least recently used gives way). A parked model keeps a
+  # RAM copy while the pod's memory allows it (see the Deployment's limit), so
+  # a swap is seconds; without one it reloads from iSCSI. Warm-up at start
+  # loads the later entry first, so Qwen ends up on the card.
   radiance.yaml: |
     server:
       host: "0.0.0.0"
@@ -21,6 +26,10 @@ data:
     memory:
       # radiance's own one-card setting for the R9700 (deploy/compose/tp1.radiance.yaml)
       gpu-headroom-mib: 160
+    scheduler:
+      # A request for the parked model waits for it (SSE keepalives meanwhile);
+      # a cold load reads its container over iSCSI, which takes minutes.
+      load-timeout: 600s
     models:
       # The model id requests name (`model`) and /v1/models lists.
       qwen3.8-27b:
@@ -44,3 +53,23 @@ data:
         # `high` (the reason llama.cpp needed Unsloth's template). The
         # `developer` role is accepted by the server itself.
         reasoning-effort-map: {high: xhigh}
+      # Inkling 2 Mini IQ4R-V4 + DFlash2 + vision (needs radiance >= 2.3.0).
+      # Replaces Strata's inkling Deployment in llm (kept parked as a fallback).
+      inkling-2-mini:
+        model: /models/inkling-2-mini-iq4r-v4.rad
+        tp: 1
+        # The container was converted with --max-ctx 200000 (the model's native
+        # context is 1M). Only the 8 full-attention applications keep a full KV;
+        # at int8 that is a few GiB, well inside what the card leaves.
+        max-model-len: 200000
+        kv-cache-dtype: i8
+        max-num-seqs: 4
+        # The model card's serving setup: DFlash2 drafts up to 7 tokens, each
+        # sequence verifies up to its first draft unlikely to be kept. Every draft
+        # is checked by the model (greedy text matches the undrafted run).
+        num-speculative-tokens: 7
+        draft-window: adaptive
+        # Sampling unset: it comes from the container (Inkling's card: temp 1.0,
+        # no truncation). Its template takes none..max natively, so no map;
+        # "low" when a request names none, as Strata's inkling was pinned.
+        reasoning-effort: low

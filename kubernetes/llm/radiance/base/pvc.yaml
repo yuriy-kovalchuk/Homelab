@@ -13,6 +13,6 @@ spec:
   storageClassName: truenas-iscsi
   resources:
     requests:
-      # qwen3.8-27b-iq4r-l-v4.rad is 18.7 GB; room for one other size beside it
-      # (IQ5R 20.9 GB, IQ6R-S 23 GB) to compare before deleting the old one.
+      # qwen3.8-27b-iq4r-l-v4.rad (18.7 GB) + inkling-2-mini-iq4r-v4.rad
+      # (15.5 GB) = 34.2 GB; about 15 GB left for a download in flight.
       storage: 50Gi

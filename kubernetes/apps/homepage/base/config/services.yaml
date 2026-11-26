@@ -29,7 +29,7 @@
     - Radiance:
         icon: mdi-white-balance-sunny
         href: https://radiance.yuriykovalchuk.dev
-        description: Qwen3.8-27B IQR-V4 — R9700
+        description: Qwen3.8-27B IQR-V4 + Inkling-2-Mini IQ4R-V4 — R9700
         namespace: llm-radiance
         app: radiance
         podSelector: app=radiance

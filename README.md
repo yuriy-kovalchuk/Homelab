@@ -216,7 +216,7 @@ ingesters are spread one per node; Loki's are not yet. Tempo runs as one pod
 | llama-cpp | llama.cpp server on the R9700 (Vulkan) |
 | llama-cpp-cuda | llama.cpp (CUDA 12) on the GTX 1070 (yojimbo): Gemma 4, Qwen3.6-35B-A3B |
 | strata | Expert-caching inference engine on the R9700 |
-| radiance | radiance (HIP) on the R9700: Qwen3.8-27B IQR-V4 with the DFlash2 drafter (parked at 0 by default) |
+| radiance | radiance (HIP) on the R9700: Qwen3.8-27B IQR-V4 and Inkling-2-Mini IQ4R-V4, each with its DFlash2 drafter, swapped on demand (parked at 0 by default) |
 | sd-server | stable-diffusion.cpp on the 780M, beside the chat models (parked at 0 by default) |
 | open-webui | Chat UI for the llama.cpp, Strata and radiance servers |
 

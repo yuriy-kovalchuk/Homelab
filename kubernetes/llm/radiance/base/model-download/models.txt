@@ -9,3 +9,10 @@
 # Other sizes: https://huggingface.co/StillDeadcode/qwen3.8-27b-iqr-v4 (up to
 # IQ5R fits one 32 GB card with long context).
 https://huggingface.co/StillDeadcode/qwen3.8-27b-iqr-v4/resolve/e5f1b3ef70741d705a64a28b852acf3fcefcead7/qwen3.8-27b-iq4r-l-v4.rad qwen3.8-27b-iq4r-l-v4.rad d57d1428218e20a4cd578c3e286f30a2e566e589c832bf5004f49e164cb48ae4
+
+# Inkling 2 Mini IQ4R-V4 + DFlash2 (Thinking Machines; 26.2B MoE, 3.4B active, middle 12
+# layers looped 3x): routed experts in IQR-V4's 4-bit trellis (GPTQ), attention, head and
+# embedding int8, incoai's DFlash2 drafter, vision tower; 14.43 GiB. KL 0.0066 against the
+# release's weights (top-1 97.6 %). The only Inkling form radiance 2.3.0 serves (DSpark,
+# NVFP4, int8 or IQ8R containers are refused by name). Needs radiance >= 2.3.0.
+https://huggingface.co/StillDeadcode/inkling-2-mini-iq4r-v4/resolve/e1eca628d2c9b855d82e0e402a0f1e2d1c54f49e/inkling-2-mini-iq4r-v4.rad inkling-2-mini-iq4r-v4.rad 1522e6d7e0432cd8308ba0478a969d678648d0245983d05e964caecb4b03dcc9

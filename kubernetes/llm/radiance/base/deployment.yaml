@@ -31,9 +31,11 @@ spec:
           type: RuntimeDefault
       containers:
         - name: radiance
-          # radiance 2.2.0 (codeberg.org/StillDeadcode/radiance v2.2.0), the
-          # upstream image: kernels for gfx1201, ROCm 10.1 user space.
-          image: docker.io/stilldeadcode/radiance:2.2.0@sha256:a70008971617b615ab01cca61d856003160b52c1d73866b0b88420af634cefa2
+          # radiance 2.3.0 (codeberg.org/StillDeadcode/radiance v2.3.0), the
+          # upstream image: kernels for gfx1201. 2.3.0 is the first release that
+          # serves Inkling 2 Mini, and only as the IQR-V4 + DFlash2 container
+          # (other Inkling containers are refused by name).
+          image: docker.io/stilldeadcode/radiance:2.3.0@sha256:7d18847e2ea028de3d9e6306191e05e113c7c5258e3f12026aa14fba91ff2cd7
           args:
             - --config
             - /etc/radiance/radiance.yaml
@@ -55,14 +57,22 @@ spec:
               cpu: "2"
               # Host side: the container's page cache while it loads, the
               # pinned snapshot store (checkpoint-slots, capped at an eighth of
-              # host memory) and staging. The weights and KV live in VRAM.
-              memory: 12Gi
+              # host memory), staging, and the parked model's RAM copy (Qwen
+              # 18.7 GB or Inkling 14.4 GB: the two do not fit the card together,
+              # so the one not in use parks). Pinned memory is not reclaimable,
+              # so the request covers it; sd-server's 20Gi still fits beside it
+              # on bahamut's 64 GB.
+              memory: 24Gi
             limits:
               cpu: "8"
-              # radiance caps its pinned host memory at 75% of this limit.
-              memory: 24Gi
-          # Loading reads ~19 GB from the volume and builds the plan; the 27B
-          # took 13.5 s from local disk upstream, minutes over iSCSI.
+              # radiance caps its pinned host memory (parked copies included) at
+              # 75% of this limit, 30 GiB, and keeps 8 GiB of it free. Without
+              # room for a RAM copy a swap reloads the container over iSCSI
+              # (minutes) instead of restoring from RAM (seconds).
+              memory: 40Gi
+          # Loading reads ~19 GB (Qwen) / ~15 GB (Inkling) from the volume and
+          # builds the plan; the 27B took 13.5 s from local disk upstream,
+          # minutes over iSCSI.
           startupProbe:
             httpGet:
               path: /health
