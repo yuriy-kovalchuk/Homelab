@@ -7,7 +7,7 @@ spec:
   interval: 12h
   url: oci://ghcr.io/netbox-community/netbox-chart/netbox
   ref:
-    tag: "8.3.109"
+    tag: "8.4.0"
   # Since 8.3.101 the provenance layer comes first; without a selector Flux
   # extracts that one and fails with "gzip: invalid header".
   layerSelector:
